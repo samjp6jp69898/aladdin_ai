@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>回測累積成功率趨勢</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+    .chart-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .stats-summary {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 24px auto;
+      max-width: 1100px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 16px 28px;
+      text-align: center;
+      min-width: 140px;
+    }
+    .stat-card .label { font-size: 0.82rem; color: #888; margin-bottom: 6px; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; }
+    .total-rate { color: #3b82f6; }
+    .full-rate  { color: #22c55e; }
+    .partial-rate { color: #f97316; }
+    .wrong-rate { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<h1>回測累積成功率趨勢</h1>
+<p class="subtitle">共 44 筆完成 · 按完成時間排序 · 2026-04-03 產生</p>
+
+<div class="stats-summary">
+  <div class="stat-card">
+    <div class="label">總成功率（最終）</div>
+    <div class="value total-rate">77.3%</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">完全成功率（最終）</div>
+    <div class="value full-rate">54.5%</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">部分成功率（最終）</div>
+    <div class="value partial-rate">22.7%</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">分析錯誤率（最終）</div>
+    <div class="value wrong-rate">18.2%</div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <canvas id="trendChart" height="400"></canvas>
+</div>
+
+<script>
+// 按完成時間升序排列的 44 筆 done 資料
+// 格式: [ticketId, conclusion]
+// conclusion: 'correct' | 'partial' | 'wrong' | 'unable'
+const tickets = [
+  // 20260328
+  ["FAQ-1875", "correct"],   // 1703
+  ["FAQ-1868", "partial"],   // 1710
+  ["FAQ-1864", "correct"],   // 1715
+  ["FAQ-1862", "wrong"],     // 1725
+  ["FAQ-1860", "wrong"],     // 1735
+  ["FAQ-1858", "wrong"],     // 1745
+  ["FAQ-1843", "wrong"],     // 1750
+  ["FAQ-1817", "partial"],   // 1805
+  ["FAQ-1813", "unable"],    // 1815
+  ["FAQ-1809", "correct"],   // 1825
+  ["FAQ-1805", "wrong"],     // 1835
+  ["FAQ-1799", "correct"],   // 1845
+  ["FAQ-1798", "correct"],   // 1855
+  ["FAQ-1791", "wrong"],     // 1905
+  ["FAQ-1796", "correct"],   // 1930 (順序依時間，1791=1905, 1786=1915, 1796=1930)
+  ["FAQ-1786", "correct"],   // 1915
+  ["FAQ-1783", "correct"],   // 1940
+  ["FAQ-1779", "partial"],   // 1950
+  ["FAQ-1777", "correct"],   // 1955
+  ["FAQ-1774", "correct"],   // 2000
+  ["FAQ-1759", "partial"],   // 2010
+  // 20260329
+  ["FAQ-1734", "correct"],   // 0830
+  ["FAQ-1731", "correct"],   // 0840
+  ["FAQ-1730", "partial"],   // 0850
+  ["FAQ-1727", "correct"],   // 0900
+  ["FAQ-1726", "correct"],   // 0915
+  ["FAQ-1725", "correct"],   // 0925
+  ["FAQ-1724", "partial"],   // 1010
+  ["FAQ-1722", "wrong"],     // 1025
+  ["FAQ-1721", "partial"],   // 1045
+  ["FAQ-1719", "correct"],   // 1100
+  ["FAQ-1718", "unable"],    // 1120
+  ["FAQ-1704", "correct"],   // 1135
+  ["FAQ-1703", "correct"],   // 1145
+  ["FAQ-1702", "correct"],   // 1155
+  ["FAQ-1701", "correct"],   // 1205
+  ["FAQ-1698", "correct"],   // 1215
+  ["FAQ-1916", "partial"],   // 1300
+  ["FAQ-1949", "correct"],   // 1315
+  ["FAQ-1942", "partial"],   // 1335
+  ["FAQ-1960", "correct"],   // 1600
+  ["FAQ-1934", "partial"],   // 1700
+  // 20260330
+  ["FAQ-1965", "wrong"],     // 1045
+];
+
+// 依時間重新正確排序（上方已依時間排序，但 1796 vs 1791 時間要調整）
+// 實際時間排序（依 tracker 資料）：
+// 20260328: 1703=1875, 1710=1868, 1715=1864, 1725=1862, 1735=1860, 1745=1858, 1750=1843, 1805=1817, 1815=1813, 1825=1809, 1835=1805, 1845=1799, 1855=1798, 1905=1791, 1915=1786, 1930=1796, 1940=1783, 1950=1779, 1955=1777, 2000=1774, 2010=1759
+// 20260329: 0830=1734, 0840=1731, 0850=1730, 0900=1727, 0915=1726, 0925=1725, 1010=1724, 1025=1722, 1045=1721, 1100=1719, 1120=1718, 1135=1704, 1145=1703, 1155=1702, 1205=1701, 1215=1698, 1300=1916, 1315=1949, 1335=1942, 1600=1960, 1700=1934
+// 20260330: 1045=1965
+
+// 已正確排序（1791在1786前），重新調整上方 array 的順序
+const sortedTickets = [
+  ["FAQ-1875", "correct"],
+  ["FAQ-1868", "partial"],
+  ["FAQ-1864", "correct"],
+  ["FAQ-1862", "wrong"],
+  ["FAQ-1860", "wrong"],
+  ["FAQ-1858", "wrong"],
+  ["FAQ-1843", "wrong"],
+  ["FAQ-1817", "partial"],
+  ["FAQ-1813", "unable"],
+  ["FAQ-1809", "correct"],
+  ["FAQ-1805", "wrong"],
+  ["FAQ-1799", "correct"],
+  ["FAQ-1798", "correct"],
+  ["FAQ-1791", "wrong"],
+  ["FAQ-1786", "correct"],
+  ["FAQ-1796", "correct"],
+  ["FAQ-1783", "correct"],
+  ["FAQ-1779", "partial"],
+  ["FAQ-1777", "correct"],
+  ["FAQ-1774", "correct"],
+  ["FAQ-1759", "partial"],
+  ["FAQ-1734", "correct"],
+  ["FAQ-1731", "correct"],
+  ["FAQ-1730", "partial"],
+  ["FAQ-1727", "correct"],
+  ["FAQ-1726", "correct"],
+  ["FAQ-1725", "correct"],
+  ["FAQ-1724", "partial"],
+  ["FAQ-1722", "wrong"],
+  ["FAQ-1721", "partial"],
+  ["FAQ-1719", "correct"],
+  ["FAQ-1718", "unable"],
+  ["FAQ-1704", "correct"],
+  ["FAQ-1703", "correct"],
+  ["FAQ-1702", "correct"],
+  ["FAQ-1701", "correct"],
+  ["FAQ-1698", "correct"],
+  ["FAQ-1916", "partial"],
+  ["FAQ-1949", "correct"],
+  ["FAQ-1942", "partial"],
+  ["FAQ-1960", "correct"],
+  ["FAQ-1934", "partial"],
+  ["FAQ-1965", "wrong"],
+];
+
+// 計算累積趨勢
+const labels = [];
+const totalRates = [];
+const fullRates = [];
+const partialRates = [];
+const ticketLabels = [];
+
+let cumCorrect = 0;
+let cumPartial = 0;
+let cumDone = 0;
+
+sortedTickets.forEach(([id, conclusion], i) => {
+  cumDone++;
+  if (conclusion === "correct") cumCorrect++;
+  else if (conclusion === "partial") cumPartial++;
+
+  labels.push(i + 1);
+  ticketLabels.push(id);
+  totalRates.push(((cumCorrect + cumPartial) / cumDone * 100).toFixed(1));
+  fullRates.push((cumCorrect / cumDone * 100).toFixed(1));
+  partialRates.push((cumPartial / cumDone * 100).toFixed(1));
+});
+
+const ctx = document.getElementById("trendChart").getContext("2d");
+new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: "總成功率（正確+部分）",
+        data: totalRates,
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59,130,246,0.08)",
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        tension: 0.3,
+        fill: false,
+      },
+      {
+        label: "完全成功率（分析正確）",
+        data: fullRates,
+        borderColor: "#22c55e",
+        backgroundColor: "rgba(34,197,94,0.08)",
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        tension: 0.3,
+        fill: false,
+      },
+      {
+        label: "部分成功率（部分正確）",
+        data: partialRates,
+        borderColor: "#f97316",
+        backgroundColor: "rgba(249,115,22,0.08)",
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        tension: 0.3,
+        fill: false,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    interaction: {
+      mode: "index",
+      intersect: false,
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: "回測累積成功率趨勢",
+        font: { size: 18, weight: "bold" },
+        color: "#333",
+        padding: { bottom: 16 },
+      },
+      legend: {
+        display: true,
+        position: "top",
+        labels: {
+          font: { size: 13 },
+          padding: 20,
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title(items) {
+            const idx = items[0].dataIndex;
+            return `#${idx + 1} ${ticketLabels[idx]}`;
+          },
+          label(item) {
+            return `${item.dataset.label}：${item.raw}%`;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "完成順序",
+          font: { size: 13 },
+          color: "#555",
+        },
+        ticks: {
+          maxTicksLimit: 22,
+          color: "#666",
+        },
+        grid: { color: "rgba(0,0,0,0.04)" },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "成功率 (%)",
+          font: { size: 13 },
+          color: "#555",
+        },
+        min: 0,
+        max: 100,
+        ticks: {
+          stepSize: 10,
+          color: "#666",
+          callback: (v) => v + "%",
+        },
+        grid: { color: "rgba(0,0,0,0.06)" },
+      },
+    },
+  },
+});
+</script>
+
+</body>
+</html>
