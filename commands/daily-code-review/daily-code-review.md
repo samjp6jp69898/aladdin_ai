@@ -1,24 +1,24 @@
 ---
 name: daily-code-review
-description: Daily code review manager — scans yesterday's commit authors across four projects and dispatches sub agents to conduct code reviews.
+description: Daily code review manager — scans commit authors, groups by workload, dispatches review agents with progressive dimension loading, then QA agents for quality assurance.
 user-invocable: true
 ---
 
-# Daily Code Review Workflow
+# Daily Code Review v2 Workflow
 
-You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's commits from yesterday, find all authors who made commits, and concurrently dispatch sub agents to conduct independent code reviews for each author.
+You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's commits, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
 
 ## Parameters
 
 `$ARGUMENTS` format: `/daily-code-review [date] [concurrent]`
 
-- **date** (optional): Specify the review date, format `YYYYMMDD`. If not provided, defaults to **yesterday** (today - 1 day)
-- **concurrent** (optional): Number of sub agents to run per batch, defaults to `8`
+- **date** (optional): Review date, format `YYYYMMDD`. Defaults to **yesterday**.
+- **concurrent** (optional): Sub agents per batch, defaults to `5`.
 
 Examples:
-- `/daily-code-review` → review all authors from yesterday, 5 sub agents per batch
-- `/daily-code-review 20260323` → review all authors from 2026-03-23, 8 per batch
-- `/daily-code-review 20260323 5` → review all authors from 2026-03-23, 5 per batch
+- `/daily-code-review` → review yesterday, 5 per batch
+- `/daily-code-review 20260323` → review 2026-03-23, 5 per batch
+- `/daily-code-review 20260323 3` → review 2026-03-23, 3 per batch
 
 ---
 
@@ -26,21 +26,14 @@ Examples:
 
 ### Step 0: Parse Parameters
 
-1. Parse parameters from `$ARGUMENTS`:
-   - If the first parameter is an 8-digit number → set as `REVIEW_DATE` (format `YYYYMMDD`)
-   - If the second parameter is a number → set as `CONCURRENT_COUNT`
-2. If `REVIEW_DATE` is not specified, use yesterday's date:
-   ```bash
-   REVIEW_DATE=$(TZ=Asia/Taipei date -v-1d +%Y%m%d)   # macOS
-   # REVIEW_DATE=$(TZ=Asia/Taipei date -d "yesterday" +%Y%m%d)  # Linux
-   ```
-3. If `CONCURRENT_COUNT` is not specified, default to `5`
+1. Parse `$ARGUMENTS`:
+   - First param is 8-digit number → `REVIEW_DATE`
+   - Second param is number → `CONCURRENT_COUNT`
+2. Defaults: `REVIEW_DATE` = yesterday (macOS: `TZ=Asia/Taipei date -v-1d +%Y%m%d`), `CONCURRENT_COUNT` = 5
 
 ---
 
 ### Step 1: Confirm Bootstrap Flag
-
-Check whether today's bootstrap flag exists (flag date is **today**, not the review date):
 
 ```bash
 TODAY=$(TZ=Asia/Taipei date +%Y%m%d)
@@ -49,92 +42,115 @@ FLAG_FILE="/Users/user/aladdin/review/.$TODAY.bootstrap_ready"
 
 | Situation | Action |
 |-----------|--------|
-| Flag exists | Continue execution |
-| Flag does not exist | Run `sh daily_bootstrap.sh` and wait for it to complete |
+| Flag exists | Continue |
+| Flag missing | Run `sh daily_bootstrap.sh` and wait |
 
 ---
 
-### Step 2: Scan Four Repos for Author List
+### Step 2: Scan All Repos — Collect Author Workload Data
 
-Run git log on the following four repos to get all authors who committed on `REVIEW_DATE` (UTC+8 00:00 ~ 23:59):
+Run git log with `--numstat` on all 4 repos to get author + commit count + lines changed in one pass:
 
 ```bash
-# Convert YYYYMMDD to YYYY-MM-DD format
 REVIEW_DATE_FMT="${REVIEW_DATE:0:4}-${REVIEW_DATE:4:2}-${REVIEW_DATE:6:2}"
 
-# agrabah
-git -C /Users/user/aladdin/agrabah log --format="%an|%ae" \
-  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59"
-
-# abu
-git -C /Users/user/aladdin/abu log --format="%an|%ae" \
-  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59"
-
-# lago
-git -C /Users/user/aladdin/lago log --format="%an|%ae" \
-  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59"
-
-# rajah
-git -C /Users/user/aladdin/rajah log --format="%an|%ae" \
+# Run on each repo: agrabah, abu, lago, rajah
+git -C /Users/user/aladdin/<repo> log --format="COMMIT_START|%an|%ae|%H|%s" --numstat \
   --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59"
 ```
 
-Deduplicate by `author name` (`%an`) and build the complete `ALL_AUTHORS` list.
+Parse the output to build a workload table per author:
+
+| Author | Email | Repos | Commits | Lines Changed | Group | Agent Type | Model |
+|--------|-------|-------|---------|---------------|-------|------------|-------|
+
+**Parsing rules:**
+- Lines starting with `COMMIT_START|` mark a new commit → extract author, email, repo
+- Subsequent lines with `<added>\t<deleted>\t<filepath>` are numstat → sum added+deleted per author
+- Deduplicate by author name (`%an`)
 
 ---
 
-### Step 3: Create Review Directory and Find Pending Authors
+### Step 3: Group & Assign Strategy
 
-1. Confirm the review directory exists; create it if not:
-   ```
-   /Users/user/aladdin/review/{REVIEW_DATE}/
-   ```
+#### 3a. Repo Type Grouping
 
-2. Scan the directory, list completed review reports (`*_{REVIEW_DATE}.md`), and build a "completed authors" set
+For each author, determine their repo group based on which repos they have commits in:
 
-3. Filter `ALL_AUTHORS` to remove completed authors, yielding `PENDING_AUTHORS`
+| Group | Condition | Dimensions to Load |
+|-------|-----------|-------------------|
+| Backend | Only agrabah and/or rajah | A, B, C, D, E, G |
+| Frontend | Only abu and/or lago (may include rajah) | A, C, D, E, F |
+| Cross-domain | Both agrabah and abu/lago | A, B, C, D, E, F, G |
 
-4. If `PENDING_AUTHORS` is empty:
-   - Output `[DONE] {REVIEW_DATE} all author reviews complete (total N authors)` and **terminate**
+#### 3b. Workload Merging (within each group)
 
----
+**Independent agent** if author meets ANY of:
+- ≥ 5 commits
+- ≥ 200 lines changed
 
-### Step 4: Concurrently Dispatch Sub Agents for Review
+**Merge candidate** otherwise. Merge candidates in the same group are combined into merge groups:
+- Add candidates sequentially to a merge group
+- Start a new merge group when cumulative total exceeds 12 commits OR 500 lines changed
+- Each merge group still produces **per-author independent reports**
 
-Take authors from `PENDING_AUTHORS` in order; each batch launches up to `CONCURRENT_COUNT` sub agents, with each sub agent responsible for one author.
+#### 3c. Dynamic Model Assignment
 
-**Each batch flow:**
+| Condition | Model |
+|-----------|-------|
+| Independent agent (≥5 commits or ≥200 lines) | opus, medium effort |
+| Merge group (total ≥8 commits or ≥300 lines) | opus, medium effort |
+| Merge group (total <8 commits and <300 lines) | sonnet, high effort |
+| Report QA Agent | sonnet, high effort |
 
-1. Take up to `CONCURRENT_COUNT` unprocessed authors
-2. **Call multiple Agent tools simultaneously in a single message**, launching these sub agents in parallel (must not be done in series; must not wait for one to complete before launching the next)
-3. Wait for all sub agents in this batch to complete
-4. Confirm each author's report file has been created
-5. If `PENDING_AUTHORS` still has remaining authors, repeat this batch
-6. Continue until all authors are complete
+#### 3d. Build Dimension Read List
 
-**Sub Agent settings:**
-
-Sub agents must use model: opus 4.6 Medium effort  
-And permissionMode: inherited  
-When launching a sub agent, **the prompt must include the following instructions — must not be omitted or summarized**:
-
-**Sub Agent Prompt Template** (replace `{}` with actual values):
+For each agent, build the list of dimension files to read based on the group's Dimensions:
 
 ```
-You are a senior code review expert for the Aladdin project. Please follow the instructions below to conduct a complete review of the specified author's code changes.
+/Users/user/aladdin/obsidian/skills/daily-code-review/dimensions/dim-a-architecture.md
+/Users/user/aladdin/obsidian/skills/daily-code-review/dimensions/dim-b-database.md
+... (only the ones matching the group)
+```
+
+---
+
+### Step 4: Create Review Directory & Filter Completed Authors
+
+1. Ensure directory exists: `/Users/user/aladdin/review/{REVIEW_DATE}/`
+2. Scan for completed reports (`*_{REVIEW_DATE}.md`), build completed set
+3. Filter all authors to get `PENDING_AUTHORS`
+4. If empty: `[DONE] {REVIEW_DATE} all author reviews complete (total N authors)` → terminate
+
+---
+
+### Step 5: Dispatch Review Agents in Batches
+
+Take agents from the assignment list; each batch launches up to `CONCURRENT_COUNT` agents.
+
+**Each batch:**
+1. Take up to `CONCURRENT_COUNT` unprocessed agents (each agent = 1 independent author OR 1 merge group)
+2. **Call multiple Agent tools simultaneously in a single message** — must not serialize
+3. Wait for all agents in batch to complete
+4. Confirm each author's report file exists
+5. Repeat until all agents dispatched
+
+**Review Agent Prompt Template** (replace `{PLACEHOLDERS}` with actual values):
+
+```
+You are a senior code review expert for the Aladdin project. Follow the instructions below to conduct a complete code review.
 
 ## Language Requirement
-**All report content must be written in Traditional Chinese (繁體中文).** Code snippets, file paths, variable names, and other technical identifiers remain in their original form. This rule overrides any English templates found in the review standards document.
+**All report content must be in Traditional Chinese (繁體中文).** Code snippets, file paths, variable names remain in original form.
 
-## Review Standards
-Please first read the complete review standards document:
-/Users/user/aladdin/obsidian/skills/daily-code-review/DAILY_REVIEW_PROMPT.md
-
-Please first read the project conventions document:
-/Users/user/aladdin/CLAUDE.md
+## Review Standards — Read in Order
+1. Read the core rules: /Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md
+2. Read ONLY these dimension files:
+{DIMENSION_FILE_LIST}
+3. Read the project conventions: /Users/user/aladdin/CLAUDE.md
 
 ## Task Parameters
-- Author: {AUTHOR_NAME} ({AUTHOR_EMAIL})
+- Authors: {AUTHOR_LIST} (format: "name|email" per line)
 - Review date: {REVIEW_DATE_FMT} (REVIEW_DATE: {REVIEW_DATE})
 - Repo paths:
   - agrabah: /Users/user/aladdin/agrabah
@@ -144,29 +160,15 @@ Please first read the project conventions document:
 
 ## Execution Steps
 
-### 1. Collect all commits by this author on this date
-
-Run the following command on each of the four repos to find all commits by this author:
+### 1. For each author, collect all commits on this date
 
 ```bash
-git -C /Users/user/aladdin/agrabah log --format="%H|%s|%ai" \
-  --after="{REVIEW_DATE_FMT} 00:00:00" --before="{REVIEW_DATE_FMT} 23:59:59" \
-  --author="{AUTHOR_EMAIL}"
-
-git -C /Users/user/aladdin/abu log --format="%H|%s|%ai" \
-  --after="{REVIEW_DATE_FMT} 00:00:00" --before="{REVIEW_DATE_FMT} 23:59:59" \
-  --author="{AUTHOR_EMAIL}"
-
-git -C /Users/user/aladdin/lago log --format="%H|%s|%ai" \
-  --after="{REVIEW_DATE_FMT} 00:00:00" --before="{REVIEW_DATE_FMT} 23:59:59" \
-  --author="{AUTHOR_EMAIL}"
-
-git -C /Users/user/aladdin/rajah log --format="%H|%s|%ai" \
+git -C /Users/user/aladdin/<repo> log --format="%H|%s|%ai" \
   --after="{REVIEW_DATE_FMT} 00:00:00" --before="{REVIEW_DATE_FMT} 23:59:59" \
   --author="{AUTHOR_EMAIL}"
 ```
 
-If a repo has no commits from this author, skip it.
+Skip repos with no commits from this author.
 
 ### 2. Read the complete diff for each commit
 
@@ -174,90 +176,121 @@ If a repo has no commits from this author, skip it.
 git -C /Users/user/aladdin/<repo> show <commit_hash> --stat --unified=5
 ```
 
-### 3. Read the full content of modified files
+### 3. Read full content of modified files
 
-For each key modified file in the diff (excluding generated/ and node_modules/), use the Read tool to read the full content for review context.
+For each key modified file (excluding generated/ and node_modules/), use Read tool for full review context.
 
-### 4. Execute a complete code review per DAILY_REVIEW_PROMPT.md
+### 4. Execute code review per review-core.md and loaded dimensions
 
-Cover all review dimensions (architecture & design, TypeScript quality, database SQL, security, etc.).
+Cover all loaded review dimensions. Apply severity per the 5-level system in review-core.md.
 
-### 5. Create the review report
+### 5. Create per-author review report
 
-Organize by project: lago / abu / agrabah / rajah as separate sections.
+Process authors one at a time. Complete one author's report before starting the next.
 
-Write the review result to:
-/Users/user/aladdin/review/{REVIEW_DATE}/{AUTHOR_NAME}_{REVIEW_DATE}.md
+Write each report to: /Users/user/aladdin/review/{REVIEW_DATE}/{AUTHOR_NAME}_{REVIEW_DATE}.md
 
-Follow the output format specified in DAILY_REVIEW_PROMPT.md.
+Follow the output format in review-core.md.
+
 ## Security Constraints
-- Do not modify any code or make any changes to the codebase
-- Do not execute any destructive operations (rm -rf, etc.)
-- Only use Read, Write (for report output only), Glob, Grep, Bash (git commands only)
+- Do not modify any source code
+- Do not execute destructive operations
+- Only use: Read, Write (for report output only), Glob, Grep, Bash (git commands only)
 
 ## After Completion
-When done, tell the main agent that {AUTHOR_NAME}'s review is complete, and report any critical issues found in the report.
-
-List each critical issue as a separate line using this **exact** format — one issue per line, fields separated by ` ||| ` (triple pipe with spaces):
+Report each author's P0/P1 issues using this exact format (one per line):
 
 ```
-CRITICAL_ISSUE ||| <Issue Description> ||| <Issue Location: file / method name / line number>
+CRITICAL_ISSUE ||| <P0 or P1> ||| <Issue Description> ||| <Issue Location>
 ```
 
-Example:
-```
-CRITICAL_ISSUE ||| Missing @Permission on GetCommissionInvoiceOriginalData: sensitive financial data exposed without permission check ||| rajah/services/agent_back_office.rajah:1970 / GetCommissionInvoiceOriginalData
-CRITICAL_ISSUE ||| SQL GROUP BY inconsistency: started_at_timestamp in SELECT but not in GROUP BY ||| agrabah/src/servers/venture_agent/models/statistic.ts:855 / GetUsersGameBetWinByIds
+If no P0/P1 issues: `CRITICAL_ISSUE ||| none`
 ```
 
-If there are no critical issues, write: `CRITICAL_ISSUE ||| none`
-```
+**Review Agent settings:**
+- model: as determined in Step 3c
+- effort: as determined in Step 3c
+- permissionMode: inherited
 
 ---
 
-### Step 5: Compile Completion Report
+### Step 6: Dispatch Report QA Agents Per Batch
 
-After all authors' reviews are complete, collect all `CRITICAL_ISSUE` lines reported by each sub agent.
+After each batch of Review Agents completes, dispatch ONE Report QA Agent to check all reports from that batch.
 
-Parse each line with the ` ||| ` separator to extract: Issue Description and Issue Location.
-Skip any line where the description is `none`.
-
-Write the results to the following CSV file:
+**Report QA Agent Prompt Template:**
 
 ```
-/Users/user/aladdin/review/{REVIEW_DATE}/CRITICAL_ISSUES_{REVIEW_DATE}.csv
+You are a report quality assurance specialist. Your job is to ensure all code review reports meet formatting standards and have reasonable severity ratings. You do NOT re-review code.
+
+## QA Standards
+Read the QA specification: /Users/user/aladdin/obsidian/skills/daily-code-review/report-qa.md
+
+Also read the core rules for reference: /Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md
+
+## Reports to Check
+{REPORT_FILE_LIST}
+
+## Execution
+1. Read each report file
+2. Run through the checklist in report-qa.md
+3. Fix issues directly by rewriting the report with Write tool
+4. Report results when done
+
+## Constraints
+- You can ONLY downgrade severity, never upgrade
+- You cannot add new issues or delete existing ones
+- You cannot re-review code
+- Only use: Read, Write, Glob
 ```
 
-**Important: The CSV file must be stored under the review date directory `/Users/user/aladdin/review/{REVIEW_DATE}/` — it must not be stored anywhere else.**
+**Report QA Agent settings:**
+- model: sonnet
+- effort: high
+- permissionMode: inherited
 
-#### CSV Format Rules — follow exactly:
+---
 
-1. **Delimiter**: comma `,` (NOT pipe `|`)
-2. **Header row** (write once, only if creating a new file):
-   ```
-   Issue Description,Issue Location (file / method name / line number),Author,Date
-   ```
-3. **Each data row**: 4 fields separated by commas
-4. **Quoting rule**: If a field value contains a comma, a double-quote, or a newline, wrap the entire field in double-quotes (`"`). Escape any literal double-quote inside a field by doubling it (`""`).
-5. **Author field**: Use the author's name (e.g. `ashliu`, `pkh_tom`)
-6. **Date field**: Use format `YYYY/MM/DD` (e.g. `2026/04/03`)
+### Step 7: Compile CRITICAL_ISSUES CSV
 
-#### Example of correct CSV output:
+After ALL batches (Review + QA) are complete:
 
+1. Collect all `CRITICAL_ISSUE` lines from Review Agents (these reflect pre-QA severity)
+2. Re-read each report file to get the final (post-QA) severity for each issue
+3. Only include P0 and P1 issues in the CSV
+
+Write to: `/Users/user/aladdin/review/{REVIEW_DATE}/CRITICAL_ISSUES_{REVIEW_DATE}.csv`
+
+**CSV Format:**
+
+Header (write once if creating new file):
 ```
-Issue Description,Issue Location (file / method name / line number),Author,Date
-"Missing @Permission on GetCommissionInvoiceOriginalData: sensitive financial data exposed without permission check",rajah/services/agent_back_office.rajah:1970 / GetCommissionInvoiceOriginalData,farus,2026/04/04
-"SQL GROUP BY inconsistency: started_at_timestamp in SELECT but not in GROUP BY in GetUsersGameBetWinByIds",agrabah/src/servers/venture_agent/models/statistic.ts:855 / GetUsersGameBetWinByIds,jonathan,2026/04/03
+Severity,Issue Description,Issue Location (file / method name / line number),Author,Date
 ```
 
-**If the file already exists**, read its current content first, then append only the new rows (do not re-write the header). Use the Write tool to write the complete file (header + existing rows + new rows).
+Rules:
+- Delimiter: comma `,`
+- If field contains comma, double-quote, or newline: wrap in double-quotes, escape internal double-quotes by doubling
+- Severity field: `P0` or `P1`
+- Author field: author name (e.g. `ashliu`, `pkh_tom`)
+- Date field: `YYYY/MM/DD` format
 
-After the CSV update is complete, the Main Agent's task is finished.
+Example:
+```
+Severity,Issue Description,Issue Location (file / method name / line number),Author,Date
+P0,"SQL injection: 使用字串拼接而非 placeholder",agrabah/src/servers/payment/models/order.ts:142 / createOrder,farus,2026/04/05
+P1,"Missing @Permission on sensitive API",rajah/services/agent_back_office.rajah:1970,jonathan,2026/04/05
+```
+
+If file already exists, read current content, append new rows only (do not re-write header).
+
+---
 
 ## Notes
 
-1. **Concurrent launch**: Each batch must call multiple Agent tools simultaneously in a single message to achieve true parallel execution — serial waiting is not allowed
-2. **Author deduplication**: If the same author committed to multiple repos, they are still treated as one author, and a single sub agent reviews across all repos
-3. **Report path naming**: If an author name contains spaces or special characters, keep the original name (as output by `%an` in git log)
-4. **Sub agent independence**: Each sub agent independently reviews one author and does not interfere with others
-5. **Bootstrap flag**: The flag date is the **current date** (the day the script runs); the commits reviewed are from the **specified date**
+1. **Concurrent launch**: Each batch must call multiple Agent tools simultaneously — serial waiting is forbidden
+2. **Author deduplication**: Same author across multiple repos = one author, reviewed by one agent across all repos
+3. **Report naming**: Keep original author name from git `%an` even if it contains spaces/special chars
+4. **Agent independence**: Each sub agent reviews independently
+5. **Bootstrap flag**: Flag date = today (script execution date); reviewed commits = specified date
+6. **QA is mandatory**: Every batch must go through QA before the next batch starts (but QA and the next batch's Review Agents can run in parallel if there are remaining batches)
