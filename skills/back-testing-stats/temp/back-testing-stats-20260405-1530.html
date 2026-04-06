@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>回測累積成功率趨勢</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px; }
+h1 { text-align: center; color: #333; margin-bottom: 8px; }
+h2 { color: #444; margin-top: 0; }
+canvas { margin-top: 20px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.stat-card { background: #f8f9fa; border-radius: 10px; padding: 20px; }
+.stat-card h3 { margin: 0 0 12px 0; font-size: 16px; color: #555; }
+.big-number { font-size: 42px; font-weight: 700; color: #2563eb; line-height: 1.1; }
+.big-number.green { color: #16a34a; }
+.big-number.orange { color: #ea580c; }
+.sub-stats { margin-top: 10px; font-size: 14px; color: #666; line-height: 1.8; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+th, td { padding: 10px 14px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+th { background: #f1f5f9; font-weight: 600; color: #475569; }
+tr:hover { background: #f8fafc; }
+.severity-tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-weight: 600; font-size: 13px; }
+.severity-P1 { background: #fee2e2; color: #dc2626; }
+.severity-P2 { background: #ffedd5; color: #ea580c; }
+.severity-P3 { background: #fef9c3; color: #ca8a04; }
+.severity-P4 { background: #e0e7ff; color: #4f46e5; }
+.rate-bar { display: inline-block; height: 8px; border-radius: 4px; vertical-align: middle; }
+.progress-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13px; color: #666; }
+.progress-bar-bg { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 4px; }
+.timestamp { text-align: center; color: #94a3b8; font-size: 13px; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- Overall Stats -->
+<div class="container">
+<h1>回測統計報告</h1>
+<p class="timestamp">報告時間：2026-04-05 15:30</p>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <h3>總成功率（正確 + 部分正確）</h3>
+    <div class="big-number">85.4%</div>
+    <div class="sub-stats">已完成 130 / 132 張（98.5%）</div>
+  </div>
+  <div class="stat-card">
+    <h3>完全成功率</h3>
+    <div class="big-number green">58.5%</div>
+    <div class="sub-stats">部分成功率：<strong>26.9%</strong></div>
+  </div>
+</div>
+
+<h2>回測結論分布</h2>
+<div style="margin-bottom: 8px;">
+  <div class="progress-row">✅ 分析正確　76 (58.5%)
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:58.5%;background:#16a34a;"></div></div>
+  </div>
+  <div class="progress-row">✅ 部分正確　35 (26.9%)
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:26.9%;background:#ea580c;"></div></div>
+  </div>
+  <div class="progress-row">❌ 分析錯誤　14 (10.8%)
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:10.8%;background:#dc2626;"></div></div>
+  </div>
+  <div class="progress-row">⚠️ 無法比對　 5 ( 3.8%)
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:3.8%;background:#94a3b8;"></div></div>
+  </div>
+</div>
+</div>
+
+<!-- Per-Severity Breakdown -->
+<div class="container">
+<h2>各嚴重性等級成功率</h2>
+<table>
+  <thead>
+    <tr>
+      <th>嚴重性</th><th>總數</th><th>正確</th><th>部分</th><th>錯誤</th><th>無法比對</th><th>完全率</th><th>部分率</th><th>總成功率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="severity-tag severity-P1">P1 重點</span></td>
+      <td>16</td><td>10</td><td>1</td><td>3</td><td>2</td>
+      <td>62.5%</td><td>6.3%</td><td><strong>68.8%</strong></td>
+    </tr>
+    <tr>
+      <td><span class="severity-tag severity-P2">P2 較高</span></td>
+      <td>94</td><td>54</td><td>30</td><td>8</td><td>2</td>
+      <td>57.4%</td><td>31.9%</td><td><strong>89.4%</strong></td>
+    </tr>
+    <tr>
+      <td><span class="severity-tag severity-P3">P3 一般</span></td>
+      <td>19</td><td>11</td><td>5</td><td>2</td><td>1</td>
+      <td>57.9%</td><td>26.3%</td><td><strong>84.2%</strong></td>
+    </tr>
+    <tr>
+      <td><span class="severity-tag severity-P4">P4 較低</span></td>
+      <td>3</td><td>2</td><td>0</td><td>1</td><td>0</td>
+      <td>66.7%</td><td>0.0%</td><td><strong>66.7%</strong></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Trend Chart -->
+<div class="container">
+<h2>累積成功率趨勢</h2>
+<canvas id="trendChart"></canvas>
+</div>
+<script>
+const data = [
+  {id:"FAQ-1875",t:"20260328 1703"},{id:"FAQ-1868",t:"20260328 1710"},{id:"FAQ-1864",t:"20260328 1715"},
+  {id:"FAQ-1862",t:"20260328 1725"},{id:"FAQ-1860",t:"20260328 1735"},{id:"FAQ-1858",t:"20260328 1745"},
+  {id:"FAQ-1843",t:"20260328 1750"},{id:"FAQ-1817",t:"20260328 1805"},{id:"FAQ-1813",t:"20260328 1815"},
+  {id:"FAQ-1809",t:"20260328 1825"},{id:"FAQ-1805",t:"20260328 1835"},{id:"FAQ-1799",t:"20260328 1845"},
+  {id:"FAQ-1798",t:"20260328 1855"},{id:"FAQ-1791",t:"20260328 1905"},{id:"FAQ-1786",t:"20260328 1915"},
+  {id:"FAQ-1796",t:"20260328 1930"},{id:"FAQ-1783",t:"20260328 1940"},{id:"FAQ-1779",t:"20260328 1950"},
+  {id:"FAQ-1777",t:"20260328 1955"},{id:"FAQ-1774",t:"20260328 2000"},{id:"FAQ-1759",t:"20260328 2010"},
+  {id:"FAQ-1734",t:"20260329 0830"},{id:"FAQ-1731",t:"20260329 0840"},{id:"FAQ-1730",t:"20260329 0850"},
+  {id:"FAQ-1727",t:"20260329 0900"},{id:"FAQ-1726",t:"20260329 0915"},{id:"FAQ-1725",t:"20260329 0925"},
+  {id:"FAQ-1724",t:"20260329 1010"},{id:"FAQ-1722",t:"20260329 1025"},{id:"FAQ-1721",t:"20260329 1045"},
+  {id:"FAQ-1719",t:"20260329 1100"},{id:"FAQ-1718",t:"20260329 1120"},{id:"FAQ-1704",t:"20260329 1135"},
+  {id:"FAQ-1703",t:"20260329 1145"},{id:"FAQ-1702",t:"20260329 1155"},{id:"FAQ-1701",t:"20260329 1205"},
+  {id:"FAQ-1698",t:"20260329 1215"},{id:"FAQ-1694",t:"20260329 1230"},{id:"FAQ-1916",t:"20260329 1300"},
+  {id:"FAQ-1949",t:"20260329 1315"},{id:"FAQ-1942",t:"20260329 1335"},{id:"FAQ-1960",t:"20260329 1600"},
+  {id:"FAQ-1934",t:"20260329 1700"},
+  {id:"FAQ-1965",t:"20260330 1045"},{id:"FAQ-1975",t:"20260330 1510"},{id:"FAQ-1932",t:"20260330 1515"},
+  {id:"FAQ-2020",t:"20260330 1950"},{id:"FAQ-2011",t:"20260330 1955"},{id:"FAQ-1961",t:"20260330 2030"},
+  {id:"FAQ-1912",t:"20260330 2035"},{id:"FAQ-1887",t:"20260330 2045"},{id:"FAQ-1820",t:"20260330 2055"},
+  {id:"FAQ-1819",t:"20260330 2100"},{id:"FAQ-1720",t:"20260330 2110"},{id:"FAQ-1695",t:"20260330 2120"},
+  {id:"FAQ-2015",t:"20260330 2135"},{id:"FAQ-1939",t:"20260330 2145"},{id:"FAQ-1918",t:"20260330 2155"},
+  {id:"FAQ-653",t:"20260330 2015"},
+  {id:"FAQ-2069",t:"20260331 2320"},{id:"FAQ-2067",t:"20260331 2340"},
+  {id:"FAQ-2052",t:"20260331 1530"},{id:"FAQ-2013",t:"20260331 1545"},
+  {id:"FAQ-2008",t:"20260331 1600"},{id:"FAQ-2073",t:"20260331 1603"},{id:"FAQ-2005",t:"20260331 1615"},
+  {id:"FAQ-1995",t:"20260331 1630"},{id:"FAQ-1929",t:"20260331 1645"},{id:"FAQ-1892",t:"20260331 1700"},
+  {id:"FAQ-2038",t:"20260331 1730"},{id:"FAQ-2035",t:"20260331 1745"},{id:"FAQ-2017",t:"20260331 1800"},
+  {id:"FAQ-2006",t:"20260331 1815"},{id:"FAQ-1917",t:"20260331 1830"},{id:"FAQ-1885",t:"20260331 1845"},
+  {id:"FAQ-2019",t:"20260331 2008"},{id:"FAQ-2010",t:"20260331 2025"},{id:"FAQ-1985",t:"20260331 2045"},
+  {id:"FAQ-1952",t:"20260331 1920"},{id:"FAQ-1870",t:"20260331 1935"},
+  {id:"FAQ-1967",t:"20260331 2215"},{id:"FAQ-1811",t:"20260331 2355"},
+  {id:"FAQ-399",t:"20260331 1430"},
+  {id:"FAQ-2110",t:"20260401 1345"},{id:"FAQ-2055",t:"20260401 1345"},
+  {id:"FAQ-2095",t:"20260401 1400"},{id:"FAQ-2093",t:"20260401 1400"},{id:"FAQ-2066",t:"20260401 1402"},
+  {id:"FAQ-2012",t:"20260401 1406"},{id:"FAQ-1996",t:"20260401 1410"},
+  {id:"FAQ-2103",t:"20260401 1427"},{id:"FAQ-2112",t:"20260401 1430"},
+  {id:"FAQ-2096",t:"20260401 1437"},{id:"FAQ-2097",t:"20260401 1530"},
+  {id:"FAQ-2094",t:"20260401 1535"},{id:"FAQ-2088",t:"20260401 1600"},
+  {id:"FAQ-2090",t:"20260401 1645"},{id:"FAQ-1910",t:"20260401 1648"},
+  {id:"FAQ-1978",t:"20260401 1700"},{id:"FAQ-2092",t:"20260401 1630"},
+  {id:"FAQ-2037",t:"20260401 0842"},{id:"FAQ-2051",t:"20260401 0830"},
+  {id:"FAQ-2130",t:"20260402 0001"},{id:"FAQ-2100",t:"20260402 0002"},{id:"FAQ-2087",t:"20260402 0003"},
+  {id:"FAQ-2082",t:"20260402 0004"},{id:"FAQ-2061",t:"20260402 0005"},{id:"FAQ-2054",t:"20260402 0006"},
+  {id:"FAQ-2050",t:"20260402 0007"},{id:"FAQ-2021",t:"20260402 0008"},{id:"FAQ-1822",t:"20260402 0009"},
+  {id:"FAQ-2168",t:"20260402 1045"},{id:"FAQ-2057",t:"20260402 1115"},{id:"FAQ-2022",t:"20260402 1117"},
+  {id:"FAQ-2163",t:"20260402 1120"},{id:"FAQ-2075",t:"20260402 1122"},{id:"FAQ-1928",t:"20260402 1124"},
+  {id:"FAQ-1911",t:"20260402 1126"},{id:"FAQ-2185",t:"20260402 1430"},{id:"FAQ-2155",t:"20260402 1432"},
+  {id:"FAQ-2028",t:"20260402 1435"},{id:"FAQ-2026",t:"20260402 1438"},{id:"FAQ-2189",t:"20260402 1500"},
+  {id:"FAQ-2000",t:"20260402 1502"},{id:"FAQ-1998",t:"20260402 1505"},
+  {id:"FAQ-2181",t:"20260405 1430"},{id:"FAQ-2123",t:"20260405 1435"},{id:"FAQ-1980",t:"20260405 1440"},
+  {id:"FAQ-1931",t:"20260405 1450"},{id:"FAQ-1886",t:"20260405 1500"}
+];
+
+// Conclusion mapping
+const conclusions = {
+  "FAQ-1875":"correct","FAQ-1868":"partial","FAQ-1864":"correct","FAQ-1862":"wrong","FAQ-1860":"wrong",
+  "FAQ-1858":"wrong","FAQ-1843":"wrong","FAQ-1817":"partial","FAQ-1813":"unable","FAQ-1809":"correct",
+  "FAQ-1805":"wrong","FAQ-1799":"correct","FAQ-1798":"correct","FAQ-1791":"wrong","FAQ-1786":"correct",
+  "FAQ-1796":"correct","FAQ-1783":"correct","FAQ-1779":"partial","FAQ-1777":"correct","FAQ-1774":"correct",
+  "FAQ-1759":"partial","FAQ-1734":"correct","FAQ-1731":"correct","FAQ-1730":"partial","FAQ-1727":"correct",
+  "FAQ-1726":"correct","FAQ-1725":"correct","FAQ-1724":"partial","FAQ-1722":"wrong","FAQ-1721":"partial",
+  "FAQ-1719":"correct","FAQ-1718":"unable","FAQ-1704":"correct","FAQ-1703":"correct","FAQ-1702":"correct",
+  "FAQ-1701":"correct","FAQ-1698":"correct","FAQ-1694":"correct","FAQ-1916":"partial","FAQ-1949":"correct",
+  "FAQ-1942":"partial","FAQ-1960":"correct","FAQ-1934":"partial",
+  "FAQ-1965":"wrong","FAQ-1975":"correct","FAQ-1932":"unable","FAQ-2020":"correct","FAQ-2011":"partial",
+  "FAQ-1961":"wrong","FAQ-1912":"correct","FAQ-1887":"partial","FAQ-1820":"correct","FAQ-1819":"correct",
+  "FAQ-1720":"correct","FAQ-1695":"partial","FAQ-2015":"correct","FAQ-1939":"correct","FAQ-1918":"correct",
+  "FAQ-653":"partial",
+  "FAQ-2069":"partial","FAQ-2067":"correct","FAQ-2052":"partial","FAQ-2013":"partial",
+  "FAQ-2008":"correct","FAQ-2073":"correct","FAQ-2005":"correct","FAQ-1995":"correct","FAQ-1929":"wrong",
+  "FAQ-1892":"correct","FAQ-2038":"unable","FAQ-2035":"correct","FAQ-2017":"partial","FAQ-2006":"unable",
+  "FAQ-1917":"correct","FAQ-1885":"correct","FAQ-2019":"partial","FAQ-2010":"partial","FAQ-1985":"correct",
+  "FAQ-1952":"wrong","FAQ-1870":"correct","FAQ-1967":"partial","FAQ-1811":"partial","FAQ-399":"correct",
+  "FAQ-2110":"partial","FAQ-2055":"correct","FAQ-2095":"correct","FAQ-2093":"correct","FAQ-2066":"correct",
+  "FAQ-2012":"partial","FAQ-1996":"partial","FAQ-2103":"wrong","FAQ-2112":"correct","FAQ-2096":"correct",
+  "FAQ-2097":"correct","FAQ-2094":"partial","FAQ-2088":"wrong","FAQ-2090":"correct","FAQ-1910":"correct",
+  "FAQ-1978":"partial","FAQ-2092":"correct","FAQ-2037":"correct","FAQ-2051":"partial",
+  "FAQ-2130":"correct","FAQ-2100":"correct","FAQ-2087":"partial","FAQ-2082":"correct","FAQ-2061":"partial",
+  "FAQ-2054":"correct","FAQ-2050":"correct","FAQ-2021":"correct","FAQ-1822":"correct",
+  "FAQ-2168":"correct","FAQ-2057":"partial","FAQ-2022":"correct","FAQ-2163":"correct","FAQ-2075":"correct",
+  "FAQ-1928":"correct","FAQ-1911":"partial","FAQ-2185":"partial","FAQ-2155":"correct","FAQ-2028":"partial",
+  "FAQ-2026":"correct","FAQ-2189":"partial","FAQ-2000":"correct","FAQ-1998":"correct",
+  "FAQ-2181":"correct","FAQ-2123":"correct","FAQ-1980":"correct","FAQ-1931":"correct","FAQ-1886":"wrong"
+};
+
+// Sort by timestamp
+data.sort((a, b) => a.t.localeCompare(b.t));
+
+// Build cumulative series
+const labels = [];
+const totalRate = [];
+const correctRate = [];
+const partialRate = [];
+let cumCorrect = 0, cumPartial = 0, cumDone = 0;
+
+data.forEach((item, i) => {
+  cumDone++;
+  const c = conclusions[item.id];
+  if (c === "correct") cumCorrect++;
+  else if (c === "partial") cumPartial++;
+
+  labels.push(i + 1);
+  totalRate.push(((cumCorrect + cumPartial) / cumDone * 100).toFixed(1));
+  correctRate.push((cumCorrect / cumDone * 100).toFixed(1));
+  partialRate.push((cumPartial / cumDone * 100).toFixed(1));
+});
+
+const ticketIds = data.map(d => d.id);
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: '總成功率',
+        data: totalRate,
+        borderColor: 'rgb(54, 162, 235)',
+        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2
+      },
+      {
+        label: '完全成功率',
+        data: correctRate,
+        borderColor: 'rgb(75, 192, 75)',
+        backgroundColor: 'rgba(75, 192, 75, 0.05)',
+        fill: false,
+        tension: 0.3,
+        pointRadius: 2
+      },
+      {
+        label: '部分成功率',
+        data: partialRate,
+        borderColor: 'rgb(255, 159, 64)',
+        backgroundColor: 'rgba(255, 159, 64, 0.05)',
+        fill: false,
+        tension: 0.3,
+        pointRadius: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'top' },
+      tooltip: {
+        callbacks: {
+          title: function(ctx) { return ticketIds[ctx[0].dataIndex]; },
+          label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + '%'; }
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        title: { display: true, text: '成功率 (%)' },
+        ticks: { callback: v => v + '%' }
+      },
+      x: {
+        title: { display: true, text: '完成順序' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

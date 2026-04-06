@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 — 2026-04-05</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    padding: 32px 24px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #111;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .card-label {
+    font-size: 12px;
+    color: #aaa;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .card-big {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: #666;
+  }
+  .green { color: #22c55e; }
+  .blue  { color: #3b82f6; }
+  .orange{ color: #f97316; }
+  .red   { color: #ef4444; }
+  .gray  { color: #9ca3af; }
+
+  /* Progress bar section */
+  .dist-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
+  }
+  .dist-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .dist-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .dist-name {
+    font-size: 13px;
+    color: #444;
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .dist-bar-wrap {
+    flex: 1;
+    background: #f3f4f6;
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .dist-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
+  }
+  .dist-stat {
+    font-size: 12px;
+    color: #888;
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Table */
+  .table-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  thead th {
+    padding: 12px 16px;
+    text-align: right;
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+  }
+  thead th:first-child { text-align: left; }
+  tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td {
+    padding: 12px 16px;
+    text-align: right;
+    color: #444;
+  }
+  tbody td:first-child { text-align: left; }
+  .badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-p1 { background: #fee2e2; color: #b91c1c; }
+  .badge-p2 { background: #ffedd5; color: #c2410c; }
+  .badge-p3 { background: #fef9c3; color: #92400e; }
+  .badge-p4 { background: #dbeafe; color: #1d4ed8; }
+
+  .rate-good  { color: #16a34a; font-weight: 600; }
+  .rate-mid   { color: #d97706; font-weight: 600; }
+  .rate-low   { color: #dc2626; font-weight: 600; }
+
+  /* Chart */
+  .chart-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .chart-wrap {
+    position: relative;
+    height: 380px;
+  }
+</style>
+</head>
+<body>
+
+<h1>回測統計報告</h1>
+<p class="subtitle">截至 2026-04-05｜共 147 張票｜已完成 144 張</p>
+
+<!-- Section 1: 總覽卡片 -->
+<div class="section-title">總覽</div>
+
+<div class="card-grid">
+  <div class="card">
+    <div class="card-label">總成功率</div>
+    <div class="card-big green">86.1%</div>
+    <div class="card-sub">分析正確 + 部分正確 ／ 已完成 144 張</div>
+  </div>
+  <div class="card">
+    <div class="card-label">完全成功率</div>
+    <div class="card-big blue">60.4%</div>
+    <div class="card-sub">部分成功率：<strong class="orange">25.7%</strong></div>
+  </div>
+</div>
+
+<div class="dist-card">
+  <div class="dist-title">結論分布（已完成 144 張）</div>
+
+  <div class="dist-row">
+    <div class="dist-name">✅ 分析正確</div>
+    <div class="dist-bar-wrap">
+      <div class="dist-bar" style="width:60.4%; background:#22c55e;"></div>
+    </div>
+    <div class="dist-stat">87 張 (60.4%)</div>
+  </div>
+  <div class="dist-row">
+    <div class="dist-name">✅ 部分正確</div>
+    <div class="dist-bar-wrap">
+      <div class="dist-bar" style="width:25.7%; background:#f97316;"></div>
+    </div>
+    <div class="dist-stat">37 張 (25.7%)</div>
+  </div>
+  <div class="dist-row">
+    <div class="dist-name">❌ 分析錯誤</div>
+    <div class="dist-bar-wrap">
+      <div class="dist-bar" style="width:9.7%; background:#ef4444;"></div>
+    </div>
+    <div class="dist-stat">14 張 (9.7%)</div>
+  </div>
+  <div class="dist-row">
+    <div class="dist-name">⚠️ 無法比對</div>
+    <div class="dist-bar-wrap">
+      <div class="dist-bar" style="width:4.2%; background:#9ca3af;"></div>
+    </div>
+    <div class="dist-stat">6 張 (4.2%)</div>
+  </div>
+</div>
+
+<!-- Section 2: 各嚴重性表格 -->
+<div class="section-title">各嚴重性等級成功率</div>
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>嚴重性</th>
+        <th>總數</th>
+        <th>正確</th>
+        <th>部分</th>
+        <th>錯誤</th>
+        <th>無法比對</th>
+        <th>完全率</th>
+        <th>部分率</th>
+        <th>總成功率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-p1">P1 重點</span></td>
+        <td>19</td>
+        <td>13</td>
+        <td>1</td>
+        <td>3</td>
+        <td>2</td>
+        <td class="rate-mid">68.4%</td>
+        <td>5.3%</td>
+        <td class="rate-mid">73.7%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-p2">P2 較高</span></td>
+        <td>97</td>
+        <td>56</td>
+        <td>30</td>
+        <td>8</td>
+        <td>3</td>
+        <td class="rate-mid">57.7%</td>
+        <td>30.9%</td>
+        <td class="rate-good">88.7%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-p3">P3 一般</span></td>
+        <td>21</td>
+        <td>13</td>
+        <td>5</td>
+        <td>2</td>
+        <td>1</td>
+        <td class="rate-mid">61.9%</td>
+        <td>23.8%</td>
+        <td class="rate-good">85.7%</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-p4">P4 較低</span></td>
+        <td>7</td>
+        <td>5</td>
+        <td>1</td>
+        <td>1</td>
+        <td>0</td>
+        <td class="rate-mid">71.4%</td>
+        <td>14.3%</td>
+        <td class="rate-good">85.7%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Section 3: 累積趨勢圖表 -->
+<div class="section-title">累積成功率趨勢</div>
+
+<div class="chart-card">
+  <div class="chart-wrap">
+    <canvas id="trendChart"></canvas>
+  </div>
+</div>
+
+<script>
+const labels = ["FAQ-1875","FAQ-1868","FAQ-1864","FAQ-1862","FAQ-1860","FAQ-1858","FAQ-1843","FAQ-1817","FAQ-1813","FAQ-1809","FAQ-1805","FAQ-1799","FAQ-1798","FAQ-1791","FAQ-1786","FAQ-1796","FAQ-1783","FAQ-1779","FAQ-1777","FAQ-1774","FAQ-1759","FAQ-1734","FAQ-1731","FAQ-1730","FAQ-1727","FAQ-1726","FAQ-1725","FAQ-1724","FAQ-1722","FAQ-1721","FAQ-1719","FAQ-1718","FAQ-1704","FAQ-1703","FAQ-1702","FAQ-1701","FAQ-1698","FAQ-1694","FAQ-1916","FAQ-1949","FAQ-1942","FAQ-1960","FAQ-1934","FAQ-1965","FAQ-1975","FAQ-1932","FAQ-2020","FAQ-2011","FAQ-653","FAQ-1961","FAQ-1912","FAQ-1887","FAQ-1820","FAQ-1819","FAQ-1720","FAQ-1695","FAQ-2015","FAQ-1939","FAQ-1918","FAQ-399","FAQ-2052","FAQ-2013","FAQ-2008","FAQ-2005","FAQ-1995","FAQ-1929","FAQ-1892","FAQ-2038","FAQ-2035","FAQ-2017","FAQ-2006","FAQ-1917","FAQ-1885","FAQ-2045","FAQ-1952","FAQ-1870","FAQ-2019","FAQ-2010","FAQ-1985","FAQ-2065","FAQ-1967","FAQ-2069","FAQ-2067","FAQ-1811","FAQ-2051","FAQ-2037","FAQ-2110","FAQ-2055","FAQ-2095","FAQ-2093","FAQ-2066","FAQ-2012","FAQ-1996","FAQ-2103","FAQ-2112","FAQ-2096","FAQ-2097","FAQ-2094","FAQ-2088","FAQ-2073","FAQ-2092","FAQ-2090","FAQ-1910","FAQ-1978","FAQ-2130","FAQ-2100","FAQ-2087","FAQ-2082","FAQ-2061","FAQ-2054","FAQ-2050","FAQ-2021","FAQ-1822","FAQ-2168","FAQ-2057","FAQ-2022","FAQ-2163","FAQ-2075","FAQ-1928","FAQ-1911","FAQ-2185","FAQ-2155","FAQ-2028","FAQ-2026","FAQ-2189","FAQ-2000","FAQ-1998","FAQ-2181","FAQ-2123","FAQ-1980","FAQ-1931","FAQ-1886","FAQ-1869","FAQ-1839","FAQ-2111","FAQ-1977","FAQ-1976","FAQ-1974","FAQ-1963","FAQ-1548","FAQ-1507","FAQ-1156","FAQ-2169","FAQ-2004"];
+const totalRate = [100.0,100.0,100.0,75.0,60.0,50.0,42.9,50.0,44.4,50.0,45.5,50.0,53.8,50.0,53.3,56.2,58.8,61.1,63.2,65.0,66.7,68.2,69.6,70.8,72.0,73.1,74.1,75.0,72.4,73.3,74.2,71.9,72.7,73.5,74.3,75.0,75.7,76.3,76.9,77.5,78.0,78.6,79.1,77.3,77.8,76.1,76.6,77.1,77.6,76.0,76.5,76.9,77.4,77.8,78.2,78.6,78.9,79.3,79.7,80.0,80.3,80.6,81.0,81.2,81.5,80.3,80.6,79.4,79.7,80.0,78.9,79.2,79.5,79.7,78.7,78.9,79.2,79.5,79.7,80.0,80.2,80.5,80.7,81.0,81.2,81.4,81.6,81.8,82.0,82.2,82.4,82.6,82.8,81.9,82.1,82.3,82.5,82.7,81.8,82.0,82.2,82.4,82.5,82.7,82.9,83.0,83.2,83.3,83.5,83.6,83.8,83.9,84.1,84.2,84.3,84.5,84.6,84.7,84.9,85.0,85.1,85.2,85.4,85.5,85.6,85.7,85.8,85.9,86.0,86.2,86.3,85.6,85.7,85.8,85.2,85.3,85.4,85.5,85.6,85.7,85.8,85.9,86.0,86.1];
+const fullRate  = [100.0,50.0,66.7,50.0,40.0,33.3,28.6,25.0,22.2,30.0,27.3,33.3,38.5,35.7,40.0,43.8,47.1,44.4,47.4,50.0,47.6,50.0,52.2,50.0,52.0,53.8,55.6,53.6,51.7,50.0,51.6,50.0,51.5,52.9,54.3,55.6,56.8,57.9,56.4,57.5,56.1,57.1,55.8,54.5,55.6,54.3,55.3,54.2,53.1,52.0,52.9,51.9,52.8,53.7,54.5,53.6,54.4,55.2,55.9,56.7,55.7,54.8,55.6,56.2,56.9,56.1,56.7,55.9,56.5,55.7,54.9,55.6,56.2,55.4,54.7,55.3,54.5,53.8,54.4,55.0,54.3,53.7,54.2,53.6,52.9,53.5,52.9,53.4,53.9,54.4,54.9,54.3,53.8,53.2,53.7,54.2,54.6,54.1,53.5,54.0,54.5,54.9,55.3,54.8,55.2,55.7,55.1,55.6,55.0,55.5,55.9,56.2,56.6,57.0,56.5,56.9,57.3,57.6,58.0,57.5,57.0,57.4,56.9,57.3,56.8,57.1,57.5,57.8,58.1,58.5,58.8,58.3,58.6,59.0,58.5,58.8,59.1,58.7,59.0,59.3,59.6,59.9,60.1,60.4];
+const partRate  = [0.0,50.0,33.3,25.0,20.0,16.7,14.3,25.0,22.2,20.0,18.2,16.7,15.4,14.3,13.3,12.5,11.8,16.7,15.8,15.0,19.0,18.2,17.4,20.8,20.0,19.2,18.5,21.4,20.7,23.3,22.6,21.9,21.2,20.6,20.0,19.4,18.9,18.4,20.5,20.0,22.0,21.4,23.3,22.7,22.2,21.7,21.3,22.9,24.5,24.0,23.5,25.0,24.5,24.1,23.6,25.0,24.6,24.1,23.7,23.3,24.6,25.8,25.4,25.0,24.6,24.2,23.9,23.5,23.2,24.3,23.9,23.6,23.3,24.3,24.0,23.7,24.7,25.6,25.3,25.0,25.9,26.8,26.5,27.4,28.2,27.9,28.7,28.4,28.1,27.8,27.5,28.3,29.0,28.7,28.4,28.1,27.8,28.6,28.3,28.0,27.7,27.5,27.2,27.9,27.6,27.4,28.0,27.8,28.4,28.2,27.9,27.7,27.4,27.2,27.8,27.6,27.4,27.1,26.9,27.5,28.1,27.9,28.5,28.2,28.8,28.6,28.3,28.1,27.9,27.7,27.5,27.3,27.1,26.9,26.7,26.5,26.3,26.8,26.6,26.4,26.2,26.1,25.9,25.7];
+const xLabels = labels.map((_, i) => i + 1);
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: xLabels,
+    datasets: [
+      {
+        label: '總成功率',
+        data: totalRate,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59,130,246,0.08)',
+        fill: true,
+        tension: 0.3,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+      },
+      {
+        label: '完全成功率',
+        data: fullRate,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.04)',
+        fill: false,
+        tension: 0.3,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+      },
+      {
+        label: '部分成功率',
+        data: partRate,
+        borderColor: '#f97316',
+        backgroundColor: 'rgba(249,115,22,0.04)',
+        fill: false,
+        tension: 0.3,
+        borderWidth: 2,
+        borderDash: [5, 3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: '累積成功率趨勢',
+        font: { size: 15, weight: '600' },
+        color: '#333',
+        padding: { bottom: 16 }
+      },
+      legend: {
+        position: 'top',
+        labels: {
+          font: { size: 12 },
+          color: '#555',
+          usePointStyle: true,
+          pointStyleWidth: 16,
+          padding: 20,
+        }
+      },
+      tooltip: {
+        callbacks: {
+          title: function(items) {
+            const idx = items[0].dataIndex;
+            return `#${idx+1} ${labels[idx]}`;
+          },
+          label: function(item) {
+            return `${item.dataset.label}: ${item.raw}%`;
+          }
+        },
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        titleColor: '#222',
+        bodyColor: '#444',
+        borderColor: '#e5e7eb',
+        borderWidth: 1,
+        padding: 12,
+        titleFont: { size: 13, weight: '600' },
+        bodyFont: { size: 12 },
+      }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: '完成順序',
+          color: '#888',
+          font: { size: 12 }
+        },
+        ticks: {
+          color: '#aaa',
+          font: { size: 11 },
+          maxTicksLimit: 20,
+        },
+        grid: { color: '#f3f4f6' }
+      },
+      y: {
+        title: {
+          display: true,
+          text: '成功率 (%)',
+          color: '#888',
+          font: { size: 12 }
+        },
+        min: 0,
+        max: 100,
+        ticks: {
+          color: '#aaa',
+          font: { size: 11 },
+          callback: v => v + '%'
+        },
+        grid: { color: '#f3f4f6' }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

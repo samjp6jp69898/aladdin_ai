@@ -123,6 +123,9 @@ When launching a sub agent, **the prompt must include the following instructions
 ```
 You are a senior code review expert for the Aladdin project. Please follow the instructions below to conduct a complete review of the specified author's code changes.
 
+## Language Requirement
+**All report content must be written in Traditional Chinese (繁體中文).** Code snippets, file paths, variable names, and other technical identifiers remain in their original form. This rule overrides any English templates found in the review standards document.
+
 ## Review Standards
 Please first read the complete review standards document:
 /Users/user/aladdin/obsidian/skills/daily-code-review/DAILY_REVIEW_PROMPT.md
@@ -193,23 +196,33 @@ Follow the output format specified in DAILY_REVIEW_PROMPT.md.
 - Only use Read, Write (for report output only), Glob, Grep, Bash (git commands only)
 
 ## After Completion
-When done, tell the main agent that {AUTHOR_NAME}'s review is complete, and report any critical issues found in the report in the following format:
-Issue Description | Issue Location (file / method name / line number)
+When done, tell the main agent that {AUTHOR_NAME}'s review is complete, and report any critical issues found in the report.
+
+List each critical issue as a separate line using this **exact** format — one issue per line, fields separated by ` ||| ` (triple pipe with spaces):
+
+```
+CRITICAL_ISSUE ||| <Issue Description> ||| <Issue Location: file / method name / line number>
+```
+
+Example:
+```
+CRITICAL_ISSUE ||| Missing @Permission on GetCommissionInvoiceOriginalData: sensitive financial data exposed without permission check ||| rajah/services/agent_back_office.rajah:1970 / GetCommissionInvoiceOriginalData
+CRITICAL_ISSUE ||| SQL GROUP BY inconsistency: started_at_timestamp in SELECT but not in GROUP BY ||| agrabah/src/servers/venture_agent/models/statistic.ts:855 / GetUsersGameBetWinByIds
+```
+
+If there are no critical issues, write: `CRITICAL_ISSUE ||| none`
 ```
 
 ---
 
 ### Step 5: Compile Completion Report
 
-After all authors' reviews are complete, output the following summary:
+After all authors' reviews are complete, collect all `CRITICAL_ISSUE` lines reported by each sub agent.
 
-## Daily Code Review Completion Report
+Parse each line with the ` ||| ` separator to extract: Issue Description and Issue Location.
+Skip any line where the description is `none`.
 
-Before ending their tasks, each sub agent will compile the serious issues found for that author and report them to you. Compile them into the following CSV format:
-
-Issue Description | Issue Location (file / method name / line number) | author | date (YYYY/MM/DD)
-
-Then **append** this data to the bottom of the following CSV file at its **complete absolute path**:
+Write the results to the following CSV file:
 
 ```
 /Users/user/aladdin/review/{REVIEW_DATE}/CRITICAL_ISSUES_{REVIEW_DATE}.csv
@@ -217,7 +230,29 @@ Then **append** this data to the bottom of the following CSV file at its **compl
 
 **Important: The CSV file must be stored under the review date directory `/Users/user/aladdin/review/{REVIEW_DATE}/` — it must not be stored anywhere else.**
 
-If the file does not exist, create a new file and write the header row. After the CSV update is complete, the Main Agent's task is finished.
+#### CSV Format Rules — follow exactly:
+
+1. **Delimiter**: comma `,` (NOT pipe `|`)
+2. **Header row** (write once, only if creating a new file):
+   ```
+   Issue Description,Issue Location (file / method name / line number),Author,Date
+   ```
+3. **Each data row**: 4 fields separated by commas
+4. **Quoting rule**: If a field value contains a comma, a double-quote, or a newline, wrap the entire field in double-quotes (`"`). Escape any literal double-quote inside a field by doubling it (`""`).
+5. **Author field**: Use the author's name (e.g. `ashliu`, `pkh_tom`)
+6. **Date field**: Use format `YYYY/MM/DD` (e.g. `2026/04/03`)
+
+#### Example of correct CSV output:
+
+```
+Issue Description,Issue Location (file / method name / line number),Author,Date
+"Missing @Permission on GetCommissionInvoiceOriginalData: sensitive financial data exposed without permission check",rajah/services/agent_back_office.rajah:1970 / GetCommissionInvoiceOriginalData,farus,2026/04/04
+"SQL GROUP BY inconsistency: started_at_timestamp in SELECT but not in GROUP BY in GetUsersGameBetWinByIds",agrabah/src/servers/venture_agent/models/statistic.ts:855 / GetUsersGameBetWinByIds,jonathan,2026/04/03
+```
+
+**If the file already exists**, read its current content first, then append only the new rows (do not re-write the header). Use the Write tool to write the complete file (header + existing rows + new rows).
+
+After the CSV update is complete, the Main Agent's task is finished.
 
 ## Notes
 

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Back-Testing 統計報告 — 20260405-1741</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  h1.report-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  .report-meta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 28px;
+  }
+
+  /* ---- cards ---- */
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+    padding-left: 4px;
+    border-left: 3px solid #1976d2;
+    padding-left: 10px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    padding: 24px 28px;
+  }
+
+  /* ---- overview grid ---- */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .big-number {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .big-number.success { color: #2e7d32; }
+  .big-number.correct { color: #1565c0; }
+  .card-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .card-sub {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 4px;
+  }
+  .card-sub span {
+    font-weight: 600;
+    color: #333;
+  }
+  .divider-line {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 12px 0;
+  }
+
+  /* ---- progress bars ---- */
+  .progress-section { margin-top: 8px; }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .progress-label {
+    width: 80px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #555;
+    flex-shrink: 0;
+  }
+  .progress-bar-wrap {
+    flex: 1;
+    background: #eee;
+    border-radius: 6px;
+    height: 12px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+  .progress-stat {
+    width: 110px;
+    font-size: 0.82rem;
+    color: #666;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ---- table ---- */
+  .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .stats-table th {
+    background: #f8f9fa;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid #e8e8e8;
+  }
+  .stats-table th.num { text-align: right; }
+  .stats-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .stats-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .stats-table tr:last-child td { border-bottom: none; }
+  .stats-table tr:hover td { background: #fafafa; }
+
+  .priority-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.03em;
+  }
+  .p1 { background: #ef5350; }
+  .p2 { background: #fb8c00; }
+  .p3 { background: #f9a825; color: #333; }
+  .p4 { background: #1e88e5; }
+
+  .rate-cell {
+    font-weight: 700;
+  }
+  .rate-high { color: #2e7d32; }
+  .rate-mid  { color: #f57c00; }
+  .rate-low  { color: #c62828; }
+
+  /* ---- chart ---- */
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 380px;
+  }
+
+  /* total row in table */
+  .table-total td {
+    background: #f5f7ff !important;
+    font-weight: 700;
+    border-top: 2px solid #d0d8ff;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="report-title">Back-Testing 統計報告</h1>
+<p class="report-meta">生成時間：2026-04-05 17:41 &nbsp;|&nbsp; 資料範圍：20260328 – 20260405 &nbsp;|&nbsp; 總 done：154 筆&nbsp;(另有 1 筆 pending 未納入)</p>
+
+<!-- ============================================================ -->
+<!-- Section 1: Overview                                           -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">Section 1 &nbsp;總覽</div>
+
+  <div class="overview-grid">
+    <!-- Left card: total success -->
+    <div class="card">
+      <div class="card-label">總成功率（正確 + 部分）</div>
+      <div class="big-number success">86.4%</div>
+      <hr class="divider-line">
+      <div class="card-sub">已完成 <span>154</span> 筆 &nbsp;/&nbsp; 總計 <span>161</span> 筆（含 pending）</div>
+      <div class="card-sub" style="margin-top:6px;">分析正確 <span>91</span> + 部分正確 <span>42</span> = <span>133</span> 筆成功</div>
+    </div>
+
+    <!-- Right card: correct / partial rates -->
+    <div class="card">
+      <div class="card-label">完全成功率</div>
+      <div class="big-number correct">59.1%</div>
+      <hr class="divider-line">
+      <div class="card-sub">分析正確 <span>91</span> 筆 / 154 done</div>
+      <div class="card-sub" style="margin-top:6px;">部分成功率 <span>27.3%</span>（部分正確 <span>42</span> 筆）</div>
+    </div>
+  </div>
+
+  <!-- Progress bars -->
+  <div class="card">
+    <div class="card-label" style="margin-bottom:14px;">結論分布</div>
+    <div class="progress-section">
+
+      <div class="progress-row">
+        <div class="progress-label">✅ 分析正確</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:59.1%; background:#1565c0;"></div>
+        </div>
+        <div class="progress-stat">91 筆 &nbsp;<strong>59.1%</strong></div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-label">✅ 部分正確</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:27.3%; background:#43a047;"></div>
+        </div>
+        <div class="progress-stat">42 筆 &nbsp;<strong>27.3%</strong></div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-label">❌ 分析錯誤</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:9.7%; background:#e53935;"></div>
+        </div>
+        <div class="progress-stat">15 筆 &nbsp;<strong>9.7%</strong></div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-label">⚠️ 無法比對</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:3.9%; background:#bdbdbd;"></div>
+        </div>
+        <div class="progress-stat">6 筆 &nbsp;<strong>3.9%</strong></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Section 2: Per-Priority Table                                 -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">Section 2 &nbsp;各嚴重性等級統計</div>
+
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>嚴重性</th>
+          <th class="num">總數</th>
+          <th class="num">✅ 正確</th>
+          <th class="num">✅ 部分</th>
+          <th class="num">❌ 錯誤</th>
+          <th class="num">⚠️ 無法比對</th>
+          <th class="num">完全率</th>
+          <th class="num">部分率</th>
+          <th class="num">總成功率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="priority-badge p1">P1 重點</span></td>
+          <td class="num">21</td>
+          <td class="num">14</td>
+          <td class="num">2</td>
+          <td class="num">3</td>
+          <td class="num">2</td>
+          <td class="num rate-cell rate-high">66.7%</td>
+          <td class="num">9.5%</td>
+          <td class="num rate-cell rate-mid">76.2%</td>
+        </tr>
+        <tr>
+          <td><span class="priority-badge p2">P2 較高</span></td>
+          <td class="num">101</td>
+          <td class="num">57</td>
+          <td class="num">33</td>
+          <td class="num">8</td>
+          <td class="num">3</td>
+          <td class="num rate-cell rate-mid">56.4%</td>
+          <td class="num">32.7%</td>
+          <td class="num rate-cell rate-high">89.1%</td>
+        </tr>
+        <tr>
+          <td><span class="priority-badge p3">P3 一般</span></td>
+          <td class="num">22</td>
+          <td class="num">14</td>
+          <td class="num">5</td>
+          <td class="num">2</td>
+          <td class="num">1</td>
+          <td class="num rate-cell rate-high">63.6%</td>
+          <td class="num">22.7%</td>
+          <td class="num rate-cell rate-high">86.4%</td>
+        </tr>
+        <tr>
+          <td><span class="priority-badge p4">P4 較低</span></td>
+          <td class="num">10</td>
+          <td class="num">6</td>
+          <td class="num">2</td>
+          <td class="num">2</td>
+          <td class="num">0</td>
+          <td class="num rate-cell rate-mid">60.0%</td>
+          <td class="num">20.0%</td>
+          <td class="num rate-cell rate-mid">80.0%</td>
+        </tr>
+        <tr class="table-total">
+          <td>合計</td>
+          <td class="num">154</td>
+          <td class="num">91</td>
+          <td class="num">42</td>
+          <td class="num">15</td>
+          <td class="num">6</td>
+          <td class="num rate-cell rate-mid">59.1%</td>
+          <td class="num">27.3%</td>
+          <td class="num rate-cell rate-high">86.4%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Section 3: Trend Chart                                        -->
+<!-- ============================================================ -->
+<div class="section">
+  <div class="section-title">Section 3 &nbsp;累積成功率趨勢</div>
+  <div class="card">
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+const labels = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154"];
+
+const totalRate    = [100.0,100.0,100.0,75.0,60.0,50.0,42.9,50.0,44.4,50.0,45.5,50.0,53.8,50.0,53.3,56.2,58.8,61.1,63.2,65.0,66.7,68.2,69.6,70.8,72.0,73.1,74.1,75.0,72.4,73.3,74.2,71.9,72.7,73.5,74.3,75.0,75.7,76.3,76.9,77.5,78.0,78.6,79.1,77.3,77.8,76.1,76.6,77.1,77.6,76.0,76.5,76.9,77.4,77.8,78.2,78.6,78.9,79.3,79.7,80.0,80.3,80.6,81.0,81.2,81.5,80.3,80.6,79.4,79.7,80.0,78.9,79.2,79.5,79.7,78.7,78.9,79.2,79.5,79.7,80.0,80.2,80.5,80.7,81.0,81.2,81.4,81.6,81.8,82.0,82.2,82.4,82.6,82.8,81.9,82.1,82.3,82.5,82.7,81.8,82.0,82.2,82.4,82.5,82.7,82.9,83.0,83.2,83.3,83.5,83.6,83.8,83.9,84.1,84.2,84.3,84.5,84.6,84.7,84.9,85.0,85.1,85.2,85.4,85.5,85.6,85.7,85.8,85.9,86.0,86.2,86.3,85.6,85.7,85.8,85.2,85.3,85.4,85.5,85.6,85.7,85.8,85.9,86.0,86.1,86.2,86.3,86.4,86.5,86.6,86.7,86.8,86.8,86.9,86.4];
+
+const correctRate  = [100.0,50.0,66.7,50.0,40.0,33.3,28.6,25.0,22.2,30.0,27.3,33.3,38.5,35.7,40.0,43.8,47.1,44.4,47.4,50.0,47.6,50.0,52.2,50.0,52.0,53.8,55.6,53.6,51.7,50.0,51.6,50.0,51.5,52.9,54.3,55.6,56.8,57.9,56.4,57.5,56.1,57.1,55.8,54.5,55.6,54.3,55.3,54.2,53.1,52.0,52.9,51.9,52.8,53.7,54.5,53.6,54.4,55.2,55.9,56.7,55.7,54.8,55.6,56.2,56.9,56.1,56.7,55.9,56.5,55.7,54.9,55.6,56.2,55.4,54.7,55.3,54.5,53.8,54.4,55.0,54.3,53.7,54.2,53.6,52.9,53.5,52.9,53.4,53.9,54.4,54.9,54.3,53.8,53.2,53.7,54.2,54.6,54.1,53.5,54.0,54.5,54.9,55.3,54.8,55.2,55.7,55.1,55.6,55.0,55.5,55.9,56.2,56.6,57.0,56.5,56.9,57.3,57.6,58.0,57.5,57.0,57.4,56.9,57.3,56.8,57.1,57.5,57.8,58.1,58.5,58.8,58.3,58.6,59.0,58.5,58.8,59.1,58.7,59.0,59.3,59.6,59.9,60.1,60.4,60.7,61.0,61.2,60.8,60.4,60.0,59.6,59.2,59.5,59.1];
+
+const partialRate  = [0.0,50.0,33.3,25.0,20.0,16.7,14.3,25.0,22.2,20.0,18.2,16.7,15.4,14.3,13.3,12.5,11.8,16.7,15.8,15.0,19.0,18.2,17.4,20.8,20.0,19.2,18.5,21.4,20.7,23.3,22.6,21.9,21.2,20.6,20.0,19.4,18.9,18.4,20.5,20.0,22.0,21.4,23.3,22.7,22.2,21.7,21.3,22.9,24.5,24.0,23.5,25.0,24.5,24.1,23.6,25.0,24.6,24.1,23.7,23.3,24.6,25.8,25.4,25.0,24.6,24.2,23.9,23.5,23.2,24.3,23.9,23.6,23.3,24.3,24.0,23.7,24.7,25.6,25.3,25.0,25.9,26.8,26.5,27.4,28.2,27.9,28.7,28.4,28.1,27.8,27.5,28.3,29.0,28.7,28.4,28.1,27.8,28.6,28.3,28.0,27.7,27.5,27.2,27.9,27.6,27.4,28.0,27.8,28.4,28.2,27.9,27.7,27.4,27.2,27.8,27.6,27.4,27.1,26.9,27.5,28.1,27.9,28.5,28.2,28.8,28.6,28.3,28.1,27.9,27.7,27.5,27.3,27.1,26.9,26.7,26.5,26.3,26.8,26.6,26.4,26.2,26.1,25.9,25.7,25.5,25.3,25.2,25.7,26.2,26.7,27.2,27.6,27.5,27.3];
+
+const ticketIds    = ["FAQ-1875","FAQ-1868","FAQ-1864","FAQ-1862","FAQ-1860","FAQ-1858","FAQ-1843","FAQ-1817","FAQ-1813","FAQ-1809","FAQ-1805","FAQ-1799","FAQ-1798","FAQ-1791","FAQ-1786","FAQ-1796","FAQ-1783","FAQ-1779","FAQ-1777","FAQ-1774","FAQ-1759","FAQ-1734","FAQ-1731","FAQ-1730","FAQ-1727","FAQ-1726","FAQ-1725","FAQ-1724","FAQ-1722","FAQ-1721","FAQ-1719","FAQ-1718","FAQ-1704","FAQ-1703","FAQ-1702","FAQ-1701","FAQ-1698","FAQ-1694","FAQ-1916","FAQ-1949","FAQ-1942","FAQ-1960","FAQ-1934","FAQ-1965","FAQ-1975","FAQ-1932","FAQ-2020","FAQ-2011","FAQ-653","FAQ-1961","FAQ-1912","FAQ-1887","FAQ-1820","FAQ-1819","FAQ-1720","FAQ-1695","FAQ-2015","FAQ-1939","FAQ-1918","FAQ-399","FAQ-2052","FAQ-2013","FAQ-2008","FAQ-2005","FAQ-1995","FAQ-1929","FAQ-1892","FAQ-2038","FAQ-2035","FAQ-2017","FAQ-2006","FAQ-1917","FAQ-1885","FAQ-2045","FAQ-1952","FAQ-1870","FAQ-2019","FAQ-2010","FAQ-1985","FAQ-2065","FAQ-1967","FAQ-2069","FAQ-2067","FAQ-1811","FAQ-2051","FAQ-2037","FAQ-2110","FAQ-2055","FAQ-2095","FAQ-2093","FAQ-2066","FAQ-2012","FAQ-1996","FAQ-2103","FAQ-2112","FAQ-2096","FAQ-2097","FAQ-2094","FAQ-2088","FAQ-2073","FAQ-2092","FAQ-2090","FAQ-1910","FAQ-1978","FAQ-2130","FAQ-2100","FAQ-2087","FAQ-2082","FAQ-2061","FAQ-2054","FAQ-2050","FAQ-2021","FAQ-1822","FAQ-2168","FAQ-2057","FAQ-2022","FAQ-2163","FAQ-2075","FAQ-1928","FAQ-1911","FAQ-2185","FAQ-2155","FAQ-2028","FAQ-2026","FAQ-2189","FAQ-2000","FAQ-1998","FAQ-2181","FAQ-2123","FAQ-1980","FAQ-1931","FAQ-1886","FAQ-1869","FAQ-1839","FAQ-2111","FAQ-1977","FAQ-1976","FAQ-1974","FAQ-1963","FAQ-1548","FAQ-1507","FAQ-1156","FAQ-2169","FAQ-2004","FAQ-2182","FAQ-2159","FAQ-2119","FAQ-2043","FAQ-2029","FAQ-1906","FAQ-1893","FAQ-1691","FAQ-1664","FAQ-1609"];
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: '總成功率（正確+部分）',
+        data: totalRate,
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,0.06)',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#1976d2',
+        tension: 0.3,
+        fill: false,
+      },
+      {
+        label: '完全成功率（分析正確）',
+        data: correctRate,
+        borderColor: '#2e7d32',
+        backgroundColor: 'rgba(46,125,50,0.05)',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#2e7d32',
+        tension: 0.3,
+        fill: false,
+      },
+      {
+        label: '部分成功率（部分正確）',
+        data: partialRate,
+        borderColor: '#f57c00',
+        backgroundColor: 'rgba(245,124,0,0.05)',
+        borderWidth: 2,
+        borderDash: [5, 3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#f57c00',
+        tension: 0.3,
+        fill: false,
+      },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: '累積成功率趨勢（按完成時間排序，共 154 筆）',
+        font: { size: 14, weight: '600' },
+        color: '#444',
+        padding: { bottom: 16 },
+      },
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          boxWidth: 10,
+          padding: 20,
+          font: { size: 12 },
+        },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(30,30,30,0.88)',
+        titleFont: { size: 12, weight: '700' },
+        bodyFont: { size: 12 },
+        padding: 12,
+        callbacks: {
+          title: function(items) {
+            const idx = items[0].dataIndex;
+            return `#${idx + 1}  ${ticketIds[idx]}`;
+          },
+          label: function(item) {
+            return `  ${item.dataset.label}: ${item.raw}%`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: '完成序號（時間升序）',
+          color: '#888',
+          font: { size: 11 },
+        },
+        ticks: {
+          maxTicksLimit: 20,
+          color: '#aaa',
+          font: { size: 10 },
+        },
+        grid: { color: 'rgba(0,0,0,0.04)' },
+      },
+      y: {
+        min: 0,
+        max: 100,
+        title: {
+          display: true,
+          text: '成功率 (%)',
+          color: '#888',
+          font: { size: 11 },
+        },
+        ticks: {
+          callback: v => v + '%',
+          color: '#aaa',
+          font: { size: 10 },
+          stepSize: 10,
+        },
+        grid: { color: 'rgba(0,0,0,0.05)' },
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

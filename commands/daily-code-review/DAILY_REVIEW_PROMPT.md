@@ -498,6 +498,7 @@ Issues already fixed in a later commit within the same review date must NOT be l
 
 ## Execution Rules
 
+0. **Report language**: All report content must be written in **Traditional Chinese（繁體中文）**. Code snippets, file paths, variable names, commit hashes, and other technical identifiers remain in their original form. This applies to all headings, descriptions, issue lists, trend notes, and the overall score commentary.
 1. **Single Agent per author**: One Agent is responsible for reviewing all repos for that author to obtain full cross-repo context. The Agent must read the complete content of this file as its review standard; the Main Agent must not summarize or paraphrase it.
 2. **Skip authors with existing reports for the specified date** (determined by the report filename date).
 3. **Must read full files** — reviewing only the diff is insufficient; full context is required for accurate review.

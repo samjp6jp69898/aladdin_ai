@@ -143,17 +143,33 @@ Write to:
 HTML structure:
 - Standalone single file, no external assets except Chart.js CDN
 - `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`
+- **HTML 必須包含完整的統計摘要，不能只有圖表。** 頁面由上而下依序包含：
+
+#### Section 1: 總覽卡片
+- 兩張卡片並排 (CSS grid 2-column)：
+  - 左卡：**總成功率** (大字) + 已完成 / 總數
+  - 右卡：**完全成功率** (大字) + 部分成功率
+- 下方以 progress bar 顯示結論分布（分析正確 / 部分正確 / 分析錯誤 / 無法比對）含數量與百分比
+
+#### Section 2: 各嚴重性等級成功率表格
+- HTML `<table>` 呈現 Step 3 Block 2 的完整內容
+- 欄位：嚴重性 | 總數 | 正確 | 部分 | 錯誤 | 無法比對 | 完全率 | 部分率 | 總成功率
+- 嚴重性使用顏色標籤 (P1 紅 / P2 橙 / P3 黃 / P4 藍)
+
+#### Section 3: 累積趨勢圖表
 - Three lines on the same chart:
   - 總成功率 (blue)
   - 完全成功率 (green)
   - 部分成功率 (orange)
-- Chart title: `回測累積成功率趨勢`
+- Chart title: `累積成功率趨勢`
 - Y-axis: 0–100%, label `成功率 (%)`
 - X-axis: ticket index, label `完成順序`
 - Legend displayed
 - Tooltip shows: ticket ID, 總成功率, 完全成功率, 部分成功率
 
 All chart data is embedded inline as a JSON literal in a `<script>` tag — no external data files.
+
+**視覺風格：** 使用圓角卡片 (border-radius 12px)、淺灰底色 (#f5f5f5)、白色容器、box-shadow、system font stack。整體排版乾淨俐落。
 
 #### 4c. Open in browser
 
