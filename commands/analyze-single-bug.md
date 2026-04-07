@@ -1,26 +1,31 @@
 ---
 name: analyze-single-bug
-description: Full pipeline for processing a Notion bug ticket — automatically analyzes ownership and provides fix recommendations.
+description: Full pipeline for processing a Notion bug ticket — analyzes, fixes code in worktree, tests, validates, and uploads results.
 user-invocable: true
 argument-hint: "<NotionURL> [ticket_id]"
 context: fork
 ---
 
-# Bug Analysis Pipeline
+# Bug Analysis Pipeline v2
 
-You are a manager responsible for dispatching engineers. Your role is to sequentially dispatch four engineers to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate personnel.
-Always use the specified prompt document to create the corresponding sub agent for each step. It is strictly forbidden to read the prompt yourself and handle tasks that should be delegated to sub agents!
+You are a pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
+
+Always use the specified prompt document to create the corresponding sub agent. Never read the prompt yourself and handle tasks that should be delegated to sub agents.
 
 ## Parameters
 
 `$ARGUMENTS` format: `/analyze-single-bug <NotionURL> [ticket_id]`
 
 - **NotionURL** (required): The Notion URL of the bug ticket
-- **ticket_id** (optional): e.g. `FAQ-1702`; if not provided, it will be parsed and returned by Bug Report Analyst
+- **ticket_id** (optional): e.g. `FAQ-1702`; if not provided, parsed by Bug Report Analyst
 
 ---
 
 ## Execution Flow
+
+### Step 0: Parse Arguments
+
+Extract NotionURL and ticket_id from `$ARGUMENTS`.
 
 ### Step 1: Bug Report Analyst
 
@@ -35,128 +40,180 @@ When done, return the ticket ID on the last line in this format:
 TICKET_ID: FAQ-XXXX
 ```
 
-**Wait for completion**, then extract `TICKET_ID: FAQ-XXXX` from the response to get the ticket ID (if `$ARGUMENTS` already contains the ticket ID, use it directly).
-
-In all subsequent steps, replace `{ticket_id}` with the actual ticket ID (e.g. `FAQ-1702`).
-
----
+**Wait for completion**, extract `TICKET_ID: FAQ-XXXX`. In all subsequent steps, use the actual ticket ID.
 
 ### Step 1.5: Download Bug Screenshot (Main Flow)
 
 This step is **executed by the main flow itself**, not by a sub agent.
 
 1. Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md`
-2. Extract all image URLs from the "Supporting Document Links" section (typically URLs starting with `prod-files-secure.s3.us-west-2.amazonaws.com`)
-3. If image URLs are found, use the Bash tool to download each one to `/Users/user/aladdin/debug/{ticket_id}/`:
+2. Extract all image URLs from the "Supporting Document Links" section
+3. If image URLs found, download each:
+   ```bash
+   curl -sL -o "/Users/user/aladdin/debug/{ticket_id}/screenshot_1.png" "full_image_url"
+   ```
+4. Read each image, append description to analytics document under `## Screenshot Analysis`
+5. If no images or download fails, skip and proceed.
+
+### Step 1.7: Create Worktree
 
 ```bash
-curl -sL -o "/Users/user/aladdin/debug/{ticket_id}/screenshot_1.png" "full_image_url_with_signed_params"
+mkdir -p /Users/user/aladdin/worktrees
+git worktree add /Users/user/aladdin/worktrees/{ticket_id} -b landon/{ticket_id} main
+cd /Users/user/aladdin/worktrees/{ticket_id} && sh bootstrap.sh
 ```
 
-4. After downloading, use the Read tool to read each image, then **append** a description of the image content to the analytics document:
+Store the worktree path: `/Users/user/aladdin/worktrees/{ticket_id}`
 
-```
-## Screenshot Analysis
-
-### screenshot_1.png
-(Describe what is visible in the image, including UI state, values, error messages, and other observable information)
+If `git worktree add` fails (branch already exists), try:
+```bash
+git worktree add /Users/user/aladdin/worktrees/{ticket_id} landon/{ticket_id}
 ```
 
-5. If "Supporting Document Links" is "(not provided)" or contains no image URLs, skip this step.
-6. If any step of image downloading or reading fails (e.g. 403/404, corrupted file, read timeout), log the failure reason then **immediately skip remaining screenshot processing and proceed to Step 2 (Bug Trace Fixer)** without retrying further images.
+If bootstrap.sh fails, log the error but continue.
 
 ---
 
-### Step 2: Bug Trace Fixer (Initial Analysis)
+### Step 2: Bug Fixer
+
+**Initialize fixer_attempt_count = 0.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-trace-fixer.md`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/bug-trace-fixer.md} as the prompt. Please read the following bug analysis document, trace through the code, and provide a solution.
+Use all text in {/Users/user/aladdin/.claude/agents/bug-trace-fixer.md} as the prompt. Please read the bug analysis document, trace through the code, fix the bug in the worktree, and write the analysis notes.
 analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
-**Wait for completion**, confirm that `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-solution.md` has been created.
-
-Read the solution document and check whether it contains a "Previously Fixed" section. **If the solution explicitly records that the issue has been fixed (including commit hash and fix summary)**, skip the Step 3 review loop and go directly to Step 4. Bugs with a confirmed fix commit do not require Peer Review.
+**Wait for completion.** Read analysis-notes.md and check for "已修復紀錄" section. If the bug is confirmed already fixed (with commit hash), **skip Steps 3-5** and go directly to Step 6.
 
 ---
 
-### Step 3: Peer Reviewer Review Loop
+### Step 3: Spec Fetcher
 
-**Initialize rejection counter to 0.**
-
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/peer-reviewer.md`:
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/spec-fetcher.md`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/peer-reviewer.md} as the prompt. Please review the consistency between the solution and the bug ticket:
-analytics document: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-solution document: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-solution.md
+Use all text in {/Users/user/aladdin/.claude/agents/spec-fetcher.md} as the prompt. Please find the business specification for the affected module.
+ticket_id: {ticket_id}
 ```
 
-**After waiting for completion, read** `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-peer-review.md` to confirm the review result:
-
-#### If review result contains `✅ 審核通過`
-
-→ Proceed directly to **Step 4**.
-
-#### If review result contains `❌ 審核未通過`
-
-Increment rejection counter by 1.
-
-**If rejection counter < 4**: Re-launch Bug Trace Fixer with all historical documents:
-
-```
-prompt:
-The previous solution failed review. Please re-read all documents and propose a new solution from a different perspective.
-analytics document: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-previous solution document: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-solution.md
-peer-review feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-peer-review.md
-
-Please overwrite the solution document with a revised solution.
-```
-
-Wait for completion, then **return to Step 3 to review again**.
-
-**If rejection counter reaches 4**:
-
-Report to the user:
-```
-{ticket_id} could not produce a solution that passes review after 4 attempts. Manual intervention required.
-Documents at: /Users/user/aladdin/debug/{ticket_id}/
-```
-
-End the pipeline without executing Step 4.
+**Wait for completion.** If spec.md was not created, the pipeline continues (graceful degradation).
 
 ---
 
-### Step 4: Drive Uploader
+### Step 4: Evaluator
+
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/evaluator.md`:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/evaluator.md} as the prompt. Please review the Bug Fixer's solution, write tests, and execute them.
+ticket_id: {ticket_id}
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+```
+
+**Wait for completion.** Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md`.
+
+#### If `✅ 通過` → Proceed to Step 5.
+
+#### If `❌ 未通過`
+
+Increment fixer_attempt_count.
+
+**If fixer_attempt_count < 3:** Re-launch Bug Fixer with feedback:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/bug-trace-fixer.md} as the prompt. The previous solution failed review. Please re-read all documents and propose a new fix.
+analytics document: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
+evaluator feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+
+Read the evaluator feedback carefully, modify the code on the same branch, and commit a new fix.
+```
+
+Wait for completion, then **return to Step 4**.
+
+**If fixer_attempt_count reaches 3:** Report failure and end pipeline (skip Steps 5-6).
+
+```
+{ticket_id} 經過 3 次修復嘗試仍未通過 Evaluator 審核。需要人工介入。
+Worktree 保留在：/Users/user/aladdin/worktrees/{ticket_id}
+文件位於：/Users/user/aladdin/debug/{ticket_id}/
+```
+
+---
+
+### Step 5: Test Validator
+
+**Initialize validator_attempt_count = 0.**
+
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/test-validator.md`:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/test-validator.md} as the prompt. Please validate the test quality and coverage.
+ticket_id: {ticket_id}
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+```
+
+**Wait for completion.** Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
+
+#### If `✅ 通過` → Proceed to Step 6.
+
+#### If `❌ 未通過`
+
+Increment validator_attempt_count.
+
+**If validator_attempt_count < 2:** Re-launch Evaluator with feedback:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/evaluator.md} as the prompt. The tests failed validation. Please supplement the tests based on the feedback.
+ticket_id: {ticket_id}
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+validation feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md
+
+Read the validation feedback and add/modify test cases to address the gaps.
+```
+
+Wait for completion, then **return to Step 5**.
+
+**If validator_attempt_count reaches 2:** Report failure, preserve worktree, end pipeline.
+
+---
+
+### Step 6: Drive Uploader
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. Please upload the analysis documents for the following ticket to Google Drive and leave a comment in Notion.
+Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. Please compile the solution document, upload to Google Drive, and comment on Notion.
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
 **Wait for completion.**
 
 ---
 
-### Step 5: Completion Report
-
-Report to the user:
+### Step 7: Completion Report
 
 ```
 ## {ticket_id} Analysis Complete
 
-- Peer Review: passed (attempt N)
-- Google Drive: {share link returned by drive-uploader}
-- Notion comment: completed / failed (reason)
+- Bug Fixer attempts: {fixer_attempt_count + 1}
+- Evaluator: passed
+- Test Validator: passed (attempt {validator_attempt_count + 1})
+- Google Drive: {share link}
+- Notion comment: completed / failed
+- Worktree: /Users/user/aladdin/worktrees/{ticket_id} (branch: landon/{ticket_id})
 
 Documents at: /Users/user/aladdin/debug/{ticket_id}/
 ```
