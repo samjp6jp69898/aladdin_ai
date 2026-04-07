@@ -55,6 +55,12 @@ sh /Users/user/aladdin/daily_bootstrap.sh
 
 Wait for it to finish before proceeding to Step 1. If the script fails, report the error to the user but continue with subsequent steps (using existing code).
 
+After bootstrap completes, ensure the worktrees directory exists:
+
+```bash
+mkdir -p /Users/user/aladdin/worktrees
+```
+
 ### Step 1: Read Tracker
 
 1. Read the tracker file `/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md`
@@ -170,6 +176,13 @@ Check the following conditions:
 | 1 | FAQ-1841 | done |
 | 2 | FAQ-1807 | done |
 | 3 | FAQ-1722 | skipped (claimed by another session) |
+```
+
+After the report, remind the user:
+```
+提醒：已完成的 worktrees 可以手動清理：
+git worktree list
+git worktree remove /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
 ---
