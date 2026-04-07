@@ -87,7 +87,20 @@ analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analy
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
-**Wait for completion.** Read analysis-notes.md and check for "已修復紀錄" section. If the bug is confirmed already fixed (with commit hash), **skip Steps 3-5** and go directly to Step 6.
+**Wait for completion.**
+
+#### BRANCH_ERROR Handling
+If the Bug Fixer returns a message containing `BRANCH_ERROR`:
+1. Log the error
+2. Attempt to re-create the worktree:
+   ```bash
+   git worktree remove /Users/user/aladdin/worktrees/{ticket_id} --force 2>/dev/null; git worktree add /Users/user/aladdin/worktrees/{ticket_id} -b landon/{ticket_id} main
+   ```
+   If the branch already exists: `git worktree add /Users/user/aladdin/worktrees/{ticket_id} landon/{ticket_id}`
+3. Verify: `cd /Users/user/aladdin/worktrees/{ticket_id} && git branch --show-current`
+4. If verified, re-dispatch Bug Fixer. If still failing, report error and end pipeline.
+
+Read analysis-notes.md and check for "已修復紀錄" section. If the bug is confirmed already fixed (with commit hash), **skip Steps 3-5** and go directly to Step 6.
 
 ---
 
@@ -116,7 +129,12 @@ ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
-**Wait for completion.** Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md`.
+**Wait for completion.**
+
+#### BRANCH_ERROR Handling
+If the Evaluator returns a message containing `BRANCH_ERROR`, follow the same worktree recovery procedure as in Step 2, then re-dispatch the Evaluator.
+
+Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md`.
 
 #### If `✅ 通過` → Proceed to Step 5.
 
@@ -161,7 +179,12 @@ ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
-**Wait for completion.** Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
+**Wait for completion.**
+
+#### BRANCH_ERROR Handling
+If the Test Validator returns a message containing `BRANCH_ERROR`, follow the same worktree recovery procedure as in Step 2, then re-dispatch the Test Validator.
+
+Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
 
 #### If `✅ 通過` → Proceed to Step 6.
 

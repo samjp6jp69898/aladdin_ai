@@ -29,6 +29,28 @@ You read from the same git worktree used by Bug Fixer and Evaluator. You do NOT 
 
 ## Execution Steps
 
+### Step 0: Worktree Branch Validation (Mandatory — Must Execute First)
+
+Before any work, verify you are on the correct branch:
+
+```bash
+cd {worktree_path} && git branch --show-current
+```
+
+**Expected output:** `landon/{ticket_id}` (e.g. `landon/FAQ-1841`)
+
+- **If the command fails** (directory doesn't exist, not a git repo): immediately stop and return:
+  ```
+  BRANCH_ERROR: worktree 不存在或無效 — {worktree_path}
+  ```
+- **If the branch name does NOT match** `landon/{ticket_id}`: immediately stop and return:
+  ```
+  BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_branch}。需要 Bug Fixer 重新建立正確的 worktree。
+  ```
+- **If matched**: proceed to Step 1.
+
+**Do NOT proceed with any validation until this check passes.**
+
 ### Step 1: Collect All Inputs (Parallelize)
 
 Read all documents:
