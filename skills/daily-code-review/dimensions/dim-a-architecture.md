@@ -21,4 +21,18 @@
 - Cache key 必須透過 `Keys`（`common/keys.ts`）定義，不可在 service/manager 中字串拼接；使用 `cache_helper.ts` 的 helper（`getDataWithCache` / `getDatabaseDataWithCache` / `getArrayWithCache`）
 - 無狀態 service 強制：Service/Manager class 不可有 instance-level mutable state
 
+## 重構正確性（必查）
+
+- **邏輯搬遷後語義偏移**：將查詢邏輯從 service/manager 搬至 model 層時，JOIN 對象、SELECT 欄位、WHERE 條件是否與原始碼完全一致。常見錯誤：JOIN 的表改變了（如原本 JOIN 下級使用者表改為 JOIN 上級代理表）、欄位映射到了錯誤的來源欄位
+- **多條件查詢衝突**：同一欄位在不同 if 分支中被設定為不同值（如先設 `mode = A` 再設 `mode = B`），導致 `AND` 條件下結果永遠為空
+- **分層違反**：model 層應為純資料存取，不可引入 Logger、不可包含業務邏輯判斷
+
+## 其他必查項
+
+- **DRY 原則**：是否有重複代碼可抽取為共用方法（composable、helper、base class）
+- **過度設計**：是否有不必要的抽象、過度封裝
+- **ErrorCode 傳播**：ErrorCode 是否正確向上傳遞，transaction 失敗是否 rollback
+- **跨服務資料一致性**：涉及多個服務的複合操作（如送禮 = 扣款 + 扣道具 + 記錄）是否有最終一致性策略（先建 pending 記錄，由 Job 處理後續），失敗時是否有補償機制
+- **Job 失敗處理**：Job handler 是否有明確的失敗處理策略（最大重試次數、失敗狀態標記、補償機制如退款），是否使用 globalLock 防止 Job 併發處理同一批資料
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

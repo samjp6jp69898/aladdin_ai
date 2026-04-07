@@ -112,6 +112,7 @@
 7. **agrabah RPC 必須交叉驗證 rajah 定義**：確認 service group 設定正確。
 8. **Rajah-only commits**：如果 author 只有 rajah commits，仍然審查 rajah 定義的合理性。
 9. **Emoji 用法**：一律使用 Unicode emoji 字元（🔴 🟠 🟡 🔵 🟢 ✅ ❌ ⚠️ 💡 🐛），禁止使用 shortcode 語法（如 `:red_circle:`）。
+10. **Dimension 清單是下限，不是上限**：每個 dimension 的檢查項是「必須覆蓋的最低要求」。你必須基於資深架構師的專業判斷，主動發現清單之外的問題 — 包括但不限於 JavaScript 語言陷阱、業務邏輯漏洞、跨 commit 的不一致、隱含的資料正確性問題等。清單未列出的問題不代表不需要審查。
 
 ---
 

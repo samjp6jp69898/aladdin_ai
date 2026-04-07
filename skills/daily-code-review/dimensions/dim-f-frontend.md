@@ -22,4 +22,18 @@
 - **檔案命名規範**：`.vue` 元件用 PascalCase；`.ts` 檔案用 snake_case；資料夾用 snake_case
 - **Generated files 不可修改**：`common/generated/` 下的檔案不可出現手動編輯
 
+## 資料顯示正確性（必查）
+
+- **函式缺少 null guard**：display 函式（如 `displayRate(value)`）接收 nullable 值時，若未檢查 `null`/`undefined`，直接做算術運算（`value / 100`）會顯示 `NaN`
+- **陣列索引 vs 值比對**：使用 `options[value]` 做查找時，若 `value` 不等於陣列 index 會取到錯誤項目。應改用 `.find(opt => opt.value === value)`
+- **跨檔案一致性**：同類型頁面（如 DepositOrderList / AgentDepositOrderList / WithdrawOrderList / AgentWithdrawOrderList）的修改是否完整同步。常見遺漏：部分檔案的 `loadData` / `onSearchReset` 缺少相同的修正
+
+## 其他必查項
+
+- **console 殘留**：commit 中不應包含除錯用的 `console.log`/`console.warn`/`console.debug`/`console.error`（生產代碼禁止）
+- **v-html 消毒**：所有 `v-html` 是否都經過 `HtmlHelper.purifyHtml()` 處理或使用 `v-safe-html` directive（lago），防止 XSS
+- **v-if / v-show 選用**：頻繁切換的元素應使用 `v-show`；不頻繁但渲染成本高的元素應使用 `v-if` 懶渲染
+- **效能 — 全局 watcher**：是否有不必要的全局 watcher；computed 是否有副作用
+- **TypeScript 型別完整性**：前端 TypeScript 型別是否完整，避免過多 `any`
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

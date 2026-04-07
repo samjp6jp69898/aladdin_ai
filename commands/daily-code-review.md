@@ -265,21 +265,21 @@ Write to: `/Users/user/aladdin/review/{REVIEW_DATE}/CRITICAL_ISSUES_{REVIEW_DATE
 
 Header (write once if creating new file):
 ```
-Severity,Issue Description,Issue Location (file / method name / line number),Author,Date
+問題描述,程式碼位置（檔案＋行數）,Author,Date
 ```
 
 Rules:
 - Delimiter: comma `,`
 - If field contains comma, double-quote, or newline: wrap in double-quotes, escape internal double-quotes by doubling
-- Severity field: `P0` or `P1`
 - Author field: author name (e.g. `ashliu`, `pkh_tom`)
 - Date field: `YYYY/MM/DD` format
+- 不需要 Severity 欄位（因為只收錄 P0 和 P1，級別已透過收錄門檻隱含）
 
 Example:
 ```
-Severity,Issue Description,Issue Location (file / method name / line number),Author,Date
-P0,"SQL injection: 使用字串拼接而非 placeholder",agrabah/src/servers/payment/models/order.ts:142 / createOrder,farus,2026/04/05
-P1,"Missing @Permission on sensitive API",rajah/services/agent_back_office.rajah:1970,jonathan,2026/04/05
+問題描述,程式碼位置（檔案＋行數）,Author,Date
+"SQL injection: 使用字串拼接而非 placeholder",agrabah/src/servers/payment/models/order.ts:142,farus,2026/04/05
+"Missing @Permission on sensitive API",rajah/services/agent_back_office.rajah:1970,jonathan,2026/04/05
 ```
 
 If file already exists, read current content, append new rows only (do not re-write header).

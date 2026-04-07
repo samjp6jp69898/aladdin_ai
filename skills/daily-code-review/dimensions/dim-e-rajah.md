@@ -21,4 +21,13 @@
 - **命名長度限制**：Service name ≤ 30 字元；Method name ≤ 50；Permission name ≤ 50（含 `.` 分隔符）
 - **service_common 引用限制**：`service_common.rajah` 僅供後端（agrabah）使用，**禁止**在 lago 專案中 import
 
+## 其他必查項
+
+- **@Reflection 完整性**：前端 DataTable/DataSearch/DataEditPopup 使用的 model 是否加上 `@Reflection`；純內部 model 不應多加 `@Reflection`
+- **@Rules 驗證一致性**：需前端驗證的欄位是否加上適當的 `@Rules`（`Required`、`Range`、`MaxLength`），且規則是否與後端業務邏輯一致
+- **@Type 正確性**：欄位的 `@Type` 是否正確對應資料用途（金額 = `Currency`、圖片 = `File:Image`、日期範圍 = `DateTimeRange:Start/End`），直接影響前端 Reflection UI 渲染
+- **欄位型別規範**：金額必須用 `i64`（對應 BIGINT）不得用 `i32`；開關功能應使用 `StatusEnum` 而非 `bool`；可能擴展的狀態應使用 enum 而非 bool
+- **page/pageSize 位置**：`page` 和 `pageSize` 參數是否放在函式末尾，而非包在 model 中
+- **@Union model 正確性**：`@Union` model 的欄位是否互斥（同一時間只有一個有值），提交時是否建立全新 Union 物件（`UnionModel.create()`）而非修改既有物件，`valueType` 鑑別欄位是否正確使用
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

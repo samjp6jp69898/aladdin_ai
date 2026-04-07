@@ -20,4 +20,24 @@
 - **ORM base class 選擇**：`DbObject` 必須使用正確的 base class：`WithTimestamp`（含 createdAt/updatedAt）、`WithPlatformAndTimestamp`（額外含 platformId）
 - **Migration 檔名格式**：`YYYYMMDDhhmm_<action>_<table_name>.sql`
 
+## SQL 欄位驗證（必查）
+
+- **引用不存在的欄位**：SQL 查詢中使用的欄位名（如 `user_id`）必須確實存在於目標表中。特別注意 1:1 關聯表（如 `user_login_details`）的 PK `id` 可能就是 user ID，不存在額外的 `user_id` 欄位
+- **ORDER BY 與 GROUP BY 的多餘/缺失**：1:1 表查詢不需要 `ORDER BY`；分頁查詢必須有 `ORDER BY`
+- **欄位映射與 JOIN 一致性**：SELECT 中的 alias（如 `ur.created_at as registerTime`）必須語義正確，特別是重構後 JOIN 對象改變時，原本從 A 表取的欄位可能被錯誤地從 B 表取得
+
+## 其他必查項
+
+- **審計欄位**：每表必須含 `created_at`、`updated_at`
+- **隱式型別轉換**：WHERE 或 JOIN ON 中比較的兩側型別是否一致（如字串欄位禁用數字比較 `WHERE varchar_col = 123`），不同編碼欄位 JOIN 會導致索引失效
+- **CHARACTER SET 一致性**：`currency_code` 是否使用 `latin1`，其餘是否使用 `utf8mb4`；JOIN 的兩側欄位編碼是否一致
+- **Transaction 鎖定順序**：使用 `FOR UPDATE` 的交易中，多表/多行鎖定是否遵循一致的順序，避免 deadlock
+- **Transaction 範圍最小化**：`doTransaction` 區塊內是否包含不必要的操作（如 RPC 外部呼叫、日誌寫入、快取操作），避免長時間持有鎖
+- **大表 ALTER 安全**：ALTER TABLE 目標是否為高流量/大資料量表，是否可使用 `ALGORITHM=INSTANT`（加欄位到末尾）避免 metadata lock 阻塞 DML
+- **禁止 VARCHAR 存多值**：禁止 VARCHAR 逗號分隔存多值（如 `"10,50,100"`），必須另開表做一對多（金額用 `amountLinkManager`，ID 對應用 remote 呼叫 `app_user` 的 `LinkManager`）
+- **排序欄位命名**：排序欄位統一命名 `sort_order`（非 `sortId`），手動填的類型預設值為 `1000`，查詢排序 `ORDER BY sort_order, id ASC`
+- **敏感資訊加密儲存**：密碼或敏感資訊（用戶個人資料）是否使用 `Security.encrypt` 加密儲存，而非明文存入資料庫
+- **型別規範補充**：`INT`/`SMALLINT` 不定義長度；`VARBINARY` 欄位名以 `_binary` 結尾
+- **Migration 補充**：新增 database 是否在 `migrations/database.sql` 中加入 `CREATE DATABASE IF NOT EXISTS`
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。
