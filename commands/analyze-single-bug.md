@@ -27,6 +27,8 @@ Always use the specified prompt document to create the corresponding sub agent. 
 
 Extract NotionURL and ticket_id from `$ARGUMENTS`.
 
+Also extract page_id from the Notion URL (the 32-char hex after the last `-` or `/`), convert to UUID format (8-4-4-4-12). Store this for use in Notion API calls throughout the pipeline (especially failure paths).
+
 ### Step 1: Bug Report Analyst
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-report-analyst.md`:
@@ -156,7 +158,15 @@ Read the evaluator feedback carefully, modify the code on the same branch, and c
 
 Wait for completion, then **return to Step 4**.
 
-**If fixer_attempt_count reaches 3:** Report failure and end pipeline (skip Steps 5-6).
+**If fixer_attempt_count reaches 3:** Update Notion AI分析 to "分析失敗", report failure, and end pipeline (skip Steps 5-6).
+
+```bash
+curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{"properties":{"AI分析":{"select":{"name":"分析失敗"}}}}'
+```
 
 ```
 {ticket_id} 經過 3 次修復嘗試仍未通過 Evaluator 審核。需要人工介入。
@@ -206,7 +216,15 @@ Read the validation feedback and add/modify test cases to address the gaps.
 
 Wait for completion, then **return to Step 5**.
 
-**If validator_attempt_count reaches 2:** Report failure, preserve worktree, end pipeline.
+**If validator_attempt_count reaches 2:** Update Notion AI分析 to "分析失敗", report failure, preserve worktree, end pipeline.
+
+```bash
+curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{"properties":{"AI分析":{"select":{"name":"分析失敗"}}}}'
+```
 
 ---
 

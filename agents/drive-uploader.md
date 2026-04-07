@@ -37,11 +37,18 @@ Script: `/Users/user/.claude/gdrive.sh`
 
 ### Notion
 
-Use curl with Notion API directly:
+**Token:** `***REMOVED-NOTION-TOKEN***`
 
-- Fetch page: `curl -s -H "Authorization: Bearer {token}" -H "Notion-Version: 2022-06-28" "https://api.notion.com/v1/pages/{page_id}"`
-- Comment: `curl -s -X POST "https://api.notion.com/v1/comments" -H "Authorization: Bearer {token}" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
-- Update property: `curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" -H "Authorization: Bearer {token}" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
+Use curl with Notion API directly. All requests require these headers:
+```
+Authorization: Bearer ***REMOVED-NOTION-TOKEN***
+Notion-Version: 2022-06-28
+Content-Type: application/json
+```
+
+- Fetch page: `curl -s -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" "https://api.notion.com/v1/pages/{page_id}"`
+- Comment: `curl -s -X POST "https://api.notion.com/v1/comments" -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
+- Update property: `curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
 
 ## Execution Steps
 
@@ -59,6 +66,10 @@ This is the NEW step. Compile the final solution document from all pipeline outp
 Write `/Users/user/aladdin/debug/{id}/{id}-solution.md` with this format:
 
 ```
+---
+metadata: v2
+---
+
 ## Bug 分析報告 — {ticket_id}
 
 ### 問題分析
@@ -120,13 +131,42 @@ bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-v
 bash /Users/user/.claude/gdrive.sh link "{FOLDER_ID}"
 ```
 
-### Step 5: Comment in Notion
+### Step 5: Comment & Update Notion Bug Ticket
 
-Get the page_id from the Notion URL, then post a comment and update the AI Analysis property to "分析成功".
+Extract page_id from the Notion URL (the 32-char hex after the last `-` or `/`). Convert to UUID format (8-4-4-4-12).
+
+**5a. Post a comment with the Drive link:**
+
+```bash
+curl -s -X POST "https://api.notion.com/v1/comments" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parent": {"page_id": "{page_id}"},
+    "rich_text": [{"type": "text", "text": {"content": "AI 分析完成\n分析報告：{drive_folder_link}"}}]
+  }'
+```
+
+**5b. Update "AI分析" property to "分析成功":**
+
+```bash
+curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "properties": {
+      "AI分析": {"select": {"name": "分析成功"}}
+    }
+  }'
+```
+
+If Step 5 fails (e.g. API error), still report the Drive link in Step 6 so user can manually paste it.
 
 ### Step 6: Report Results
 
-Report: sharing link, uploaded file list, Notion comment status.
+Report: sharing link, uploaded file list, Notion comment status (completed / failed).
 
 ## Error Handling
 
