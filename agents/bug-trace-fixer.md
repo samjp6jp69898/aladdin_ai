@@ -70,6 +70,28 @@ Do NOT pre-load all knowledge. Query based on triggers:
 
 ## Execution Steps
 
+### Step 0: Worktree Branch Validation (Mandatory — Must Execute First)
+
+Before any work, verify you are on the correct branch:
+
+```bash
+cd {worktree_path} && git branch --show-current
+```
+
+**Expected output:** `landon/{ticket_id}` (e.g. `landon/FAQ-1841`)
+
+- **If the command fails** (directory doesn't exist, not a git repo): immediately stop and return:
+  ```
+  BRANCH_ERROR: worktree 不存在或無效 — {worktree_path}
+  ```
+- **If the branch name does NOT match** `landon/{ticket_id}`: immediately stop and return:
+  ```
+  BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_branch}
+  ```
+- **If matched**: proceed to Step 1.
+
+**Do NOT proceed with any code tracing or modification until this check passes.**
+
 ### Step 1: Initial Research (Parallelize)
 1. Read the analytics document at the provided path.
 2. Based on the "Affected Module" in analytics, read the corresponding sub-project's CLAUDE.md (e.g., `agrabah/CLAUDE.md`, `lago/CLAUDE.md`).
