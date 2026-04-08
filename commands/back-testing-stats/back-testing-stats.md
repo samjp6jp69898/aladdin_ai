@@ -60,6 +60,15 @@ Conclusion values:
 From `done` rows:
 - `correct` = count of `✅ 分析正確`
 - `partial` = count of `✅ 部分正確`
+- `partial_A` and `partial_B` — 從 Obsidian 筆記中區分子類型：
+  1. 對每個結論為 `✅ 部分正確` 的 done ticket，根據 `單號` 找到對應的筆記檔案：
+     ```bash
+     ls /Users/user/aladdin/obsidian/backTesting/{單號}-*.md
+     ```
+  2. 讀取該筆記，檢查 `## Failure Mode` 區塊：
+     - 若包含 `alternative-path` → 計入 `partial_A`
+     - 否則 → 計入 `partial_B`
+  3. 若筆記不存在或無 Failure Mode 區塊 → 計入 `partial_B`（向後相容舊筆記）
 - `wrong` = count of `❌ 分析錯誤`
 - `unable` = count of `⚠️ 無法比對`
 - `no_fix` = count of `➖ 不需修復`
@@ -67,7 +76,6 @@ From `done` rows:
 Rates (denominator = `done` total **excluding `no_fix`**):
 - `effective` = done - no_fix (有效樣本數，排除不需修復)
 - **完全成功率** = correct / effective
-- **部分成功率** = partial / effective
 - **總成功率** = (correct + partial) / effective
 
 #### Per-severity counts
@@ -93,24 +101,25 @@ Output the following two blocks:
 回測結論分布（已完成 {done} 張）：
 ✅ 分析正確    {correct} ({correct/effective %})
 ✅ 部分正確    {partial} ({partial/effective %})
+   ├─ A 等效替代  {partial_A}
+   └─ B 不完整    {partial_B}
 ❌ 分析錯誤    {wrong}   ({wrong/effective %})
 ⚠️ 無法比對    {unable}  ({unable/effective %})
 ➖ 不需修復    {no_fix}  (不計入正確率)
 
 有效樣本數：{effective}（排除 {no_fix} 張不需修復）
 完全成功率：{correct/effective %}
-部分成功率：{partial/done %}
-總成功率　：{(correct+partial)/done %}
+總成功率　：{(correct+partial)/effective %}
 ```
 
 **Block 2: Per-Severity Breakdown**
 
 ```
-         總數  正確  部分  錯誤  無法比對  不需修復  完全率  部分率  總成功率
-P1重點     18    10     3     4      1   55.6%  16.7%   72.2%
-P2較高     15     8     3     3      1   53.3%  20.0%   73.3%
-P3一般      9     4     2     2      1   44.4%  22.2%   66.7%
-P4較低      0     —     —     —      —      —      —       —
+         總數  正確  部分A  部分B  錯誤  無法比對  不需修復  完全率  總成功率
+P1重點     18    10     2      1     4      1          55.6%   72.2%
+P2較高     15     8     2      1     3      1          53.3%   73.3%
+P3一般      9     4     1      1     2      1          44.4%   66.7%
+P4較低      0     —     —      —     —      —      —       —       —
 ```
 
 Rows with 0 done tickets show `—` for all rate columns.
@@ -127,7 +136,6 @@ For each ticket in order, compute running totals at that point:
 - cumulative `correct`, `partial`, `done_so_far`
 - **累積總成功率** = (correct + partial) / done_so_far × 100
 - **累積完全成功率** = correct / done_so_far × 100
-- **累積部分成功率** = partial / done_so_far × 100
 
 X-axis labels: ticket index (1, 2, 3 … N) with ticket ID as tooltip label.
 
@@ -153,24 +161,25 @@ HTML structure:
 #### Section 1: 總覽卡片
 - 兩張卡片並排 (CSS grid 2-column)：
   - 左卡：**總成功率** (大字) + 已完成 / 總數
-  - 右卡：**完全成功率** (大字) + 部分成功率
-- 下方以 progress bar 顯示結論分布（分析正確 / 部分正確 / 分析錯誤 / 無法比對 / 不需修復）含數量與百分比
+  - 右卡：**完全成功率** (大字) + 已完成數與有效樣本數
+- 下方以 progress bar 顯示結論分布（分析正確 / 部分正確A / 部分正確B / 分析錯誤 / 無法比對 / 不需修復）含數量與百分比
+- 部分正確 A（等效替代）使用淺綠色 (#81c784)
+- 部分正確 B（不完整）使用橙色 (#ffb74d)
 
 #### Section 2: 各嚴重性等級成功率表格
 - HTML `<table>` 呈現 Step 3 Block 2 的完整內容
-- 欄位：嚴重性 | 總數 | 正確 | 部分 | 錯誤 | 無法比對 | 不需修復 | 完全率 | 部分率 | 總成功率
+- 欄位：嚴重性 | 總數 | 正確 | 部分A | 部分B | 錯誤 | 無法比對 | 不需修復 | 完全率 | 總成功率
 - 嚴重性使用顏色標籤 (P1 紅 / P2 橙 / P3 黃 / P4 藍)
 
 #### Section 3: 累積趨勢圖表
-- Three lines on the same chart:
+- Two lines on the same chart:
   - 總成功率 (blue)
   - 完全成功率 (green)
-  - 部分成功率 (orange)
 - Chart title: `累積成功率趨勢`
 - Y-axis: 0–100%, label `成功率 (%)`
 - X-axis: ticket index, label `完成順序`
 - Legend displayed
-- Tooltip shows: ticket ID, 總成功率, 完全成功率, 部分成功率
+- Tooltip shows: ticket ID, 總成功率, 完全成功率
 
 All chart data is embedded inline as a JSON literal in a `<script>` tag — no external data files.
 
@@ -197,6 +206,6 @@ back-testing-stats-{YYYYMMDD-HHmm}.html
 
 1. **Rates are always based on `done` count** — pending/failed/in_progress tickets are excluded from all accuracy calculations
 2. **Tickets with empty `完成時間`** are excluded from the trend chart but still counted in the snapshot
-3. **Three-line chart**: 總成功率 / 完全成功率 / 部分成功率 are plotted as separate cumulative lines
+3. **Two-line chart**: 總成功率 / 完全成功率 are plotted as separate cumulative lines; A/B breakdown is shown in the table instead
 4. **Temp directory is ephemeral**: always created fresh, deleted after user confirms viewing
 5. **Does not modify the tracker** or any Notion properties
