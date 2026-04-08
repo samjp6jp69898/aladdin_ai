@@ -6,14 +6,17 @@
 
 ## 核心檢查方向
 
-1. **Event Loop Blocking**：禁止在 request path 中使用同步 I/O（`fs.readFileSync`）、同步 crypto、O(n²)+ 巢狀迴圈；未知大小的 `JSON.parse()`/`JSON.stringify()` 必須有 size limit
-2. **Memory Leaks**：module scope 的 Map/Set/Array 只有新增沒有移除或上限；手寫 cache 缺少 TTL/LRU/max-size；event listener 和 timer 未正確清理
-3. **Connection Pool**：`getConnection()` 後必須在 `finally` 中 `release()`；transaction error path 必須保證 `ROLLBACK` + release；必須設定 `acquireTimeout` 和 `idleTimeout`
-4. **併發控制與 Race Condition**：Redis `SETNX` 分散式鎖必須設 expiry；釋放鎖前必須驗證 ownership（random token）；取得鎖後必須重新讀取狀態
-5. **Cache Stampede**：大量 cache key 同 TTL 同時過期需加 random jitter；cache miss 時多個並發請求同時打 DB 需 request coalescing
-6. **Async/Await 效能陷阱**：無依賴的多個 `await` 應用 `Promise.all()`；迴圈中逐項 `await` 應改 batch query 或 `Promise.all()`；`Array.forEach(async ...)` 不會等待完成
-7. **N+1 查詢與 Batch 處理**：迴圈中的 DB query 改 `WHERE id IN (?)`；迴圈中的 RPC 改 batch method；迴圈中的 Redis 改 `MGET`/`MSET` 或 pipeline
-8. **MQ Consumer**：必須設定合理 `prefetchCount`（禁止 `prefetch = 0`）；critical message 必須處理完成後才 ACK；error path 必須有 explicit nack
+> **⚠️ 前三項為 V1/V2 比對中 V2 最常遺漏的效能問題，必須優先檢查。**
+
+1. **N+1 查詢與迴圈內 RPC/DB 呼叫（P1 級 — 必查首項）**：迴圈中的 DB query 改 `WHERE id IN (?)`；迴圈中的 RPC 改 batch method；迴圈中的 Redis 改 `MGET`/`MSET` 或 pipeline。**特別注意**：`for` / `for...of` / `.forEach` / `.map` 迴圈體內出現 `await someRpc(...)` 或 `await db.query(...)` 即為 N+1，即使只有 2~3 次迭代也應標記為 P2+（因為迭代次數取決於運行時資料量）
+2. **Cache Stampede / 全域快取併發保護（P1 級 — 必查）**：大量 cache key 同 TTL 同時過期需加 random jitter；cache miss 時多個並發請求同時打 DB/RPC 需 request coalescing（如 singleflight 模式）。**特別注意**：module-level 的 `let cachedXxx` + `if (!cachedXxx)` 模式在快取過期瞬間會被多個 Job/request 同時觸發重建，必須標記
+3. **Module-level 集合/Map 大小上限（P1 級 — 必查）**：module scope 的 `Map`、`Set`、`Array`、plain object 若只有新增（`.add()` / `.set()` / `.push()`）沒有移除或大小上限，即為記憶體洩漏風險。**必須檢查**：是否有 `maxSize` / LRU 機制 / 定期清理；僅有 TTL 清理但清理週期內可能無限增長的仍需標記。即使有過期機制，也要評估在清理週期內的最大可能大小
+4. **Event Loop Blocking**：禁止在 request path 中使用同步 I/O（`fs.readFileSync`）、同步 crypto、O(n²)+ 巢狀迴圈；未知大小的 `JSON.parse()`/`JSON.stringify()` 必須有 size limit
+5. **Memory Leaks（其他類型）**：手寫 cache 缺少 TTL/LRU/max-size；event listener 和 timer 未正確清理
+6. **Connection Pool**：`getConnection()` 後必須在 `finally` 中 `release()`；transaction error path 必須保證 `ROLLBACK` + release；必須設定 `acquireTimeout` 和 `idleTimeout`
+7. **併發控制與 Race Condition**：Redis `SETNX` 分散式鎖必須設 expiry；釋放鎖前必須驗證 ownership（random token）；取得鎖後必須重新讀取狀態
+8. **Async/Await 效能陷阱**：無依賴的多個 `await` 應用 `Promise.all()`；迴圈中逐項 `await` 應改 batch query 或 `Promise.all()`；`Array.forEach(async ...)` 不會等待完成
+9. **MQ Consumer**：必須設定合理 `prefetchCount`（禁止 `prefetch = 0`）；critical message 必須處理完成後才 ACK；error path 必須有 explicit nack
 
 ## 重複 RPC/查詢檢查（必查）
 

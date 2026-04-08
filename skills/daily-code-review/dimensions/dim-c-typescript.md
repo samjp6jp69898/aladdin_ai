@@ -5,13 +5,13 @@
 ## 核心檢查方向
 
 1. **Import 風格**：必須使用單引號；本地模組含 `.ts` 副檔名；禁止雙引號 `"`
-2. **型別安全**：`any` 允許但不鼓勵，使用時須註解原因；null/undefined 必須有 guard（`|| ''`、`?.` 等）
+2. **型別安全**：`any` 允許但不鼓勵，使用時須註解原因；null/undefined 必須有 guard（`|| ''`、`?.` 等）；**回傳 `null` 但型別宣告不含 `null` 的方法為 P1 級問題**（如 `Promise<ServiceResult<T>>` 卻 `return null`，上層存取 `.failed` 會 TypeError）
 3. **金額計算**：必須使用 `RateHelper.normalToStored` / `storedToNormal`
 4. **語言/幣別**：必須使用 `context.language` / `context.defaultCurrencyCode`
 5. **硬編碼**：不可有 hardcoded ID、URL 等
 6. **Debug 殘留**：不可有 `console.log`、`debugger` 等
 7. **錯誤碼範圍**：必須使用正確的 `AgrabahErrorCodeEnum` 範圍（按模組區段）；新錯誤碼必須在模組範圍內依序遞增；禁止用 `ErrorCode.unknown` 替代模組特定碼
-8. **ServiceResult 錯誤傳播**：錯誤必須用 `result.errorTo()` 轉型為上游的 `ServiceResult`；`result.errorToGenie()` 轉換為前端回應的 `GenieResult`；存取 `.data` 前必須先檢查 `.failed`
+8. **ServiceResult / ProviderResult 錯誤傳播**：錯誤必須用 `result.errorTo()` 轉型為上游的 `ServiceResult`；`result.errorToGenie()` 轉換為前端回應的 `GenieResult`；存取 `.data` 前必須先檢查 `.failed`。**特別注意**：`providerResult.failed` 檢查同樣必要 — 若 provider 回傳失敗但未檢查 `.failed` 就直接存取 `.data`，會導致 undefined access。此為 P1 級問題
 9. **方法長度**：單一方法不宜超過 ~80-100 行；職責過多的方法應拆分
 
 ## JavaScript/TypeScript 常見陷阱（必查）

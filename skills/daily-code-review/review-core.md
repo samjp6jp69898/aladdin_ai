@@ -109,6 +109,7 @@
 4. **不做模糊描述**：每個 issue 必須引用具體檔案、行號（如有）和程式碼片段。
 5. **正面回饋**：明確以 ✅ 標記良好的設計和正確實作。
 6. **跳過生成檔案**：不審查 `src/generated/`、`src/entries/`、`node_modules/` 下的檔案。
+6b. **禁止跳過多語系 commit**：所有修改 `.json` locale 檔案（如 `en-US.json`、`zh-CN.json`、`zh-TW.json`）的 commit **必須逐 key 審查**，不可以「僅涉及翻譯/不涉及邏輯變更」為由跳過。i18n key 內容錯誤（如 key 名稱被中文污染、翻譯內容被覆蓋、key 遺失）是嚴重的線上顯示 bug（P0/P1 級）。審查重點：(1) key 名稱是否被意外修改或污染 (2) 同一 key 在不同語系檔案間是否一致 (3) 是否有 key 被意外刪除或覆蓋。
 7. **agrabah RPC 必須交叉驗證 rajah 定義**：確認 service group 設定正確。
 8. **Rajah-only commits**：如果 author 只有 rajah commits，仍然審查 rajah 定義的合理性。
 9. **Emoji 用法**：一律使用 Unicode emoji 字元（🔴 🟠 🟡 🔵 🟢 ✅ ❌ ⚠️ 💡 🐛），禁止使用 shortcode 語法（如 `:red_circle:`）。
