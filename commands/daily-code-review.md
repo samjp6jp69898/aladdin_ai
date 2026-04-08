@@ -158,9 +158,28 @@ You are a senior code review expert for the Aladdin project. Follow the instruct
   - lago: /Users/user/aladdin/lago
   - rajah: /Users/user/aladdin/rajah
 
+## Author Isolation Protocol (CRITICAL)
+
+You may receive multiple authors. Each author MUST be processed in complete isolation — as if each author is a separate, independent task. **Never carry over commit data, diff content, or review findings from one author to another.**
+
+The workflow is strictly sequential per author:
+```
+Author A: collect → diff → read files → review → WRITE REPORT → done
+Author B: collect → diff → read files → review → WRITE REPORT → done
+```
+
+**Violation indicators (you must self-check):**
+- Referencing a file path that was not in the current author's commits
+- Describing code changes that don't match the current author's diff output
+- Copy-pasting an issue from a previous author's review into the current report
+
 ## Execution Steps
 
-### 1. For each author, collect all commits on this date
+Process authors ONE AT A TIME. Complete ALL steps (1→5) for one author, write their report, then start step 1 for the next author.
+
+### 1. Collect commits for the CURRENT author only
+
+For each repo, run with the **current author's email**:
 
 ```bash
 git -C /Users/user/aladdin/<repo> log --format="%H|%s|%ai" \
@@ -170,11 +189,17 @@ git -C /Users/user/aladdin/<repo> log --format="%H|%s|%ai" \
 
 Skip repos with no commits from this author.
 
-### 2. Read the complete diff for each commit
+**Record the commit hashes** — these are the ONLY commits you may review for this author.
+
+### 2. Read the diff for each commit, verifying author ownership
+
+For each commit hash from step 1:
 
 ```bash
 git -C /Users/user/aladdin/<repo> show <commit_hash> --stat --unified=5
 ```
+
+**Verify**: The `Author:` line in git show output must match the current author. If it does not, skip this commit and flag the discrepancy.
 
 ### 3. Read full content of modified files
 
@@ -184,13 +209,15 @@ For each key modified file (excluding generated/ and node_modules/), use Read to
 
 Cover all loaded review dimensions. Apply severity per the 5-level system in review-core.md.
 
-### 5. Create per-author review report
+**Scope check**: Every issue you raise must reference a file and line that appeared in THIS author's diffs from step 2. If you cannot trace an issue back to a specific diff from step 2, do not include it.
 
-Process authors one at a time. Complete one author's report before starting the next.
+### 5. Write this author's report BEFORE proceeding
 
-Write each report to: /Users/user/aladdin/review/{REVIEW_DATE}/{AUTHOR_NAME}_{REVIEW_DATE}.md
+Write the report to: /Users/user/aladdin/review/{REVIEW_DATE}/{AUTHOR_NAME}_{REVIEW_DATE}.md
 
 Follow the output format in review-core.md.
+
+**Only after the Write tool confirms success**, proceed to step 1 for the next author. Do NOT batch-write reports at the end.
 
 ## Security Constraints
 - Do not modify any source code
