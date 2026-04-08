@@ -77,8 +77,8 @@ permissionMode: inherited
 
 | # | 事實問題 | 回答選項 |
 |---|---------|---------|
-| F1 | AI 先前分析判定的問題性質 | `bug` / `非 bug` / `配置問題` / `業務需求` |
-| F2 | 實際修復反映的問題性質 | `bug` / `非 bug` / `配置問題` / `業務需求` |
+| F1 | AI 先前分析判定的問題性質 | `bug` / `非 bug（配置）` / `非 bug（業務需求）` / `非 bug（其他）` |
+| F2 | 實際修復反映的問題性質 | `bug` / `非 bug（配置）` / `非 bug（業務需求）` / `非 bug（其他）` |
 | F3 | AI 先前分析歸屬的方 | `frontend` / `backend` / `both` |
 | F4 | 實際修復歸屬的方 | `frontend` / `backend` / `both` |
 | F5 | AI 指向的根因與實際修復的根因，是否指向同一個問題本質？ | `同一問題` / `相關但不同面向` / `完全不同問題` |
@@ -106,6 +106,8 @@ permissionMode: inherited
 - **等效替代**：改不同檔案或不同邏輯，但都能有效解決同一個問題（例如 `showPopup()` vs `showLoginPrompt()`）
 - **方向相同但細節不同**：大方向一致（例如都是加驗證），但具體實作差異大（例如前端驗證 vs 後端驗證）
 - **完全不同**：修復思路完全不同
+
+> **注意**：若 F6 = `不能解決`，則 F7 不應為 `等效替代`（因為等效替代隱含方案可行）。若出現此矛盾，請重新審視 F6 或 F7 的判斷。
 
 ---
 
@@ -166,6 +168,8 @@ git -C <repo_path> show <fix_commit>~1:<AI方案指向的檔案路徑>
 
 基於 Step 3 的事實回答 + Step 3.5 的驗證結果（若有），套用以下 Rubric 得出結論。**按順序檢查，命中第一個即停止。**
 
+> **F6 取值規則**：若 Step 3.5 已觸發，使用調整後的 F6（含信心降級效果）；若未觸發，使用 Step 3 原始值。
+
 #### ✅ 分析正確
 
 ```
@@ -195,10 +199,10 @@ AND F7 ∈ {等效替代, 方向相同但細節不同}
 F1 == F2（問題性質一致）
 AND F3 == F4（歸屬方一致）
 AND F5 ∈ {同一問題, 相關但不同面向}
-AND (F6 ∈ {不能解決, 無法判斷} OR F7 == 方向相同但細節不同 且 F6 信心=低)
+AND 未命中部分正確 A
 ```
 
-典型場景：方向對了但解法技術上不一定能修好，或遺漏關鍵變更。
+典型場景：方向對了但解法技術上不一定能修好、遺漏關鍵變更，或 F7=完全不同但問題性質與歸屬方皆正確。
 
 #### ❌ 分析錯誤
 
@@ -220,6 +224,15 @@ OR Stage 2 status == NOT_FOUND（非 WON'T FIX）
 ```
 Stage 2 status == NOT_FOUND AND Stage 1 Bug 狀態 == WON'T FIX
 ```
+
+#### 🔄 兜底（以上規則均未命中）
+
+```
+結論 = ⚠️ 無法比對
+原因 = 事實組合不符合任何預定義規則，需人工審查
+```
+
+在筆記 `## Back-Testing Result` 中附註：「事實組合未命中任何 Rubric 規則，請人工複查 F1-F7 值。」
 
 ---
 
@@ -263,7 +276,9 @@ Stage 2 status == NOT_FOUND AND Stage 1 Bug 狀態 == WON'T FIX
 ## Fix
 （commit hash、作者、日期、變更內容 — 來自 stage2）
 
-## Structured Comparison（輔助參考）
+## Structured Comparison（輔助參考，供人工複查）
+
+基於 F1-F7 事實層結果推導填寫。前兩維度直接對應 F1/F2、F3/F4；後四維度根據 F5、F6、F7 及 stage2 的 changed files 判定。
 
 | 維度 | 吻合 | 說明 |
 |------|------|------|
@@ -287,7 +302,7 @@ Stage 2 status == NOT_FOUND AND Stage 1 Bug 狀態 == WON'T FIX
 | F7 | 方案與實際關係 | {F7 回答} |
 
 ## Causal Chain Verification
-（僅在 Step 3.5 觸發時出現。未觸發則省略此區塊。）
+（僅在 Step 3.5 觸發時出現。**未觸發時，整個 `## Causal Chain Verification` 區塊（含標題）都不要寫入。**）
 
 ### 替代解法因果鏈驗證
 
@@ -305,7 +320,7 @@ Stage 2 status == NOT_FOUND AND Stage 1 Bug 狀態 == WON'T FIX
 - **Evidence**: N/A
 
 ## Back-Testing Result
-{icon} {結論文字，含子類型}（例如：✅ 部分正確（A — 等效替代解法）：一句話說明）
+{icon} {結論文字，含子類型}（例如：✅ 部分正確（A — 等效替代）：一句話說明）
 
 ## Failure Mode
 （僅限「分析錯誤」或「部分正確」時填寫）
@@ -372,7 +387,7 @@ bash /Users/user/aladdin/scripts/notion.sh update-prop "{page_id}" "AI分析" se
 
 ```
 STAGE3_COMPLETE: {ticket_id}
-CONCLUSION: ✅ 分析正確 / ✅ 部分正確 / ❌ 分析錯誤 / ⚠️ 無法比對 / ➖ 不需修復
+CONCLUSION: ✅ 分析正確 / ✅ 部分正確（A — 等效替代） / ✅ 部分正確（B — 不完整） / ❌ 分析錯誤 / ⚠️ 無法比對 / ➖ 不需修復
 FAILURE_MODE: code / N/A
 NOTE_PATH: /Users/user/aladdin/obsidian/backTesting/{filename}.md
 OUTPUT: {staging_dir}/stage3-comparison.md
