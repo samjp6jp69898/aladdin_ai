@@ -42,6 +42,17 @@ STATUS: CONTAMINATED
 
 ---
 
+## Tool Call Budget — 搜尋效率控制
+
+**硬性上限：總工具呼叫次數不得超過 150 次。**
+
+- 每執行一次 Bash 或 Read 指令，計數 +1
+- 達到 120 次時，若仍未找到候選 commit，**立即停止搜尋**，將 Status 設為 `NOT_FOUND` 並寫入輸出
+- 不要在同一個方向上反覆嘗試不同關鍵字組合。每個 repo 最多嘗試 3 種搜尋策略（ticket ID → 作者+關鍵字 → 版本 tag），若均無結果就跳到下一個 repo
+- 找不到就是找不到，快速回報比窮盡搜尋更有價值。主 agent 可以提供額外線索後重新派遣
+
+---
+
 ## Input Parameters
 
 - `{staging_dir}` — staging 目錄路徑，例如 `/tmp/backtest-FAQ-1234`
@@ -60,6 +71,7 @@ STATUS: CONTAMINATED
 - **Version info**（版本號，若有）
 - **Affected modules**（受影響的模組或服務）
 - **Issue description keywords**（問題描述關鍵字，用於 grep）
+- **QA Comments & Supplementary Clues**（QA 留言與補充線索，若有）— 從中提取可用於搜尋的具體頁面名稱、元件名稱、欄位名稱等
 
 ---
 
@@ -111,6 +123,12 @@ git -C <repo_path> tag -l "*<version>*"
 ```
 
 若任一步驟找到候選 commit，記錄 hash 後進入 Step 4。若所有 repo 都無結果，標記為 NOT_FOUND。
+
+**搜尋紀律：**
+- 每個 repo 的搜尋策略最多執行 3a → 3b → 3c → 3d 各一輪，不要回頭重試
+- 若 QA Comments 中有提及具體元件名稱或頁面名稱，可作為額外的關鍵字用於 3c，但仍只嘗試一次
+- 不要對同一個 repo 用不同關鍵字組合反覆搜尋超過 3 次
+- 當所有優先 repo 搜完無結果，次要 repo 也各搜一輪即可結束
 
 ---
 

@@ -44,6 +44,7 @@ Conclusion values:
 - `✅ 部分正確`
 - `❌ 分析錯誤`
 - `⚠️ 無法比對`
+- `➖ 不需修復`
 
 ---
 
@@ -61,15 +62,17 @@ From `done` rows:
 - `partial` = count of `✅ 部分正確`
 - `wrong` = count of `❌ 分析錯誤`
 - `unable` = count of `⚠️ 無法比對`
+- `no_fix` = count of `➖ 不需修復`
 
-Rates (denominator = `done` total):
-- **完全成功率** = correct / done
-- **部分成功率** = partial / done
-- **總成功率** = (correct + partial) / done
+Rates (denominator = `done` total **excluding `no_fix`**):
+- `effective` = done - no_fix (有效樣本數，排除不需修復)
+- **完全成功率** = correct / effective
+- **部分成功率** = partial / effective
+- **總成功率** = (correct + partial) / effective
 
 #### Per-severity counts
 
-For each severity (P1重點 / P2較高 / P3一般 / P4較低), compute the same breakdown and three rates from `done` rows only.
+For each severity (P1重點 / P2較高 / P3一般 / P4較低), compute the same breakdown and three rates from `done` rows only (excluding `no_fix` from denominator).
 
 ---
 
@@ -88,12 +91,14 @@ Output the following two blocks:
 └─ 未完成:        {in_progress} ({in_progress/total %})
 
 回測結論分布（已完成 {done} 張）：
-✅ 分析正確    {correct} ({correct/done %})
-✅ 部分正確    {partial} ({partial/done %})
-❌ 分析錯誤    {wrong}   ({wrong/done %})
-⚠️ 無法比對    {unable}  ({unable/done %})
+✅ 分析正確    {correct} ({correct/effective %})
+✅ 部分正確    {partial} ({partial/effective %})
+❌ 分析錯誤    {wrong}   ({wrong/effective %})
+⚠️ 無法比對    {unable}  ({unable/effective %})
+➖ 不需修復    {no_fix}  (不計入正確率)
 
-完全成功率：{correct/done %}
+有效樣本數：{effective}（排除 {no_fix} 張不需修復）
+完全成功率：{correct/effective %}
 部分成功率：{partial/done %}
 總成功率　：{(correct+partial)/done %}
 ```
@@ -101,7 +106,7 @@ Output the following two blocks:
 **Block 2: Per-Severity Breakdown**
 
 ```
-         總數  正確  部分  錯誤  無法比對  完全率  部分率  總成功率
+         總數  正確  部分  錯誤  無法比對  不需修復  完全率  部分率  總成功率
 P1重點     18    10     3     4      1   55.6%  16.7%   72.2%
 P2較高     15     8     3     3      1   53.3%  20.0%   73.3%
 P3一般      9     4     2     2      1   44.4%  22.2%   66.7%
@@ -149,11 +154,11 @@ HTML structure:
 - 兩張卡片並排 (CSS grid 2-column)：
   - 左卡：**總成功率** (大字) + 已完成 / 總數
   - 右卡：**完全成功率** (大字) + 部分成功率
-- 下方以 progress bar 顯示結論分布（分析正確 / 部分正確 / 分析錯誤 / 無法比對）含數量與百分比
+- 下方以 progress bar 顯示結論分布（分析正確 / 部分正確 / 分析錯誤 / 無法比對 / 不需修復）含數量與百分比
 
 #### Section 2: 各嚴重性等級成功率表格
 - HTML `<table>` 呈現 Step 3 Block 2 的完整內容
-- 欄位：嚴重性 | 總數 | 正確 | 部分 | 錯誤 | 無法比對 | 完全率 | 部分率 | 總成功率
+- 欄位：嚴重性 | 總數 | 正確 | 部分 | 錯誤 | 無法比對 | 不需修復 | 完全率 | 部分率 | 總成功率
 - 嚴重性使用顏色標籤 (P1 紅 / P2 橙 / P3 黃 / P4 藍)
 
 #### Section 3: 累積趨勢圖表

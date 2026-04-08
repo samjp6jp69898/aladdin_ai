@@ -38,20 +38,34 @@ permissionMode: inherited
 從 stage2 提取：
 - Status（FOUND / NOT_FOUND）、Fix Commit 資訊、Independent Analysis
 
-**若 stage2 的 Status 為 `NOT_FOUND`**：跳過 Step 2，直接進入 Step 3，結論標記為 ⚠️ 無法比對。
+**若 stage2 的 Status 為 `NOT_FOUND` 且 stage1 的 Bug 狀態為 `WON'T FIX`**：跳過 Step 2–5，直接進入 Step 6，結論標記為 ➖ 不需修復。
+
+**若 stage2 的 Status 為 `NOT_FOUND`（非 WON'T FIX）**：跳過 Step 2，直接進�� Step 3，結論標記為 ⚠️ 無法比對。
 
 ---
 
 ### Step 2：讀取先前分析文件
 
-```bash
-ls -la /Users/user/aladdin/debug/{ticket_id}/ 2>/dev/null
-```
+先前分析文件存放在 `/Users/user/aladdin/debug/` 目錄下，以 `FAQ-` 前綴加上純數字 ticket_id 命名資料夾。
 
-依序嘗試讀取（找不到則略過）：
-1. `debug/{ticket_id}/{ticket_id}-solution.md`
-2. `debug/{ticket_id}/{ticket_id}-peer-review.md`
-3. `debug/{ticket_id}/{ticket_id}-analytics.md`
+**重要：ticket_id 參數可能是純數字（如 `2102`）或帶前綴（如 `FAQ-2102`），無論哪種格式，實際目錄名稱統一為 `FAQ-{數字}` 格式。**
+
+搜尋步驟：
+
+1. 先從 `{ticket_id}` 提取純數字部分（去掉可能的 `FAQ-` 前綴）
+2. 用以下指令確認目錄存在：
+   ```bash
+   ls -la /Users/user/aladdin/debug/FAQ-{數字}/ 2>/dev/null
+   ```
+3. 依序嘗試讀取以下三份文件（找不到則略過）：
+   - `/Users/user/aladdin/debug/FAQ-{數字}/FAQ-{數字}-solution.md`
+   - `/Users/user/aladdin/debug/FAQ-{數字}/FAQ-{數字}-peer-review.md`
+   - `/Users/user/aladdin/debug/FAQ-{數字}/FAQ-{數字}-analytics.md`
+
+**範例：** 若 ticket_id = `2102` 或 `FAQ-2102`，則讀取：
+- `/Users/user/aladdin/debug/FAQ-2102/FAQ-2102-solution.md`
+- `/Users/user/aladdin/debug/FAQ-2102/FAQ-2102-peer-review.md`
+- `/Users/user/aladdin/debug/FAQ-2102/FAQ-2102-analytics.md`
 
 **若三份文件均不存在**：結論標記為 ⚠️ 無法比對（無先前分析）。
 
@@ -82,6 +96,7 @@ ls -la /Users/user/aladdin/debug/{ticket_id}/ 2>/dev/null
 | ✅ 部分正確 | 問題性質判定 ✅ + 歸屬方 ✅，但根因或方向有偏差 |
 | ❌ 分析錯誤 | 問題性質判定 ❌ 或 歸屬方 ❌ 或 根因模組 ❌ |
 | ⚠️ 無法比對 | 無先前分析 / 未找到 commit |
+| ➖ 不需修復 | Bug 狀態為 WON'T FIX，確認為設計行為或不修復，不計入正確率 |
 
 ---
 
@@ -147,7 +162,7 @@ ls -la /Users/user/aladdin/debug/{ticket_id}/ 2>/dev/null
 （僅限分析有誤時填寫 — 說明錯在哪裡、日後如何避免）
 ```
 
-圖示對應：分析正確 → ✅、部分正確 → ✅、分析錯誤 → ❌、無法比對 → ⚠️
+圖示對應：分析正確 → ✅、部分正確 → ✅、分析錯誤 → ❌、無法比對 → ⚠️、不需修復 → ➖
 
 ---
 
@@ -188,7 +203,7 @@ bash /Users/user/aladdin/scripts/notion.sh update-prop "{page_id}" "AI分析" se
 
 ```
 STAGE3_COMPLETE: {ticket_id}
-CONCLUSION: ✅ 分析正確 / ✅ 部分正確 / ❌ 分析錯誤 / ⚠️ 無法比對
+CONCLUSION: ✅ 分析正確 / ✅ 部分正確 / ❌ 分析錯誤 / ⚠️ 無法比對 / ➖ 不需修復
 FAILURE_MODE: code / N/A
 NOTE_PATH: /Users/user/aladdin/obsidian/backTesting/{filename}.md
 OUTPUT: {staging_dir}/stage3-comparison.md

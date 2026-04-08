@@ -47,7 +47,26 @@ bash /Users/user/aladdin/scripts/notion.sh get-user "{user_id}"
 
 Query every missing user ID. Never display a bare user ID in the output — always resolve to a human-readable name.
 
-**Step 4 — Determine affected side**
+**Step 4 — Extract QA comments and supplementary clues**
+
+From the data collected in Step 2 (fetch-blocks and comments), extract all useful supplementary information:
+
+1. **QA 留言與評論**：提取所有評論（comments）的作者與內容，特別關注：
+   - QA 回報的具體操作步驟或重現路徑
+   - 修復後的驗證描述（例如「修改後 XX 頁面已正確顯示 YY」）
+   - 提及的具體頁面名稱、欄位名稱、按鈕文字
+   - 提及的版本號或修復時間點
+
+2. **頁面內文補充**：從 fetch-blocks 的結果中提取：
+   - 除了主描述以外的補充說明段落
+   - 列點清單中的具體細節（例如步驟、預期結果、實際結果）
+   - 提及的具體 UI 元素名稱、路由路徑、API 名稱
+
+3. **圖片描述**：若內文中有圖片區塊（type: image），記錄其 caption 文字（若有）。圖片本身無法讀取，但 caption 可能包含有用資訊。
+
+將以上提取的內容整理為結構化摘要，寫入輸出的 `## QA Comments & Supplementary Clues` 段落。若無任何留言或補充資訊，寫 `(無)` 即可。
+
+**Step 5 — Determine affected side**
 
 Based on the ticket content (affected modules, backend path, app page, description), classify the affected side as one of:
 
@@ -55,7 +74,7 @@ Based on the ticket content (affected modules, backend path, app page, descripti
 - `frontend` — lago / abu / UI / app
 - `both` — touches both sides
 
-**Step 5 — Write output**
+**Step 6 — Write output**
 
 Write the structured summary to `{staging_dir}/stage1-ticket-info.md` using the format below.
 
@@ -85,6 +104,9 @@ Write the structured summary to `{staging_dir}/stage1-ticket-info.md` using the 
 
 ## Issue Description
 (problem description summary, 3-5 sentences)
+
+## QA Comments & Supplementary Clues
+(從 Notion 評論與頁面內文提取的補充資訊，包含：QA 留言摘要、修復驗證描述、提及的具體 UI 元素/頁面/欄位名稱、重現步驟細節等。若無則寫「(無)」)
 ```
 
 ## Constraints

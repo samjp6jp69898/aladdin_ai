@@ -206,6 +206,7 @@ Process remaining `PROCESSING_LIST` in batches of N. For each batch:
 | ✅ 部分正確 | ✅ 部分正確 |
 | ❌ 分析錯誤 | ❌ 分析錯誤 |
 | ⚠️ 無法比對 | ⚠️ 無法比對 |
+| ➖ 不需修復 | ➖ 不需修復 |
 
 ---
 
