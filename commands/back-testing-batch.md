@@ -163,6 +163,8 @@ Then proceed to the next ticket in the pending list (back to Step 3a).
 | Stage 3 Conclusion | Tracker 回測結論 |
 |--------------------|-----------------|
 | ✅ 分析正確 | ✅ 分析正確 |
+| ✅ 部分正確（A — 等效替代） | ✅ 部分正確 |
+| ✅ 部分正確（B — 不完整） | ✅ 部分正確 |
 | ✅ 部分正確 | ✅ 部分正確 |
 | ❌ 分析錯誤 | ❌ 分析錯誤 |
 | ⚠️ 無法比對 | ⚠️ 無法比對 |
