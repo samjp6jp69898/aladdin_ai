@@ -122,13 +122,31 @@ git -C <repo_path> log --oneline --all --grep="<keyword>" --since="3 months ago"
 git -C <repo_path> tag -l "*<version>*"
 ```
 
+**3e. 按相關檔案的 git history 搜尋（最重要的兜底策略）：**
+
+當 3a-3d 均無結果時，**必須執行此步驟**。從 Stage 1 的「程式碼定位線索」或「Issue Description」中提取關鍵檔案路徑，直接查看該檔案在版本區間內的所有改動：
+
+```bash
+# 先確定版本 tag 區間（問題版本 → 驗證通過版本）
+git -C <repo_path> log --oneline <problem_tag>..<fix_tag> -- <file_path>
+
+# 對每個 commit 查看 diff，確認是否涉及問題修復
+git -C <repo_path> show <hash> -- <file_path>
+```
+
+若 Stage 1 提供了多個關鍵檔案，逐一查看其 git history。重點關注：
+- 相關欄位的顯示邏輯變更（例如 `||` 改為 `??`、新增格式化函式）
+- 看似無關但實際影響了問題區域的重構 commit
+- 其他 FAQ 編號的 commit 可能順便修復了本 ticket 的問題
+
 若任一步驟找到候選 commit，記錄 hash 後進入 Step 4。若所有 repo 都無結果，標記為 NOT_FOUND。
 
 **搜尋紀律：**
 - 每個 repo 的搜尋策略最多執行 3a → 3b → 3c → 3d 各一輪，不要回頭重試
 - 若 QA Comments 中有提及具體元件名稱或頁面名稱，可作為額外的關鍵字用於 3c，但仍只嘗試一次
 - 不要對同一個 repo 用不同關鍵字組合反覆搜尋超過 3 次
-- 當所有優先 repo 搜完無結果，次要 repo 也各搜一輪即可結束
+- **3e 是例外**：當 3a-3d 全無結果時，3e（檔案 git history）是必須執行的兜底策略，可對每個關鍵檔案查看版本區間內的所有 commit diff
+- 當所有優先 repo 搜完無結果（含 3e），次要 repo 也各搜一輪即可結束
 
 ---
 
