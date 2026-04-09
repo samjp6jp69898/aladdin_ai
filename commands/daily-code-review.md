@@ -265,7 +265,7 @@ Also read the core rules for reference: /Users/user/aladdin/obsidian/skills/dail
 4. Report results when done
 
 ## Constraints
-- You can ONLY downgrade severity, never upgrade
+- You can downgrade and upgrade severity if needed
 - You cannot add new issues or delete existing ones
 - You cannot re-review code
 - Only use: Read, Write, Glob
