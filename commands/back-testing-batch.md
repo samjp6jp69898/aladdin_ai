@@ -40,8 +40,9 @@ Wait for completion. If the script fails, report the error but continue using ex
    Tracker is empty. Please run the query script first:
    bun scripts/notion-backtest-query.ts
    ```
-3. Filter all rows with **回測狀態 = `pending`**, sort by ticket number descending (newest first), **max {max} tickets**
-4. If no pending tickets:
+3. **清除誤匯資料**：掃描 tracker 中所有 **Bug狀態 = `待上版`** 的行（不限回測狀態），用 Edit 工具直接從 tracker 刪除這些行。刪除後列出被移除的票號。
+4. Filter all rows with **回測狀態 = `pending`**, sort by ticket number descending (newest first), **max {max} tickets**
+5. If no pending tickets:
    ```
    No pending back-testing tasks (all tasks are in_progress/done/failed).
    To import new tickets, run: bun scripts/notion-backtest-query.ts
@@ -62,6 +63,8 @@ Display the filtered list (for informational purposes only — locks are NOT cla
 | # | 單號 | 嚴重性 | AI分析 | Bug狀態 | Notion 連結 |
 |---|------|--------|--------|---------|-------------|
 | 1 | FAQ-XXXX | P1重點 | 分析成功 | 已解決 | https://... |
+
+🗑️ Removed (待上版 — 誤匯資料): FAQ-AAAA, FAQ-BBBB
 ```
 
 ---
@@ -192,6 +195,7 @@ Total processed: {total} tickets
 
 | Scenario | Action |
 |----------|--------|
+| Bug狀態 = 待上版 | 視為誤匯資料，直接從 tracker 刪除該行 |
 | Stage 1 failure (file missing) | Release lock → tracker `failed` → skip to next ticket |
 | Stage 2 failure (file missing) | Release lock → tracker `failed` → skip to next ticket |
 | Stage 2 NOT_FOUND (file exists, status NOT_FOUND) | Continue to Stage 3 (will produce ⚠️) |

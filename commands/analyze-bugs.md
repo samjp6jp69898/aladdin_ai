@@ -6,7 +6,7 @@ user-invocable: true
 
 # Bug Batch Analysis Workflow
 
-Reads `pending` tasks from the bug tracker in memory, claims them, and dispatches each one to `/analyze-single-bug` to run the full analysis pipeline (report → trace fix → review → upload).
+Reads `pending` tasks from the bug tracker in memory, claims them, and dispatches each one to `/analyze-single-bug` to run the full analysis pipeline (report → screenshot → worktree → trace fix → spec → evaluate → validate → upload).
 
 ## Parameters
 
@@ -73,7 +73,7 @@ mkdir -p /Users/user/aladdin/worktrees
 
 ### Step 2: Filter Pending Tasks
 
-Filter all bugs with **status = `pending`** from the tracker, sorted by ticket number descending (newest first), **up to 10 tickets**.
+Filter all bugs with **status = `pending`** from the tracker, sorted by ticket number descending (newest first), **up to 5 tickets**.
 
 If there are no `pending` bugs, report to the user and stop:
 ```
@@ -88,7 +88,7 @@ Show the filtered list to the user:
 ```
 ## Pending Bug List
 
-N tickets to analyze (up to 10):
+N tickets to analyze (up to 5):
 
 | # | 單號 | 嚴重性 | Notion 連結 |
 |---|------|--------|-------------|
@@ -113,7 +113,7 @@ bash scripts/bug-lock.sh claim FAQ-{ticket_id}
 ```
 
 - **Exit code 0** (output `CLAIMED`) → claim successful, proceed to 4b
-- **Exit code 1** (output `LOCKED`) → already claimed by another session, **skip this ticket**, move to the next
+- **Exit code 1** (output `LOCKED`) → already claimed by another session, **skip this ticket and go to 4e to refill**
 
 After a successful claim, use the Edit tool to change the tracker status for that ticket from `pending` to `in_progress`.
 
@@ -154,13 +154,19 @@ If `/analyze-single-bug` encounters an error or fails:
 3. Increment completed counter by 1 (counts as processed)
 4. Continue to the next ticket
 
-#### 4e. Determine Whether to Continue
+#### 4e. Determine Whether to Continue (Refill Logic)
+
+The goal is to ensure this session **actually completes 5 tickets** (done + failed), not merely iterates through 5 candidates.
 
 Check the following conditions:
 
-1. **List check**:
-   - If there are still unprocessed bugs in the list → return to **4a** to automatically claim the next ticket
-   - If all are processed → proceed to **Step 5**
+1. **Completion check**: If `completed counter >= 5` → proceed to **Step 5**
+2. **List check**: If there are still unprocessed bugs in the current working list → return to **4a** for the next ticket
+3. **Refill**: If the current working list is exhausted but `completed counter < 5`:
+   - Re-read the tracker file to get a fresh snapshot
+   - Filter all bugs with **status = `pending`** (excluding any ticket already in the current working list)
+   - If new pending tickets exist → add them to the working list (up to `5 - completed` tickets) and return to **4a**
+   - If no new pending tickets exist → proceed to **Step 5** (all available work is exhausted)
 
 **Important: After completing each ticket, automatically continue to the next — no need to wait for user instruction. The entire loop is fully automatic.**
 
@@ -193,6 +199,6 @@ git worktree remove /Users/user/aladdin/worktrees/{ticket_id}
 2. **Atomic lock mechanism**: Use `bash scripts/bug-lock.sh claim FAQ-{ticket_id}` for atomic claiming (backed by `mkdir`, which the OS guarantees to be atomic). 8 parallel sessions will not claim the same ticket. Always `release` after completion or failure.
 3. **Fully automatic loop**: After completing each ticket, automatically claim the next — no user input needed. Continues until the list is empty.
 4. **Serial processing**: Only one ticket is processed at a time; wait for `/analyze-single-bug` to finish completely before processing the next.
-5. **Maximum 10 tickets per run**: Prevents any single execution from running too long.
+5. **Maximum 5 tickets per run**: Each session targets exactly 5 completed tickets. If initial candidates are locked by other sessions, the tracker is re-read to refill with new pending tickets until 5 are completed or no pending tickets remain.
 6. **Tracker is the single source of truth**: The query script imports Notion data into the tracker; this skill only reads from the tracker.
 7. **Lock cleanup**: If a session crashes and leaves locks unreleased, manually run `bash scripts/bug-lock.sh cleanup` to clear all locks, or `bash scripts/bug-lock.sh release FAQ-{ticket_id}` to release a specific lock.
