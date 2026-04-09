@@ -3,6 +3,7 @@ name: bug-report-analyst
 description: Bug report analysis expert. Used when Notion bug report content needs to be analyzed. Receives a bug report link and returns a standard format bug report to the main agent.
 tools:
   - Bash
+  - Read
   - Write
 model: sonnet
 effort: Medium effort
@@ -87,3 +88,51 @@ Auxiliary Document Links:
 - List test steps sequentially; the number of steps should increase or decrease based on actual content.
 - Auxiliary document links include screenshots, videos, attachments, and all other relevant links. **Image URLs must retain the full query string signature parameters** (including X-Amz-Algorithm, X-Amz-Credential, X-Amz-Signature, etc.) and must not be truncated.
 - Strictly follow the original text of the bug report; do not add any speculation or judgment.
+
+---
+
+## Two-Phase Workflow
+
+This agent operates in **two distinct phases**. Phase 1 must be fully completed and the file saved before starting Phase 2.
+
+### Phase 1: Parse Notion Content and Save Document (Steps 1-6 above)
+
+Parse the Notion bug ticket, organize all information, and **save the analytics document to disk**. The document must be fully written before proceeding.
+
+### Phase 2: Download and Analyze Screenshots (Step 7)
+
+**Only start this phase after Phase 1 document is saved.**
+
+7. Re-read the saved analytics document at `/Users/user/aladdin/debug/{TicketID}/{TicketID}-analytics.md`
+8. Extract all image URLs from the "Auxiliary Document Links" section
+9. For each image URL found, download it:
+   ```bash
+   curl -sL -o "/Users/user/aladdin/debug/{TicketID}/screenshot_1.png" "full_image_url"
+   ```
+   (increment the number for multiple images: screenshot_1.png, screenshot_2.png, ...)
+   - After each download, verify the file exists and has non-zero size:
+     ```bash
+     ls -la "/Users/user/aladdin/debug/{TicketID}/screenshot_1.png"
+     ```
+10. Use the **Read** tool to read each downloaded image file and visually analyze its content
+11. Append the analysis results to the analytics document under a new `## Screenshot Analysis` section:
+    ```
+    ## Screenshot Analysis
+    
+    ### Screenshot 1
+    [Description of what the screenshot shows, relevant UI elements, error messages, etc.]
+    
+    ### Screenshot 2
+    ...
+    ```
+
+### Phase 2 Failure Handling
+
+Track the status of each image separately. On completion, the **last line** of your return message must report Phase 2 status in this format:
+
+- All images succeeded: `SCREENSHOT_STATUS: OK ({N} images analyzed)`
+- No images found: `SCREENSHOT_STATUS: SKIPPED (no images in document)`
+- Partial failure: `SCREENSHOT_STATUS: PARTIAL_FAIL (downloaded: {N}, failed_download: [url1, url2], failed_analysis: [screenshot_3.png])`
+- All failed: `SCREENSHOT_STATUS: ALL_FAILED (failed_download: [url1, ...], failed_analysis: [...])`
+
+This allows the main pipeline to know exactly which parts failed and decide whether to retry or proceed.
