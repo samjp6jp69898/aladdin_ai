@@ -56,7 +56,7 @@ Content-Type: application/json
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
-1. Read `/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md` — Bug Fixer's analysis
+1. Read `/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md` — Bug Tracer's root cause analysis + Bug Fixer's repair record
 2. Run `git -C {worktree_path} diff main...HEAD -- . ':!agrabah/tests/'` — code changes (excluding test files)
 3. Run `git -C {worktree_path} diff main...HEAD -- agrabah/tests/` — test file changes only
 4. Read `/Users/user/aladdin/debug/{id}/{id}-evaluator-report.md` — test results and coverage
@@ -72,8 +72,11 @@ metadata: v2
 
 ## Bug 分析報告 — {ticket_id}
 
-### 問題分析
-（來自 analysis-notes.md 的根因分析，含呼叫鏈追蹤）
+### 根因分析（Bug Tracer）
+（來自 analysis-notes.md 的推理過程紀錄、根因定位、呼叫鏈追蹤）
+
+### 修復方案（Bug Fixer）
+（來自 analysis-notes.md 的修復策略、修復紀錄、Fixer 備註）
 
 ### 修正代碼
 （git diff main...HEAD 的完整內容，排除測試檔案）
@@ -106,6 +109,7 @@ ls /Users/user/aladdin/debug/{ticket_id}/
 
 Required documents:
 - `{id}-solution.md` (compiled in Step 0)
+- `{id}-analysis-notes.md` (Bug Tracer analysis + Bug Fixer repair record)
 - `{id}-validation-report.md` (from Test Validator)
 
 ### Step 2: Create Google Drive Subfolder
@@ -122,6 +126,7 @@ Upload each document:
 
 ```bash
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-solution.md" "{FOLDER_ID}"
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-validation-report.md" "{FOLDER_ID}"
 ```
 
@@ -144,7 +149,10 @@ curl -s -X POST "https://api.notion.com/v1/comments" \
   -H "Content-Type: application/json" \
   -d '{
     "parent": {"page_id": "{page_id}"},
-    "rich_text": [{"type": "text", "text": {"content": "AI 分析完成\n分析報告：{drive_folder_link}"}}]
+    "rich_text": [
+      {"type": "text", "text": {"content": "AI 分析完成\n分析報告："}},
+      {"type": "text", "text": {"content": "{drive_folder_link}", "link": {"url": "{drive_folder_link}"}}}
+    ]
   }'
 ```
 
@@ -175,7 +183,7 @@ Report: sharing link, uploaded file list, Notion comment status (completed / fai
 - Token expired (401) → Prompt user to re-authorize
 
 ## Important Restrictions
-- Only upload `*-solution.md` and `*-validation-report.md`
+- Only upload `*-solution.md`, `*-analysis-notes.md`, and `*-validation-report.md`
 - Do not modify source code
 - Do not delete any files
 - Do not git push
