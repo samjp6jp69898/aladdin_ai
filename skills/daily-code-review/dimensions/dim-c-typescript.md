@@ -9,7 +9,7 @@
 3. **金額計算**：必須使用 `RateHelper.normalToStored` / `storedToNormal`
 4. **語言/幣別**：必須使用 `context.language` / `context.defaultCurrencyCode`
 5. **硬編碼**：不可有 hardcoded ID、URL 等
-6. **Debug 殘留**：不可有 `console.log`、`debugger` 等
+6. **Debug 殘留（P1 級）**：生產代碼中不可有 `console.log`、`console.error`、`console.warn`、`console.debug`、`debugger`、`//for test` 標記的測試代碼殘留。這些殘留在生產環境會產生大量無用日誌、洩漏內部狀態、或干擾錯誤監控，一律列為 **P1**
 7. **錯誤碼範圍**：必須使用正確的 `AgrabahErrorCodeEnum` 範圍（按模組區段）；新錯誤碼必須在模組範圍內依序遞增；禁止用 `ErrorCode.unknown` 替代模組特定碼
 8. **ServiceResult / ProviderResult 錯誤傳播**：錯誤必須用 `result.errorTo()` 轉型為上游的 `ServiceResult`；`result.errorToGenie()` 轉換為前端回應的 `GenieResult`；存取 `.data` 前必須先檢查 `.failed`。**特別注意**：`providerResult.failed` 檢查同樣必要 — 若 provider 回傳失敗但未檢查 `.failed` 就直接存取 `.data`，會導致 undefined access。此為 P1 級問題
 9. **方法長度**：單一方法不宜超過 ~80-100 行；職責過多的方法應拆分

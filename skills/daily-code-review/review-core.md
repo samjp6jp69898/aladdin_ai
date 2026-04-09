@@ -9,8 +9,8 @@
 | 級別 | 圖示 | 名稱 | 定義 | 進入 CSV |
 |------|------|------|------|----------|
 | P0 | 🔴 | Blocker | 線上必出事：資料遺失、安全漏洞（SQL injection / 未授權存取）、邏輯錯誤導致資金異常 | Yes |
-| P1 | 🟠 | Critical | 高風險：高併發 race condition、N+1 嚴重效能問題、權限檢查遺漏、跨平台資料洩漏 | Yes |
-| P2 | 🟡 | Warning | 不符規範但不會立即出事：型別選用不當（TEXT/DECIMAL）、命名不符規範、null check 遺漏、console.log 殘留 | No |
+| P1 | 🟠 | Critical | 高風險：高併發 race condition、N+1 嚴重效能問題、權限檢查遺漏、跨平台資料洩漏、`console.log`/`console.error`/`debugger` 殘留在生產代碼、嚴重度校準錯誤（將功能性 bug 或規範違反降級至 P3/P4） | Yes |
+| P2 | 🟡 | Warning | 不符規範但不會立即出事：型別選用不當（TEXT/DECIMAL）、命名不符規範、null check 遺漏 | No |
 | P3 | 🔵 | Note | 可改進但有合理理由不改：效能優化建議、架構改進方向、可讀性提升 | No |
 | P4 | 🟢 | Nit | 風格偏好：import 順序、命名風格、註解格式 | No |
 
@@ -114,6 +114,8 @@
 8. **Rajah-only commits**：如果 author 只有 rajah commits，仍然審查 rajah 定義的合理性。
 9. **Emoji 用法**：一律使用 Unicode emoji 字元（🔴 🟠 🟡 🔵 🟢 ✅ ❌ ⚠️ 💡 🐛），禁止使用 shortcode 語法（如 `:red_circle:`）。
 10. **Dimension 清單是下限，不是上限**：每個 dimension 的檢查項是「必須覆蓋的最低要求」。你必須基於資深架構師的專業判斷，主動發現清單之外的問題 — 包括但不限於 JavaScript 語言陷阱、業務邏輯漏洞、跨 commit 的不一致、隱含的資料正確性問題等。清單未列出的問題不代表不需要審查。
+11. **每個 commit 的每個修改點都必須獨立審查**：不可因 commit 數量多而跳過或簡略帶過任何 commit。每個 diff hunk 都必須逐一檢視，確保問題覆蓋面的完整性。特別注意跨 commit 之間的時序依賴和中間狀態問題。
+12. **刪除操作必須追查引用點**：當 commit 刪除元件、路由、函式、變數時，必須主動搜索（Grep/Glob）是否有其他檔案仍在引用被刪除的目標。殘留的引用會導致 runtime crash、白屏、404 等嚴重問題，屬於 P0/P1 級別。
 
 ---
 

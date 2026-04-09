@@ -28,9 +28,18 @@
 - **陣列索引 vs 值比對**：使用 `options[value]` 做查找時，若 `value` 不等於陣列 index 會取到錯誤項目。應改用 `.find(opt => opt.value === value)`
 - **跨檔案一致性**：同類型頁面（如 DepositOrderList / AgentDepositOrderList / WithdrawOrderList / AgentWithdrawOrderList）的修改是否完整同步。常見遺漏：部分檔案的 `loadData` / `onSearchReset` 缺少相同的修正
 
+## 刪除操作追查（必查）
+
+- **刪除元件/頁面時必須追查引用**：當 commit 刪除 `.vue` 元件或頁面時，必須用 Grep 搜索該元件名稱，確認無其他檔案仍在 import 或引用。殘留的引用會導致白屏、路由 404、或 build 失敗。常見遺漏場景：
+  - 刪除路由頁面但導航列表（如 `SecurityCenterList.vue`）仍保留對應入口
+  - 刪除共用元件但其他品牌子專案仍在使用
+  - 刪除 composable 但頁面仍在 import
+- **刪除路由時必須清理導航入口**：從 `router/` 移除路由定義後，必須同步檢查所有 `<router-link>`、程式化導航（`router.push`）、選單/列表元件中是否有殘留入口
+- **孤立元件清理**：若刪除的是父元件，其子元件若不再被其他元件引用，應一併標記為待清理
+
 ## 其他必查項
 
-- **console 殘留**：commit 中不應包含除錯用的 `console.log`/`console.warn`/`console.debug`/`console.error`（生產代碼禁止）
+- **console 殘留（P1 級）**：commit 中不應包含除錯用的 `console.log`/`console.warn`/`console.debug`/`console.error`（生產代碼禁止，一律列為 P1）
 - **v-html 消毒**：所有 `v-html` 是否都經過 `HtmlHelper.purifyHtml()` 處理或使用 `v-safe-html` directive（lago），防止 XSS
 - **v-if / v-show 選用**：頻繁切換的元素應使用 `v-show`；不頻繁但渲染成本高的元素應使用 `v-if` 懶渲染
 - **效能 — 全局 watcher**：是否有不必要的全局 watcher；computed 是否有副作用
