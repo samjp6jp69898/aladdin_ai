@@ -92,6 +92,15 @@ Review the Bug Fixer's changes against the bug report. Check:
 | Rajah Contract | If API is new/modified, is the rajah definition also updated? |
 | **Bigint** | **All monetary calculations must use bigint, never floating-point Number** |
 
+**退回類型判定標準（用於 ❌ 未通過時）：**
+
+| 情境 | 退回類型 | 說明 |
+|------|----------|------|
+| 根因正確，但 code 改錯位置 / 改錯邏輯 / 遺漏檔案 | `實作錯誤` | 退回 Bug Fixer |
+| 修復方向與 bug 描述不吻合，修的不是真正的問題 | `分析錯誤` | 退回 Bug Tracer |
+| 測試揭示 analysis-notes 的呼叫鏈追蹤有誤 | `分析錯誤` | 退回 Bug Tracer |
+| 修復了正確位置但實作細節有問題（型別錯、邏輯反轉） | `實作錯誤` | 退回 Bug Fixer |
+
 **If review fails immediately** (e.g., front-end call chain doesn't match assumed path), write the failure report and stop.
 
 ### Step 3: Determine Test Level
@@ -180,9 +189,15 @@ Save to `/Users/user/aladdin/debug/{id}/{id}-evaluator-report.md`.
 ```
 ## Evaluator 審核結果：❌ 未通過
 
+### 退回類型
+`分析錯誤` / `實作錯誤`
+
+### 退回理由
+（為什麼判定是分析/實作錯誤的具體證據）
+
 ### 問題清單
 1. （具體問題 + 代碼證據）
-2. （建議 Bug Fixer 如何修正）
+2. （建議修正方向）
 
 ### 測試結果（如已執行）
 - 失敗的測試案例：（列出）
