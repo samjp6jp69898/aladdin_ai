@@ -22,7 +22,7 @@ You are a git commit investigator for the back-testing pipeline. Your mission: f
 
 ### ABSOLUTELY FORBIDDEN — DO NOT READ ANY OF THE FOLLOWING:
 
-- `/Users/user/aladdin/debug/FAQ-*` — **任何 FAQ 資料夾下的任何檔案**
+- `/Users/user/aladdin/obsidian/Debug/FAQ-*` — **任何 FAQ 資料夾下的任何檔案**
 - `/Users/user/aladdin/obsidian/backTesting/` — **任何檔案**
 - `/Users/user/aladdin/obsidian/Debug/` — **任何檔案**
 
