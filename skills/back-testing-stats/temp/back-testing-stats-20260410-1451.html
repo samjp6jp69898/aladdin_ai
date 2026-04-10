@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 — 2026-04-10</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f5f5;color:#333;padding:24px}
+.container{max-width:1100px;margin:0 auto}
+h1{font-size:1.6rem;margin-bottom:20px;color:#1a1a1a}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card .big{font-size:2.8rem;font-weight:700;line-height:1.1}
+.card .label{font-size:.85rem;color:#888;margin-top:4px}
+.card .sub{font-size:.9rem;color:#666;margin-top:8px}
+.blue{color:#1976d2}.green{color:#388e3c}
+.bar-container{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:20px}
+.bar-track{display:flex;height:36px;border-radius:8px;overflow:hidden;margin:12px 0}
+.bar-seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:600;transition:width .3s}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;color:#555}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+.section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:#fafafa;padding:10px 8px;text-align:center;border-bottom:2px solid #e0e0e0;font-weight:600}
+td{padding:8px;text-align:center;border-bottom:1px solid #eee}
+.sev-tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:.8rem;font-weight:600}
+canvas{max-height:400px}
+.footer{text-align:center;color:#aaa;font-size:.75rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>回測統計報告</h1>
+
+<div class="cards">
+<div class="card">
+<div class="big blue">87.3%</div>
+<div class="label">總成功率（正確 + 部分正確）</div>
+<div class="sub">已完成 161 / 161 張票</div>
+</div>
+<div class="card">
+<div class="big green">56.7%</div>
+<div class="label">完全成功率（僅分析正確）</div>
+<div class="sub">有效樣本 150 張（排除 3 不需修復 + 8 無法比對）</div>
+</div>
+</div>
+
+<div class="bar-container">
+<div style="font-weight:600;margin-bottom:4px">結論分布</div>
+<div class="bar-track"><div class="bar-seg" style="width:52.79503105590062%;background:#4caf50" title="分析正確 85 (52.8%)">85</div><div class="bar-seg" style="width:28.57142857142857%;background:#ffb74d" title="部分B 46 (28.6%)">46</div><div class="bar-seg" style="width:11.801242236024844%;background:#ef5350" title="分析錯誤 19 (11.8%)">19</div><div class="bar-seg" style="width:4.968944099378882%;background:#bdbdbd" title="無法比對 8 (5.0%)">8</div><div class="bar-seg" style="width:1.8633540372670807%;background:#90a4ae" title="不需修復 3 (1.9%)"></div></div>
+<div class="legend">
+<span><span class="dot" style="background:#4caf50"></span>分析正確 85 (52.8%)</span>
+<span><span class="dot" style="background:#81c784"></span>部分A(等效替代) 0</span>
+<span><span class="dot" style="background:#ffb74d"></span>部分B(不完整) 46 (28.6%)</span>
+<span><span class="dot" style="background:#ef5350"></span>分析錯誤 19 (11.8%)</span>
+<span><span class="dot" style="background:#bdbdbd"></span>無法比對 8 (5.0%)</span>
+<span><span class="dot" style="background:#90a4ae"></span>不需修復 3 (1.9%)</span>
+</div>
+</div>
+
+<div class="section">
+<div style="font-weight:600;margin-bottom:12px">各嚴重性等級成功率</div>
+<table>
+<thead><tr><th>嚴重性</th><th>總數</th><th>正確</th><th>部分A</th><th>部分B</th><th>錯誤</th><th>無法比對</th><th>不需修復</th><th>完全率</th><th>總成功率</th></tr></thead>
+<tbody><tr>
+<td><span class="sev-tag" style="background:#ef5350;color:#fff">P1重點</span></td>
+<td>26</td><td>13</td><td>0</td><td>3</td><td>6</td><td>3</td><td>1</td>
+<td><strong>59.1%</strong></td><td><strong>72.7%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#ff9800;color:#fff">P2較高</span></td>
+<td>107</td><td>57</td><td>0</td><td>34</td><td>11</td><td>4</td><td>1</td>
+<td><strong>55.9%</strong></td><td><strong>89.2%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#fdd835;color:#333">P3一般</span></td>
+<td>27</td><td>14</td><td>0</td><td>9</td><td>2</td><td>1</td><td>1</td>
+<td><strong>56.0%</strong></td><td><strong>92.0%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#42a5f5;color:#fff">P4較低</span></td>
+<td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+<td><strong>100.0%</strong></td><td><strong>100.0%</strong></td>
+</tr></tbody>
+</table>
+</div>
+
+<div class="section">
+<div style="font-weight:600;margin-bottom:12px">累積成功率趨勢</div>
+<canvas id="trendChart"></canvas>
+</div>
+
+<div class="footer">Generated 2026-04-10 14:51 (Asia/Taipei)</div>
+</div>
+
+<script>
+const trendData = [{"idx": 1, "ticket": "FAQ-1875", "total_rate": 100.0, "exact_rate": 100.0}, {"idx": 2, "ticket": "FAQ-1864", "total_rate": 100.0, "exact_rate": 100.0}, {"idx": 3, "ticket": "FAQ-1862", "total_rate": 66.7, "exact_rate": 66.7}, {"idx": 4, "ticket": "FAQ-1860", "total_rate": 50.0, "exact_rate": 50.0}, {"idx": 5, "ticket": "FAQ-1858", "total_rate": 40.0, "exact_rate": 40.0}, {"idx": 6, "ticket": "FAQ-1843", "total_rate": 33.3, "exact_rate": 33.3}, {"idx": 7, "ticket": "FAQ-1817", "total_rate": 42.9, "exact_rate": 28.6}, {"idx": 8, "ticket": "FAQ-1813", "total_rate": 37.5, "exact_rate": 25.0}, {"idx": 9, "ticket": "FAQ-1809", "total_rate": 44.4, "exact_rate": 33.3}, {"idx": 10, "ticket": "FAQ-1805", "total_rate": 40.0, "exact_rate": 30.0}, {"idx": 11, "ticket": "FAQ-1799", "total_rate": 45.5, "exact_rate": 36.4}, {"idx": 12, "ticket": "FAQ-1798", "total_rate": 50.0, "exact_rate": 41.7}, {"idx": 13, "ticket": "FAQ-1786", "total_rate": 53.8, "exact_rate": 46.2}, {"idx": 14, "ticket": "FAQ-1796", "total_rate": 57.1, "exact_rate": 50.0}, {"idx": 15, "ticket": "FAQ-1783", "total_rate": 60.0, "exact_rate": 53.3}, {"idx": 16, "ticket": "FAQ-1779", "total_rate": 62.5, "exact_rate": 50.0}, {"idx": 17, "ticket": "FAQ-1777", "total_rate": 64.7, "exact_rate": 52.9}, {"idx": 18, "ticket": "FAQ-1774", "total_rate": 66.7, "exact_rate": 55.6}, {"idx": 19, "ticket": "FAQ-1759", "total_rate": 68.4, "exact_rate": 52.6}, {"idx": 20, "ticket": "FAQ-1731", "total_rate": 70.0, "exact_rate": 55.0}, {"idx": 21, "ticket": "FAQ-1730", "total_rate": 71.4, "exact_rate": 52.4}, {"idx": 22, "ticket": "FAQ-1727", "total_rate": 72.7, "exact_rate": 54.5}, {"idx": 23, "ticket": "FAQ-1726", "total_rate": 73.9, "exact_rate": 56.5}, {"idx": 24, "ticket": "FAQ-1725", "total_rate": 75.0, "exact_rate": 58.3}, {"idx": 25, "ticket": "FAQ-1724", "total_rate": 76.0, "exact_rate": 56.0}, {"idx": 26, "ticket": "FAQ-1722", "total_rate": 73.1, "exact_rate": 53.8}, {"idx": 27, "ticket": "FAQ-1721", "total_rate": 74.1, "exact_rate": 51.9}, {"idx": 28, "ticket": "FAQ-1719", "total_rate": 75.0, "exact_rate": 53.6}, {"idx": 29, "ticket": "FAQ-1718", "total_rate": 72.4, "exact_rate": 51.7}, {"idx": 30, "ticket": "FAQ-1704", "total_rate": 73.3, "exact_rate": 53.3}, {"idx": 31, "ticket": "FAQ-1703", "total_rate": 74.2, "exact_rate": 54.8}, {"idx": 32, "ticket": "FAQ-1702", "total_rate": 75.0, "exact_rate": 56.2}, {"idx": 33, "ticket": "FAQ-1701", "total_rate": 75.8, "exact_rate": 57.6}, {"idx": 34, "ticket": "FAQ-1698", "total_rate": 76.5, "exact_rate": 58.8}, {"idx": 35, "ticket": "FAQ-1694", "total_rate": 77.1, "exact_rate": 60.0}, {"idx": 36, "ticket": "FAQ-1916", "total_rate": 77.8, "exact_rate": 58.3}, {"idx": 37, "ticket": "FAQ-1949", "total_rate": 78.4, "exact_rate": 59.5}, {"idx": 38, "ticket": "FAQ-1942", "total_rate": 78.9, "exact_rate": 57.9}, {"idx": 39, "ticket": "FAQ-1960", "total_rate": 79.5, "exact_rate": 59.0}, {"idx": 40, "ticket": "FAQ-1934", "total_rate": 80.0, "exact_rate": 57.5}, {"idx": 41, "ticket": "FAQ-1965", "total_rate": 78.0, "exact_rate": 56.1}, {"idx": 42, "ticket": "FAQ-1975", "total_rate": 78.6, "exact_rate": 57.1}, {"idx": 43, "ticket": "FAQ-1932", "total_rate": 76.7, "exact_rate": 55.8}, {"idx": 44, "ticket": "FAQ-2020", "total_rate": 77.3, "exact_rate": 56.8}, {"idx": 45, "ticket": "FAQ-2011", "total_rate": 77.8, "exact_rate": 55.6}, {"idx": 46, "ticket": "FAQ-653", "total_rate": 78.3, "exact_rate": 54.3}, {"idx": 47, "ticket": "FAQ-1961", "total_rate": 76.6, "exact_rate": 53.2}, {"idx": 48, "ticket": "FAQ-1912", "total_rate": 77.1, "exact_rate": 54.2}, {"idx": 49, "ticket": "FAQ-1887", "total_rate": 77.6, "exact_rate": 53.1}, {"idx": 50, "ticket": "FAQ-1820", "total_rate": 78.0, "exact_rate": 54.0}, {"idx": 51, "ticket": "FAQ-1819", "total_rate": 78.4, "exact_rate": 54.9}, {"idx": 52, "ticket": "FAQ-1720", "total_rate": 78.8, "exact_rate": 55.8}, {"idx": 53, "ticket": "FAQ-1695", "total_rate": 79.2, "exact_rate": 54.7}, {"idx": 54, "ticket": "FAQ-2015", "total_rate": 79.6, "exact_rate": 55.6}, {"idx": 55, "ticket": "FAQ-1939", "total_rate": 80.0, "exact_rate": 56.4}, {"idx": 56, "ticket": "FAQ-1918", "total_rate": 80.4, "exact_rate": 57.1}, {"idx": 57, "ticket": "FAQ-399", "total_rate": 80.7, "exact_rate": 57.9}, {"idx": 58, "ticket": "FAQ-2052", "total_rate": 81.0, "exact_rate": 56.9}, {"idx": 59, "ticket": "FAQ-2008", "total_rate": 81.4, "exact_rate": 57.6}, {"idx": 60, "ticket": "FAQ-2005", "total_rate": 81.7, "exact_rate": 58.3}, {"idx": 61, "ticket": "FAQ-1995", "total_rate": 82.0, "exact_rate": 59.0}, {"idx": 62, "ticket": "FAQ-1929", "total_rate": 80.6, "exact_rate": 58.1}, {"idx": 63, "ticket": "FAQ-1892", "total_rate": 81.0, "exact_rate": 58.7}, {"idx": 64, "ticket": "FAQ-2038", "total_rate": 79.7, "exact_rate": 57.8}, {"idx": 65, "ticket": "FAQ-2035", "total_rate": 80.0, "exact_rate": 58.5}, {"idx": 66, "ticket": "FAQ-2017", "total_rate": 80.3, "exact_rate": 57.6}, {"idx": 67, "ticket": "FAQ-2006", "total_rate": 79.1, "exact_rate": 56.7}, {"idx": 68, "ticket": "FAQ-1917", "total_rate": 79.4, "exact_rate": 57.4}, {"idx": 69, "ticket": "FAQ-1885", "total_rate": 79.7, "exact_rate": 58.0}, {"idx": 70, "ticket": "FAQ-2045", "total_rate": 80.0, "exact_rate": 57.1}, {"idx": 71, "ticket": "FAQ-1952", "total_rate": 78.9, "exact_rate": 56.3}, {"idx": 72, "ticket": "FAQ-1870", "total_rate": 79.2, "exact_rate": 56.9}, {"idx": 73, "ticket": "FAQ-2019", "total_rate": 79.5, "exact_rate": 56.2}, {"idx": 74, "ticket": "FAQ-2065", "total_rate": 79.7, "exact_rate": 56.8}, {"idx": 75, "ticket": "FAQ-2069", "total_rate": 80.0, "exact_rate": 56.0}, {"idx": 76, "ticket": "FAQ-1811", "total_rate": 80.3, "exact_rate": 55.3}, {"idx": 77, "ticket": "FAQ-2037", "total_rate": 80.5, "exact_rate": 55.8}, {"idx": 78, "ticket": "FAQ-2110", "total_rate": 80.8, "exact_rate": 55.1}, {"idx": 79, "ticket": "FAQ-2055", "total_rate": 81.0, "exact_rate": 55.7}, {"idx": 80, "ticket": "FAQ-2095", "total_rate": 81.2, "exact_rate": 56.2}, {"idx": 81, "ticket": "FAQ-2093", "total_rate": 81.5, "exact_rate": 56.8}, {"idx": 82, "ticket": "FAQ-2066", "total_rate": 81.7, "exact_rate": 57.3}, {"idx": 83, "ticket": "FAQ-2012", "total_rate": 81.9, "exact_rate": 56.6}, {"idx": 84, "ticket": "FAQ-1996", "total_rate": 82.1, "exact_rate": 56.0}, {"idx": 85, "ticket": "FAQ-2103", "total_rate": 81.2, "exact_rate": 55.3}, {"idx": 86, "ticket": "FAQ-2096", "total_rate": 81.4, "exact_rate": 55.8}, {"idx": 87, "ticket": "FAQ-2097", "total_rate": 81.6, "exact_rate": 56.3}, {"idx": 88, "ticket": "FAQ-2094", "total_rate": 81.8, "exact_rate": 55.7}, {"idx": 89, "ticket": "FAQ-2088", "total_rate": 80.9, "exact_rate": 55.1}, {"idx": 90, "ticket": "FAQ-2073", "total_rate": 81.1, "exact_rate": 55.6}, {"idx": 91, "ticket": "FAQ-2092", "total_rate": 81.3, "exact_rate": 56.0}, {"idx": 92, "ticket": "FAQ-2090", "total_rate": 81.5, "exact_rate": 56.5}, {"idx": 93, "ticket": "FAQ-1978", "total_rate": 81.7, "exact_rate": 55.9}, {"idx": 94, "ticket": "FAQ-2130", "total_rate": 81.9, "exact_rate": 56.4}, {"idx": 95, "ticket": "FAQ-2100", "total_rate": 82.1, "exact_rate": 56.8}, {"idx": 96, "ticket": "FAQ-2087", "total_rate": 82.3, "exact_rate": 56.2}, {"idx": 97, "ticket": "FAQ-2082", "total_rate": 82.5, "exact_rate": 56.7}, {"idx": 98, "ticket": "FAQ-2061", "total_rate": 82.7, "exact_rate": 56.1}, {"idx": 99, "ticket": "FAQ-2054", "total_rate": 82.8, "exact_rate": 56.6}, {"idx": 100, "ticket": "FAQ-2050", "total_rate": 83.0, "exact_rate": 57.0}, {"idx": 101, "ticket": "FAQ-2021", "total_rate": 83.2, "exact_rate": 57.4}, {"idx": 102, "ticket": "FAQ-2168", "total_rate": 83.3, "exact_rate": 57.8}, {"idx": 103, "ticket": "FAQ-2057", "total_rate": 83.5, "exact_rate": 57.3}, {"idx": 104, "ticket": "FAQ-2022", "total_rate": 83.7, "exact_rate": 57.7}, {"idx": 105, "ticket": "FAQ-2163", "total_rate": 83.8, "exact_rate": 58.1}, {"idx": 106, "ticket": "FAQ-2075", "total_rate": 84.0, "exact_rate": 58.5}, {"idx": 107, "ticket": "FAQ-1911", "total_rate": 84.1, "exact_rate": 57.9}, {"idx": 108, "ticket": "FAQ-2185", "total_rate": 84.3, "exact_rate": 57.4}, {"idx": 109, "ticket": "FAQ-2028", "total_rate": 84.4, "exact_rate": 56.9}, {"idx": 110, "ticket": "FAQ-2026", "total_rate": 84.5, "exact_rate": 57.3}, {"idx": 111, "ticket": "FAQ-2189", "total_rate": 84.7, "exact_rate": 56.8}, {"idx": 112, "ticket": "FAQ-2000", "total_rate": 84.8, "exact_rate": 57.1}, {"idx": 113, "ticket": "FAQ-1998", "total_rate": 85.0, "exact_rate": 57.5}, {"idx": 114, "ticket": "FAQ-2123", "total_rate": 85.1, "exact_rate": 57.9}, {"idx": 115, "ticket": "FAQ-1839", "total_rate": 85.2, "exact_rate": 58.3}, {"idx": 116, "ticket": "FAQ-2111", "total_rate": 84.5, "exact_rate": 57.8}, {"idx": 117, "ticket": "FAQ-1977", "total_rate": 84.6, "exact_rate": 58.1}, {"idx": 118, "ticket": "FAQ-1548", "total_rate": 84.7, "exact_rate": 58.5}, {"idx": 119, "ticket": "FAQ-1507", "total_rate": 84.9, "exact_rate": 58.8}, {"idx": 120, "ticket": "FAQ-1156", "total_rate": 85.0, "exact_rate": 59.2}, {"idx": 121, "ticket": "FAQ-2169", "total_rate": 85.1, "exact_rate": 59.5}, {"idx": 122, "ticket": "FAQ-2004", "total_rate": 85.2, "exact_rate": 59.8}, {"idx": 123, "ticket": "FAQ-2182", "total_rate": 85.4, "exact_rate": 60.2}, {"idx": 124, "ticket": "FAQ-2159", "total_rate": 85.5, "exact_rate": 60.5}, {"idx": 125, "ticket": "FAQ-1893", "total_rate": 85.6, "exact_rate": 60.0}, {"idx": 126, "ticket": "FAQ-1691", "total_rate": 85.7, "exact_rate": 59.5}, {"idx": 127, "ticket": "FAQ-2207", "total_rate": 85.8, "exact_rate": 59.1}, {"idx": 128, "ticket": "FAQ-2205", "total_rate": 85.9, "exact_rate": 58.6}, {"idx": 129, "ticket": "FAQ-2204", "total_rate": 86.0, "exact_rate": 58.1}, {"idx": 130, "ticket": "FAQ-2245", "total_rate": 85.4, "exact_rate": 57.7}, {"idx": 131, "ticket": "FAQ-2136", "total_rate": 85.5, "exact_rate": 57.3}, {"idx": 132, "ticket": "FAQ-2114", "total_rate": 85.6, "exact_rate": 56.8}, {"idx": 133, "ticket": "FAQ-2108", "total_rate": 85.7, "exact_rate": 56.4}, {"idx": 134, "ticket": "FAQ-2105", "total_rate": 85.1, "exact_rate": 56.0}, {"idx": 135, "ticket": "FAQ-2137", "total_rate": 85.2, "exact_rate": 56.3}, {"idx": 136, "ticket": "FAQ-2173", "total_rate": 84.6, "exact_rate": 55.9}, {"idx": 137, "ticket": "FAQ-2248", "total_rate": 84.7, "exact_rate": 56.2}, {"idx": 138, "ticket": "FAQ-2188", "total_rate": 84.8, "exact_rate": 56.5}, {"idx": 139, "ticket": "FAQ-2179", "total_rate": 84.9, "exact_rate": 56.8}, {"idx": 140, "ticket": "FAQ-2165", "total_rate": 85.0, "exact_rate": 57.1}, {"idx": 141, "ticket": "FAQ-696", "total_rate": 85.1, "exact_rate": 56.7}, {"idx": 142, "ticket": "FAQ-1572", "total_rate": 84.5, "exact_rate": 56.3}, {"idx": 143, "ticket": "FAQ-2002", "total_rate": 84.6, "exact_rate": 56.6}, {"idx": 144, "ticket": "FAQ-1814", "total_rate": 84.7, "exact_rate": 56.2}, {"idx": 145, "ticket": "FAQ-2102", "total_rate": 84.8, "exact_rate": 56.6}, {"idx": 146, "ticket": "FAQ-2076", "total_rate": 84.2, "exact_rate": 56.2}, {"idx": 147, "ticket": "FAQ-2040", "total_rate": 84.4, "exact_rate": 55.8}, {"idx": 148, "ticket": "FAQ-1737", "total_rate": 83.8, "exact_rate": 55.4}, {"idx": 149, "ticket": "FAQ-1710", "total_rate": 83.2, "exact_rate": 55.0}, {"idx": 150, "ticket": "FAQ-1706", "total_rate": 83.3, "exact_rate": 54.7}, {"idx": 151, "ticket": "FAQ-1685", "total_rate": 82.8, "exact_rate": 54.3}, {"idx": 152, "ticket": "FAQ-1723", "total_rate": 82.2, "exact_rate": 53.9}, {"idx": 153, "ticket": "FAQ-1705", "total_rate": 81.7, "exact_rate": 53.6}, {"idx": 154, "ticket": "FAQ-2269", "total_rate": 81.8, "exact_rate": 53.9}, {"idx": 155, "ticket": "FAQ-2167", "total_rate": 81.9, "exact_rate": 54.2}, {"idx": 156, "ticket": "FAQ-2154", "total_rate": 82.1, "exact_rate": 54.5}, {"idx": 157, "ticket": "FAQ-2144", "total_rate": 81.5, "exact_rate": 54.1}, {"idx": 158, "ticket": "FAQ-2106", "total_rate": 81.6, "exact_rate": 53.8}, {"idx": 159, "ticket": "FAQ-2104", "total_rate": 81.8, "exact_rate": 53.5}, {"idx": 160, "ticket": "FAQ-1729", "total_rate": 81.2, "exact_rate": 53.1}, {"idx": 161, "ticket": "FAQ-1686", "total_rate": 81.4, "exact_rate": 52.8}];
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: trendData.map(d => d.idx),
+    datasets: [
+      {
+        label: '總成功率',
+        data: trendData.map(d => d.total_rate),
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      },
+      {
+        label: '完全成功率',
+        data: trendData.map(d => d.exact_rate),
+        borderColor: '#388e3c',
+        backgroundColor: 'rgba(56,142,60,.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      title: { display: true, text: '累積成功率趨勢', font: { size: 14 } },
+      tooltip: {
+        callbacks: {
+          title: function(items) { return trendData[items[0].dataIndex].ticket; },
+          label: function(item) { return item.dataset.label + ': ' + item.raw + '%'; }
+        }
+      }
+    },
+    scales: {
+      y: { min: 0, max: 100, title: { display: true, text: '成功率 (%)' } },
+      x: { title: { display: true, text: '完成順序' }, ticks: { maxTicksLimit: 20 } }
+    }
+  }
+});
+</script>
+</body>
+</html>

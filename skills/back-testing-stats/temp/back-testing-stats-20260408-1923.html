@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 - 20260408-1923</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 24px; color: #333; }
+.container { max-width: 960px; margin: 0 auto; }
+h1 { font-size: 24px; margin-bottom: 24px; color: #1a1a1a; }
+h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a1a; }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card .big-number { font-size: 48px; font-weight: 700; color: #2563eb; }
+.card .big-number.green { color: #16a34a; }
+.card .label { font-size: 14px; color: #666; margin-top: 4px; }
+.card .sub { font-size: 13px; color: #999; margin-top: 8px; }
+
+.progress-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+.progress-bar { display: flex; height: 32px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.progress-bar .seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+.seg-correct { background: #16a34a; }
+.seg-partial { background: #f59e0b; }
+.seg-wrong { background: #dc2626; }
+.seg-unable { background: #9ca3af; }
+.seg-nofix { background: #d1d5db; color: #666 !important; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+.table-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; padding: 10px 12px; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #374151; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; }
+tr:hover td { background: #f9fafb; }
+.sev-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #fff; }
+.sev-p1 { background: #dc2626; }
+.sev-p2 { background: #f97316; }
+.sev-p3 { background: #eab308; color: #333; }
+.sev-p4 { background: #3b82f6; }
+
+.chart-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+canvas { max-height: 400px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>回測統計報告</h1>
+
+<!-- Section 1: Overview Cards -->
+<div class="cards">
+  <div class="card">
+    <div class="big-number">85.2%</div>
+    <div class="label">總成功率（正確 + 部分正確）</div>
+    <div class="sub">已完成 199 / 199 張</div>
+  </div>
+  <div class="card">
+    <div class="big-number green">54.1%</div>
+    <div class="label">完全成功率</div>
+    <div class="sub">部分成功率 31.1%</div>
+  </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-section">
+  <h2>回測結論分布（已完成 199 張，有效樣本 196 張）</h2>
+  <div class="progress-bar">
+    <div class="seg seg-correct" style="width:54.08%">106</div>
+    <div class="seg seg-partial" style="width:31.12%">61</div>
+    <div class="seg seg-wrong" style="width:10.71%">21</div>
+    <div class="seg seg-unable" style="width:4.08%">8</div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>分析正確 106 (54.1%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>部分正確 61 (31.1%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div>分析錯誤 21 (10.7%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>無法比對 8 (4.1%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d1d5db"></div>不需修復 3 (不計入)</div>
+  </div>
+</div>
+
+<!-- Section 2: Per-Severity Table -->
+<div class="table-section">
+  <h2>各嚴重性等級成功率</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>嚴重性</th><th>總數</th><th>正確</th><th>部分</th><th>錯誤</th><th>無法比對</th><th>不需修復</th><th>完全率</th><th>部分率</th><th>總成功率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="sev-badge sev-p1">P1重點</span></td>
+        <td>32</td><td>16</td><td>6</td><td>6</td><td>3</td><td>1</td>
+        <td>51.6%</td><td>19.4%</td><td>71.0%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p2">P2較高</span></td>
+        <td>124</td><td>66</td><td>42</td><td>11</td><td>4</td><td>1</td>
+        <td>53.7%</td><td>34.1%</td><td>87.8%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p3">P3一般</span></td>
+        <td>30</td><td>16</td><td>10</td><td>2</td><td>1</td><td>1</td>
+        <td>55.2%</td><td>34.5%</td><td>89.7%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p4">P4較低</span></td>
+        <td>13</td><td>8</td><td>3</td><td>2</td><td>0</td><td>0</td>
+        <td>61.5%</td><td>23.1%</td><td>84.6%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Section 3: Trend Chart -->
+<div class="chart-section">
+  <h2>累積成功率趨勢</h2>
+  <canvas id="trendChart"></canvas>
+</div>
+
+</div>
+
+<script>
+const data = [{"i":1,"id":"FAQ-1875","t":100.0,"c":100.0,"p":0.0},{"i":2,"id":"FAQ-1868","t":100.0,"c":50.0,"p":50.0},{"i":3,"id":"FAQ-1864","t":100.0,"c":66.7,"p":33.3},{"i":4,"id":"FAQ-1862","t":75.0,"c":50.0,"p":25.0},{"i":5,"id":"FAQ-1860","t":60.0,"c":40.0,"p":20.0},{"i":6,"id":"FAQ-1858","t":50.0,"c":33.3,"p":16.7},{"i":7,"id":"FAQ-1843","t":42.9,"c":28.6,"p":14.3},{"i":8,"id":"FAQ-1817","t":50.0,"c":25.0,"p":25.0},{"i":9,"id":"FAQ-1813","t":44.4,"c":22.2,"p":22.2},{"i":10,"id":"FAQ-1809","t":50.0,"c":30.0,"p":20.0},{"i":11,"id":"FAQ-1805","t":45.5,"c":27.3,"p":18.2},{"i":12,"id":"FAQ-1799","t":50.0,"c":33.3,"p":16.7},{"i":13,"id":"FAQ-1798","t":53.8,"c":38.5,"p":15.4},{"i":14,"id":"FAQ-1791","t":50.0,"c":35.7,"p":14.3},{"i":15,"id":"FAQ-1786","t":53.3,"c":40.0,"p":13.3},{"i":16,"id":"FAQ-1796","t":56.2,"c":43.8,"p":12.5},{"i":17,"id":"FAQ-1783","t":58.8,"c":47.1,"p":11.8},{"i":18,"id":"FAQ-1779","t":61.1,"c":44.4,"p":16.7},{"i":19,"id":"FAQ-1777","t":63.2,"c":47.4,"p":15.8},{"i":20,"id":"FAQ-1774","t":65.0,"c":50.0,"p":15.0},{"i":21,"id":"FAQ-1759","t":66.7,"c":47.6,"p":19.0},{"i":22,"id":"FAQ-1734","t":68.2,"c":50.0,"p":18.2},{"i":23,"id":"FAQ-1731","t":69.6,"c":52.2,"p":17.4},{"i":24,"id":"FAQ-1730","t":70.8,"c":50.0,"p":20.8},{"i":25,"id":"FAQ-1727","t":72.0,"c":52.0,"p":20.0},{"i":26,"id":"FAQ-1726","t":73.1,"c":53.8,"p":19.2},{"i":27,"id":"FAQ-1725","t":74.1,"c":55.6,"p":18.5},{"i":28,"id":"FAQ-1724","t":75.0,"c":53.6,"p":21.4},{"i":29,"id":"FAQ-1722","t":72.4,"c":51.7,"p":20.7},{"i":30,"id":"FAQ-1721","t":73.3,"c":50.0,"p":23.3},{"i":31,"id":"FAQ-1719","t":74.2,"c":51.6,"p":22.6},{"i":32,"id":"FAQ-1718","t":71.9,"c":50.0,"p":21.9},{"i":33,"id":"FAQ-1704","t":72.7,"c":51.5,"p":21.2},{"i":34,"id":"FAQ-1703","t":73.5,"c":52.9,"p":20.6},{"i":35,"id":"FAQ-1702","t":74.3,"c":54.3,"p":20.0},{"i":36,"id":"FAQ-1701","t":75.0,"c":55.6,"p":19.4},{"i":37,"id":"FAQ-1698","t":75.7,"c":56.8,"p":18.9},{"i":38,"id":"FAQ-1694","t":76.3,"c":57.9,"p":18.4},{"i":39,"id":"FAQ-1916","t":76.9,"c":56.4,"p":20.5},{"i":40,"id":"FAQ-1949","t":77.5,"c":57.5,"p":20.0},{"i":41,"id":"FAQ-1942","t":78.0,"c":56.1,"p":22.0},{"i":42,"id":"FAQ-1960","t":78.6,"c":57.1,"p":21.4},{"i":43,"id":"FAQ-1934","t":79.1,"c":55.8,"p":23.3},{"i":44,"id":"FAQ-1965","t":77.3,"c":54.5,"p":22.7},{"i":45,"id":"FAQ-1975","t":77.8,"c":55.6,"p":22.2},{"i":46,"id":"FAQ-1932","t":76.1,"c":54.3,"p":21.7},{"i":47,"id":"FAQ-2020","t":76.6,"c":55.3,"p":21.3},{"i":48,"id":"FAQ-2011","t":77.1,"c":54.2,"p":22.9},{"i":49,"id":"FAQ-653","t":77.6,"c":53.1,"p":24.5},{"i":50,"id":"FAQ-1961","t":76.0,"c":52.0,"p":24.0},{"i":51,"id":"FAQ-1912","t":76.5,"c":52.9,"p":23.5},{"i":52,"id":"FAQ-1887","t":76.9,"c":51.9,"p":25.0},{"i":53,"id":"FAQ-1820","t":77.4,"c":52.8,"p":24.5},{"i":54,"id":"FAQ-1819","t":77.8,"c":53.7,"p":24.1},{"i":55,"id":"FAQ-1720","t":78.2,"c":54.5,"p":23.6},{"i":56,"id":"FAQ-1695","t":78.6,"c":53.6,"p":25.0},{"i":57,"id":"FAQ-2015","t":78.9,"c":54.4,"p":24.6},{"i":58,"id":"FAQ-1939","t":79.3,"c":55.2,"p":24.1},{"i":59,"id":"FAQ-1918","t":79.7,"c":55.9,"p":23.7},{"i":60,"id":"FAQ-399","t":80.0,"c":56.7,"p":23.3},{"i":61,"id":"FAQ-2052","t":80.3,"c":55.7,"p":24.6},{"i":62,"id":"FAQ-2013","t":80.6,"c":54.8,"p":25.8},{"i":63,"id":"FAQ-2008","t":81.0,"c":55.6,"p":25.4},{"i":64,"id":"FAQ-2005","t":81.2,"c":56.2,"p":25.0},{"i":65,"id":"FAQ-1995","t":81.5,"c":56.9,"p":24.6},{"i":66,"id":"FAQ-1929","t":80.3,"c":56.1,"p":24.2},{"i":67,"id":"FAQ-1892","t":80.6,"c":56.7,"p":23.9},{"i":68,"id":"FAQ-2038","t":79.4,"c":55.9,"p":23.5},{"i":69,"id":"FAQ-2035","t":79.7,"c":56.5,"p":23.2},{"i":70,"id":"FAQ-2017","t":80.0,"c":55.7,"p":24.3},{"i":71,"id":"FAQ-2006","t":78.9,"c":54.9,"p":23.9},{"i":72,"id":"FAQ-1917","t":79.2,"c":55.6,"p":23.6},{"i":73,"id":"FAQ-1885","t":79.5,"c":56.2,"p":23.3},{"i":74,"id":"FAQ-2045","t":79.7,"c":55.4,"p":24.3},{"i":75,"id":"FAQ-1952","t":78.7,"c":54.7,"p":24.0},{"i":76,"id":"FAQ-1870","t":78.9,"c":55.3,"p":23.7},{"i":77,"id":"FAQ-2019","t":79.2,"c":54.5,"p":24.7},{"i":78,"id":"FAQ-2010","t":79.5,"c":53.8,"p":25.6},{"i":79,"id":"FAQ-1985","t":79.7,"c":54.4,"p":25.3},{"i":80,"id":"FAQ-2065","t":80.0,"c":55.0,"p":25.0},{"i":81,"id":"FAQ-1967","t":80.2,"c":54.3,"p":25.9},{"i":82,"id":"FAQ-2069","t":80.5,"c":53.7,"p":26.8},{"i":83,"id":"FAQ-2067","t":80.7,"c":54.2,"p":26.5},{"i":84,"id":"FAQ-1811","t":81.0,"c":53.6,"p":27.4},{"i":85,"id":"FAQ-2051","t":81.2,"c":52.9,"p":28.2},{"i":86,"id":"FAQ-2037","t":81.4,"c":53.5,"p":27.9},{"i":87,"id":"FAQ-2055","t":81.6,"c":54.0,"p":27.6},{"i":88,"id":"FAQ-2110","t":81.8,"c":53.4,"p":28.4},{"i":89,"id":"FAQ-2093","t":82.0,"c":53.9,"p":28.1},{"i":90,"id":"FAQ-2095","t":82.2,"c":54.4,"p":27.8},{"i":91,"id":"FAQ-2066","t":82.4,"c":54.9,"p":27.5},{"i":92,"id":"FAQ-2012","t":82.6,"c":54.3,"p":28.3},{"i":93,"id":"FAQ-1996","t":82.8,"c":53.8,"p":29.0},{"i":94,"id":"FAQ-2103","t":81.9,"c":53.2,"p":28.7},{"i":95,"id":"FAQ-2112","t":82.1,"c":53.7,"p":28.4},{"i":96,"id":"FAQ-2096","t":82.3,"c":54.2,"p":28.1},{"i":97,"id":"FAQ-2097","t":82.5,"c":54.6,"p":27.8},{"i":98,"id":"FAQ-2094","t":82.7,"c":54.1,"p":28.6},{"i":99,"id":"FAQ-2088","t":81.8,"c":53.5,"p":28.3},{"i":100,"id":"FAQ-2073","t":82.0,"c":54.0,"p":28.0},{"i":101,"id":"FAQ-2092","t":82.2,"c":54.5,"p":27.7},{"i":102,"id":"FAQ-2090","t":82.4,"c":54.9,"p":27.5},{"i":103,"id":"FAQ-1910","t":82.5,"c":55.3,"p":27.2},{"i":104,"id":"FAQ-1978","t":82.7,"c":54.8,"p":27.9},{"i":105,"id":"FAQ-2130","t":82.9,"c":55.2,"p":27.6},{"i":106,"id":"FAQ-2100","t":83.0,"c":55.7,"p":27.4},{"i":107,"id":"FAQ-2087","t":83.2,"c":55.1,"p":28.0},{"i":108,"id":"FAQ-2082","t":83.3,"c":55.6,"p":27.8},{"i":109,"id":"FAQ-2061","t":83.5,"c":55.0,"p":28.4},{"i":110,"id":"FAQ-2054","t":83.6,"c":55.5,"p":28.2},{"i":111,"id":"FAQ-2050","t":83.8,"c":55.9,"p":27.9},{"i":112,"id":"FAQ-2021","t":83.9,"c":56.2,"p":27.7},{"i":113,"id":"FAQ-1822","t":84.1,"c":56.6,"p":27.4},{"i":114,"id":"FAQ-2168","t":84.2,"c":57.0,"p":27.2},{"i":115,"id":"FAQ-2057","t":84.3,"c":56.5,"p":27.8},{"i":116,"id":"FAQ-2022","t":84.5,"c":56.9,"p":27.6},{"i":117,"id":"FAQ-2163","t":84.6,"c":57.3,"p":27.4},{"i":118,"id":"FAQ-2075","t":84.7,"c":57.6,"p":27.1},{"i":119,"id":"FAQ-1928","t":84.9,"c":58.0,"p":26.9},{"i":120,"id":"FAQ-1911","t":85.0,"c":57.5,"p":27.5},{"i":121,"id":"FAQ-2185","t":85.1,"c":57.0,"p":28.1},{"i":122,"id":"FAQ-2155","t":85.2,"c":57.4,"p":27.9},{"i":123,"id":"FAQ-2028","t":85.4,"c":56.9,"p":28.5},{"i":124,"id":"FAQ-2026","t":85.5,"c":57.3,"p":28.2},{"i":125,"id":"FAQ-2189","t":85.6,"c":56.8,"p":28.8},{"i":126,"id":"FAQ-2000","t":85.7,"c":57.1,"p":28.6},{"i":127,"id":"FAQ-1998","t":85.8,"c":57.5,"p":28.3},{"i":128,"id":"FAQ-2181","t":85.9,"c":57.8,"p":28.1},{"i":129,"id":"FAQ-2123","t":86.0,"c":58.1,"p":27.9},{"i":130,"id":"FAQ-1980","t":86.2,"c":58.5,"p":27.7},{"i":131,"id":"FAQ-1931","t":86.3,"c":58.8,"p":27.5},{"i":132,"id":"FAQ-1886","t":85.6,"c":58.3,"p":27.3},{"i":133,"id":"FAQ-1869","t":85.7,"c":58.6,"p":27.1},{"i":134,"id":"FAQ-1839","t":85.8,"c":59.0,"p":26.9},{"i":135,"id":"FAQ-2111","t":85.2,"c":58.5,"p":26.7},{"i":136,"id":"FAQ-1977","t":85.3,"c":58.8,"p":26.5},{"i":137,"id":"FAQ-1976","t":85.4,"c":59.1,"p":26.3},{"i":138,"id":"FAQ-1974","t":85.5,"c":58.7,"p":26.8},{"i":139,"id":"FAQ-1963","t":85.6,"c":59.0,"p":26.6},{"i":140,"id":"FAQ-1548","t":85.7,"c":59.3,"p":26.4},{"i":141,"id":"FAQ-1507","t":85.8,"c":59.6,"p":26.2},{"i":142,"id":"FAQ-1156","t":85.9,"c":59.9,"p":26.1},{"i":143,"id":"FAQ-2169","t":86.0,"c":60.1,"p":25.9},{"i":144,"id":"FAQ-2004","t":86.1,"c":60.4,"p":25.7},{"i":145,"id":"FAQ-2182","t":86.2,"c":60.7,"p":25.5},{"i":146,"id":"FAQ-2159","t":86.3,"c":61.0,"p":25.3},{"i":147,"id":"FAQ-2119","t":86.4,"c":61.2,"p":25.2},{"i":148,"id":"FAQ-2043","t":86.5,"c":60.8,"p":25.7},{"i":149,"id":"FAQ-2029","t":86.6,"c":60.4,"p":26.2},{"i":150,"id":"FAQ-1906","t":86.7,"c":60.0,"p":26.7},{"i":151,"id":"FAQ-1893","t":86.8,"c":59.6,"p":27.2},{"i":152,"id":"FAQ-1691","t":86.8,"c":59.2,"p":27.6},{"i":153,"id":"FAQ-1664","t":86.9,"c":59.5,"p":27.5},{"i":154,"id":"FAQ-1609","t":86.4,"c":59.1,"p":27.3},{"i":155,"id":"FAQ-2204","t":86.5,"c":58.7,"p":27.7},{"i":156,"id":"FAQ-2205","t":86.5,"c":58.3,"p":28.2},{"i":157,"id":"FAQ-2207","t":86.6,"c":58.0,"p":28.7},{"i":158,"id":"FAQ-2105","t":86.1,"c":57.6,"p":28.5},{"i":159,"id":"FAQ-2108","t":86.2,"c":57.2,"p":28.9},{"i":160,"id":"FAQ-2114","t":86.2,"c":56.9,"p":29.4},{"i":161,"id":"FAQ-2125","t":85.7,"c":56.5,"p":29.2},{"i":162,"id":"FAQ-2133","t":85.8,"c":56.8,"p":29.0},{"i":163,"id":"FAQ-2136","t":85.9,"c":56.4,"p":29.4},{"i":164,"id":"FAQ-2245","t":85.4,"c":56.1,"p":29.3},{"i":165,"id":"FAQ-2137","t":85.5,"c":56.4,"p":29.1},{"i":166,"id":"FAQ-2151","t":85.5,"c":56.0,"p":29.5},{"i":167,"id":"FAQ-2157","t":85.6,"c":56.3,"p":29.3},{"i":168,"id":"FAQ-2173","t":85.1,"c":56.0,"p":29.2},{"i":169,"id":"FAQ-2248","t":85.2,"c":56.2,"p":29.0},{"i":170,"id":"FAQ-2179","t":85.3,"c":56.5,"p":28.8},{"i":171,"id":"FAQ-2188","t":85.4,"c":56.7,"p":28.7},{"i":172,"id":"FAQ-2191","t":85.5,"c":57.0,"p":28.5},{"i":173,"id":"FAQ-2252","t":85.5,"c":57.2,"p":28.3},{"i":174,"id":"FAQ-2165","t":85.6,"c":57.5,"p":28.2},{"i":175,"id":"FAQ-2193","t":85.7,"c":57.1,"p":28.6},{"i":176,"id":"FAQ-2254","t":85.8,"c":56.8,"p":29.0},{"i":177,"id":"FAQ-2209","t":85.9,"c":57.1,"p":28.8},{"i":178,"id":"FAQ-696","t":86.0,"c":56.7,"p":29.2},{"i":179,"id":"FAQ-1572","t":85.5,"c":56.4,"p":29.1},{"i":180,"id":"FAQ-2049","t":85.6,"c":56.1,"p":29.4},{"i":181,"id":"FAQ-2086","t":85.6,"c":55.8,"p":29.8},{"i":182,"id":"FAQ-1880","t":85.7,"c":55.5,"p":30.2},{"i":183,"id":"FAQ-2002","t":85.8,"c":55.7,"p":30.1},{"i":184,"id":"FAQ-2023","t":85.9,"c":55.4,"p":30.4},{"i":185,"id":"FAQ-1814","t":85.9,"c":55.1,"p":30.8},{"i":186,"id":"FAQ-1852","t":86.0,"c":55.4,"p":30.6},{"i":187,"id":"FAQ-1745","t":86.1,"c":55.6,"p":30.5},{"i":188,"id":"FAQ-1823","t":86.2,"c":55.3,"p":30.9},{"i":189,"id":"FAQ-2102","t":86.2,"c":55.6,"p":30.7},{"i":190,"id":"FAQ-2040","t":86.3,"c":55.3,"p":31.1},{"i":191,"id":"FAQ-2076","t":85.9,"c":55.0,"p":30.9},{"i":192,"id":"FAQ-2257","t":85.9,"c":55.2,"p":30.7},{"i":193,"id":"FAQ-1737","t":85.5,"c":54.9,"p":30.6},{"i":194,"id":"FAQ-1742","t":85.6,"c":54.6,"p":30.9},{"i":195,"id":"FAQ-1685","t":85.1,"c":54.4,"p":30.8},{"i":196,"id":"FAQ-1706","t":85.2,"c":54.1,"p":31.1},{"i":197,"id":"FAQ-1710","t":84.8,"c":53.8,"p":31.0},{"i":198,"id":"FAQ-1705","t":84.3,"c":53.5,"p":30.8},{"i":199,"id":"FAQ-1723","t":83.9,"c":53.3,"p":30.7}];
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: data.map(d => d.i),
+    datasets: [
+      {
+        label: '總成功率',
+        data: data.map(d => d.t),
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37,99,235,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      },
+      {
+        label: '完全成功率',
+        data: data.map(d => d.c),
+        borderColor: '#16a34a',
+        backgroundColor: 'transparent',
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      },
+      {
+        label: '部分成功率',
+        data: data.map(d => d.p),
+        borderColor: '#f59e0b',
+        backgroundColor: 'transparent',
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      title: { display: true, text: '累積成功率趨勢', font: { size: 16 } },
+      tooltip: {
+        callbacks: {
+          title: function(items) { return data[items[0].dataIndex].id; },
+          label: function(item) { return item.dataset.label + ': ' + item.raw.toFixed(1) + '%'; }
+        }
+      }
+    },
+    scales: {
+      y: { min: 0, max: 100, title: { display: true, text: '成功率 (%)' } },
+      x: { title: { display: true, text: '完成順序' }, ticks: { maxTicksLimit: 20 } }
+    }
+  }
+});
+</script>
+</body>
+</html>
