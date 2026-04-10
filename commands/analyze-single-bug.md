@@ -80,8 +80,8 @@ Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-t
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer.md} as the prompt. Please analyze the bug, trace the root cause through the codebase, and write a detailed analysis document.
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
 ticket_id: {ticket_id}
 ```
 
@@ -90,9 +90,9 @@ ticket_id: {ticket_id}
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer.md} as the prompt. Your previous analysis was rejected by the Evaluator. Please re-analyze the bug with the evaluator's feedback.
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md
-evaluator feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+evaluator feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-evaluator-report.md
 ticket_id: {ticket_id}
 
 The evaluator determined your previous root cause analysis was incorrect. Read the evaluator feedback carefully and re-analyze from scratch.
@@ -136,8 +136,8 @@ Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-f
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer.md} as the prompt. Please read the analysis notes and implement the code fix in the worktree.
-analysis notes path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
+analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ticket_id: {ticket_id}
 ```
@@ -147,9 +147,9 @@ ticket_id: {ticket_id}
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer.md} as the prompt. The previous implementation failed review. Please fix the issues based on evaluator feedback.
-analysis notes path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-evaluator feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md
+analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+evaluator feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-evaluator-report.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ticket_id: {ticket_id}
 
@@ -187,7 +187,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 #### BRANCH_ERROR Handling
 If the Evaluator returns a message containing `BRANCH_ERROR`, follow the same worktree recovery procedure as in Step 5, then re-dispatch the Evaluator.
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-evaluator-report.md`.
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-evaluator-report.md`.
 
 #### If `✅ 通過` → Proceed to Step 7.
 
@@ -229,7 +229,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 #### BRANCH_ERROR Handling
 If the Test Validator returns a message containing `BRANCH_ERROR`, follow the same worktree recovery procedure as in Step 5, then re-dispatch the Test Validator.
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md`.
 
 #### If `✅ 通過` → Proceed to Step 8.
 
@@ -244,7 +244,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/evaluator.md} as the prompt. The tests failed validation. Please supplement the tests based on the feedback.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
-validation feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md
+validation feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md
 
 Read the validation feedback and add/modify test cases to address the gaps.
 ```
@@ -285,7 +285,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 - Notion comment: completed / failed
 - Worktree: /Users/user/aladdin/worktrees/{ticket_id} (branch: landon/{ticket_id})
 
-Documents at: /Users/user/aladdin/debug/{ticket_id}/
+Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
 
 ---
@@ -311,5 +311,5 @@ Report:
 - 總嘗試：{total_attempt_count} 次
 - 失敗原因：{最後一次 evaluator report 的退回理由摘要}
 - Worktree 保留在：/Users/user/aladdin/worktrees/{ticket_id}
-- 文件位於：/Users/user/aladdin/debug/{ticket_id}/
+- 文件位於：/Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```

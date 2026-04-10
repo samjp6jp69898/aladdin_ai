@@ -118,8 +118,8 @@ Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-t
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer.md} as the prompt. Please analyze the bug, trace the root cause through the codebase, and write a detailed analysis document.
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
 ticket_id: {ticket_id}
 ```
 
@@ -128,9 +128,9 @@ ticket_id: {ticket_id}
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer.md} as the prompt. Your previous analysis was rejected. Please re-analyze.
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md
-evaluator feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+evaluator feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md
 ticket_id: {ticket_id}
 ```
 
@@ -181,8 +181,8 @@ Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-f
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer.md} as the prompt. Please read the analysis notes and implement the code fix in the worktree.
-analysis notes path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
+analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ticket_id: {ticket_id}
 ```
@@ -192,10 +192,10 @@ ticket_id: {ticket_id}
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer.md} as the prompt. The previous implementation failed tests. Please fix the issues based on evaluator feedback.
-analysis notes path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md
-analytics document path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md
-evaluator feedback (backend): /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md
-evaluator feedback (frontend): /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-frontend-evaluator-report.md
+analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+evaluator feedback (backend): /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md
+evaluator feedback (frontend): /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-frontend-evaluator-report.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 ticket_id: {ticket_id}
 
@@ -233,7 +233,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 
 **Wait for completion.**
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
 
 Extract:
 - `backend_has_changes` (true / false)
@@ -263,7 +263,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/backend-evaluator.md} as the prompt. Please write backend tests according to the test description and run them.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
-test description path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
+test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
 
 When done, output your final result on the last line:
 EVAL_RESULT: PASSED
@@ -278,7 +278,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/frontend-evaluator.md} as the prompt. Please write frontend tests according to the test description and run them.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
-test description path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
+test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
 
 When done, output your final result on the last line:
 EVAL_RESULT: PASSED
@@ -319,7 +319,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 
 **Wait for completion.**
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md`.
 
 #### If `✅ 通過` → Proceed to Step 9.
 
@@ -334,8 +334,8 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/backend-evaluator.md} as the prompt. The test validator found gaps. Please supplement the tests based on the feedback.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
-test description path: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
-validation feedback: /Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md
+test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
+validation feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md
 
 Read the validation feedback carefully and add test cases to address the identified gaps.
 ```
@@ -387,7 +387,7 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 - Notion comment: completed / failed
 - Worktree: /Users/user/aladdin/worktrees/{ticket_id} (branch: landon/{ticket_id})
 
-Documents at: /Users/user/aladdin/debug/{ticket_id}/
+Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
 
 **TaskUpdate Step 10 → `completed`.**
@@ -417,7 +417,7 @@ Report:
 - Frontend：{frontend_has_changes} → {frontend_eval_result}
 - 失敗原因：{最後一次 evaluator report 的退回理由摘要}
 - Worktree 保留在：/Users/user/aladdin/worktrees/{ticket_id}
-- 文件位於：/Users/user/aladdin/debug/{ticket_id}/
+- 文件位於：/Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
 
 Mark all remaining pending tasks as `completed` with a failure note.
