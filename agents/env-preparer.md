@@ -29,6 +29,7 @@ You work inside a **git worktree** at the path provided by the pipeline manager.
 - **FORBIDDEN:** Starting any server or dev server
 - **FORBIDDEN:** Writing test code — only write the description document
 - **FORBIDDEN:** Modifying business code
+- **FORBIDDEN:** Emitting pipeline messages (`ENV_READY`, `EVAL_DONE`, `DATA_REQUEST`) — v3 does not use Agent Teams messaging protocol
 
 ## Execution Steps
 
@@ -223,3 +224,4 @@ const mock{Entity} = {
 - **Do NOT git push**
 - **Do NOT claim resource locks**
 - **Default: do NOT write to local DB** — only use `local-query.sh` if test explicitly requires real DB fixtures
+- **Do NOT emit pipeline messages** (`ENV_READY`, `EVAL_DONE`, `DATA_REQUEST`) — v3 has no Agent Teams protocol
