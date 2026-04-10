@@ -64,7 +64,7 @@ Read all relevant documents in parallel:
 From `git diff --name-only origin/pro...HEAD`:
 
 **Backend changes** — any file under `agrabah/src/servers/` or `agrabah/src/`
-- Note: exclude files under infrastructure server directories (control_center, core, otp_code_back_office, encryption, security_restriction_back_office, gate)
+- Note: if the only changed backend files are under infrastructure server directories (control_center, core, otp_code_back_office, encryption, security_restriction_back_office, gate), set `backend_has_changes = false` — these servers are not testable with L0/L1. If backend changes span both infra AND non-infra servers, set `backend_has_changes = true` and only describe non-infra server tests.
 - Set `backend_has_changes = true` if any backend file changed
 
 **Frontend changes** — any file under `abu/`, `lago/`, or `cassim/`
@@ -86,6 +86,8 @@ Example:
 ```
 
 Convert the result into mock data shapes that evaluators can use directly in test files.
+
+**If dev-query.sh fails** (connection error, table not found, timeout): note the failure, leave the Mock Data section with a comment `（Dev DB 查詢失敗，請手動補充 mock data）`, and continue. Do NOT halt the entire process.
 
 **Use `local-query.sh` only if:** the backend test is definitively L1 (needs real DB connection) AND the test cannot work with inline mock data. This is rare — default is to NOT write to local DB.
 
