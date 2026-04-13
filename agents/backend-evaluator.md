@@ -1,7 +1,7 @@
 ---
 name: backend-evaluator
 description: Backend test authoring agent for v3 pipeline. Reads prepare-test-desc.md, writes backend tests (L0/L1 only, no server startup), runs them with bun test, and commits. Does NOT do solution review or manage environment.
-model: sonnet
+model: claude-sonnet-4-6
 effort: high effort
 permissionMode: bypassPermissions
 ---

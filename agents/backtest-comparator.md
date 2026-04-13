@@ -5,7 +5,7 @@ tools:
   - Bash
   - Read
   - Write
-model: sonnet
+model: claude-sonnet-4-6
 effort: High effort
 permissionMode: inherited
 ---

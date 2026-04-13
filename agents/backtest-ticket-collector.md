@@ -4,7 +4,7 @@ description: Stage 1 of back-testing pipeline. Reads a Notion bug ticket via not
 tools:
   - Bash
   - Write
-model: sonnet
+model: claude-sonnet-4-6
 effort: High effort
 permissionMode: inherited
 ---

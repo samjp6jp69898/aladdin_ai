@@ -300,7 +300,7 @@ Wait for completion, then **return to Step 8**.
 
 ---
 
-### Step 9: Drive Uploader
+### Step 9: Drive Uploader（成功路徑）
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
 
@@ -310,9 +310,12 @@ Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the pr
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+pipeline_status: success
 ```
 
 **Wait for completion.**
+
+drive-uploader 會根據 `pipeline_status` 將 Notion「AI分析」欄位更新為「分析成功」。
 
 ---
 
@@ -338,15 +341,26 @@ Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 
 ### Pipeline Failure
 
-Update Notion AI分析 to "分析失敗":
+無論失敗發生在哪個步驟，都必須透過 drive-uploader 統一同步狀態至 Notion（留下失敗留言、並更新「AI分析」欄位為「分析失敗」）。**失敗路徑不上傳任何文件、不建立 Drive 資料夾。**
 
-```bash
-curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
-  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
-  -H "Notion-Version: 2022-06-28" \
-  -H "Content-Type: application/json" \
-  -d '{"properties":{"AI分析":{"select":{"name":"分析失敗"}}}}'
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
+
 ```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. The pipeline has failed. Do NOT upload any files or create any Drive folder. Only post a failure comment on Notion and update the Notion "AI分析" property to "分析失敗".
+ticket_id: {ticket_id}
+Notion URL: {Notion URL from $ARGUMENTS}
+worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+pipeline_status: failed
+failure_reason: {最後一次 evaluator / tracer / fixer 退回理由摘要}
+tracer_attempt_count: {tracer_attempt_count}
+fixer_attempt_count: {fixer_attempt_count}
+total_attempt_count: {total_attempt_count}
+backend_eval_result: {backend_eval_result}
+frontend_eval_result: {frontend_eval_result}
+```
+
+**Wait for completion.** 即使 drive-uploader 內部部分步驟失敗（例如 solution.md 無法產出），它仍須嘗試更新 Notion 狀態為「分析失敗」。
 
 Report:
 

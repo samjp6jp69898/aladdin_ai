@@ -1,7 +1,7 @@
 ---
 name: bug-fixer
 description: Bug code repair agent. Receives root cause analysis from Bug Tracer and implements the code fix in a git worktree. Does not perform independent analysis — strictly follows the Tracer's conclusions.
-model: sonnet
+model: claude-sonnet-4-6
 effort: High effort
 permissionMode: bypassPermissions
 ---
