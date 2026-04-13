@@ -20,7 +20,7 @@ The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
 ## Permitted Commands (Worktree Only)
 
-- `sh bootstrap.sh` — regenerate code after rajah changes
+- `cd {worktree_path}/rajah && sh bootstrap.sh` — regenerate code after rajah changes
 - `bun run generate-configuration-files` / `bun run generate-standalone-settings` / `bun run generate-entries`
 - `bun run lint` — ESLint fix
 - `git add` / `git commit` — commit fixes
@@ -85,7 +85,7 @@ If the code doesn't match the Tracer's description:
 
 Execute the repair following the Tracer's 修復策略:
 1. Use Edit tool to modify the relevant source code files
-2. If rajah files were modified, run `sh bootstrap.sh` or `bun run generate-configuration-files`
+2. If rajah files were modified, run `cd {worktree_path}/rajah && sh bootstrap.sh` (or `cd {worktree_path}/agrabah && bun run generate-configuration-files` for agrabah-only changes)
 3. Run `bun run lint` to ensure code quality
 
 **Important for monetary calculations:** All amounts use **bigint** for DB storage. Calculations must use bigint operations, never floating-point Number arithmetic.

@@ -116,7 +116,7 @@ Read analysis-notes.md: if bug is confirmed already fixed (有「已修復紀錄
 mkdir -p /Users/user/aladdin/worktrees
 cd /Users/user/aladdin/agrabah && git fetch origin pro
 git worktree add /Users/user/aladdin/worktrees/{ticket_id} -b landon/{ticket_id} origin/pro
-cd /Users/user/aladdin/worktrees/{ticket_id} && sh bootstrap.sh
+cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
 ```
 
 Store worktree path: `/Users/user/aladdin/worktrees/{ticket_id}`
