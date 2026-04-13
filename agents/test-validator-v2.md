@@ -46,11 +46,11 @@ BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_
 ### Step 1: Collect All Inputs
 
 Read in parallel:
-1. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md` — the required test cases (primary reference)
-2. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md` — backend results (may not exist if backend was SKIPPED)
-3. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-frontend-evaluator-report.md` — frontend results (may not exist if frontend was SKIPPED)
-4. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md` — original bug description
-5. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md` — fix analysis
+1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md` — the required test cases (primary reference)
+2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md` — backend results (may not exist if backend was SKIPPED)
+3. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-frontend-evaluator-report.md` — frontend results (may not exist if frontend was SKIPPED)
+4. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` — original bug description
+5. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` — fix analysis
 6. Actual test files in `{worktree_path}/agrabah/tests/{ticket_id}/` (if backend tests exist)
 7. Actual test files in `{worktree_path}/{sub_project}/test/{ticket_id}/` (if frontend tests exist)
 
@@ -116,7 +116,7 @@ Note any mismatches between mock data shape and real schema.
 
 ### Step 7: Write Validation Report
 
-Save to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-validation-report.md`.
+Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md`.
 
 #### If PASSED:
 

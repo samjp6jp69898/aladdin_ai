@@ -53,9 +53,9 @@ All subsequent `git diff` commands MUST use `origin/pro...HEAD` as the base.
 
 Read all relevant documents in parallel:
 
-1. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md` — bug description and reproduction steps
-2. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md` — root cause analysis and fix record
-3. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md` — business spec (may not exist)
+1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` — bug description and reproduction steps
+2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` — root cause analysis and fix record
+3. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md` — business spec (may not exist)
 4. `cd {worktree_path} && git diff --name-only origin/pro...HEAD` — list of changed files
 5. `cd {worktree_path} && git diff origin/pro...HEAD` — full diff
 
@@ -134,7 +134,7 @@ The list MUST cover:
 
 ### Step 7: Write prepare-test-desc.md
 
-Save to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
+Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
 
 Use this exact structure:
 

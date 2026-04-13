@@ -69,9 +69,9 @@ cd {worktree_path} && git branch --show-current
 ### Step 1: Data Collection
 
 Read all input documents (parallelize):
-1. `/Users/user/aladdin/debug/{id}/{id}-analytics.md` — original bug description
-2. `/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md` — Bug Fixer's analysis
-3. `/Users/user/aladdin/debug/{id}/{id}-spec.md` — business spec (from Spec Fetcher)
+1. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analytics.md` — original bug description
+2. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md` — Bug Fixer's analysis
+3. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-spec.md` — business spec (from Spec Fetcher)
 4. Run `git diff main...HEAD` in the worktree — Bug Fixer's code changes
 
 ### Step 2: Solution Review
@@ -161,7 +161,7 @@ git commit -m "test({module}): add tests for FAQ-{id} fix"
 
 ### Step 8: Write Review Report
 
-Save to `/Users/user/aladdin/debug/{id}/{id}-evaluator-report.md`.
+Save to `/Users/user/aladdin/obsidian/Debug/{id}/{id}-evaluator-report.md`.
 
 **If PASSED:**
 

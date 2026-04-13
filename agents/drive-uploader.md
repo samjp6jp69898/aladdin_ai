@@ -20,7 +20,7 @@ You are a document aggregation and upload assistant. You compile the final solut
 ## Working Environment
 
 **Worktree path:** `{worktree_path}` (provided in dispatch prompt)
-**Debug folder:** `/Users/user/aladdin/debug/{ticket_id}/`
+**Debug folder:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
 
 ## Tools
 
@@ -56,14 +56,14 @@ Content-Type: application/json
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
-1. Read `/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md` — Bug Tracer's root cause analysis + Bug Fixer's repair record
+1. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md` — Bug Tracer's root cause analysis + Bug Fixer's repair record
 2. Run `git -C {worktree_path} diff main...HEAD -- . ':!agrabah/tests/'` — code changes (excluding test files)
 3. Run `git -C {worktree_path} diff main...HEAD -- agrabah/tests/` — test file changes only
-4. Read `/Users/user/aladdin/debug/{id}/{id}-evaluator-report.md` — test results and coverage
-5. Read `/Users/user/aladdin/debug/{id}/{id}-spec.md` — spec summary
+4. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-evaluator-report.md` — test results and coverage
+5. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-spec.md` — spec summary
 6. Run `git -C {worktree_path} log --oneline main..HEAD` — commit history
 
-Write `/Users/user/aladdin/debug/{id}/{id}-solution.md` with this format:
+Write `/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md` with this format:
 
 ```
 ---
@@ -104,7 +104,7 @@ metadata: v2
 ### Step 1: Confirm Documents Exist
 
 ```bash
-ls /Users/user/aladdin/debug/{ticket_id}/
+ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
 
 Required documents:
@@ -125,9 +125,9 @@ Extract FOLDER_ID and URL.
 Upload each document:
 
 ```bash
-bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-solution.md" "{FOLDER_ID}"
-bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
-bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/debug/{id}/{id}-validation-report.md" "{FOLDER_ID}"
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md" "{FOLDER_ID}"
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-validation-report.md" "{FOLDER_ID}"
 ```
 
 ### Step 4: Get Folder Link

@@ -58,7 +58,7 @@ cd {worktree_path} && git branch --show-current
 
 ### Step 1: Read Analysis Notes
 
-Read the Bug Tracer's analysis document at `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md`.
+Read the Bug Tracer's analysis document at `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md`.
 
 Extract and understand:
 1. **根因定位** — exact file paths, line numbers, problematic code
@@ -66,7 +66,7 @@ Extract and understand:
 3. **修復策略** — what to change, where, and why
 4. **業務規則上下文** — business rules that constrain the fix
 
-Also read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md` for the original bug description (supplementary reference).
+Also read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` for the original bug description (supplementary reference).
 
 ### Step 2: Read Sub-project CLAUDE.md
 
@@ -100,7 +100,7 @@ git commit -m "fix({module}): {brief description} [{ticket_id}]"
 
 ### Step 6: Update Analysis Notes
 
-Append to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md`:
+Append to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md`:
 
 ```
 ### 修復紀錄

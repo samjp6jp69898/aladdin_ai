@@ -54,10 +54,10 @@ cd {worktree_path} && git branch --show-current
 ### Step 1: Collect All Inputs (Parallelize)
 
 Read all documents:
-1. `/Users/user/aladdin/debug/{id}/{id}-spec.md` — business specification
-2. `/Users/user/aladdin/debug/{id}/{id}-analytics.md` — original bug description
-3. `/Users/user/aladdin/debug/{id}/{id}-analysis-notes.md` — Bug Fixer's analysis
-4. `/Users/user/aladdin/debug/{id}/{id}-evaluator-report.md` — Evaluator's report
+1. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-spec.md` — business specification
+2. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analytics.md` — original bug description
+3. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md` — Bug Fixer's analysis
+4. `/Users/user/aladdin/obsidian/Debug/{id}/{id}-evaluator-report.md` — Evaluator's report
 5. Test files in `{worktree_path}/agrabah/tests/{id}/`
 6. `git diff main...HEAD` in worktree — all code changes
 
@@ -100,7 +100,7 @@ Use `dev-query.sh` to fetch real data and compare with test fixtures:
 
 ### Step 6: Write Validation Report
 
-Save to `/Users/user/aladdin/debug/{id}/{id}-validation-report.md`.
+Save to `/Users/user/aladdin/obsidian/Debug/{id}/{id}-validation-report.md`.
 
 **If PASSED:**
 

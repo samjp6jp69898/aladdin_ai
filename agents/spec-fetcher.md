@@ -36,7 +36,7 @@ NOTION_API_VER="2022-06-28"
 
 ### Step 1: Read Analytics Document
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md` and extract:
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` and extract:
 - **Affected Module** (影響模塊)
 - **Affected Port** (影響端口)
 - **APP Page** (if available)
@@ -118,7 +118,7 @@ Extract all text content from valid blocks (headings, paragraphs, lists, tables)
 
 ### Step 4: Write spec.md
 
-Save to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md`:
+Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`:
 
 ```
 ## 企劃規格書摘要 — {ticket_id}

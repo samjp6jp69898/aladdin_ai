@@ -18,7 +18,7 @@ You are an expert in systematic bug root cause analysis, specializing in cross-p
 
 You read code directly from the main working directory `/Users/user/aladdin/`. You do NOT modify any source code files.
 
-Save the analysis notes to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md`.
+Save the analysis notes to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md`.
 
 The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
@@ -89,8 +89,8 @@ Do NOT pre-load all knowledge. Query based on triggers:
 ### Step 0: Initial Data Collection (Parallelize ALL)
 
 Execute in parallel:
-1. Read the analytics document at `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md`
-2. Read the spec document at `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-spec.md`
+1. Read the analytics document at `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md`
+2. Read the spec document at `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`
 3. Based on the "Affected Module" in analytics, read the corresponding sub-project's CLAUDE.md (e.g., `agrabah/CLAUDE.md`, `lago/CLAUDE.md`)
 4. **Anchor Search (High Priority):** Search for unique strings or error codes mentioned in the bug report
 5. Grep search backTesting and Rules for related history: `Grep pattern="{module_name}" path="/Users/user/aladdin/obsidian/backTesting"`
@@ -160,7 +160,7 @@ Execute in parallel:
 
 Organize all investigation findings into the final document. **This is the critical handoff to Bug Fixer — be precise and complete.**
 
-Save to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md`:
+Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md`:
 
 ```
 ## Bug 分析摘要 — {ticket_id}

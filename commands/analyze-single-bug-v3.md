@@ -8,9 +8,7 @@ context: fork
 
 # Bug Analysis Pipeline v3 (L0/L1 Tests Only)
 
-You are a pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state, maintain the visible TaskCreate todo list, and coordinate agents.
-
-**Task tracking requirement:** You MUST maintain a `TaskCreate`-based todo list with one task per pipeline step. Update task status (`pending` → `in_progress` → `completed`) at the boundary of each step.
+You are a pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
 
 **Always use the specified prompt document to create the corresponding sub agent.**
 
@@ -42,32 +40,13 @@ validator_attempt_count = 0
 
 ## Execution Flow
 
-### Step 0: Initialize Todo List & Parse Arguments
+### Step 0: Parse Arguments
 
 Extract NotionURL and ticket_id from `$ARGUMENTS`. Extract page_id from the Notion URL (32-char hex after last `-` or `/`), convert to UUID format (8-4-4-4-12).
-
-**Create pipeline todo list:**
-
-```
-1. Step 1: Bug Report Analyst — 解析 Notion 工單
-2. Step 2: Spec Fetcher — 抓取企劃規格書
-3. Step 3: Bug Tracer — 根因分析
-4. Step 4: Create Worktree — 建立隔離工作目錄
-5. Step 5: Bug Fixer — 實作修復
-6. Step 6: Env Preparer — 收集資料、撰寫測試描述
-7. Step 7: Evaluators — 寫測試並執行（後端 / 前端，條件派發）
-8. Step 8: Test Validator — 審查測試覆蓋度
-9. Step 9: Drive Uploader — 上傳 Google Drive + 回寫 Notion
-10. Step 10: Completion Report — 輸出完成報告
-```
-
-All tasks start as `pending`.
 
 ---
 
 ### Step 1: Bug Report Analyst
-
-**TaskUpdate Step 1 → `in_progress`.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-report-analyst.md`:
 
@@ -83,13 +62,9 @@ SCREENSHOT_STATUS: ...
 
 **Wait for completion**, extract `TICKET_ID` and `SCREENSHOT_STATUS`.
 
-**TaskUpdate Step 1 → `completed`.**
-
 ---
 
 ### Step 2: Spec Fetcher
-
-**TaskUpdate Step 2 → `in_progress`.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/spec-fetcher.md`:
 
@@ -101,13 +76,9 @@ ticket_id: {ticket_id}
 
 **Wait for completion.** If spec.md was not created, continue (graceful degradation).
 
-**TaskUpdate Step 2 → `completed`.**
-
 ---
 
 ### Step 3: Bug Tracer
-
-**TaskUpdate Step 3 → `in_progress`.**
 
 **Increment tracer_attempt_count. Increment total_attempt_count.**
 
@@ -138,13 +109,9 @@ ticket_id: {ticket_id}
 
 Read analysis-notes.md: if bug is confirmed already fixed (有「已修復紀錄」section with commit hash), **skip Steps 4-8** and go directly to Step 9.
 
-**TaskUpdate Step 3 → `completed`.**
-
 ---
 
 ### Step 4: Create Worktree
-
-**TaskUpdate Step 4 → `in_progress`.**
 
 ```bash
 mkdir -p /Users/user/aladdin/worktrees
@@ -162,13 +129,9 @@ git worktree add /Users/user/aladdin/worktrees/{ticket_id} landon/{ticket_id}
 
 If bootstrap.sh fails, log the error but continue.
 
-**TaskUpdate Step 4 → `completed`.**
-
 ---
 
 ### Step 5: Bug Fixer
-
-**TaskUpdate Step 5 → `in_progress`.**
 
 **Increment fixer_attempt_count. Increment total_attempt_count.**
 
@@ -214,13 +177,9 @@ If Bug Fixer returns `BRANCH_ERROR`:
 2. Verify: `cd /Users/user/aladdin/worktrees/{ticket_id} && git branch --show-current`
 3. Re-dispatch Bug Fixer. If still failing, go to Pipeline Failure.
 
-**TaskUpdate Step 5 → `completed`.**
-
 ---
 
 ### Step 6: Env Preparer
-
-**TaskUpdate Step 6 → `in_progress`.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/env-preparer.md`:
 
@@ -239,13 +198,9 @@ Extract:
 - `backend_has_changes` (true / false)
 - `frontend_has_changes` (true / false)
 
-**TaskUpdate Step 6 → `completed`.**
-
 ---
 
 ### Step 7: Evaluators (Conditional Parallel Dispatch)
-
-**TaskUpdate Step 7 → `in_progress`.**
 
 Determine dispatch based on extracted flags:
 
@@ -300,13 +255,10 @@ Extract `EVAL_RESULT` from each response. Set state:
 | FAILED | any | Increment fixer_attempt_count + total_attempt_count. If fixer < 3 AND total ≤ 5 → Step 5. If fixer ≥ 3 → Pipeline Failure. |
 | any | FAILED | Increment fixer_attempt_count + total_attempt_count. If fixer < 3 AND total ≤ 5 → Step 5. If fixer ≥ 3 → Pipeline Failure. |
 
-**TaskUpdate Step 7 → `completed`** (only when routing to Step 8).
 
 ---
 
 ### Step 8: Test Validator
-
-**TaskUpdate Step 8 → `in_progress`.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/test-validator-v2.md`:
 
@@ -346,13 +298,9 @@ Wait for completion, then **return to Step 8**.
 
 **If validator_attempt_count reaches 2:** Go to Pipeline Failure.
 
-**TaskUpdate Step 8 → `completed`.**
-
 ---
 
 ### Step 9: Drive Uploader
-
-**TaskUpdate Step 9 → `in_progress`.**
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
 
@@ -366,13 +314,9 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 
 **Wait for completion.**
 
-**TaskUpdate Step 9 → `completed`.**
-
 ---
 
 ### Step 10: Completion Report
-
-**TaskUpdate Step 10 → `in_progress`.**
 
 ```
 ## {ticket_id} Analysis Complete (v3)
@@ -389,8 +333,6 @@ worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 
 Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
-
-**TaskUpdate Step 10 → `completed`.**
 
 ---
 

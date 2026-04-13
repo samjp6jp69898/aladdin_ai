@@ -51,7 +51,7 @@ BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_
 
 ### Step 1: Read Test Description
 
-Read `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
+Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md`.
 
 Extract:
 - `backend_test_layer` (L0 or L1)
@@ -64,8 +64,8 @@ Extract:
 ### Step 2: Read Context Documents
 
 Read in parallel:
-1. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analytics.md` — understand the bug
-2. `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-analysis-notes.md` — understand the fix
+1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` — understand the bug
+2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` — understand the fix
 3. `cd {worktree_path} && git diff origin/pro...HEAD` — see exact code changes
 
 Focus on the target file and method identified in prepare-test-desc.md.
@@ -196,7 +196,7 @@ git commit -m "test({module}): add L{level} tests for {ticket_id} fix"
 
 ### Step 7: Write Report
 
-Save to `/Users/user/aladdin/debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md`.
+Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md`.
 
 #### If PASSED:
 

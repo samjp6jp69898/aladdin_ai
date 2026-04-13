@@ -36,7 +36,7 @@ Derive a temporary directory name from the URL:
 Create the staging directory:
 
 ```bash
-mkdir -p /Users/user/aladdin/debug/backtest-staging/temp-{first8chars}
+mkdir -p /Users/user/aladdin/obsidian/Debug/backtest-staging/temp-{first8chars}
 ```
 
 ---
@@ -51,7 +51,7 @@ Read all text in /Users/user/aladdin/obsidian/agents/backtest-ticket-collector.m
 Parameters:
 - NotionURL: {NotionURL}
 - git_author: {git_author_names or "none"}
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/temp-{first8chars}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/temp-{first8chars}
 ```
 
 **Wait for completion.** Extract the ticket_id from the agent's final output line:
@@ -60,13 +60,13 @@ Parameters:
 Then rename the staging directory to use the real ticket ID:
 
 ```bash
-mv /Users/user/aladdin/debug/backtest-staging/temp-{first8chars} /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+mv /Users/user/aladdin/obsidian/Debug/backtest-staging/temp-{first8chars} /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 ```
 
 Verify that `stage1-ticket-info.md` exists in the staging directory:
 
 ```bash
-ls /Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage1-ticket-info.md
+ls /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage1-ticket-info.md
 ```
 
 **If Stage 1 failed** (no STAGE1_COMPLETE signal, or stage1-ticket-info.md missing): report the error and stop. Leave the staging directory intact for debugging.
@@ -83,13 +83,13 @@ Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/back
 Read all text in /Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md as your instructions.
 
 Parameters:
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 ```
 
 **Wait for completion.** Verify that `stage2-actual-fix.md` exists in the staging directory:
 
 ```bash
-ls /Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage2-actual-fix.md
+ls /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage2-actual-fix.md
 ```
 
 Extract commit status from the agent's final output (`COMMIT_FOUND` or `COMMIT_NOT_FOUND`).
@@ -108,14 +108,14 @@ Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/back
 Read all text in /Users/user/aladdin/obsidian/agents/backtest-comparator.md as your instructions.
 
 Parameters:
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 - ticket_id: {ticket_id}
 ```
 
 **Wait for completion.** Verify that `stage3-comparison.md` exists in the staging directory:
 
 ```bash
-ls /Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage3-comparison.md
+ls /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage3-comparison.md
 ```
 
 **If Stage 3 failed** (stage3-comparison.md missing): report the error and stop. Leave staging dir intact.
@@ -141,7 +141,7 @@ Report:
 - **Fix Commit**: {hash} by {author}
 - **Failure Mode**: {code or N/A}
 - **Note**: {note_path}
-- **Staging**: /Users/user/aladdin/debug/backtest-staging/{ticket_id}/
+- **Staging**: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/
 ```
 
 ---

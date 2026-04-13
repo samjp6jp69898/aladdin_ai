@@ -92,7 +92,7 @@ bash /Users/user/aladdin/scripts/backtest-lock.sh claim FAQ-{ticket_id}
 Create staging directory:
 
 ```bash
-mkdir -p /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+mkdir -p /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 ```
 
 Dispatch ONE agent:
@@ -103,10 +103,10 @@ Read all text in /Users/user/aladdin/obsidian/agents/backtest-ticket-collector.m
 Parameters:
 - NotionURL: {url from tracker}
 - git_author: none
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 ```
 
-Wait for completion. Verify `/Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage1-ticket-info.md` exists.
+Wait for completion. Verify `/Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage1-ticket-info.md` exists.
 - Missing → **Stage 1 failure** → release lock, update tracker to `failed`, report, skip to next ticket
 
 #### 3c. Stage 2 — Commit Search & Independent Analysis
@@ -117,10 +117,10 @@ Dispatch ONE agent:
 Read all text in /Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md as your instructions.
 
 Parameters:
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 ```
 
-Wait for completion. Verify `/Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage2-actual-fix.md` exists.
+Wait for completion. Verify `/Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage2-actual-fix.md` exists.
 - Missing → **Stage 2 failure** → release lock, update tracker to `failed`, report, skip to next ticket
 - File exists with `NOT_FOUND` status → **continue to Stage 3** (will produce ⚠️)
 
@@ -132,14 +132,14 @@ Dispatch ONE agent:
 Read all text in /Users/user/aladdin/obsidian/agents/backtest-comparator.md as your instructions.
 
 Parameters:
-- staging_dir: /Users/user/aladdin/debug/backtest-staging/{ticket_id}
+- staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 - ticket_id: {ticket_id}
 ```
 
 Wait for completion.
 
 - **Success** (stage3-comparison.md exists):
-  - Read `/Users/user/aladdin/debug/backtest-staging/{ticket_id}/stage3-comparison.md`
+  - Read `/Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/stage3-comparison.md`
   - Extract the conclusion line
   - Release lock:
     ```bash
