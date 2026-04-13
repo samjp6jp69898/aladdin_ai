@@ -52,7 +52,7 @@ If you catch yourself thinking any of these, STOP and return to Phase 1:
 - **Scoped Searching:** Always scope searches to sub-directories (e.g., `path: "lago/ny-gaming"`).
 - **Anchor Search:** If the bug report contains a specific error message or i18n key, search for that unique anchor globally first with `Grep` using fixed string matching.
 
-## Knowledge Query Strategy (Progressive Disclosure)
+## Knowledge Query Strategy (Progressive Disclosure + Link Tracing)
 
 Do NOT pre-load all knowledge. Query based on triggers:
 
@@ -65,6 +65,13 @@ Do NOT pre-load all knowledge. Query based on triggers:
    - FAQ numbers (e.g. `FAQ-1702`)
    - Error codes (e.g. `COMMON_AUTH_FAILED`)
    - Module paths (e.g. `wallet`, `room`, `promotion`)
+
+**Link Tracing (MANDATORY):** After locating any note via Grep or obsidian search, you MUST trace `[[ ]]` links at least 1 level deep:
+
+1. `Read` the full note found by Grep/search
+2. Scan for `[[ ]]` bidirectional links in the note
+3. Identify which links are relevant to the current investigation, `Read` those linked notes (1st level)
+4. Links within 1st-level notes do NOT need further tracing unless the investigation explicitly requires deeper context
 
 ## Project Layer Mapping Table
 
@@ -93,7 +100,20 @@ Execute in parallel:
 2. Read the spec document at `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`
 3. Based on the "Affected Module" in analytics, read the corresponding sub-project's CLAUDE.md (e.g., `agrabah/CLAUDE.md`, `lago/CLAUDE.md`)
 4. **Anchor Search (High Priority):** Search for unique strings or error codes mentioned in the bug report
-5. Grep search backTesting and Rules for related history: `Grep pattern="{module_name}" path="/Users/user/aladdin/obsidian/backTesting"`
+5. **Back-testing History Search (MANDATORY):** Search for similar historical bugs and their solutions:
+   - Grep by module name: `Grep pattern="{module_name}" path="/Users/user/aladdin/obsidian/backTesting"`
+   - Grep by component name: `Grep pattern="{component_name}" path="/Users/user/aladdin/obsidian/backTesting"`
+   - Grep by error keyword: `Grep pattern="{error_keyword}" path="/Users/user/aladdin/obsidian/backTesting"`
+   - **For each matching note found:** `Read` the full note, focusing on:
+     - **Root Cause** section — what was the actual root cause of the similar bug?
+     - **Fix** section — what files were changed and how?
+     - **Affected Modules** section — are the same modules/components involved?
+   - Apply Link Tracing: follow relevant `[[ ]]` links in the back-testing note (1 level deep)
+   - **Record findings** in analysis-notes.md under the「backTesting 參考」section, including:
+     - Which FAQ tickets were similar and why
+     - What root cause patterns are shared
+     - Whether the current bug could have the same or analogous root cause
+6. Grep search Rules for related development guidelines: `Grep pattern="{module_name}" path="/Users/user/aladdin/obsidian/Rules"`
 
 ### Step 1: Phase 1 — Root Cause Investigation
 

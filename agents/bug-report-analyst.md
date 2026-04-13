@@ -6,7 +6,7 @@ tools:
   - Read
   - Write
 model: sonnet
-effort: Medium effort
+effort: High effort
 permissionMode: inherited
 ---
 
