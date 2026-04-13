@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 — 2026-04-10 20:27</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 24px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #1a1a1a;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 24px;
+  }
+  /* ── Section title ── */
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #555;
+    margin: 28px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  /* ── Cards ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 0;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .card-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .card-big {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .card-big.green { color: #2e7d32; }
+  .card-big.blue  { color: #1565c0; }
+  .card-sub {
+    font-size: 13px;
+    color: #888;
+  }
+  /* ── Progress bar ── */
+  .bar-wrap {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    margin-top: 16px;
+  }
+  .bar-track {
+    display: flex;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .bar-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    transition: width 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    font-size: 13px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  /* ── Table ── */
+  .table-wrap {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead tr {
+    background: #f8f8f8;
+  }
+  th {
+    padding: 11px 14px;
+    text-align: center;
+    font-weight: 600;
+    color: #555;
+    font-size: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  th:first-child { text-align: left; }
+  td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
+  }
+  td:first-child { text-align: left; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  .sev-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .sev-p1 { background: #ffebee; color: #c62828; }
+  .sev-p2 { background: #fff3e0; color: #e65100; }
+  .sev-p3 { background: #fffde7; color: #f57f17; }
+  .sev-p4 { background: #e3f2fd; color: #0d47a1; }
+  .rate-good { color: #2e7d32; font-weight: 700; }
+  .rate-ok   { color: #1565c0; font-weight: 700; }
+  .dash { color: #ccc; }
+  /* ── Chart ── */
+  .chart-wrap {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+</style>
+</head>
+<body>
+
+<h1>回測統計報告</h1>
+<div class="subtitle">生成時間：2026-04-10 20:27 &nbsp;|&nbsp; 資料來源：backtest_tracker.md</div>
+
+<!-- Section 1: 總覽卡片 -->
+<div class="section-title">總覽</div>
+
+<div class="card-grid">
+  <div class="card">
+    <div class="card-label">總成功率（含部分正確）</div>
+    <div class="card-big green">83.1%</div>
+    <div class="card-sub">已完成 163 / 總計 163 tickets<br>有效樣本 160（排除 3 張不需修復）</div>
+  </div>
+  <div class="card">
+    <div class="card-label">完全成功率（僅分析正確）</div>
+    <div class="card-big blue">54.4%</div>
+    <div class="card-sub">分析正確 87 / 有效樣本 160<br>done 100% &nbsp;|&nbsp; failed 0% &nbsp;|&nbsp; 未完成 0%</div>
+  </div>
+</div>
+
+<div class="bar-wrap">
+  <div class="bar-track">
+    <div class="bar-seg" style="width:54.4%;background:#2e7d32;">87</div>
+    <div class="bar-seg" style="width:28.8%;background:#81c784;color:#333;">46</div>
+    <div class="bar-seg" style="width:11.9%;background:#ef5350;">19</div>
+    <div class="bar-seg" style="width:5.0%;background:#bdbdbd;color:#333;">8</div>
+    <div class="bar-seg" style="width:1.9%;background:#eeeeee;color:#999;">3</div>
+  </div>
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32;"></div><span>✅ 分析正確 87（54.4%）</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#81c784;"></div><span>✅ 部分正確 B 46（28.8%）</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef5350;"></div><span>❌ 分析錯誤 19（11.9%）</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bdbdbd;"></div><span>⚠️ 無法比對 8（5.0%）</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eeeeee;border:1px solid #ddd;"></div><span>➖ 不需修復 3（不計入正確率）</span></div>
+  </div>
+</div>
+
+<!-- Section 2: 各嚴重性等級 -->
+<div class="section-title">各嚴重性等級分析</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>嚴重性</th>
+        <th>總數</th>
+        <th>正確</th>
+        <th>部分A</th>
+        <th>部分B</th>
+        <th>錯誤</th>
+        <th>無法比對</th>
+        <th>不需修復</th>
+        <th>完全率</th>
+        <th>總成功率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="sev-badge sev-p1">P1重點</span></td>
+        <td>26</td>
+        <td>13</td>
+        <td>0</td>
+        <td>3</td>
+        <td>6</td>
+        <td>3</td>
+        <td>1</td>
+        <td class="rate-ok">52.0%</td>
+        <td class="rate-good">64.0%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p2">P2較高</span></td>
+        <td>109</td>
+        <td>59</td>
+        <td>0</td>
+        <td>34</td>
+        <td>11</td>
+        <td>4</td>
+        <td>1</td>
+        <td class="rate-ok">54.6%</td>
+        <td class="rate-good">86.1%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p3">P3一般</span></td>
+        <td>27</td>
+        <td>14</td>
+        <td>0</td>
+        <td>9</td>
+        <td>2</td>
+        <td>1</td>
+        <td>1</td>
+        <td class="rate-ok">53.8%</td>
+        <td class="rate-good">88.5%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-badge sev-p4">P4較低</span></td>
+        <td>1</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td class="rate-good">100.0%</td>
+        <td class="rate-good">100.0%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Section 3: 累積趨勢圖 -->
+<div class="section-title">累積成功率趨勢</div>
+
+<div class="chart-wrap">
+  <canvas id="trendChart" height="90"></canvas>
+</div>
+
+<script>
+const labels = ["FAQ-1875","FAQ-1864","FAQ-1862","FAQ-1860","FAQ-1858","FAQ-1843","FAQ-1817","FAQ-1813","FAQ-1809","FAQ-1805","FAQ-1799","FAQ-1798","FAQ-1786","FAQ-1796","FAQ-1783","FAQ-1779","FAQ-1777","FAQ-1774","FAQ-1759","FAQ-1731","FAQ-1730","FAQ-1727","FAQ-1726","FAQ-1725","FAQ-1724","FAQ-1722","FAQ-1721","FAQ-1719","FAQ-1718","FAQ-1704","FAQ-1703","FAQ-1702","FAQ-1701","FAQ-1698","FAQ-1694","FAQ-1916","FAQ-1949","FAQ-1942","FAQ-1960","FAQ-1934","FAQ-1965","FAQ-1975","FAQ-1932","FAQ-2020","FAQ-2011","FAQ-653","FAQ-1961","FAQ-1912","FAQ-1887","FAQ-1820","FAQ-1819","FAQ-1720","FAQ-1695","FAQ-2015","FAQ-1939","FAQ-1918","FAQ-399","FAQ-2052","FAQ-2008","FAQ-2005","FAQ-1995","FAQ-1929","FAQ-1892","FAQ-2038","FAQ-2035","FAQ-2017","FAQ-2006","FAQ-1917","FAQ-1885","FAQ-2045","FAQ-1952","FAQ-1870","FAQ-2019","FAQ-2065","FAQ-2069","FAQ-1811","FAQ-2037","FAQ-2110","FAQ-2055","FAQ-2095","FAQ-2093","FAQ-2066","FAQ-2012","FAQ-1996","FAQ-2103","FAQ-2096","FAQ-2097","FAQ-2094","FAQ-2088","FAQ-2073","FAQ-2092","FAQ-2090","FAQ-1978","FAQ-2130","FAQ-2100","FAQ-2087","FAQ-2082","FAQ-2061","FAQ-2054","FAQ-2050","FAQ-2021","FAQ-2168","FAQ-2057","FAQ-2022","FAQ-2163","FAQ-2075","FAQ-1911","FAQ-2185","FAQ-2028","FAQ-2026","FAQ-2189","FAQ-2000","FAQ-1998","FAQ-2123","FAQ-1839","FAQ-2111","FAQ-1977","FAQ-1548","FAQ-1507","FAQ-1156","FAQ-2169","FAQ-2004","FAQ-2182","FAQ-2159","FAQ-1893","FAQ-1691","FAQ-2207","FAQ-2205","FAQ-2204","FAQ-2245","FAQ-2136","FAQ-2114","FAQ-2108","FAQ-2105","FAQ-2137","FAQ-2173","FAQ-2248","FAQ-2188","FAQ-2179","FAQ-2165","FAQ-696","FAQ-1572","FAQ-2002","FAQ-1814","FAQ-2102","FAQ-2076","FAQ-2040","FAQ-1737","FAQ-1710","FAQ-1706","FAQ-1685","FAQ-1723","FAQ-1705","FAQ-2269","FAQ-2167","FAQ-2154","FAQ-2144","FAQ-2106","FAQ-2104","FAQ-1729","FAQ-1686","FAQ-2295","FAQ-2260"];
+const indices = labels.map((_, i) => i + 1);
+const totalRate = [100.0,100.0,66.7,50.0,40.0,33.3,42.9,37.5,44.4,40.0,45.5,50.0,53.8,57.1,60.0,62.5,64.7,66.7,68.4,70.0,71.4,72.7,73.9,75.0,76.0,73.1,74.1,75.0,72.4,73.3,74.2,75.0,75.8,76.5,77.1,77.8,78.4,78.9,79.5,80.0,78.0,78.6,76.7,77.3,77.8,78.3,76.6,77.1,77.6,78.0,78.4,78.8,79.2,79.6,80.0,80.4,80.7,81.0,81.4,81.7,82.0,80.6,81.0,79.7,80.0,80.3,79.1,79.4,79.7,80.0,78.9,79.2,79.5,79.7,80.0,80.3,80.5,80.8,81.0,81.2,81.5,81.7,81.9,82.1,81.2,81.4,81.6,81.8,80.9,81.1,81.3,81.5,81.7,81.9,82.1,82.3,82.5,82.7,82.8,83.0,83.2,83.3,83.5,83.7,83.8,84.0,84.1,84.3,84.4,84.5,84.7,84.8,85.0,85.1,85.2,84.5,84.6,84.7,84.9,85.0,85.1,85.2,85.4,85.5,85.6,85.7,85.8,85.9,86.0,85.4,85.5,85.6,85.7,85.1,85.2,84.6,84.7,84.8,84.9,85.0,85.1,84.5,84.6,84.7,84.8,84.2,84.4,83.8,83.2,83.3,82.8,82.2,81.7,81.8,81.9,82.1,81.5,81.6,81.8,81.2,81.4,81.5,81.6];
+const fullRate = [100.0,100.0,66.7,50.0,40.0,33.3,28.6,25.0,33.3,30.0,36.4,41.7,46.2,50.0,53.3,50.0,52.9,55.6,52.6,55.0,52.4,54.5,56.5,58.3,56.0,53.8,51.9,53.6,51.7,53.3,54.8,56.2,57.6,58.8,60.0,58.3,59.5,57.9,59.0,57.5,56.1,57.1,55.8,56.8,55.6,54.3,53.2,54.2,53.1,54.0,54.9,55.8,54.7,55.6,56.4,57.1,57.9,56.9,57.6,58.3,59.0,58.1,58.7,57.8,58.5,57.6,56.7,57.4,58.0,57.1,56.3,56.9,56.2,56.8,56.0,55.3,55.8,55.1,55.7,56.2,56.8,57.3,56.6,56.0,55.3,55.8,56.3,55.7,55.1,55.6,56.0,56.5,55.9,56.4,56.8,56.2,56.7,56.1,56.6,57.0,57.4,57.8,57.3,57.7,58.1,58.5,57.9,57.4,56.9,57.3,56.8,57.1,57.5,57.9,58.3,57.8,58.1,58.5,58.8,59.2,59.5,59.8,60.2,60.5,60.0,59.5,59.1,58.6,58.1,57.7,57.3,56.8,56.4,56.0,56.3,55.9,56.2,56.5,56.8,57.1,56.7,56.3,56.6,56.2,56.6,56.2,55.8,55.4,55.0,54.7,54.3,53.9,53.6,53.9,54.2,54.5,54.1,53.8,53.5,53.1,52.8,53.1,53.4];
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: indices,
+    datasets: [
+      {
+        label: '總成功率（含部分正確）',
+        data: totalRate,
+        borderColor: '#1565c0',
+        backgroundColor: 'rgba(21,101,192,0.05)',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false,
+      },
+      {
+        label: '完全成功率（僅分析正確）',
+        data: fullRate,
+        borderColor: '#2e7d32',
+        backgroundColor: 'rgba(46,125,50,0.05)',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    plugins: {
+      title: {
+        display: true,
+        text: '累積成功率趨勢（共 163 張，依完成時間排序）',
+        font: { size: 15, weight: '600' },
+        color: '#444',
+        padding: { bottom: 12 }
+      },
+      legend: {
+        position: 'top',
+        labels: { font: { size: 13 }, padding: 16 }
+      },
+      tooltip: {
+        callbacks: {
+          title: function(items) {
+            const idx = items[0].dataIndex;
+            return `#${idx+1} ${labels[idx]}`;
+          },
+          label: function(item) {
+            return `${item.dataset.label}：${item.raw}%`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '完成順序', font: { size: 12 }, color: '#777' },
+        grid: { color: '#f0f0f0' },
+        ticks: { font: { size: 11 }, maxTicksLimit: 20 }
+      },
+      y: {
+        title: { display: true, text: '成功率 (%)', font: { size: 12 }, color: '#777' },
+        min: 0,
+        max: 100,
+        grid: { color: '#f0f0f0' },
+        ticks: {
+          font: { size: 11 },
+          callback: v => v + '%'
+        }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
