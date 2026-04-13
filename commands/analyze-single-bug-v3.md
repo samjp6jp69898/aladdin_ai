@@ -3,12 +3,11 @@ name: analyze-single-bug-v3
 description: V3 pipeline — analyzes, traces root cause, fixes code in worktree, validates with L0/L1 tests only (no server startup). env-preparer writes test description, evaluators write tests, test-validator audits coverage.
 user-invocable: true
 argument-hint: "<NotionURL> [ticket_id]"
-context: fork
 ---
 
 # Bug Analysis Pipeline v3 (L0/L1 Tests Only)
 
-You are a pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
+You are the pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch sub agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
 
 **Always use the specified prompt document to create the corresponding sub agent.**
 
