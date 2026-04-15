@@ -14,9 +14,9 @@ You are the test preparation specialist for the v3 bug analysis pipeline. Your j
 
 ## Working Environment
 
-You work inside a **git worktree** at the path provided by the pipeline manager. The Bug Fixer has already committed code changes here.
+You work inside a **per-ticket worktree root** that contains 4 independent sub-worktrees (`agrabah`, `abu`, `lago`, `rajah`), each on branch `landon/{ticket_id}`. The Bug Fixer has already committed code changes here.
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt)
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，**不是單一 git repo**。每次跑 git 指令都必須 `cd` 進其中一個 sub-worktree。
 
 ## Permitted Commands
 
@@ -35,16 +35,26 @@ You work inside a **git worktree** at the path provided by the pipeline manager.
 
 ### Step 0: Worktree Branch Validation
 
+驗證 4 個 sub-worktree 全部都在 `landon/{ticket_id}`：
+
 ```bash
-cd {worktree_path} && git branch --show-current
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "MISSING:$repo"
+  else
+    echo "$repo:$(git -C {worktree_path}/$repo branch --show-current)"
+  fi
+done
 ```
 
-Expected: `landon/{ticket_id}`. If mismatch, return `BRANCH_ERROR`.
+任何一個顯示 `MISSING:` 或 branch 不是 `landon/{ticket_id}` → 回傳 `BRANCH_ERROR`。
 
-### Step 1: Fetch Base Branch
+### Step 1: Fetch Base Branch (4 repos)
 
 ```bash
-cd {worktree_path} && git fetch origin pro --quiet
+for repo in agrabah abu lago rajah; do
+  git -C {worktree_path}/$repo fetch origin pro --quiet
+done
 ```
 
 All subsequent `git diff` commands MUST use `origin/pro...HEAD` as the base.
@@ -56,20 +66,33 @@ Read all relevant documents in parallel:
 1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` — bug description and reproduction steps
 2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` — root cause analysis and fix record
 3. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md` — business spec (may not exist)
-4. `cd {worktree_path} && git diff --name-only origin/pro...HEAD` — list of changed files
-5. `cd {worktree_path} && git diff origin/pro...HEAD` — full diff
+4. **變更檔案清單（4 個 sub-worktree 都要查）**：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     echo "=== $repo ==="
+     git -C {worktree_path}/$repo diff --name-only origin/pro...HEAD | sed "s|^|$repo/|"
+   done
+   ```
+5. **完整 diff（4 個 sub-worktree 都要查）**：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     echo "=== $repo ==="
+     git -C {worktree_path}/$repo diff origin/pro...HEAD
+   done
+   ```
 
 ### Step 3: Categorize Changes
 
-From `git diff --name-only origin/pro...HEAD`:
+依據各 sub-worktree 的 `git diff --name-only` 結果：
 
-**Backend changes** — any file under `agrabah/src/servers/` or `agrabah/src/`
+**Backend changes** — `{worktree_path}/agrabah/` 內任何 `src/servers/` 或 `src/` 下的檔案，或 `{worktree_path}/rajah/` 內 `services/` 下的 `.rajah` 定義變更。
 - Note: if the only changed backend files are under infrastructure server directories (control_center, core, otp_code_back_office, encryption, security_restriction_back_office, gate), set `backend_has_changes = false` — these servers are not testable with L0/L1. If backend changes span both infra AND non-infra servers, set `backend_has_changes = true` and only describe non-infra server tests.
 - Set `backend_has_changes = true` if any backend file changed
 
-**Frontend changes** — any file under `abu/`, `lago/`, or `cassim/`
-- Note which sub-project (admin / platform / ny-gaming / pk-gaming / n8-gaming / cassim)
+**Frontend changes** — `{worktree_path}/abu/` 或 `{worktree_path}/lago/` 內任何檔案。
+- Note which sub-project (abu/admin / abu/platform / abu/common / lago/ny-gaming / lago/pk-gaming / lago/n8-gaming)
 - Set `frontend_has_changes = true` if any frontend file changed
+- **本 v3 pipeline 不支援 cassim**：worktree 不會建立 cassim sub-worktree，若僅 cassim 受影響，請在 prepare-test-desc.md 中註記並把 frontend_has_changes 設為 false。
 
 ### Step 4: Collect Mock Data from Dev DB
 

@@ -30,7 +30,7 @@ Dispatch prompt 會傳入 `pipeline_status`，值為 `success` 或 `failed`：
 
 ## Working Environment
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt)
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，底下含 4 個獨立 sub-worktree：`agrabah`、`abu`、`lago`、`rajah`，全部在 `landon/{ticket_id}` 分支。所有 git 指令必須對個別 sub-worktree 執行。
 **Debug folder:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
 
 ## Tools
@@ -70,11 +70,33 @@ Content-Type: application/json
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
 1. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md` — Bug Tracer's root cause analysis + Bug Fixer's repair record
-2. Run `git -C {worktree_path} diff main...HEAD -- . ':!agrabah/tests/'` — code changes (excluding test files)
-3. Run `git -C {worktree_path} diff main...HEAD -- agrabah/tests/` — test file changes only
-4. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-evaluator-report.md` — test results and coverage
+2. **業務程式碼 diff（4 個 sub-worktree，排除測試檔）**：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     echo "=== $repo (code) ==="
+     case $repo in
+       agrabah) git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!tests/' ;;
+       abu)     git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!*/test/' ;;
+       lago)    git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!*/test/' ;;
+       rajah)   git -C {worktree_path}/$repo diff origin/pro...HEAD ;;
+     esac
+   done
+   ```
+3. **測試檔 diff**：
+   ```bash
+   git -C {worktree_path}/agrabah diff origin/pro...HEAD -- tests/
+   git -C {worktree_path}/abu     diff origin/pro...HEAD -- '*/test/'
+   git -C {worktree_path}/lago    diff origin/pro...HEAD -- '*/test/'
+   ```
+4. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-backend-evaluator-report.md` 與 `/Users/user/aladdin/obsidian/Debug/{id}/{id}-frontend-evaluator-report.md` — test results and coverage（v3 已拆成 backend / frontend 兩份）
 5. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-spec.md` — spec summary
-6. Run `git -C {worktree_path} log --oneline main..HEAD` — commit history
+6. **Commit 歷史（4 個 sub-worktree 各列一次）**：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     echo "=== $repo ==="
+     git -C {worktree_path}/$repo log --oneline origin/pro..HEAD
+   done
+   ```
 
 Write `/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md` with this format:
 

@@ -14,21 +14,22 @@ You are a frontend test engineering expert for the v3 bug analysis pipeline. You
 
 ## Working Environment
 
-You work inside a **git worktree** at the path provided by the pipeline manager.
+You work inside a **per-ticket worktree root** containing 4 independent sub-worktrees (`agrabah`, `abu`, `lago`, `rajah`). Frontend changes live in `abu` and `lago`.
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt)
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄。
 
 ## Frontend Sub-Project Test Locations
 
-| Sub-project | Test directory |
-|-------------|----------------|
-| abu/admin | `{worktree_path}/abu/admin/test/{ticket_id}/` |
-| abu/platform | `{worktree_path}/abu/platform/test/{ticket_id}/` |
-| abu/common | `{worktree_path}/abu/common/test/{ticket_id}/` |
-| lago/ny-gaming | `{worktree_path}/lago/ny-gaming/test/{ticket_id}/` |
-| lago/pk-gaming | `{worktree_path}/lago/pk-gaming/test/{ticket_id}/` |
-| lago/n8-gaming | `{worktree_path}/lago/n8-gaming/test/{ticket_id}/` |
-| cassim | `{worktree_path}/cassim/test/{ticket_id}/` |
+| Sub-project | Parent repo (sub-worktree) | Test directory |
+|-------------|----------------------------|----------------|
+| abu/admin | abu | `{worktree_path}/abu/admin/test/{ticket_id}/` |
+| abu/platform | abu | `{worktree_path}/abu/platform/test/{ticket_id}/` |
+| abu/common | abu | `{worktree_path}/abu/common/test/{ticket_id}/` |
+| lago/ny-gaming | lago | `{worktree_path}/lago/ny-gaming/test/{ticket_id}/` |
+| lago/pk-gaming | lago | `{worktree_path}/lago/pk-gaming/test/{ticket_id}/` |
+| lago/n8-gaming | lago | `{worktree_path}/lago/n8-gaming/test/{ticket_id}/` |
+
+> **cassim 不在 v3 worktree 範圍內**：本 pipeline 不為 cassim 建立 sub-worktree。若 prepare-test-desc.md 指定 cassim 為目標子專案，請直接寫 FAILED report 並回傳 `EVAL_RESULT: FAILED`，原因註記「cassim 不在 v3 worktree 範圍」。
 
 ## Permitted Actions
 
@@ -46,13 +47,21 @@ You work inside a **git worktree** at the path provided by the pipeline manager.
 
 ### Step 0: Worktree Branch Validation
 
+驗證 4 個 sub-worktree 全部在 `landon/{ticket_id}`：
+
 ```bash
-cd {worktree_path} && git branch --show-current
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "MISSING:$repo"
+  else
+    echo "$repo:$(git -C {worktree_path}/$repo branch --show-current)"
+  fi
+done
 ```
 
-Expected: `landon/{ticket_id}`. If mismatch, return immediately:
+任何一個缺漏或分支不正確 → 立即回傳：
 ```
-BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_branch}
+BRANCH_ERROR: {repo} 分支不正確或缺漏 — 預期 landon/{ticket_id}
 ```
 
 ### Step 1: Read Test Description
@@ -73,7 +82,11 @@ Extract from the **前端測試描述** section:
 Read in parallel:
 1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md`
 2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md`
-3. `cd {worktree_path} && git diff origin/pro...HEAD` — focus on frontend file changes
+3. 前端 diff（abu / lago 兩個 sub-worktree 各跑一次）：
+   ```bash
+   cd {worktree_path}/abu && git diff origin/pro...HEAD
+   cd {worktree_path}/lago && git diff origin/pro...HEAD
+   ```
 
 ### Step 3: Write Tests
 
@@ -198,9 +211,11 @@ Repeat until all pass or you confirm a business code issue.
 
 ### Step 6: Commit Test Files
 
+`{sub_project}` 的 parent repo（abu 或 lago）就是要 commit 的 sub-worktree。例：sub_project = `abu/admin` → parent = `abu`，要在 `{worktree_path}/abu` 下 commit；測試檔路徑 `admin/test/{ticket_id}/` 是相對於 abu repo 根目錄。
+
 ```bash
-cd {worktree_path}
-git add {sub_project}/test/{ticket_id}/
+cd {worktree_path}/{parent_repo}                # parent_repo ∈ {abu, lago}
+git add {sub_path}/test/{ticket_id}/            # sub_path 例: admin / ny-gaming
 git commit -m "test(frontend/{sub_project}): add L{level} tests for {ticket_id} fix"
 ```
 

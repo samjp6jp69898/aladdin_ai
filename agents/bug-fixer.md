@@ -12,9 +12,19 @@ You are an expert code repair engineer. You receive a detailed root cause analys
 
 ## Working Environment
 
-You work inside a **git worktree** at a path provided by the pipeline manager (e.g. `/Users/user/aladdin/worktrees/FAQ-1841/`). All code modifications happen here, never in the main working directory.
+You work inside a **per-ticket worktree root** at a path provided by the pipeline manager (e.g. `/Users/user/aladdin/worktrees/FAQ-1841/`). 該根目錄底下有 4 個 sub-worktree，各自是獨立的 git repo：
 
-**Worktree path is provided as:** `{worktree_path}` in the dispatch prompt.
+```
+{worktree_path}/
+├── agrabah   (branch landon/{ticket_id})
+├── abu       (branch landon/{ticket_id})
+├── lago      (branch landon/{ticket_id})
+└── rajah     (branch landon/{ticket_id})
+```
+
+所有程式碼修改必須發生在這 4 個 sub-worktree 內，**絕對不可改主 checkout**（`/Users/user/aladdin/{repo}`）。任何不在 `{worktree_path}/` 底下的路徑都是錯的。
+
+**Worktree path is provided as:** `{worktree_path}` in the dispatch prompt（per-ticket 根目錄，不是單一 git repo）。
 
 The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
@@ -36,23 +46,30 @@ The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
 ### Step 0: Worktree Branch Validation (Mandatory — Must Execute First)
 
-Before any work, verify you are on the correct branch:
+Before any work, verify **all 4 sub-worktrees** exist and are on the correct branch:
 
 ```bash
-cd {worktree_path} && git branch --show-current
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "MISSING:$repo"
+  else
+    branch=$(git -C {worktree_path}/$repo branch --show-current)
+    echo "$repo:$branch"
+  fi
+done
 ```
 
-**Expected output:** `landon/{ticket_id}` (e.g. `landon/FAQ-1841`)
+**Expected output:** every line must be `{repo}:landon/{ticket_id}`（4 行 agrabah / abu / lago / rajah 全部要對）。
 
-- **If the command fails** (directory doesn't exist, not a git repo): immediately stop and return:
+- **If any sub-worktree is `MISSING:` or directory is not a git repo**: immediately stop and return:
   ```
-  BRANCH_ERROR: worktree 不存在或無效 — {worktree_path}
+  BRANCH_ERROR: sub-worktree 不存在或無效 — {worktree_path}/{repo}
   ```
-- **If the branch name does NOT match** `landon/{ticket_id}`: immediately stop and return:
+- **If any branch name does NOT match** `landon/{ticket_id}`: immediately stop and return:
   ```
-  BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_branch}
+  BRANCH_ERROR: 分支不正確 — {repo} 預期 landon/{ticket_id}，實際為 {actual_branch}
   ```
-- **If matched**: proceed to Step 1.
+- **If all 4 matched**: proceed to Step 1.
 
 **Do NOT proceed with any code modification until this check passes.**
 
@@ -84,19 +101,23 @@ If the code doesn't match the Tracer's description:
 ### Step 4: Implement Fix
 
 Execute the repair following the Tracer's 修復策略:
-1. Use Edit tool to modify the relevant source code files
-2. If rajah files were modified, run `cd {worktree_path}/rajah && sh bootstrap.sh` (or `cd {worktree_path}/agrabah && bun run generate-configuration-files` for agrabah-only changes)
-3. Run `bun run lint` to ensure code quality
+1. Use Edit tool to modify the relevant source code files **inside the matching sub-worktree** — agrabah 改 `{worktree_path}/agrabah/...`，abu 改 `{worktree_path}/abu/...`，lago 改 `{worktree_path}/lago/...`，rajah 改 `{worktree_path}/rajah/...`。**禁止編輯主 checkout `/Users/user/aladdin/{repo}/...`**。
+2. If rajah `.rajah` files were modified, run `cd {worktree_path}/rajah && sh bootstrap.sh`（從 sub-worktree 跑 bootstrap，相對路徑 `../agrabah` 會解到 `{worktree_path}/agrabah` 兄弟 worktree，產生的程式碼會留在 worktree 內）。對於只動 agrabah 設定的情境，可改用 `cd {worktree_path}/agrabah && bun run generate-configuration-files`。
+3. Run `cd {worktree_path}/{repo} && bun run lint` for each sub-worktree you actually modified.
 
 **Important for monetary calculations:** All amounts use **bigint** for DB storage. Calculations must use bigint operations, never floating-point Number arithmetic.
 
-### Step 5: Commit
+### Step 5: Commit (per sub-worktree)
+
+每個 sub-worktree 是獨立 git repo，必須**分別 commit**。對你實際修改過的每個 repo 執行：
 
 ```bash
-cd {worktree_path}
-git add <modified_files>
+cd {worktree_path}/{repo}     # repo ∈ {agrabah, abu, lago, rajah}
+git add <modified_files_in_this_repo>
 git commit -m "fix({module}): {brief description} [{ticket_id}]"
 ```
+
+修改了幾個 repo 就 commit 幾次。如果 rajah bootstrap 在 agrabah / abu / lago 內生成了檔案，記得在那些 sub-worktree 也分別 commit。
 
 ### Step 6: Update Analysis Notes
 

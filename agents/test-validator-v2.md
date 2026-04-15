@@ -17,9 +17,9 @@ You are the final test quality gatekeeper for the v3 bug analysis pipeline. You 
 
 ## Working Environment
 
-You read from the same git worktree used by the evaluators. You do NOT modify any files.
+You read from the same per-ticket worktree root used by the evaluators. 該根目錄底下有 4 個獨立 sub-worktree（`agrabah`, `abu`, `lago`, `rajah`），全部在 `landon/{ticket_id}` 分支。You do NOT modify any files.
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt)
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄。
 
 ## Permitted Commands
 
@@ -34,13 +34,21 @@ You read from the same git worktree used by the evaluators. You do NOT modify an
 
 ### Step 0: Worktree Branch Validation
 
+驗證 4 個 sub-worktree 全部在 `landon/{ticket_id}`：
+
 ```bash
-cd {worktree_path} && git branch --show-current
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "MISSING:$repo"
+  else
+    echo "$repo:$(git -C {worktree_path}/$repo branch --show-current)"
+  fi
+done
 ```
 
-Expected: `landon/{ticket_id}`. If mismatch, return:
+任何一個缺漏或分支不正確 → 回傳：
 ```
-BRANCH_ERROR: 分支不正確 — 預期 landon/{ticket_id}，實際為 {actual_branch}
+BRANCH_ERROR: {repo} 分支不正確或缺漏 — 預期 landon/{ticket_id}
 ```
 
 ### Step 1: Collect All Inputs

@@ -110,23 +110,60 @@ Read analysis-notes.md: if bug is confirmed already fixed (有「已修復紀錄
 
 ---
 
-### Step 4: Create Worktree
+### Step 4: Create Worktrees (4 repos, nested layout)
+
+每張單會建立 4 個 sub-worktree，放在同一個 per-ticket 根目錄底下，目的是讓 `rajah/bootstrap.sh` 與 `generate-*.sh` 內的 `../agrabah` / `../abu` / `../lago` 相對路徑能正確解析到「同一張單對應的兄弟 worktree」。
+
+**目標結構：**
+```
+/Users/user/aladdin/worktrees/{ticket_id}/
+├── agrabah   (git worktree, branch landon/{ticket_id}, base origin/pro)
+├── abu       (git worktree, branch landon/{ticket_id}, base origin/pro)
+├── lago      (git worktree, branch landon/{ticket_id}, base origin/pro)
+└── rajah     (git worktree, branch landon/{ticket_id}, base origin/pro)
+```
+
+**指令（4 個 repo 全部建立 + 驗證 + bootstrap）：**
 
 ```bash
-mkdir -p /Users/user/aladdin/worktrees
-cd /Users/user/aladdin/agrabah && git fetch origin pro
-git worktree add /Users/user/aladdin/worktrees/{ticket_id} -b landon/{ticket_id} origin/pro
+mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
+
+# 對 agrabah / abu / lago / rajah 4 個主 repo 逐一建立 worktree
+for repo in agrabah abu lago rajah; do
+  cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
+  git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
+    || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+done
+
+# 強制驗證：4 個 sub-worktree 全部都必須在 landon/{ticket_id}
+ALL_OK=1
+for repo in agrabah abu lago rajah; do
+  branch=$(git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current 2>/dev/null)
+  if [ "$branch" != "landon/{ticket_id}" ]; then
+    echo "WORKTREE_ERROR: $repo branch=$branch (expected landon/{ticket_id})"
+    ALL_OK=0
+  fi
+done
+[ "$ALL_OK" = "1" ] || exit 1
+
+# 從 rajah 子 worktree 跑 bootstrap，相對路徑會解到兄弟 sub-worktree（agrabah/abu/lago）
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
 ```
 
-Store worktree path: `/Users/user/aladdin/worktrees/{ticket_id}`
+Store worktree root: `worktree_path = /Users/user/aladdin/worktrees/{ticket_id}`
+（注意：本變數已不再指向單一 git repo，而是指向「包含 4 個 sub-worktree 的 per-ticket 根目錄」，這個語意必須傳遞給所有 sub-agent。）
 
-If `git worktree add` fails (branch already exists):
-```bash
-git worktree add /Users/user/aladdin/worktrees/{ticket_id} landon/{ticket_id}
-```
+**若任一 sub-worktree 建立或驗證失敗：**
+1. 先嘗試清掉殘留：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     cd /Users/user/aladdin/$repo 2>/dev/null && git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
+   done
+   rm -rf /Users/user/aladdin/worktrees/{ticket_id}
+   ```
+2. 再次執行整段建立 + 驗證指令。若仍失敗 → 進入 Pipeline Failure。
 
-If bootstrap.sh fails, log the error but continue.
+如果 bootstrap.sh 失敗（例如 sync-all 連不到 DB），記錄錯誤但繼續流程；只有「4 個 sub-worktree 沒全部建立成功」才視為硬性失敗。
 
 ---
 
@@ -168,12 +205,26 @@ Read the evaluator feedback carefully, modify the code on the same branch, and c
 
 #### BRANCH_ERROR Handling
 
-If Bug Fixer returns `BRANCH_ERROR`:
-1. Re-create the worktree:
+If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
+1. 清除殘留並重建 4 個 sub-worktree：
    ```bash
-   cd /Users/user/aladdin/agrabah && git fetch origin pro && git worktree remove /Users/user/aladdin/worktrees/{ticket_id} --force 2>/dev/null; git worktree add /Users/user/aladdin/worktrees/{ticket_id} -b landon/{ticket_id} origin/pro
+   for repo in agrabah abu lago rajah; do
+     cd /Users/user/aladdin/$repo 2>/dev/null && git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
+   done
+   rm -rf /Users/user/aladdin/worktrees/{ticket_id}
+   mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
+   for repo in agrabah abu lago rajah; do
+     cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
+     git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
+       || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+   done
    ```
-2. Verify: `cd /Users/user/aladdin/worktrees/{ticket_id} && git branch --show-current`
+2. 驗證 4 個 sub-worktree 全部都在 `landon/{ticket_id}`：
+   ```bash
+   for repo in agrabah abu lago rajah; do
+     git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current
+   done
+   ```
 3. Re-dispatch Bug Fixer. If still failing, go to Pipeline Failure.
 
 ---
@@ -331,10 +382,14 @@ drive-uploader 會根據 `pipeline_status` 將 Notion「AI分析」欄位更新�
 - Test Validator: passed (attempt {validator_attempt_count + 1})
 - Google Drive: {share link}
 - Notion comment: completed / failed
-- Worktree: /Users/user/aladdin/worktrees/{ticket_id} (branch: landon/{ticket_id})
+- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (含 4 個 sub-worktree: agrabah / abu / lago / rajah，全部 branch: landon/{ticket_id})
 
 Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
+
+> **重要：呼叫端控制權交還規則**
+>
+> 若本次呼叫來自 `/analyze-bugs-v3` batch 流程（或任何外層迴圈 skill），完成本步驟後**必須立即返回外層 Step 4c 繼續迴圈**（release lock → 標記 done → 計數 +1 → 回到 4a 處理下一張單），不可在此停止或等待使用者指令。本 Completion Report 僅是單張單的階段性回報，不是整個 batch 的終點。
 
 ---
 
@@ -376,3 +431,7 @@ Report:
 ```
 
 Mark all remaining pending tasks as `completed` with a failure note.
+
+> **重要：呼叫端控制權交還規則**
+>
+> 若本次呼叫來自 `/analyze-bugs-v3` batch 流程（或任何外層迴圈 skill），即使本張單以失敗收尾，也**必須立即返回外層 Step 4d 繼續迴圈**（release lock → 標記 failed → 計數 +1 → 回到 4a 處理下一張單），不可在此停止或等待使用者指令。
