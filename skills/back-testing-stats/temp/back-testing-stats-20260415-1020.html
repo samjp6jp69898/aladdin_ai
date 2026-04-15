@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>回測統計報告 20260415-1020</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 24px;
+  color: #333;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 24px; margin-bottom: 4px; }
+.subtitle { color: #888; font-size: 13px; margin-bottom: 24px; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  text-align: center;
+}
+.summary-card .label { color: #666; font-size: 14px; margin-bottom: 8px; }
+.summary-card .value { font-size: 48px; font-weight: 700; line-height: 1; }
+.summary-card .value.blue { color: #1976d2; }
+.summary-card .value.green { color: #43a047; }
+.summary-card .meta { color: #999; font-size: 12px; margin-top: 8px; }
+h2 { font-size: 18px; margin: 0 0 16px; }
+.bar-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
+.bar-label { width: 200px; color: #555; }
+.bar-track { flex: 1; height: 18px; background: #eceff1; border-radius: 9px; overflow: hidden; margin: 0 12px; }
+.bar-fill { height: 100%; border-radius: 9px; transition: width 0.4s; }
+.bar-num { width: 110px; text-align: right; color: #555; font-variant-numeric: tabular-nums; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th, td {
+  padding: 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+th { background: #f5f5f5; color: #555; font-weight: 600; }
+td:first-child { text-align: left; }
+.sev-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+.chart-wrap { position: relative; height: 380px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>回測統計報告</h1>
+  <div class="subtitle">產出時間：20260415-1020　|　Tracker 來源：backtest_tracker.md</div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">總成功率</div>
+      <div class="value blue">81.7%</div>
+      <div class="meta">已完成 178 / 總數 181</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">完全成功率</div>
+      <div class="value green">53.7%</div>
+      <div class="meta">已完成 178　|　有效樣本 175</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>結論分布</h2>
+    <div class="bar-row">
+<div class="bar-label">✅ 分析正確</div>
+<div class="bar-track"><div class="bar-fill" style="width:52.80898876404494%;background:#43a047"></div></div>
+<div class="bar-num">94 (52.8%)</div>
+</div><div class="bar-row">
+<div class="bar-label">✅ 部分正確 A 等效替代</div>
+<div class="bar-track"><div class="bar-fill" style="width:0.5617977528089888%;background:#81c784"></div></div>
+<div class="bar-num">1 (0.6%)</div>
+</div><div class="bar-row">
+<div class="bar-label">✅ 部分正確 B 不完整</div>
+<div class="bar-track"><div class="bar-fill" style="width:26.96629213483146%;background:#ffb74d"></div></div>
+<div class="bar-num">48 (27.0%)</div>
+</div><div class="bar-row">
+<div class="bar-label">❌ 分析錯誤</div>
+<div class="bar-track"><div class="bar-fill" style="width:12.921348314606742%;background:#e53935"></div></div>
+<div class="bar-num">23 (12.9%)</div>
+</div><div class="bar-row">
+<div class="bar-label">⚠️ 無法比對</div>
+<div class="bar-track"><div class="bar-fill" style="width:5.056179775280898%;background:#90a4ae"></div></div>
+<div class="bar-num">9 (5.1%)</div>
+</div><div class="bar-row">
+<div class="bar-label">➖ 不需修復</div>
+<div class="bar-track"><div class="bar-fill" style="width:1.6853932584269662%;background:#bdbdbd"></div></div>
+<div class="bar-num">3 (1.7%)</div>
+</div>
+  </div>
+
+  <div class="card">
+    <h2>各嚴重性等級成功率</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>嚴重性</th><th>總數</th><th>正確</th><th>部分A</th><th>部分B</th>
+          <th>錯誤</th><th>無法比對</th><th>不需修復</th><th>完全率</th><th>總成功率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+<td><span class="sev-tag" style="background:#e53935">P1重點</span></td>
+<td>28</td><td>14</td><td>0</td><td>3</td>
+<td>7</td><td>3</td><td>1</td>
+<td><strong>51.9%</strong></td><td><strong>63.0%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#fb8c00">P2較高</span></td>
+<td>119</td><td>64</td><td>0</td><td>35</td>
+<td>14</td><td>5</td><td>1</td>
+<td><strong>54.2%</strong></td><td><strong>83.9%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#fdd835">P3一般</span></td>
+<td>29</td><td>15</td><td>0</td><td>10</td>
+<td>2</td><td>1</td><td>1</td>
+<td><strong>53.6%</strong></td><td><strong>89.3%</strong></td>
+</tr><tr>
+<td><span class="sev-tag" style="background:#1e88e5">P4較低</span></td>
+<td>2</td><td>1</td><td>1</td><td>0</td>
+<td>0</td><td>0</td><td>0</td>
+<td><strong>50.0%</strong></td><td><strong>100.0%</strong></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>累積成功率趨勢</h2>
+    <div class="chart-wrap">
+      <canvas id="trend"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+const trend = [{"i": 1, "ticket": "FAQ-1875", "done_time": "20260328 1703", "total_rate": 100.0, "full_rate": 100.0}, {"i": 2, "ticket": "FAQ-1864", "done_time": "20260328 1715", "total_rate": 100.0, "full_rate": 100.0}, {"i": 3, "ticket": "FAQ-1862", "done_time": "20260328 1725", "total_rate": 66.67, "full_rate": 66.67}, {"i": 4, "ticket": "FAQ-1860", "done_time": "20260328 1735", "total_rate": 50.0, "full_rate": 50.0}, {"i": 5, "ticket": "FAQ-1858", "done_time": "20260328 1745", "total_rate": 40.0, "full_rate": 40.0}, {"i": 6, "ticket": "FAQ-1843", "done_time": "20260328 1750", "total_rate": 33.33, "full_rate": 33.33}, {"i": 7, "ticket": "FAQ-1817", "done_time": "20260328 1805", "total_rate": 42.86, "full_rate": 28.57}, {"i": 8, "ticket": "FAQ-1813", "done_time": "20260328 1815", "total_rate": 37.5, "full_rate": 25.0}, {"i": 9, "ticket": "FAQ-1809", "done_time": "20260328 1825", "total_rate": 44.44, "full_rate": 33.33}, {"i": 10, "ticket": "FAQ-1805", "done_time": "20260328 1835", "total_rate": 40.0, "full_rate": 30.0}, {"i": 11, "ticket": "FAQ-1799", "done_time": "20260328 1845", "total_rate": 45.45, "full_rate": 36.36}, {"i": 12, "ticket": "FAQ-1798", "done_time": "20260328 1855", "total_rate": 50.0, "full_rate": 41.67}, {"i": 13, "ticket": "FAQ-1786", "done_time": "20260328 1915", "total_rate": 53.85, "full_rate": 46.15}, {"i": 14, "ticket": "FAQ-1796", "done_time": "20260328 1930", "total_rate": 57.14, "full_rate": 50.0}, {"i": 15, "ticket": "FAQ-1783", "done_time": "20260328 1940", "total_rate": 60.0, "full_rate": 53.33}, {"i": 16, "ticket": "FAQ-1779", "done_time": "20260328 1950", "total_rate": 62.5, "full_rate": 50.0}, {"i": 17, "ticket": "FAQ-1777", "done_time": "20260328 1955", "total_rate": 64.71, "full_rate": 52.94}, {"i": 18, "ticket": "FAQ-1774", "done_time": "20260328 2000", "total_rate": 66.67, "full_rate": 55.56}, {"i": 19, "ticket": "FAQ-1759", "done_time": "20260328 2010", "total_rate": 68.42, "full_rate": 52.63}, {"i": 20, "ticket": "FAQ-1731", "done_time": "20260329 0840", "total_rate": 70.0, "full_rate": 55.0}, {"i": 21, "ticket": "FAQ-1730", "done_time": "20260329 0850", "total_rate": 71.43, "full_rate": 52.38}, {"i": 22, "ticket": "FAQ-1727", "done_time": "20260329 0900", "total_rate": 72.73, "full_rate": 54.55}, {"i": 23, "ticket": "FAQ-1726", "done_time": "20260329 0915", "total_rate": 73.91, "full_rate": 56.52}, {"i": 24, "ticket": "FAQ-1725", "done_time": "20260329 0925", "total_rate": 75.0, "full_rate": 58.33}, {"i": 25, "ticket": "FAQ-1724", "done_time": "20260329 1010", "total_rate": 76.0, "full_rate": 56.0}, {"i": 26, "ticket": "FAQ-1722", "done_time": "20260329 1025", "total_rate": 73.08, "full_rate": 53.85}, {"i": 27, "ticket": "FAQ-1721", "done_time": "20260329 1045", "total_rate": 74.07, "full_rate": 51.85}, {"i": 28, "ticket": "FAQ-1719", "done_time": "20260329 1100", "total_rate": 75.0, "full_rate": 53.57}, {"i": 29, "ticket": "FAQ-1718", "done_time": "20260329 1120", "total_rate": 72.41, "full_rate": 51.72}, {"i": 30, "ticket": "FAQ-1704", "done_time": "20260329 1135", "total_rate": 73.33, "full_rate": 53.33}, {"i": 31, "ticket": "FAQ-1703", "done_time": "20260329 1145", "total_rate": 74.19, "full_rate": 54.84}, {"i": 32, "ticket": "FAQ-1702", "done_time": "20260329 1155", "total_rate": 75.0, "full_rate": 56.25}, {"i": 33, "ticket": "FAQ-1701", "done_time": "20260329 1205", "total_rate": 75.76, "full_rate": 57.58}, {"i": 34, "ticket": "FAQ-1698", "done_time": "20260329 1215", "total_rate": 76.47, "full_rate": 58.82}, {"i": 35, "ticket": "FAQ-1694", "done_time": "20260329 1230", "total_rate": 77.14, "full_rate": 60.0}, {"i": 36, "ticket": "FAQ-1916", "done_time": "20260329 1300", "total_rate": 77.78, "full_rate": 58.33}, {"i": 37, "ticket": "FAQ-1949", "done_time": "20260329 1315", "total_rate": 78.38, "full_rate": 59.46}, {"i": 38, "ticket": "FAQ-1942", "done_time": "20260329 1335", "total_rate": 78.95, "full_rate": 57.89}, {"i": 39, "ticket": "FAQ-1960", "done_time": "20260329 1600", "total_rate": 79.49, "full_rate": 58.97}, {"i": 40, "ticket": "FAQ-1934", "done_time": "20260329 1700", "total_rate": 80.0, "full_rate": 57.5}, {"i": 41, "ticket": "FAQ-1965", "done_time": "20260330 1045", "total_rate": 78.05, "full_rate": 56.1}, {"i": 42, "ticket": "FAQ-1975", "done_time": "20260330 1510", "total_rate": 78.57, "full_rate": 57.14}, {"i": 43, "ticket": "FAQ-1932", "done_time": "20260330 1515", "total_rate": 76.74, "full_rate": 55.81}, {"i": 44, "ticket": "FAQ-2020", "done_time": "20260330 1950", "total_rate": 77.27, "full_rate": 56.82}, {"i": 45, "ticket": "FAQ-2011", "done_time": "20260330 1955", "total_rate": 77.78, "full_rate": 55.56}, {"i": 46, "ticket": "FAQ-653", "done_time": "20260330 2015", "total_rate": 78.26, "full_rate": 54.35}, {"i": 47, "ticket": "FAQ-1961", "done_time": "20260330 2030", "total_rate": 76.6, "full_rate": 53.19}, {"i": 48, "ticket": "FAQ-1912", "done_time": "20260330 2035", "total_rate": 77.08, "full_rate": 54.17}, {"i": 49, "ticket": "FAQ-1887", "done_time": "20260330 2045", "total_rate": 77.55, "full_rate": 53.06}, {"i": 50, "ticket": "FAQ-1820", "done_time": "20260330 2055", "total_rate": 78.0, "full_rate": 54.0}, {"i": 51, "ticket": "FAQ-1819", "done_time": "20260330 2100", "total_rate": 78.43, "full_rate": 54.9}, {"i": 52, "ticket": "FAQ-1720", "done_time": "20260330 2110", "total_rate": 78.85, "full_rate": 55.77}, {"i": 53, "ticket": "FAQ-1695", "done_time": "20260330 2120", "total_rate": 79.25, "full_rate": 54.72}, {"i": 54, "ticket": "FAQ-2015", "done_time": "20260330 2135", "total_rate": 79.63, "full_rate": 55.56}, {"i": 55, "ticket": "FAQ-1939", "done_time": "20260330 2145", "total_rate": 80.0, "full_rate": 56.36}, {"i": 56, "ticket": "FAQ-1918", "done_time": "20260330 2155", "total_rate": 80.36, "full_rate": 57.14}, {"i": 57, "ticket": "FAQ-399", "done_time": "20260331 1430", "total_rate": 80.7, "full_rate": 57.89}, {"i": 58, "ticket": "FAQ-2052", "done_time": "20260331 1530", "total_rate": 81.03, "full_rate": 56.9}, {"i": 59, "ticket": "FAQ-2008", "done_time": "20260331 1600", "total_rate": 81.36, "full_rate": 57.63}, {"i": 60, "ticket": "FAQ-2005", "done_time": "20260331 1615", "total_rate": 81.67, "full_rate": 58.33}, {"i": 61, "ticket": "FAQ-1995", "done_time": "20260331 1630", "total_rate": 81.97, "full_rate": 59.02}, {"i": 62, "ticket": "FAQ-1929", "done_time": "20260331 1645", "total_rate": 80.65, "full_rate": 58.06}, {"i": 63, "ticket": "FAQ-1892", "done_time": "20260331 1700", "total_rate": 80.95, "full_rate": 58.73}, {"i": 64, "ticket": "FAQ-2038", "done_time": "20260331 1730", "total_rate": 79.69, "full_rate": 57.81}, {"i": 65, "ticket": "FAQ-2035", "done_time": "20260331 1745", "total_rate": 80.0, "full_rate": 58.46}, {"i": 66, "ticket": "FAQ-2017", "done_time": "20260331 1800", "total_rate": 80.3, "full_rate": 57.58}, {"i": 67, "ticket": "FAQ-2006", "done_time": "20260331 1815", "total_rate": 79.1, "full_rate": 56.72}, {"i": 68, "ticket": "FAQ-1917", "done_time": "20260331 1830", "total_rate": 79.41, "full_rate": 57.35}, {"i": 69, "ticket": "FAQ-1885", "done_time": "20260331 1845", "total_rate": 79.71, "full_rate": 57.97}, {"i": 70, "ticket": "FAQ-2045", "done_time": "20260331 1900", "total_rate": 80.0, "full_rate": 57.14}, {"i": 71, "ticket": "FAQ-1952", "done_time": "20260331 1920", "total_rate": 78.87, "full_rate": 56.34}, {"i": 72, "ticket": "FAQ-1870", "done_time": "20260331 1935", "total_rate": 79.17, "full_rate": 56.94}, {"i": 73, "ticket": "FAQ-2019", "done_time": "20260331 2008", "total_rate": 79.45, "full_rate": 56.16}, {"i": 74, "ticket": "FAQ-2065", "done_time": "20260331 2145", "total_rate": 79.73, "full_rate": 56.76}, {"i": 75, "ticket": "FAQ-2069", "done_time": "20260331 2320", "total_rate": 80.0, "full_rate": 56.0}, {"i": 76, "ticket": "FAQ-1811", "done_time": "20260331 2355", "total_rate": 80.26, "full_rate": 55.26}, {"i": 77, "ticket": "FAQ-2037", "done_time": "20260401 0842", "total_rate": 80.52, "full_rate": 55.84}, {"i": 78, "ticket": "FAQ-2110", "done_time": "20260401 1345", "total_rate": 80.77, "full_rate": 55.13}, {"i": 79, "ticket": "FAQ-2055", "done_time": "20260401 1345", "total_rate": 81.01, "full_rate": 55.7}, {"i": 80, "ticket": "FAQ-2095", "done_time": "20260401 1400", "total_rate": 81.25, "full_rate": 56.25}, {"i": 81, "ticket": "FAQ-2093", "done_time": "20260401 1400", "total_rate": 81.48, "full_rate": 56.79}, {"i": 82, "ticket": "FAQ-2066", "done_time": "20260401 1402", "total_rate": 81.71, "full_rate": 57.32}, {"i": 83, "ticket": "FAQ-2012", "done_time": "20260401 1406", "total_rate": 81.93, "full_rate": 56.63}, {"i": 84, "ticket": "FAQ-1996", "done_time": "20260401 1410", "total_rate": 82.14, "full_rate": 55.95}, {"i": 85, "ticket": "FAQ-2103", "done_time": "20260401 1427", "total_rate": 81.18, "full_rate": 55.29}, {"i": 86, "ticket": "FAQ-2096", "done_time": "20260401 1437", "total_rate": 81.4, "full_rate": 55.81}, {"i": 87, "ticket": "FAQ-2097", "done_time": "20260401 1530", "total_rate": 81.61, "full_rate": 56.32}, {"i": 88, "ticket": "FAQ-2094", "done_time": "20260401 1535", "total_rate": 81.82, "full_rate": 55.68}, {"i": 89, "ticket": "FAQ-2088", "done_time": "20260401 1600", "total_rate": 80.9, "full_rate": 55.06}, {"i": 90, "ticket": "FAQ-2073", "done_time": "20260401 1603", "total_rate": 81.11, "full_rate": 55.56}, {"i": 91, "ticket": "FAQ-2092", "done_time": "20260401 1630", "total_rate": 81.32, "full_rate": 56.04}, {"i": 92, "ticket": "FAQ-2090", "done_time": "20260401 1645", "total_rate": 81.52, "full_rate": 56.52}, {"i": 93, "ticket": "FAQ-1978", "done_time": "20260401 1700", "total_rate": 81.72, "full_rate": 55.91}, {"i": 94, "ticket": "FAQ-2130", "done_time": "20260402 0001", "total_rate": 81.91, "full_rate": 56.38}, {"i": 95, "ticket": "FAQ-2100", "done_time": "20260402 0002", "total_rate": 82.11, "full_rate": 56.84}, {"i": 96, "ticket": "FAQ-2087", "done_time": "20260402 0003", "total_rate": 82.29, "full_rate": 56.25}, {"i": 97, "ticket": "FAQ-2082", "done_time": "20260402 0004", "total_rate": 82.47, "full_rate": 56.7}, {"i": 98, "ticket": "FAQ-2061", "done_time": "20260402 0005", "total_rate": 82.65, "full_rate": 56.12}, {"i": 99, "ticket": "FAQ-2054", "done_time": "20260402 0006", "total_rate": 82.83, "full_rate": 56.57}, {"i": 100, "ticket": "FAQ-2050", "done_time": "20260402 0007", "total_rate": 83.0, "full_rate": 57.0}, {"i": 101, "ticket": "FAQ-2021", "done_time": "20260402 0008", "total_rate": 83.17, "full_rate": 57.43}, {"i": 102, "ticket": "FAQ-2168", "done_time": "20260402 1045", "total_rate": 83.33, "full_rate": 57.84}, {"i": 103, "ticket": "FAQ-2057", "done_time": "20260402 1115", "total_rate": 83.5, "full_rate": 57.28}, {"i": 104, "ticket": "FAQ-2022", "done_time": "20260402 1117", "total_rate": 83.65, "full_rate": 57.69}, {"i": 105, "ticket": "FAQ-2163", "done_time": "20260402 1120", "total_rate": 83.81, "full_rate": 58.1}, {"i": 106, "ticket": "FAQ-2075", "done_time": "20260402 1122", "total_rate": 83.96, "full_rate": 58.49}, {"i": 107, "ticket": "FAQ-1911", "done_time": "20260402 1126", "total_rate": 84.11, "full_rate": 57.94}, {"i": 108, "ticket": "FAQ-2185", "done_time": "20260402 1430", "total_rate": 84.26, "full_rate": 57.41}, {"i": 109, "ticket": "FAQ-2028", "done_time": "20260402 1435", "total_rate": 84.4, "full_rate": 56.88}, {"i": 110, "ticket": "FAQ-2026", "done_time": "20260402 1438", "total_rate": 84.55, "full_rate": 57.27}, {"i": 111, "ticket": "FAQ-2189", "done_time": "20260402 1500", "total_rate": 84.68, "full_rate": 56.76}, {"i": 112, "ticket": "FAQ-2000", "done_time": "20260402 1502", "total_rate": 84.82, "full_rate": 57.14}, {"i": 113, "ticket": "FAQ-1998", "done_time": "20260402 1505", "total_rate": 84.96, "full_rate": 57.52}, {"i": 114, "ticket": "FAQ-2123", "done_time": "20260405 1435", "total_rate": 85.09, "full_rate": 57.89}, {"i": 115, "ticket": "FAQ-1839", "done_time": "20260405 1515", "total_rate": 85.22, "full_rate": 58.26}, {"i": 116, "ticket": "FAQ-2111", "done_time": "20260405 1545", "total_rate": 84.48, "full_rate": 57.76}, {"i": 117, "ticket": "FAQ-1977", "done_time": "20260405 1555", "total_rate": 84.62, "full_rate": 58.12}, {"i": 118, "ticket": "FAQ-1548", "done_time": "20260405 1625", "total_rate": 84.75, "full_rate": 58.47}, {"i": 119, "ticket": "FAQ-1507", "done_time": "20260405 1635", "total_rate": 84.87, "full_rate": 58.82}, {"i": 120, "ticket": "FAQ-1156", "done_time": "20260405 1645", "total_rate": 85.0, "full_rate": 59.17}, {"i": 121, "ticket": "FAQ-2169", "done_time": "20260405 1650", "total_rate": 85.12, "full_rate": 59.5}, {"i": 122, "ticket": "FAQ-2004", "done_time": "20260405 1700", "total_rate": 85.25, "full_rate": 59.84}, {"i": 123, "ticket": "FAQ-2182", "done_time": "20260405 1710", "total_rate": 85.37, "full_rate": 60.16}, {"i": 124, "ticket": "FAQ-2159", "done_time": "20260405 1712", "total_rate": 85.48, "full_rate": 60.48}, {"i": 125, "ticket": "FAQ-1893", "done_time": "20260405 1730", "total_rate": 85.6, "full_rate": 60.0}, {"i": 126, "ticket": "FAQ-1691", "done_time": "20260405 1733", "total_rate": 85.71, "full_rate": 59.52}, {"i": 127, "ticket": "FAQ-2207", "done_time": "20260407 2044", "total_rate": 85.83, "full_rate": 59.06}, {"i": 128, "ticket": "FAQ-2205", "done_time": "20260407 2044", "total_rate": 85.94, "full_rate": 58.59}, {"i": 129, "ticket": "FAQ-2204", "done_time": "20260407 2044", "total_rate": 86.05, "full_rate": 58.14}, {"i": 130, "ticket": "FAQ-2245", "done_time": "20260408 1408", "total_rate": 85.38, "full_rate": 57.69}, {"i": 131, "ticket": "FAQ-2136", "done_time": "20260408 1408", "total_rate": 85.5, "full_rate": 57.25}, {"i": 132, "ticket": "FAQ-2114", "done_time": "20260408 1408", "total_rate": 85.61, "full_rate": 56.82}, {"i": 133, "ticket": "FAQ-2108", "done_time": "20260408 1408", "total_rate": 85.71, "full_rate": 56.39}, {"i": 134, "ticket": "FAQ-2105", "done_time": "20260408 1408", "total_rate": 85.07, "full_rate": 55.97}, {"i": 135, "ticket": "FAQ-2137", "done_time": "20260408 1422", "total_rate": 85.19, "full_rate": 56.3}, {"i": 136, "ticket": "FAQ-2173", "done_time": "20260408 1530", "total_rate": 84.56, "full_rate": 55.88}, {"i": 137, "ticket": "FAQ-2248", "done_time": "20260408 1531", "total_rate": 84.67, "full_rate": 56.2}, {"i": 138, "ticket": "FAQ-2188", "done_time": "20260408 1532", "total_rate": 84.78, "full_rate": 56.52}, {"i": 139, "ticket": "FAQ-2179", "done_time": "20260408 1532", "total_rate": 84.89, "full_rate": 56.83}, {"i": 140, "ticket": "FAQ-2165", "done_time": "20260408 1533", "total_rate": 85.0, "full_rate": 57.14}, {"i": 141, "ticket": "FAQ-696", "done_time": "20260408 1656", "total_rate": 85.11, "full_rate": 56.74}, {"i": 142, "ticket": "FAQ-1572", "done_time": "20260408 1704", "total_rate": 84.51, "full_rate": 56.34}, {"i": 143, "ticket": "FAQ-2002", "done_time": "20260408 1745", "total_rate": 84.62, "full_rate": 56.64}, {"i": 144, "ticket": "FAQ-1814", "done_time": "20260408 1800", "total_rate": 84.72, "full_rate": 56.25}, {"i": 145, "ticket": "FAQ-2102", "done_time": "20260408 1820", "total_rate": 84.83, "full_rate": 56.55}, {"i": 146, "ticket": "FAQ-2076", "done_time": "20260408 1821", "total_rate": 84.25, "full_rate": 56.16}, {"i": 147, "ticket": "FAQ-2040", "done_time": "20260408 1821", "total_rate": 84.35, "full_rate": 55.78}, {"i": 148, "ticket": "FAQ-1737", "done_time": "20260408 1823", "total_rate": 83.78, "full_rate": 55.41}, {"i": 149, "ticket": "FAQ-1710", "done_time": "20260408 1826", "total_rate": 83.22, "full_rate": 55.03}, {"i": 150, "ticket": "FAQ-1706", "done_time": "20260408 1826", "total_rate": 83.33, "full_rate": 54.67}, {"i": 151, "ticket": "FAQ-1685", "done_time": "20260408 1826", "total_rate": 82.78, "full_rate": 54.3}, {"i": 152, "ticket": "FAQ-1723", "done_time": "20260408 1918", "total_rate": 82.24, "full_rate": 53.95}, {"i": 153, "ticket": "FAQ-1705", "done_time": "20260408 1918", "total_rate": 81.7, "full_rate": 53.59}, {"i": 154, "ticket": "FAQ-2269", "done_time": "20260410 1406", "total_rate": 81.82, "full_rate": 53.9}, {"i": 155, "ticket": "FAQ-2167", "done_time": "20260410 1411", "total_rate": 81.94, "full_rate": 54.19}, {"i": 156, "ticket": "FAQ-2154", "done_time": "20260410 1415", "total_rate": 82.05, "full_rate": 54.49}, {"i": 157, "ticket": "FAQ-2144", "done_time": "20260410 1420", "total_rate": 81.53, "full_rate": 54.14}, {"i": 158, "ticket": "FAQ-2106", "done_time": "20260410 1425", "total_rate": 81.65, "full_rate": 53.8}, {"i": 159, "ticket": "FAQ-2104", "done_time": "20260410 1429", "total_rate": 81.76, "full_rate": 53.46}, {"i": 160, "ticket": "FAQ-1729", "done_time": "20260410 1436", "total_rate": 81.25, "full_rate": 53.12}, {"i": 161, "ticket": "FAQ-1686", "done_time": "20260410 1446", "total_rate": 81.37, "full_rate": 52.8}, {"i": 162, "ticket": "FAQ-2295", "done_time": "20260410 1940", "total_rate": 81.48, "full_rate": 53.09}, {"i": 163, "ticket": "FAQ-2260", "done_time": "20260410 1945", "total_rate": 81.6, "full_rate": 53.37}, {"i": 164, "ticket": "FAQ-2266", "done_time": "20260414 1200", "total_rate": 81.71, "full_rate": 53.66}, {"i": 165, "ticket": "FAQ-2256", "done_time": "20260414 1210", "total_rate": 81.82, "full_rate": 53.94}, {"i": 166, "ticket": "FAQ-2138", "done_time": "20260414 1220", "total_rate": 81.93, "full_rate": 53.61}, {"i": 167, "ticket": "FAQ-1735", "done_time": "20260414 1255", "total_rate": 82.04, "full_rate": 53.29}, {"i": 168, "ticket": "FAQ-2127", "done_time": "20260414 1310", "total_rate": 82.14, "full_rate": 53.57}, {"i": 169, "ticket": "FAQ-2438", "done_time": "20260415 0924", "total_rate": 82.25, "full_rate": 53.85}, {"i": 170, "ticket": "FAQ-2420", "done_time": "20260415 0929", "total_rate": 82.35, "full_rate": 54.12}, {"i": 171, "ticket": "FAQ-2385", "done_time": "20260415 0933", "total_rate": 81.87, "full_rate": 53.8}, {"i": 172, "ticket": "FAQ-2319", "done_time": "20260415 0936", "total_rate": 81.98, "full_rate": 54.07}, {"i": 173, "ticket": "FAQ-2293", "done_time": "20260415 0940", "total_rate": 82.08, "full_rate": 54.34}, {"i": 174, "ticket": "FAQ-2259", "done_time": "20260415 0946", "total_rate": 81.61, "full_rate": 54.02}, {"i": 175, "ticket": "FAQ-2183", "done_time": "20260415 0955", "total_rate": 81.14, "full_rate": 53.71}, {"i": 176, "ticket": "FAQ-2158", "done_time": "20260415 1006", "total_rate": 80.68, "full_rate": 53.41}, {"i": 177, "ticket": "FAQ-2142", "done_time": "20260415 1012", "total_rate": 80.79, "full_rate": 53.11}, {"i": 178, "ticket": "FAQ-2101", "done_time": "20260415 1017", "total_rate": 80.34, "full_rate": 52.81}];
+const ctx = document.getElementById('trend').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: trend.map(t => t.i),
+    datasets: [
+      {
+        label: '總成功率 (%)',
+        data: trend.map(t => t.total_rate),
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,0.08)',
+        tension: 0.2,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+      },
+      {
+        label: '完全成功率 (%)',
+        data: trend.map(t => t.full_rate),
+        borderColor: '#43a047',
+        backgroundColor: 'rgba(67,160,71,0.08)',
+        tension: 0.2,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          title: (items) => {
+            const i = items[0].dataIndex;
+            return `#${trend[i].i}　${trend[i].ticket}`;
+          },
+          label: (item) => `${item.dataset.label}: ${item.parsed.y.toFixed(1)}%`,
+        },
+      },
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        title: { display: true, text: '成功率 (%)' },
+        ticks: { callback: (v) => v + '%' },
+      },
+      x: {
+        title: { display: true, text: '完成順序' },
+      },
+    },
+  },
+});
+</script>
+</body>
+</html>
