@@ -146,7 +146,15 @@ for repo in agrabah abu lago rajah; do
 done
 [ "$ALL_OK" = "1" ] || exit 1
 
+# 為共用庫（jasmine / genie / jafar）建立 symlink 指回主工作區，
+# 讓 rajah/generate-*.sh 內寫死的 ../jasmine、../genie、../jafar 相對路徑能解析到真實目錄。
+# 這三個 repo 不在本單改動範圍，不需要獨立 worktree，用 symlink 即可。
+for shared in jasmine genie jafar; do
+  ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
+done
+
 # 從 rajah 子 worktree 跑 bootstrap，相對路徑會解到兄弟 sub-worktree（agrabah/abu/lago）
+# 以及 symlink 指向的 jasmine/genie/jafar。
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
 ```
 
@@ -217,6 +225,10 @@ If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
      cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
      git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
        || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+   done
+   # 共用庫 symlink（jasmine / genie / jafar）同樣要補回
+   for shared in jasmine genie jafar; do
+     ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
    done
    ```
 2. 驗證 4 個 sub-worktree 全部都在 `landon/{ticket_id}`：
