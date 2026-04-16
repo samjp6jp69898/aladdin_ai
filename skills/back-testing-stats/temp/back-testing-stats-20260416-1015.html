@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 — 2026-04-16</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 24px;
+  }
+  h1 { font-size: 24px; margin-bottom: 24px; color: #1a1a1a; }
+  h2 { font-size: 18px; margin-bottom: 16px; color: #333; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .card-label { font-size: 14px; color: #666; margin-bottom: 8px; }
+  .card-value { font-size: 42px; font-weight: 700; }
+  .card-sub { font-size: 13px; color: #999; margin-top: 4px; }
+  .card-value.blue { color: #1976d2; }
+  .card-value.green { color: #388e3c; }
+
+  .bar-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+  }
+  .progress-bar {
+    display: flex;
+    height: 32px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-bar div { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 600; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  .table-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: #fafafa; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 2px solid #e0e0e0; }
+  td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+  tr:last-child td { border-bottom: none; }
+  .sev-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #fff; }
+  .sev-p1 { background: #e53935; }
+  .sev-p2 { background: #fb8c00; }
+  .sev-p3 { background: #fdd835; color: #333; }
+  .sev-p4 { background: #42a5f5; }
+
+  .chart-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+  }
+  canvas { max-height: 400px; }
+</style>
+</head>
+<body>
+
+<h1>回測統計報告</h1>
+
+<!-- Section 1: Overview Cards -->
+<div class="cards">
+  <div class="card">
+    <div class="card-label">總成功率（正確 + 部分正確）</div>
+    <div class="card-value blue">82.5%</div>
+    <div class="card-sub">已完成 193 / 193 張</div>
+  </div>
+  <div class="card">
+    <div class="card-label">完全成功率（僅分析正確）</div>
+    <div class="card-value green">50.8%</div>
+    <div class="card-sub">有效樣本 189 張（排除 4 張不需修復）</div>
+  </div>
+</div>
+
+<div class="bar-container">
+  <h2>回測結論分布</h2>
+  <div class="progress-bar">
+    <div style="width:50.79%;background:#388e3c;" title="分析正確 96">96</div>
+    <div style="width:3.70%;background:#81c784;" title="部分正確A 7">7</div>
+    <div style="width:28.04%;background:#ffb74d;" title="部分正確B 53">53</div>
+    <div style="width:12.70%;background:#e53935;" title="分析錯誤 24">24</div>
+    <div style="width:4.76%;background:#78909c;" title="無法比對 9">9</div>
+  </div>
+  <div style="display:flex;height:20px;border-radius:4px;overflow:hidden;margin-bottom:12px;opacity:0.3;">
+    <div style="width:2.07%;background:#bdbdbd;" title="不需修復 4"></div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#388e3c;"></div>分析正確 96 (50.8%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#81c784;"></div>部分正確 A（等效替代）7 (3.7%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffb74d;"></div>部分正確 B（不完整）53 (28.0%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e53935;"></div>分析錯誤 24 (12.7%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#78909c;"></div>無法比對 9 (4.8%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bdbdbd;"></div>不需修復 4（不計入正確率）</div>
+  </div>
+</div>
+
+<!-- Section 2: Per-Severity Table -->
+<div class="table-container">
+  <h2>各嚴重性等級成功率</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>嚴重性</th>
+        <th>總數</th>
+        <th>正確</th>
+        <th>部分A</th>
+        <th>部分B</th>
+        <th>錯誤</th>
+        <th>無法比對</th>
+        <th>不需修復</th>
+        <th>完全率</th>
+        <th>總成功率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="sev-tag sev-p1">P1重點</span></td>
+        <td>32</td><td>14</td><td>1</td><td>6</td><td>7</td><td>3</td><td>1</td>
+        <td>45.2%</td><td>67.7%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p2">P2較高</span></td>
+        <td>126</td><td>65</td><td>3</td><td>37</td><td>15</td><td>5</td><td>1</td>
+        <td>52.0%</td><td>84.0%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p3">P3一般</span></td>
+        <td>33</td><td>16</td><td>2</td><td>10</td><td>2</td><td>1</td><td>2</td>
+        <td>51.6%</td><td>90.3%</td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p4">P4較低</span></td>
+        <td>2</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td>
+        <td>50.0%</td><td>100.0%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Section 3: Cumulative Trend Chart -->
+<div class="chart-container">
+  <h2>累積成功率趨勢</h2>
+  <canvas id="trendChart"></canvas>
+</div>
+
+<script>
+const labels = ["FAQ-1875","FAQ-1864","FAQ-1862","FAQ-1860","FAQ-1858","FAQ-1843","FAQ-1817","FAQ-1813","FAQ-1809","FAQ-1805","FAQ-1799","FAQ-1798","FAQ-1786","FAQ-1796","FAQ-1783","FAQ-1779","FAQ-1777","FAQ-1774","FAQ-1759","FAQ-1731","FAQ-1730","FAQ-1727","FAQ-1726","FAQ-1725","FAQ-1724","FAQ-1722","FAQ-1721","FAQ-1719","FAQ-1718","FAQ-1704","FAQ-1703","FAQ-1702","FAQ-1701","FAQ-1698","FAQ-1694","FAQ-1916","FAQ-1949","FAQ-1942","FAQ-1960","FAQ-1934","FAQ-1965","FAQ-1975","FAQ-1932","FAQ-2020","FAQ-2011","FAQ-653","FAQ-1961","FAQ-1912","FAQ-1887","FAQ-1820","FAQ-1819","FAQ-1720","FAQ-1695","FAQ-2015","FAQ-1939","FAQ-1918","FAQ-399","FAQ-2052","FAQ-2008","FAQ-2005","FAQ-1995","FAQ-1929","FAQ-1892","FAQ-2038","FAQ-2035","FAQ-2017","FAQ-2006","FAQ-1917","FAQ-1885","FAQ-2045","FAQ-1952","FAQ-1870","FAQ-2019","FAQ-2065","FAQ-2069","FAQ-1811","FAQ-2037","FAQ-2110","FAQ-2055","FAQ-2095","FAQ-2093","FAQ-2066","FAQ-2012","FAQ-1996","FAQ-2103","FAQ-2096","FAQ-2097","FAQ-2094","FAQ-2088","FAQ-2073","FAQ-2092","FAQ-2090","FAQ-1978","FAQ-2130","FAQ-2100","FAQ-2087","FAQ-2082","FAQ-2061","FAQ-2054","FAQ-2050","FAQ-2021","FAQ-2168","FAQ-2057","FAQ-2022","FAQ-2163","FAQ-2075","FAQ-1911","FAQ-2185","FAQ-2028","FAQ-2026","FAQ-2189","FAQ-2000","FAQ-1998","FAQ-2123","FAQ-1839","FAQ-2111","FAQ-1977","FAQ-1548","FAQ-1507","FAQ-1156","FAQ-2169","FAQ-2004","FAQ-2182","FAQ-2159","FAQ-1893","FAQ-1691","FAQ-2207","FAQ-2205","FAQ-2204","FAQ-2245","FAQ-2136","FAQ-2114","FAQ-2108","FAQ-2105","FAQ-2137","FAQ-2173","FAQ-2248","FAQ-2188","FAQ-2179","FAQ-2165","FAQ-696","FAQ-1572","FAQ-2002","FAQ-1814","FAQ-2102","FAQ-2076","FAQ-2040","FAQ-1737","FAQ-1710","FAQ-1706","FAQ-1685","FAQ-1723","FAQ-1705","FAQ-2269","FAQ-2167","FAQ-2154","FAQ-2144","FAQ-2106","FAQ-2104","FAQ-1729","FAQ-1686","FAQ-2295","FAQ-2260","FAQ-2266","FAQ-2256","FAQ-2138","FAQ-1735","FAQ-2127","FAQ-2438","FAQ-2420","FAQ-2385","FAQ-2319","FAQ-2293","FAQ-2259","FAQ-2183","FAQ-2158","FAQ-2142","FAQ-2101","FAQ-2501","FAQ-2357","FAQ-2343","FAQ-2244","FAQ-2206","FAQ-2098","FAQ-1959","FAQ-1935","FAQ-1789","FAQ-1547","FAQ-2489","FAQ-2427","FAQ-2425","FAQ-2305","FAQ-2196"];
+const totalSuccessRates = [100.0,100.0,66.7,50.0,40.0,33.3,42.9,37.5,44.4,40.0,45.5,50.0,53.8,57.1,60.0,62.5,64.7,66.7,68.4,70.0,71.4,72.7,73.9,75.0,76.0,73.1,74.1,75.0,72.4,73.3,74.2,75.0,75.8,76.5,77.1,77.8,78.4,78.9,79.5,80.0,78.0,78.6,76.7,77.3,77.8,78.3,76.6,77.1,77.6,78.0,78.4,78.8,79.2,79.6,80.0,80.4,80.7,81.0,81.4,81.7,82.0,80.6,81.0,79.7,80.0,80.3,79.1,79.4,79.7,80.0,78.9,79.2,79.5,79.7,80.0,80.3,80.5,80.8,81.0,81.2,81.5,81.7,81.9,82.1,81.2,81.4,81.6,81.8,80.9,81.1,81.3,81.5,81.7,81.9,82.1,82.3,82.5,82.7,82.8,83.0,83.2,83.3,83.5,83.7,83.8,84.0,84.1,84.3,84.4,84.5,84.7,84.8,85.0,85.1,85.2,84.5,84.6,84.7,84.9,85.0,85.1,85.2,85.4,85.5,85.6,85.7,85.8,85.9,86.0,85.4,85.5,85.6,85.7,85.1,85.2,85.2,85.3,85.4,85.5,85.6,85.7,85.1,85.2,85.3,85.4,85.4,85.5,85.5,84.9,85.0,84.5,83.9,83.3,83.4,83.6,83.7,83.1,83.2,83.3,82.8,82.9,83.0,83.1,83.2,83.3,83.4,83.5,83.6,83.7,83.8,83.3,83.4,83.5,83.0,82.6,82.1,82.2,81.7,81.7,81.8,81.4,81.5,81.6,81.7,81.8,81.9,82.0,82.1,82.2,82.3,82.4,82.4,82.5];
+const exactSuccessRates = [100.0,100.0,66.7,50.0,40.0,33.3,28.6,25.0,33.3,30.0,36.4,41.7,46.2,50.0,53.3,50.0,52.9,55.6,52.6,55.0,52.4,54.5,56.5,58.3,56.0,53.8,51.9,53.6,51.7,53.3,54.8,56.2,57.6,58.8,60.0,58.3,59.5,57.9,59.0,57.5,56.1,57.1,55.8,56.8,55.6,54.3,53.2,54.2,53.1,54.0,54.9,55.8,54.7,55.6,56.4,57.1,57.9,56.9,57.6,58.3,59.0,58.1,58.7,57.8,58.5,57.6,56.7,57.4,58.0,57.1,56.3,56.9,56.2,56.8,56.0,55.3,55.8,55.1,55.7,56.2,56.8,57.3,56.6,56.0,55.3,55.8,56.3,55.7,55.1,55.6,56.0,56.5,55.9,56.4,56.8,56.2,56.7,56.1,56.6,57.0,57.4,57.8,57.3,57.7,58.1,58.5,57.9,57.4,56.9,57.3,56.8,57.1,57.5,57.9,58.3,57.8,58.1,58.5,58.8,59.2,59.5,59.8,60.2,60.5,60.0,59.5,59.1,58.6,58.1,57.7,57.3,56.8,56.4,56.0,56.3,56.3,56.6,56.9,57.2,57.6,57.1,56.7,57.0,56.6,56.9,56.9,56.6,56.6,56.2,55.8,55.4,55.0,54.7,55.0,55.3,55.6,55.2,54.8,54.5,54.1,53.8,54.1,54.4,54.7,54.9,54.6,54.3,54.5,54.8,55.1,54.8,55.0,55.3,55.0,54.7,54.3,54.0,53.7,53.7,53.4,53.1,52.8,52.5,52.2,52.5,52.2,51.9,51.6,51.9,51.6,51.3,51.1,50.8];
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels.map((_, i) => i + 1),
+    datasets: [
+      {
+        label: '總成功率',
+        data: totalSuccessRates,
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,0.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      },
+      {
+        label: '完全成功率',
+        data: exactSuccessRates,
+        borderColor: '#388e3c',
+        backgroundColor: 'rgba(56,142,60,0.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          title: function(items) {
+            const idx = items[0].dataIndex;
+            return '#' + (idx + 1) + ' ' + labels[idx];
+          },
+          label: function(ctx) {
+            return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%';
+          }
+        }
+      },
+      legend: { position: 'top' }
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        title: { display: true, text: '成功率 (%)' },
+        ticks: { callback: v => v + '%' }
+      },
+      x: {
+        title: { display: true, text: '完成順序' },
+        ticks: {
+          maxTicksLimit: 20,
+          callback: function(val) { return val; }
+        }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
