@@ -1,0 +1,15 @@
+{
+  "name": "codebase-index-scripts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build-backlinks": "bun run build-backlinks.ts",
+    "generate-call-chain": "bun run generate-call-chain.ts",
+    "check-broken-links": "bun run check-broken-links.ts",
+    "check-orphan-notes": "bun run check-orphan-notes.ts",
+    "generate-indexes": "bun run generate-indexes.ts"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}
