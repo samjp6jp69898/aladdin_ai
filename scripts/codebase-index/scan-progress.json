@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T10:45:13.291Z",
+  "last_updated": "2026-04-22T11:12:41.294Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -335,7 +335,7 @@
             "completed_at": "2026-04-22T10:45:13.291Z"
           },
           "part_b2": {
-            "status": "pending",
+            "status": "completed",
             "description": "export_back_office / game / room / 其他類導出 + 共用程式碼",
             "packages": [
               {
@@ -364,9 +364,13 @@
                   "agrabah/src/servers/export_back_office/export_types/index.ts"
                 ],
                 "rajah_file": "rajah/services/export_back_office.rajah",
-                "loc_estimate": 4944
+                "loc_estimate": 4944,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-22T10:55:35.331Z",
+            "completed_at": "2026-04-22T11:12:41.293Z"
           },
           "part_c": {
             "status": "pending",
@@ -813,15 +817,20 @@
       "id": "B2-B1",
       "scope": "export_back_office / agent / user / fund 類",
       "completed_at": "2026-04-22"
+    },
+    {
+      "id": "B2-B2",
+      "scope": "export_back_office / 非 agent/user/fund 類（game/room/msg/misc）+ 共用 registry",
+      "completed_at": "2026-04-22"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T10:44:46.193Z",
-    "build-overview-aggregates.ts": "2026-04-22T10:44:46.211Z",
-    "generate-call-chain.ts": "2026-04-22T10:44:46.228Z",
-    "generate-indexes.ts": "2026-04-22T10:44:46.258Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-22T10:44:46.243Z",
-    "check-orphan-notes.ts": "2026-04-22T10:44:46.274Z"
+    "build-backlinks.ts": "2026-04-22T11:12:22.636Z",
+    "build-overview-aggregates.ts": "2026-04-22T11:12:22.651Z",
+    "generate-call-chain.ts": "2026-04-22T11:12:22.666Z",
+    "generate-indexes.ts": "2026-04-22T11:12:22.696Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-22T11:12:22.681Z",
+    "check-orphan-notes.ts": "2026-04-22T11:12:22.710Z"
   }
 }
