@@ -4,6 +4,8 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 const ROOT = '/Users/user/aladdin/obsidian/Codebase';
 
+const AUTO_MARKER = '<!-- AUTO-GENERATED BACKLINKS -->';
+
 function updateSection(raw: string, sectionHeader: string, newContent: string): string | null {
     const lines = raw.split('\n');
     const start = lines.findIndex(l => l.trim() === sectionHeader);
@@ -12,21 +14,13 @@ function updateSection(raw: string, sectionHeader: string, newContent: string): 
     const end = lines.findIndex((l, i) => i > start && /^#{1,4}\s/.test(l));
     const realEnd = end === -1 ? lines.length : end;
 
-    // Keep the header + any <!-- ... --> comment lines immediately after
-    let keepUntil = start + 1;
-    while (keepUntil < realEnd) {
-        const l = lines[keepUntil];
-        if (/^<!--[\s\S]*?-->$/.test(l) || l.trim() === '') {
-            keepUntil++;
-        } else {
-            break;
-        }
-    }
-    // Preserve the HTML comment line but replace everything after
-    const preservedHeader = lines.slice(start, keepUntil).join('\n');
-    const before = lines.slice(0, start).join('\n');
+    // Replace the entire section body. Any obsolete placeholder comments
+    // (e.g., "<!-- Phase 3 will fill this -->") are intentionally dropped so
+    // readers aren't misled into thinking backlinks haven't been populated yet.
+    const before = lines.slice(0, start + 1).join('\n');
     const after = lines.slice(realEnd).join('\n');
-    return [before, preservedHeader, newContent, after].filter(s => s !== '').join('\n');
+    const body = [AUTO_MARKER, newContent].join('\n');
+    return [before, body, after].filter(s => s !== '').join('\n');
 }
 
 async function main() {
