@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T02:29:59.921Z",
+  "last_updated": "2026-04-22T07:17:35.457Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -144,61 +144,61 @@
             "completed_at": "2026-04-22T02:29:59.921Z"
           },
           "part_b": {
-            "status": "pending",
+            "status": "completed",
             "description": "payment_back_office 2 子包 + app_user_back_office 2 子包 + vip + risk 相關 server + payment_manager",
             "packages": [
               {
                 "id": "M2-S5a",
                 "scope": "payment_back_office / Deposit",
                 "loc": 3720,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S5b",
                 "scope": "payment_back_office / Withdraw",
                 "loc": 4456,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S6a",
                 "scope": "app_user_back_office / Core User Service",
                 "loc": 5462,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S6b",
                 "scope": "app_user_back_office / Data & Utilities",
                 "loc": 1521,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S6-vip",
                 "scope": "vip + vip_back_office + user_level_back_office",
                 "loc": 4594,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S6-risk",
                 "scope": "risk + agent_app + agent",
                 "loc": 5064,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-M1",
                 "scope": "payment_manager (9.5K LOC 超大單檔)",
                 "loc": 9484,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
             ],
-            "started_at": null,
-            "completed_at": null
+            "started_at": "2026-04-22T02:41:44.936Z",
+            "completed_at": "2026-04-22T07:17:35.376Z"
           },
           "part_c": {
             "status": "pending",
@@ -343,15 +343,50 @@
       "id": "M2-M4",
       "scope": "Manager: agent_general + activity + payment_vendor",
       "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S5a",
+      "scope": "payment_back_office / Deposit",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S5b",
+      "scope": "payment_back_office / Withdraw",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S6a",
+      "scope": "app_user_back_office / Core User Service",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S6b",
+      "scope": "app_user_back_office / Data & Utilities",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S6-vip",
+      "scope": "vip + vip_back_office + user_level_back_office",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S6-risk",
+      "scope": "risk + agent_app + agent",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-M1",
+      "scope": "payment_manager (9.5K LOC 超大單檔)",
+      "completed_at": "2026-04-22"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T02:29:36.646Z",
-    "build-overview-aggregates.ts": "2026-04-22T02:29:36.661Z",
-    "generate-call-chain.ts": "2026-04-22T02:29:36.675Z",
-    "generate-indexes.ts": "2026-04-22T02:29:36.702Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-22T02:29:36.689Z",
-    "check-orphan-notes.ts": "2026-04-22T02:29:36.716Z"
+    "build-backlinks.ts": "2026-04-22T07:17:35.389Z",
+    "build-overview-aggregates.ts": "2026-04-22T07:17:35.403Z",
+    "generate-call-chain.ts": "2026-04-22T07:17:35.416Z",
+    "generate-indexes.ts": "2026-04-22T07:17:35.444Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-22T07:17:35.430Z",
+    "check-orphan-notes.ts": "2026-04-22T07:17:35.457Z"
   }
 }
