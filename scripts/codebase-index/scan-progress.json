@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-04-22T00:00:00Z",
+  "milestone_1": {
+    "status": "completed",
+    "completed_at": "2026-04-21",
+    "servers": ["wallet", "app", "core", "payment"],
+    "managers": ["wallet_manager", "currency_manager", "bonus_manager"],
+    "rajah_files": [
+      "common.rajah",
+      "service_common.rajah",
+      "wallet.rajah",
+      "app.rajah",
+      "core.rajah",
+      "payment.rajah",
+      "wallet_back_office.rajah",
+      "app_back_office.rajah"
+    ],
+    "db_schemas": ["wallet"],
+    "notes_produced": 304,
+    "commits": ["38bff46", "501ba99", "23009b8", "4719ca8", "0e6b8c4", "057c1ec", "a0f8b8a", "ed86076"]
+  },
+  "milestone_2": {
+    "status": "in_progress",
+    "started_at": "2026-04-22",
+    "total_work_packages": 49,
+    "total_loc_estimate": 218621,
+    "batches": {
+      "batch_1": {
+        "status": "in_progress",
+        "theme": "RPC 熱點 — 直接呼叫 M1 4 server 最多的 M2 server + 核心 manager",
+        "parts": {
+          "part_a": {
+            "status": "pending",
+            "description": "agent_back_office 3 子包 + activity 2 子包 + 相關 manager 1 個",
+            "packages": [
+              {
+                "id": "M2-S1a",
+                "scope": "agent_back_office / Commission & Promotions",
+                "files": [
+                  "agrabah/src/servers/agent_back_office/services/agent_commission_manage_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_promotions_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_general_platform.ts"
+                ],
+                "rajah_file": "rajah/services/agent_back_office.rajah",
+                "loc": 3888,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S1b",
+                "scope": "agent_back_office / Platform Core + Logic",
+                "files": [
+                  "agrabah/src/servers/agent_back_office/services/agent_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_applications_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_back_office_internal.ts",
+                  "agrabah/src/servers/agent_back_office/logic/general/basic.ts",
+                  "agrabah/src/servers/agent_back_office/logic/general/referral.ts",
+                  "agrabah/src/servers/agent_back_office/logic/general/recharge.ts",
+                  "agrabah/src/servers/agent_back_office/logic/general/wager.ts",
+                  "agrabah/src/servers/agent_back_office/logic/general/index.ts",
+                  "agrabah/src/servers/agent_back_office/logic/common/settlement_time_helper.ts"
+                ],
+                "rajah_file": "rajah/services/agent_back_office.rajah",
+                "loc": 3233,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S1c",
+                "scope": "agent_back_office / Management & Utilities",
+                "files": [
+                  "agrabah/src/servers/agent_back_office/services/agent_list_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_hierarchies_manage_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_payment_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_deposit_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_withdraw_platform.ts",
+                  "agrabah/src/servers/agent_back_office/services/agent_summary_platform.ts"
+                ],
+                "rajah_file": "rajah/services/agent_back_office.rajah",
+                "loc": 1463,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S4a",
+                "scope": "activity / Core + Conditions",
+                "files": [
+                  "agrabah/src/servers/activity/services/activity.ts",
+                  "agrabah/src/servers/activity/services/activity_internal.ts",
+                  "agrabah/src/servers/activity/services/conditions/"
+                ],
+                "rajah_file": "rajah/services/activity.rajah",
+                "loc": 4041,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S4b",
+                "scope": "activity / Quests & Rewards",
+                "files": [
+                  "agrabah/src/servers/activity/services/quests/",
+                  "agrabah/src/servers/activity/services/rewards/"
+                ],
+                "rajah_file": "rajah/services/activity.rajah",
+                "loc": 4232,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-M4",
+                "scope": "Manager: agent_general + activity + payment_vendor",
+                "files": [
+                  "agrabah/src/managers/agent_general_manager.ts",
+                  "agrabah/src/managers/activity_manager.ts",
+                  "agrabah/src/managers/payment_vendor_manager.ts"
+                ],
+                "loc": 8598,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              }
+            ],
+            "started_at": null,
+            "completed_at": null
+          },
+          "part_b": {
+            "status": "pending",
+            "description": "payment_back_office 2 子包 + app_user_back_office 2 子包 + vip + risk 相關 server + payment_manager",
+            "packages": [
+              {
+                "id": "M2-S5a",
+                "scope": "payment_back_office / Deposit",
+                "loc": 3720,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S5b",
+                "scope": "payment_back_office / Withdraw",
+                "loc": 4456,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S6a",
+                "scope": "app_user_back_office / Core User Service",
+                "loc": 5462,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S6b",
+                "scope": "app_user_back_office / Data & Utilities",
+                "loc": 1521,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S6-vip",
+                "scope": "vip + vip_back_office + user_level_back_office",
+                "loc": 4594,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S6-risk",
+                "scope": "risk + agent_app + agent",
+                "loc": 5064,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-M1",
+                "scope": "payment_manager (9.5K LOC 超大單檔)",
+                "loc": 9484,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              }
+            ],
+            "started_at": null,
+            "completed_at": null
+          },
+          "part_c": {
+            "status": "pending",
+            "description": "game 2 子包 + in_house_game 體系 + 熱點 3 包 + 核心 manager 群",
+            "packages": [
+              {
+                "id": "M2-S3a",
+                "scope": "game / Core Services",
+                "loc": 1105,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S3b",
+                "scope": "game / Vendor Adapters (7.1K — Phase 2 分多 session)",
+                "loc": 7138,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S10",
+                "scope": "in_house_game_api + game_consumer + in_house_game_master + in_house_game_back_office",
+                "loc": 4613,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-S-heat",
+                "scope": "customer_service + inventory_back_office + wagering_back_office (8.5K — 需再拆)",
+                "loc": 8570,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-M3",
+                "scope": "Manager: message_board + agent_report",
+                "loc": 7974,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-M-risk",
+                "scope": "Manager: discount + risk + wagering",
+                "loc": 3055,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              },
+              {
+                "id": "M2-M-core",
+                "scope": "Manager: user_vip_level + inventory + sport + agent_user",
+                "loc": 5404,
+                "phase_1_status": "pending",
+                "phase_2_status": "pending"
+              }
+            ],
+            "started_at": null,
+            "completed_at": null
+          }
+        }
+      },
+      "batch_2": {
+        "status": "pending",
+        "theme": "中熱點 & 一般後台",
+        "parts": {},
+        "note": "Batch 1 全部完成後再細分 part"
+      },
+      "batch_3": {
+        "status": "pending",
+        "theme": "低熱點 + 超小 server + 雜項",
+        "parts": {},
+        "note": "Batch 2 全部完成後再細分 part"
+      }
+    }
+  },
+  "completed_packages": [
+    { "id": "M1-wallet", "scope": "Milestone 1 — wallet server", "completed_at": "2026-04-21" },
+    { "id": "M1-app", "scope": "Milestone 1 — app server", "completed_at": "2026-04-21" },
+    { "id": "M1-core", "scope": "Milestone 1 — core server", "completed_at": "2026-04-21" },
+    { "id": "M1-payment", "scope": "Milestone 1 — payment server", "completed_at": "2026-04-21" },
+    { "id": "M1-WalletManager", "scope": "Milestone 1 — WalletManager", "completed_at": "2026-04-21" },
+    { "id": "M1-CurrencyManager", "scope": "Milestone 1 — CurrencyManager", "completed_at": "2026-04-21" },
+    { "id": "M1-BonusManager", "scope": "Milestone 1 — BonusManager", "completed_at": "2026-04-21" },
+    { "id": "M1-common-rajah", "scope": "Milestone 1 — common.rajah + service_common.rajah", "completed_at": "2026-04-21" }
+  ],
+  "packages_in_progress": [],
+  "scripts_last_run": {
+    "build-backlinks.ts": "2026-04-22T09:00:00Z",
+    "build-overview-aggregates.ts": "2026-04-22T09:00:00Z",
+    "generate-call-chain.ts": "2026-04-21T13:50:00Z",
+    "generate-indexes.ts": "2026-04-21T13:52:00Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-21T13:50:00Z",
+    "check-orphan-notes.ts": "2026-04-21T13:52:00Z"
+  }
+}
