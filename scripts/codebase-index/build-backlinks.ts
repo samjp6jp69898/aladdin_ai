@@ -132,7 +132,7 @@ async function main() {
         `Generated: ${new Date().toISOString()}`,
         `Total broken: ${brokenLinks.length}`,
         '',
-        '> 斷裂連結 = 來源筆記引用了尚未建立的目標筆記。Milestone 1 僅建立 wallet/app/core/payment 4 個 server + common/service_common + WalletManager/CurrencyManager + Wallet DB。其他 server / manager 的連結會斷裂，屬預期行為，全面展開後會補齊。',
+        '> 斷裂連結 = 來源筆記引用了尚未建立的目標筆記。目前僅建立 Milestone 1 完整範疇 + Milestone 2 部分範疇(見 scan-progress.json 查閱)。其他 server / manager 的連結會斷裂,屬預期行為,全面展開後會補齊。',
         '',
         '| Source FQN | Target FQN | Kind |',
         '|------------|------------|------|',

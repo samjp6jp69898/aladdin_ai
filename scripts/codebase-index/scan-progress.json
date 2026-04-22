@@ -1,11 +1,20 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T00:00:00Z",
+  "last_updated": "2026-04-22T02:29:59.921Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
-    "servers": ["wallet", "app", "core", "payment"],
-    "managers": ["wallet_manager", "currency_manager", "bonus_manager"],
+    "servers": [
+      "wallet",
+      "app",
+      "core",
+      "payment"
+    ],
+    "managers": [
+      "wallet_manager",
+      "currency_manager",
+      "bonus_manager"
+    ],
     "rajah_files": [
       "common.rajah",
       "service_common.rajah",
@@ -16,9 +25,20 @@
       "wallet_back_office.rajah",
       "app_back_office.rajah"
     ],
-    "db_schemas": ["wallet"],
+    "db_schemas": [
+      "wallet"
+    ],
     "notes_produced": 304,
-    "commits": ["38bff46", "501ba99", "23009b8", "4719ca8", "0e6b8c4", "057c1ec", "a0f8b8a", "ed86076"]
+    "commits": [
+      "38bff46",
+      "501ba99",
+      "23009b8",
+      "4719ca8",
+      "0e6b8c4",
+      "057c1ec",
+      "a0f8b8a",
+      "ed86076"
+    ]
   },
   "milestone_2": {
     "status": "in_progress",
@@ -31,7 +51,7 @@
         "theme": "RPC 熱點 — 直接呼叫 M1 4 server 最多的 M2 server + 核心 manager",
         "parts": {
           "part_a": {
-            "status": "pending",
+            "status": "completed",
             "description": "agent_back_office 3 子包 + activity 2 子包 + 相關 manager 1 個",
             "packages": [
               {
@@ -44,8 +64,8 @@
                 ],
                 "rajah_file": "rajah/services/agent_back_office.rajah",
                 "loc": 3888,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S1b",
@@ -63,8 +83,8 @@
                 ],
                 "rajah_file": "rajah/services/agent_back_office.rajah",
                 "loc": 3233,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S1c",
@@ -79,8 +99,8 @@
                 ],
                 "rajah_file": "rajah/services/agent_back_office.rajah",
                 "loc": 1463,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S4a",
@@ -92,8 +112,8 @@
                 ],
                 "rajah_file": "rajah/services/activity.rajah",
                 "loc": 4041,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S4b",
@@ -104,8 +124,8 @@
                 ],
                 "rajah_file": "rajah/services/activity.rajah",
                 "loc": 4232,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-M4",
@@ -116,12 +136,12 @@
                   "agrabah/src/managers/payment_vendor_manager.ts"
                 ],
                 "loc": 8598,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
             ],
-            "started_at": null,
-            "completed_at": null
+            "started_at": "2026-04-22T02:08:35.947Z",
+            "completed_at": "2026-04-22T02:29:59.921Z"
           },
           "part_b": {
             "status": "pending",
@@ -254,22 +274,84 @@
     }
   },
   "completed_packages": [
-    { "id": "M1-wallet", "scope": "Milestone 1 — wallet server", "completed_at": "2026-04-21" },
-    { "id": "M1-app", "scope": "Milestone 1 — app server", "completed_at": "2026-04-21" },
-    { "id": "M1-core", "scope": "Milestone 1 — core server", "completed_at": "2026-04-21" },
-    { "id": "M1-payment", "scope": "Milestone 1 — payment server", "completed_at": "2026-04-21" },
-    { "id": "M1-WalletManager", "scope": "Milestone 1 — WalletManager", "completed_at": "2026-04-21" },
-    { "id": "M1-CurrencyManager", "scope": "Milestone 1 — CurrencyManager", "completed_at": "2026-04-21" },
-    { "id": "M1-BonusManager", "scope": "Milestone 1 — BonusManager", "completed_at": "2026-04-21" },
-    { "id": "M1-common-rajah", "scope": "Milestone 1 — common.rajah + service_common.rajah", "completed_at": "2026-04-21" }
+    {
+      "id": "M1-wallet",
+      "scope": "Milestone 1 — wallet server",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-app",
+      "scope": "Milestone 1 — app server",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-core",
+      "scope": "Milestone 1 — core server",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-payment",
+      "scope": "Milestone 1 — payment server",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-WalletManager",
+      "scope": "Milestone 1 — WalletManager",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-CurrencyManager",
+      "scope": "Milestone 1 — CurrencyManager",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-BonusManager",
+      "scope": "Milestone 1 — BonusManager",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M1-common-rajah",
+      "scope": "Milestone 1 — common.rajah + service_common.rajah",
+      "completed_at": "2026-04-21"
+    },
+    {
+      "id": "M2-S1a",
+      "scope": "agent_back_office / Commission & Promotions",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S1b",
+      "scope": "agent_back_office / Platform Core + Logic",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S1c",
+      "scope": "agent_back_office / Management & Utilities",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S4a",
+      "scope": "activity / Core + Conditions",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S4b",
+      "scope": "activity / Quests & Rewards",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-M4",
+      "scope": "Manager: agent_general + activity + payment_vendor",
+      "completed_at": "2026-04-22"
+    }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T09:00:00Z",
-    "build-overview-aggregates.ts": "2026-04-22T09:00:00Z",
-    "generate-call-chain.ts": "2026-04-21T13:50:00Z",
-    "generate-indexes.ts": "2026-04-21T13:52:00Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-21T13:50:00Z",
-    "check-orphan-notes.ts": "2026-04-21T13:52:00Z"
+    "build-backlinks.ts": "2026-04-22T02:29:36.646Z",
+    "build-overview-aggregates.ts": "2026-04-22T02:29:36.661Z",
+    "generate-call-chain.ts": "2026-04-22T02:29:36.675Z",
+    "generate-indexes.ts": "2026-04-22T02:29:36.702Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-22T02:29:36.689Z",
+    "check-orphan-notes.ts": "2026-04-22T02:29:36.716Z"
   }
 }
