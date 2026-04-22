@@ -34,6 +34,22 @@ async function main() {
     }
     console.log(`Loaded ${notes.size} notes`);
 
+    // Alias index: `alias → canonical fqn`.
+    // Captures handwritten legacy link forms (e.g. PascalCase server or `Service`
+    // suffix still present) and lets build-backlinks resolve them instead of
+    // dumping them into broken-links-report.md.
+    const aliasIndex = new Map<string, string>();
+    for (const note of notes.values()) {
+        const aliases = (note.frontmatter as Record<string, unknown>).aliases;
+        if (Array.isArray(aliases)) {
+            for (const a of aliases) {
+                if (typeof a === 'string' && !aliasIndex.has(a)) {
+                    aliasIndex.set(a, note.fqn);
+                }
+            }
+        }
+    }
+
     const calledBy = new Map<string, Set<string>>();
     const usedBy = new Map<string, Set<string>>();
     const accessedBy = new Map<string, Set<string>>();
@@ -45,21 +61,29 @@ async function main() {
 
     const brokenLinks: Array<{ from: string; to: string; kind: string }> = [];
 
+    const resolve = (target: string): string | undefined => {
+        if (notes.has(target)) return target;
+        const viaAlias = aliasIndex.get(target);
+        if (viaAlias && notes.has(viaAlias)) return viaAlias;
+        return undefined;
+    };
+
     for (const note of notes.values()) {
         const recordCall = (target: string, kind: string) => {
-            if (!notes.has(target)) {
+            const resolved = resolve(target);
+            if (!resolved) {
                 brokenLinks.push({ from: note.fqn, to: target, kind });
                 return;
             }
-            const targetType = notes.get(target)!.type;
+            const targetType = notes.get(resolved)!.type;
             if (targetType === 'rpc-method' || targetType === 'manager-method') {
-                add(calledBy, target, note.fqn);
+                add(calledBy, resolved, note.fqn);
             } else if (targetType === 'model' || targetType === 'enum') {
-                add(usedBy, target, note.fqn);
+                add(usedBy, resolved, note.fqn);
             } else if (targetType === 'db-orm') {
-                add(usedBy, target, note.fqn);
+                add(usedBy, resolved, note.fqn);
             } else if (targetType === 'db-schema') {
-                add(accessedBy, target, note.fqn);
+                add(accessedBy, resolved, note.fqn);
             }
         };
 
@@ -69,14 +93,15 @@ async function main() {
         for (const c of note.calls.dbOperations) recordCall(c, 'db-orm');
 
         for (const link of note.otherOutgoingLinks) {
-            if (!notes.has(link)) continue;
-            const linkType = notes.get(link)!.type;
+            const resolved = resolve(link);
+            if (!resolved) continue;
+            const linkType = notes.get(resolved)!.type;
             if (linkType === 'model' || linkType === 'enum') {
-                add(usedBy, link, note.fqn);
+                add(usedBy, resolved, note.fqn);
             } else if (linkType === 'db-orm') {
-                add(usedBy, link, note.fqn);
+                add(usedBy, resolved, note.fqn);
             } else if (linkType === 'db-schema') {
-                add(accessedBy, link, note.fqn);
+                add(accessedBy, resolved, note.fqn);
             }
         }
     }
