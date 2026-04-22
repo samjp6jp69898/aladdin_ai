@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T07:17:35.457Z",
+  "last_updated": "2026-04-22T08:50:22.916Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -201,61 +201,61 @@
             "completed_at": "2026-04-22T07:17:35.376Z"
           },
           "part_c": {
-            "status": "pending",
+            "status": "completed",
             "description": "game 2 子包 + in_house_game 體系 + 熱點 3 包 + 核心 manager 群",
             "packages": [
               {
                 "id": "M2-S3a",
                 "scope": "game / Core Services",
                 "loc": 1105,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S3b",
                 "scope": "game / Vendor Adapters (7.1K — Phase 2 分多 session)",
                 "loc": 7138,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S10",
                 "scope": "in_house_game_api + game_consumer + in_house_game_master + in_house_game_back_office",
                 "loc": 4613,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-S-heat",
                 "scope": "customer_service + inventory_back_office + wagering_back_office (8.5K — 需再拆)",
                 "loc": 8570,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-M3",
                 "scope": "Manager: message_board + agent_report",
                 "loc": 7974,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-M-risk",
                 "scope": "Manager: discount + risk + wagering",
                 "loc": 3055,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "M2-M-core",
                 "scope": "Manager: user_vip_level + inventory + sport + agent_user",
                 "loc": 5404,
-                "phase_1_status": "pending",
-                "phase_2_status": "pending"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
             ],
-            "started_at": null,
-            "completed_at": null
+            "started_at": "2026-04-22T07:34:32.308Z",
+            "completed_at": "2026-04-22T08:50:22.814Z"
           }
         }
       },
@@ -378,15 +378,50 @@
       "id": "M2-M1",
       "scope": "payment_manager (9.5K LOC 超大單檔)",
       "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S3a",
+      "scope": "game / Core Services",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S3b",
+      "scope": "game / Vendor Adapters (7.1K — Phase 2 分多 session)",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S10",
+      "scope": "in_house_game_api + game_consumer + in_house_game_master + in_house_game_back_office",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-S-heat",
+      "scope": "customer_service + inventory_back_office + wagering_back_office (8.5K — 需再拆)",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-M3",
+      "scope": "Manager: message_board + agent_report",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-M-risk",
+      "scope": "Manager: discount + risk + wagering",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "M2-M-core",
+      "scope": "Manager: user_vip_level + inventory + sport + agent_user",
+      "completed_at": "2026-04-22"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T07:17:35.389Z",
-    "build-overview-aggregates.ts": "2026-04-22T07:17:35.403Z",
-    "generate-call-chain.ts": "2026-04-22T07:17:35.416Z",
-    "generate-indexes.ts": "2026-04-22T07:17:35.444Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-22T07:17:35.430Z",
-    "check-orphan-notes.ts": "2026-04-22T07:17:35.457Z"
+    "build-backlinks.ts": "2026-04-22T08:50:22.833Z",
+    "build-overview-aggregates.ts": "2026-04-22T08:50:22.853Z",
+    "generate-call-chain.ts": "2026-04-22T08:50:22.869Z",
+    "generate-indexes.ts": "2026-04-22T08:50:22.903Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-22T08:50:22.885Z",
+    "check-orphan-notes.ts": "2026-04-22T08:50:22.916Z"
   }
 }
