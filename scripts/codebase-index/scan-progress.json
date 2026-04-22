@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T08:50:22.916Z",
+  "last_updated": "2026-04-22T10:05:45.977Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -265,22 +265,30 @@
         "strategy": "A+微量C：每 part 3-4 包、LOC ≤ 12K、同時派 3-4 個 background agent（留 quota buffer）；每 part 獨立跑 Phase 3/4 + commit",
         "parts": {
           "part_a": {
-            "status": "pending",
+            "status": "completed",
             "description": "app_user + statistic + app_user_manager",
             "packages": [
               {
                 "id": "B2-A1",
                 "scope": "app_user server (所有 services)",
-                "files": ["agrabah/src/servers/app_user/"],
+                "files": [
+                  "agrabah/src/servers/app_user/"
+                ],
                 "rajah_file": "rajah/services/app_user.rajah",
-                "loc_estimate": 3574
+                "loc_estimate": 3574,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-A2",
                 "scope": "statistic server (所有 services)",
-                "files": ["agrabah/src/servers/statistic/"],
+                "files": [
+                  "agrabah/src/servers/statistic/"
+                ],
                 "rajah_file": "rajah/services/statistic.rajah",
-                "loc_estimate": 4292
+                "loc_estimate": 4292,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-A3",
@@ -290,9 +298,13 @@
                   "agrabah/src/managers/login_guard_manager.ts",
                   "agrabah/src/managers/platform_user_manager.ts"
                 ],
-                "loc_estimate": 1500
+                "loc_estimate": 1500,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-22T09:44:02.174Z",
+            "completed_at": "2026-04-22T10:05:45.887Z"
           },
           "part_b1": {
             "status": "pending",
@@ -359,14 +371,18 @@
               {
                 "id": "B2-C1",
                 "scope": "sport server (所有 services)",
-                "files": ["agrabah/src/servers/sport/"],
+                "files": [
+                  "agrabah/src/servers/sport/"
+                ],
                 "rajah_file": "rajah/services/sport.rajah",
                 "loc_estimate": 5548
               },
               {
                 "id": "B2-C2",
                 "scope": "sport_back_office server (所有 services)",
-                "files": ["agrabah/src/servers/sport_back_office/"],
+                "files": [
+                  "agrabah/src/servers/sport_back_office/"
+                ],
                 "rajah_file": "rajah/services/sport_back_office.rajah",
                 "loc_estimate": 1864
               }
@@ -379,14 +395,18 @@
               {
                 "id": "B2-D1",
                 "scope": "game_back_office server",
-                "files": ["agrabah/src/servers/game_back_office/"],
+                "files": [
+                  "agrabah/src/servers/game_back_office/"
+                ],
                 "rajah_file": "rajah/services/game_back_office.rajah",
                 "loc_estimate": 4834
               },
               {
                 "id": "B2-D2",
                 "scope": "customer_back_office server",
-                "files": ["agrabah/src/servers/customer_back_office/"],
+                "files": [
+                  "agrabah/src/servers/customer_back_office/"
+                ],
                 "rajah_file": "rajah/services/customer_back_office.rajah",
                 "loc_estimate": 3144
               },
@@ -408,14 +428,18 @@
               {
                 "id": "B2-E1",
                 "scope": "message_board server",
-                "files": ["agrabah/src/servers/message_board/"],
+                "files": [
+                  "agrabah/src/servers/message_board/"
+                ],
                 "rajah_file": "rajah/services/message_board.rajah",
                 "loc_estimate": 1932
               },
               {
                 "id": "B2-E2",
                 "scope": "message_board_back_office server",
-                "files": ["agrabah/src/servers/message_board_back_office/"],
+                "files": [
+                  "agrabah/src/servers/message_board_back_office/"
+                ],
                 "rajah_file": "rajah/services/message_board_back_office.rajah",
                 "loc_estimate": 3677
               },
@@ -449,14 +473,18 @@
               {
                 "id": "B2-F2",
                 "scope": "room server",
-                "files": ["agrabah/src/servers/room/"],
+                "files": [
+                  "agrabah/src/servers/room/"
+                ],
                 "rajah_file": "rajah/services/room.rajah",
                 "loc_estimate": 927
               },
               {
                 "id": "B2-F3",
                 "scope": "room_back_office server",
-                "files": ["agrabah/src/servers/room_back_office/"],
+                "files": [
+                  "agrabah/src/servers/room_back_office/"
+                ],
                 "rajah_file": "rajah/services/room_back_office.rajah",
                 "loc_estimate": 2945
               }
@@ -474,58 +502,146 @@
             "status": "pending",
             "description": "activity_back_office + world_cup_manager + 周邊",
             "packages": [
-              { "id": "B3-A1", "scope": "activity_back_office server", "loc_estimate": 1902 },
-              { "id": "B3-A2", "scope": "world_cup_manager + activity_cache_manager", "loc_estimate": 2185 },
-              { "id": "B3-A3", "scope": "vip_setting_manager + user_manager", "loc_estimate": 1262 }
+              {
+                "id": "B3-A1",
+                "scope": "activity_back_office server",
+                "loc_estimate": 1902
+              },
+              {
+                "id": "B3-A2",
+                "scope": "world_cup_manager + activity_cache_manager",
+                "loc_estimate": 2185
+              },
+              {
+                "id": "B3-A3",
+                "scope": "vip_setting_manager + user_manager",
+                "loc_estimate": 1262
+              }
             ]
           },
           "part_b": {
             "status": "pending",
             "description": "otp / rebate 雙生態",
             "packages": [
-              { "id": "B3-B1", "scope": "otp_code + otp_code_back_office", "loc_estimate": 3112 },
-              { "id": "B3-B2", "scope": "rebate + rebate_back_office", "loc_estimate": 2850 },
-              { "id": "B3-B3", "scope": "otp_sms_setting_manager + 小型 link / util manager（amount_link / ip_link / currency_link / duration_link）", "loc_estimate": 1300 }
+              {
+                "id": "B3-B1",
+                "scope": "otp_code + otp_code_back_office",
+                "loc_estimate": 3112
+              },
+              {
+                "id": "B3-B2",
+                "scope": "rebate + rebate_back_office",
+                "loc_estimate": 2850
+              },
+              {
+                "id": "B3-B3",
+                "scope": "otp_sms_setting_manager + 小型 link / util manager（amount_link / ip_link / currency_link / duration_link）",
+                "loc_estimate": 1300
+              }
             ]
           },
           "part_c": {
             "status": "pending",
             "description": "information + advertisement + push_notification",
             "packages": [
-              { "id": "B3-C1", "scope": "information + information_back_office", "loc_estimate": 2231 },
-              { "id": "B3-C2", "scope": "advertisement + advertisement_back_office", "loc_estimate": 1382 },
-              { "id": "B3-C3", "scope": "push_notification + push_notification_manager", "loc_estimate": 1500 },
-              { "id": "B3-C4", "scope": "information_manager + marquee_manager", "loc_estimate": 700 }
+              {
+                "id": "B3-C1",
+                "scope": "information + information_back_office",
+                "loc_estimate": 2231
+              },
+              {
+                "id": "B3-C2",
+                "scope": "advertisement + advertisement_back_office",
+                "loc_estimate": 1382
+              },
+              {
+                "id": "B3-C3",
+                "scope": "push_notification + push_notification_manager",
+                "loc_estimate": 1500
+              },
+              {
+                "id": "B3-C4",
+                "scope": "information_manager + marquee_manager",
+                "loc_estimate": 700
+              }
             ]
           },
           "part_d": {
             "status": "pending",
             "description": "gate + platform + external_stream + core_back_office",
             "packages": [
-              { "id": "B3-D1", "scope": "gate server", "loc_estimate": 1607 },
-              { "id": "B3-D2", "scope": "platform server + platform_manager", "loc_estimate": 1900 },
-              { "id": "B3-D3", "scope": "external_stream + external_stream_back_office", "loc_estimate": 1375 },
-              { "id": "B3-D4", "scope": "core_back_office server", "loc_estimate": 960 }
+              {
+                "id": "B3-D1",
+                "scope": "gate server",
+                "loc_estimate": 1607
+              },
+              {
+                "id": "B3-D2",
+                "scope": "platform server + platform_manager",
+                "loc_estimate": 1900
+              },
+              {
+                "id": "B3-D3",
+                "scope": "external_stream + external_stream_back_office",
+                "loc_estimate": 1375
+              },
+              {
+                "id": "B3-D4",
+                "scope": "core_back_office server",
+                "loc_estimate": 960
+              }
             ]
           },
           "part_e": {
             "status": "pending",
             "description": "roulette + point + ranking 系列",
             "packages": [
-              { "id": "B3-E1", "scope": "roulette + roulette_back_office", "loc_estimate": 1694 },
-              { "id": "B3-E2", "scope": "point + point_back_office + point_consumer + point_manager", "loc_estimate": 1767 },
-              { "id": "B3-E3", "scope": "ranking + ranking_back_office + ranking_consumer", "loc_estimate": 774 },
-              { "id": "B3-E4", "scope": "audit_back_office server", "loc_estimate": 2617 }
+              {
+                "id": "B3-E1",
+                "scope": "roulette + roulette_back_office",
+                "loc_estimate": 1694
+              },
+              {
+                "id": "B3-E2",
+                "scope": "point + point_back_office + point_consumer + point_manager",
+                "loc_estimate": 1767
+              },
+              {
+                "id": "B3-E3",
+                "scope": "ranking + ranking_back_office + ranking_consumer",
+                "loc_estimate": 774
+              },
+              {
+                "id": "B3-E4",
+                "scope": "audit_back_office server",
+                "loc_estimate": 2617
+              }
             ]
           },
           "part_f": {
             "status": "pending",
             "description": "雜項小 server / 小 manager 清尾",
             "packages": [
-              { "id": "B3-F1", "scope": "in_house_game_consumer + payment_consumer", "loc_estimate": 1743 },
-              { "id": "B3-F2", "scope": "verification_code + gate 相關小 server", "loc_estimate": 1500 },
-              { "id": "B3-F3", "scope": "app_back_office + admin + control_center + fund_adjustment_back_office + wallet_back_office + security_restriction_back_office", "loc_estimate": 3700 },
-              { "id": "B3-F4", "scope": "剩餘所有 <500 LOC 小 server (audit, chat, encryption, event, live, live_back_office, location, model_persistence, app_packager, scheduler, sensitive_word*, batch_operation, file_post_process, external_stream_back_office, inventory, activity servers 剩餘, 以及全部未涵蓋的小 manager)", "loc_estimate": 4000 }
+              {
+                "id": "B3-F1",
+                "scope": "in_house_game_consumer + payment_consumer",
+                "loc_estimate": 1743
+              },
+              {
+                "id": "B3-F2",
+                "scope": "verification_code + gate 相關小 server",
+                "loc_estimate": 1500
+              },
+              {
+                "id": "B3-F3",
+                "scope": "app_back_office + admin + control_center + fund_adjustment_back_office + wallet_back_office + security_restriction_back_office",
+                "loc_estimate": 3700
+              },
+              {
+                "id": "B3-F4",
+                "scope": "剩餘所有 <500 LOC 小 server (audit, chat, encryption, event, live, live_back_office, location, model_persistence, app_packager, scheduler, sensitive_word*, batch_operation, file_post_process, external_stream_back_office, inventory, activity servers 剩餘, 以及全部未涵蓋的小 manager)",
+                "loc_estimate": 4000
+              }
             ]
           }
         },
@@ -673,15 +789,30 @@
       "id": "M2-M-core",
       "scope": "Manager: user_vip_level + inventory + sport + agent_user",
       "completed_at": "2026-04-22"
+    },
+    {
+      "id": "B2-A1",
+      "scope": "app_user server (所有 services)",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "B2-A2",
+      "scope": "statistic server (所有 services)",
+      "completed_at": "2026-04-22"
+    },
+    {
+      "id": "B2-A3",
+      "scope": "app_user_manager + login_guard_manager + platform_user_manager",
+      "completed_at": "2026-04-22"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T08:50:22.833Z",
-    "build-overview-aggregates.ts": "2026-04-22T08:50:22.853Z",
-    "generate-call-chain.ts": "2026-04-22T08:50:22.869Z",
-    "generate-indexes.ts": "2026-04-22T08:50:22.903Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-22T08:50:22.885Z",
-    "check-orphan-notes.ts": "2026-04-22T08:50:22.916Z"
+    "build-backlinks.ts": "2026-04-22T10:05:45.904Z",
+    "build-overview-aggregates.ts": "2026-04-22T10:05:45.921Z",
+    "generate-call-chain.ts": "2026-04-22T10:05:45.936Z",
+    "generate-indexes.ts": "2026-04-22T10:05:45.964Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-22T10:05:45.950Z",
+    "check-orphan-notes.ts": "2026-04-22T10:05:45.977Z"
   }
 }
