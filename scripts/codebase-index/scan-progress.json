@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-23T02:20:16.588Z",
+  "last_updated": "2026-04-23T06:16:53.186Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -444,7 +444,7 @@
             "completed_at": "2026-04-23T02:20:16.500Z"
           },
           "part_e": {
-            "status": "in_progress",
+            "status": "completed",
             "description": "message_board + message_board_back_office + chat 體系",
             "packages": [
               {
@@ -455,7 +455,8 @@
                 ],
                 "rajah_file": "rajah/services/message_board.rajah",
                 "loc_estimate": 1932,
-                "phase_1_status": "completed"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-E2",
@@ -465,7 +466,8 @@
                 ],
                 "rajah_file": "rajah/services/message_board_back_office.rajah",
                 "loc_estimate": 3677,
-                "phase_1_status": "completed"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-E3",
@@ -476,13 +478,15 @@
                   "agrabah/src/managers/chat_manager.ts"
                 ],
                 "loc_estimate": 2596,
-                "phase_1_status": "completed"
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
             ],
-            "started_at": "2026-04-23T01:38:57.496Z"
+            "started_at": "2026-04-23T01:38:57.496Z",
+            "completed_at": "2026-04-23T06:16:53.186Z"
           },
           "part_f": {
-            "status": "pending",
+            "status": "in_progress",
             "description": "room 體系（manager + server + back_office + feature）",
             "packages": [
               {
@@ -514,7 +518,8 @@
                 "rajah_file": "rajah/services/room_back_office.rajah",
                 "loc_estimate": 2945
               }
-            ]
+            ],
+            "started_at": "2026-04-23T06:13:02.558Z"
           }
         },
         "note": "7 個 part，每 part 3-4 包（B1/B2 各 1 包因為 export_back_office 太大），每 part 獨立 session 跑完"
@@ -865,15 +870,30 @@
       "id": "B2-D3",
       "scope": "customer_service_manager + fund_adjustment_manager",
       "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-E1",
+      "scope": "message_board server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-E2",
+      "scope": "message_board_back_office server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-E3",
+      "scope": "chat server + chat_back_office + chat_manager",
+      "completed_at": "2026-04-23"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-23T02:20:16.515Z",
-    "build-overview-aggregates.ts": "2026-04-23T02:20:16.531Z",
-    "generate-call-chain.ts": "2026-04-23T02:20:16.546Z",
-    "generate-indexes.ts": "2026-04-23T02:20:16.574Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-23T02:20:16.561Z",
-    "check-orphan-notes.ts": "2026-04-23T02:20:16.588Z"
+    "build-backlinks.ts": "2026-04-23T06:16:09.258Z",
+    "build-overview-aggregates.ts": "2026-04-23T06:16:09.274Z",
+    "generate-call-chain.ts": "2026-04-23T06:16:09.289Z",
+    "generate-indexes.ts": "2026-04-23T06:16:09.318Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-23T06:16:09.304Z",
+    "check-orphan-notes.ts": "2026-04-23T06:16:09.331Z"
   }
 }
