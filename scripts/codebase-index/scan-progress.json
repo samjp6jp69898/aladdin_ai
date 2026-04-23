@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-23T06:16:53.186Z",
+  "last_updated": "2026-04-23T06:29:43.867Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -486,7 +486,7 @@
             "completed_at": "2026-04-23T06:16:53.186Z"
           },
           "part_f": {
-            "status": "in_progress",
+            "status": "completed",
             "description": "room 體系（manager + server + back_office + feature）",
             "packages": [
               {
@@ -498,7 +498,9 @@
                   "agrabah/src/managers/room_setting_manager.ts",
                   "agrabah/src/managers/room_gift_manager.ts"
                 ],
-                "loc_estimate": 7807
+                "loc_estimate": 7807,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-F2",
@@ -507,7 +509,9 @@
                   "agrabah/src/servers/room/"
                 ],
                 "rajah_file": "rajah/services/room.rajah",
-                "loc_estimate": 927
+                "loc_estimate": 927,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-F3",
@@ -516,10 +520,13 @@
                   "agrabah/src/servers/room_back_office/"
                 ],
                 "rajah_file": "rajah/services/room_back_office.rajah",
-                "loc_estimate": 2945
+                "loc_estimate": 2945,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
             ],
-            "started_at": "2026-04-23T06:13:02.558Z"
+            "started_at": "2026-04-23T06:13:02.558Z",
+            "completed_at": "2026-04-23T06:29:43.780Z"
           }
         },
         "note": "7 個 part，每 part 3-4 包（B1/B2 各 1 包因為 export_back_office 太大），每 part 獨立 session 跑完"
@@ -885,15 +892,30 @@
       "id": "B2-E3",
       "scope": "chat server + chat_back_office + chat_manager",
       "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-F1",
+      "scope": "room_manager + room_feature_manager + room_setting_manager + room_gift_manager",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-F2",
+      "scope": "room server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-F3",
+      "scope": "room_back_office server",
+      "completed_at": "2026-04-23"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-23T06:16:09.258Z",
-    "build-overview-aggregates.ts": "2026-04-23T06:16:09.274Z",
-    "generate-call-chain.ts": "2026-04-23T06:16:09.289Z",
-    "generate-indexes.ts": "2026-04-23T06:16:09.318Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-23T06:16:09.304Z",
-    "check-orphan-notes.ts": "2026-04-23T06:16:09.331Z"
+    "build-backlinks.ts": "2026-04-23T06:29:43.795Z",
+    "build-overview-aggregates.ts": "2026-04-23T06:29:43.809Z",
+    "generate-call-chain.ts": "2026-04-23T06:29:43.824Z",
+    "generate-indexes.ts": "2026-04-23T06:29:43.853Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-23T06:29:43.839Z",
+    "check-orphan-notes.ts": "2026-04-23T06:29:43.867Z"
   }
 }
