@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-23T06:29:43.867Z",
+  "last_updated": "2026-04-23T12:42:30.795Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -537,25 +537,46 @@
         "strategy": "A+微量C：每 part 3-5 包、LOC ≤ 10K",
         "parts": {
           "part_a": {
-            "status": "pending",
+            "status": "completed",
             "description": "activity_back_office + world_cup_manager + 周邊",
             "packages": [
               {
                 "id": "B3-A1",
                 "scope": "activity_back_office server",
-                "loc_estimate": 1902
+                "files": [
+                  "agrabah/src/servers/activity_back_office/services/activity_platform.ts",
+                  "agrabah/src/servers/activity_back_office/index.ts"
+                ],
+                "rajah_file": "rajah/services/activity_back_office.rajah",
+                "loc_estimate": 1802,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-A2",
                 "scope": "world_cup_manager + activity_cache_manager",
-                "loc_estimate": 2185
+                "files": [
+                  "agrabah/src/managers/world_cup_manager.ts",
+                  "agrabah/src/managers/activity_cache_manager.ts"
+                ],
+                "loc_estimate": 2185,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-A3",
                 "scope": "vip_setting_manager + user_manager",
-                "loc_estimate": 1262
+                "files": [
+                  "agrabah/src/managers/vip_setting_manager.ts",
+                  "agrabah/src/managers/user_manager.ts"
+                ],
+                "loc_estimate": 1289,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-23T07:30:00.000Z",
+            "completed_at": "2026-04-23T12:42:29.187Z"
           },
           "part_b": {
             "status": "pending",
@@ -907,15 +928,30 @@
       "id": "B2-F3",
       "scope": "room_back_office server",
       "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B3-A1",
+      "scope": "activity_back_office server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B3-A2",
+      "scope": "world_cup_manager + activity_cache_manager",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B3-A3",
+      "scope": "vip_setting_manager + user_manager",
+      "completed_at": "2026-04-23"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-23T06:29:43.795Z",
-    "build-overview-aggregates.ts": "2026-04-23T06:29:43.809Z",
-    "generate-call-chain.ts": "2026-04-23T06:29:43.824Z",
-    "generate-indexes.ts": "2026-04-23T06:29:43.853Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-23T06:29:43.839Z",
-    "check-orphan-notes.ts": "2026-04-23T06:29:43.867Z"
+    "build-backlinks.ts": "2026-04-23T12:42:30.728Z",
+    "build-overview-aggregates.ts": "2026-04-23T12:42:30.743Z",
+    "generate-call-chain.ts": "2026-04-23T12:42:30.756Z",
+    "generate-indexes.ts": "2026-04-23T12:42:30.782Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-23T12:42:30.769Z",
+    "check-orphan-notes.ts": "2026-04-23T12:42:30.795Z"
   }
 }
