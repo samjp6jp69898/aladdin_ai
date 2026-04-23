@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-22T13:44:06.606Z",
+  "last_updated": "2026-04-23T02:20:16.588Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -403,7 +403,7 @@
             "completed_at": "2026-04-22T13:44:06.606Z"
           },
           "part_d": {
-            "status": "pending",
+            "status": "completed",
             "description": "game_back_office + customer_back_office + customer_service_manager",
             "packages": [
               {
@@ -413,7 +413,9 @@
                   "agrabah/src/servers/game_back_office/"
                 ],
                 "rajah_file": "rajah/services/game_back_office.rajah",
-                "loc_estimate": 4834
+                "loc_estimate": 4834,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-D2",
@@ -422,7 +424,9 @@
                   "agrabah/src/servers/customer_back_office/"
                 ],
                 "rajah_file": "rajah/services/customer_back_office.rajah",
-                "loc_estimate": 3144
+                "loc_estimate": 3144,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B2-D3",
@@ -431,12 +435,16 @@
                   "agrabah/src/managers/customer_service_manager.ts",
                   "agrabah/src/managers/fund_adjustment_manager.ts"
                 ],
-                "loc_estimate": 1101
+                "loc_estimate": 1101,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-23T01:26:44.887Z",
+            "completed_at": "2026-04-23T02:20:16.500Z"
           },
           "part_e": {
-            "status": "pending",
+            "status": "in_progress",
             "description": "message_board + message_board_back_office + chat 體系",
             "packages": [
               {
@@ -446,7 +454,8 @@
                   "agrabah/src/servers/message_board/"
                 ],
                 "rajah_file": "rajah/services/message_board.rajah",
-                "loc_estimate": 1932
+                "loc_estimate": 1932,
+                "phase_1_status": "completed"
               },
               {
                 "id": "B2-E2",
@@ -455,7 +464,8 @@
                   "agrabah/src/servers/message_board_back_office/"
                 ],
                 "rajah_file": "rajah/services/message_board_back_office.rajah",
-                "loc_estimate": 3677
+                "loc_estimate": 3677,
+                "phase_1_status": "completed"
               },
               {
                 "id": "B2-E3",
@@ -465,9 +475,11 @@
                   "agrabah/src/servers/chat_back_office/",
                   "agrabah/src/managers/chat_manager.ts"
                 ],
-                "loc_estimate": 2596
+                "loc_estimate": 2596,
+                "phase_1_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-23T01:38:57.496Z"
           },
           "part_f": {
             "status": "pending",
@@ -838,15 +850,30 @@
       "id": "B2-C2",
       "scope": "sport_back_office server (所有 services)",
       "completed_at": "2026-04-22"
+    },
+    {
+      "id": "B2-D1",
+      "scope": "game_back_office server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-D2",
+      "scope": "customer_back_office server",
+      "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B2-D3",
+      "scope": "customer_service_manager + fund_adjustment_manager",
+      "completed_at": "2026-04-23"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-22T13:43:38.267Z",
-    "build-overview-aggregates.ts": "2026-04-22T13:43:38.282Z",
-    "generate-call-chain.ts": "2026-04-22T13:43:38.296Z",
-    "generate-indexes.ts": "2026-04-22T13:43:38.324Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-22T13:43:38.311Z",
-    "check-orphan-notes.ts": "2026-04-22T13:43:38.337Z"
+    "build-backlinks.ts": "2026-04-23T02:20:16.515Z",
+    "build-overview-aggregates.ts": "2026-04-23T02:20:16.531Z",
+    "generate-call-chain.ts": "2026-04-23T02:20:16.546Z",
+    "generate-indexes.ts": "2026-04-23T02:20:16.574Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-23T02:20:16.561Z",
+    "check-orphan-notes.ts": "2026-04-23T02:20:16.588Z"
   }
 }
