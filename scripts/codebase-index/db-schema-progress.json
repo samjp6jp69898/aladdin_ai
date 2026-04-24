@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "description": "DB Schema & ORM 文件化進度追蹤。每個 work package 對應一個 database_types 檔案 + 對應的 migration 目錄。",
-  "last_updated": "2026-04-24T11:40:12.527Z",
+  "last_updated": "2026-04-24T11:40:58.029Z",
   "total_databases": 47,
   "total_orm_classes": 563,
   "total_orm_loc": 9365,
@@ -851,8 +851,8 @@
     }
   },
   "scripts_last_run": {
-    "generate-indexes.ts": null,
-    "build-backlinks.ts": null
+    "generate-indexes.ts": "2026-04-24T11:40:58.029Z",
+    "build-backlinks.ts": "2026-04-24T11:40:58.012Z"
   },
   "notes_produced": 1030,
   "recovery_instructions": "恢復流程：1) Read 本檔確認各 package status；2) 找到第一個 status=pending 或 status=in_progress 的 package；3) 若 in_progress 則 git status 檢查已產出的殘檔，判斷接續或重派；4) 若 pending 則正常派 agent 開始"
