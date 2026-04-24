@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-24T01:18:54.619Z",
+  "last_updated": "2026-04-24T01:53:54.316Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -608,30 +608,40 @@
             "completed_at": "2026-04-24T01:18:52.555Z"
           },
           "part_c": {
-            "status": "pending",
+            "status": "completed",
             "description": "information + advertisement + push_notification",
             "packages": [
               {
                 "id": "B3-C1",
                 "scope": "information + information_back_office",
-                "loc_estimate": 2231
+                "loc_estimate": 2231,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-C2",
                 "scope": "advertisement + advertisement_back_office",
-                "loc_estimate": 1382
+                "loc_estimate": 1382,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-C3",
                 "scope": "push_notification + push_notification_manager",
-                "loc_estimate": 1500
+                "loc_estimate": 1500,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-C4",
                 "scope": "information_manager + marquee_manager",
-                "loc_estimate": 700
+                "loc_estimate": 700,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-24T01:31:25.099Z",
+            "completed_at": "2026-04-24T01:53:49.193Z"
           },
           "part_d": {
             "status": "pending",
@@ -966,15 +976,35 @@
       "id": "B3-B3",
       "scope": "otp_sms_setting_manager + 小型 link / util manager（amount_link / ip_link / currency_link / duration_link）",
       "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-C1",
+      "scope": "information + information_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-C2",
+      "scope": "advertisement + advertisement_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-C3",
+      "scope": "push_notification + push_notification_manager",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-C4",
+      "scope": "information_manager + marquee_manager",
+      "completed_at": "2026-04-24"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-24T01:18:54.536Z",
-    "build-overview-aggregates.ts": "2026-04-24T01:18:54.554Z",
-    "generate-call-chain.ts": "2026-04-24T01:18:54.571Z",
-    "generate-indexes.ts": "2026-04-24T01:18:54.603Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-24T01:18:54.587Z",
-    "check-orphan-notes.ts": "2026-04-24T01:18:54.619Z"
+    "build-backlinks.ts": "2026-04-24T01:53:54.247Z",
+    "build-overview-aggregates.ts": "2026-04-24T01:53:54.263Z",
+    "generate-call-chain.ts": "2026-04-24T01:53:54.277Z",
+    "generate-indexes.ts": "2026-04-24T01:53:54.303Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-24T01:53:54.290Z",
+    "check-orphan-notes.ts": "2026-04-24T01:53:54.316Z"
   }
 }
