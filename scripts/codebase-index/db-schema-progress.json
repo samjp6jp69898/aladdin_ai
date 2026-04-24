@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "description": "DB Schema & ORM 文件化進度追蹤。每個 work package 對應一個 database_types 檔案 + 對應的 migration 目錄。",
-  "last_updated": "2026-04-24T09:21:15.317Z",
+  "last_updated": "2026-04-24T11:30:45.467Z",
   "total_databases": 47,
   "total_orm_classes": 563,
   "total_orm_loc": 9365,
@@ -100,7 +100,16 @@
     "room",
     "inventory",
     "vip",
-    "advertisement"
+    "advertisement",
+    "verification_code",
+    "security_restriction",
+    "core",
+    "in_house_game",
+    "rebate",
+    "world_cup",
+    "chat",
+    "push_notification",
+    "wagering"
   ],
   "batches": {
     "batch_1": {
@@ -343,7 +352,7 @@
       "completed_at": "2026-04-24T09:21:10.049Z"
     },
     "batch_3": {
-      "status": "pending",
+      "status": "completed",
       "theme": "中小型 DB（100-200 LOC）— 功能模組表",
       "packages": [
         {
@@ -355,9 +364,11 @@
           "orm_classes": 3,
           "migration_count": 6,
           "output_dir": "Codebase/Servers/VerificationCode/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.162Z",
+          "completed_at": "2026-04-24T11:30:40.001Z"
         },
         {
           "id": "DB-16",
@@ -368,9 +379,11 @@
           "orm_classes": 7,
           "migration_count": 9,
           "output_dir": "Codebase/Servers/SecurityRestriction/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.178Z",
+          "completed_at": "2026-04-24T11:30:40.018Z"
         },
         {
           "id": "DB-17",
@@ -381,9 +394,11 @@
           "orm_classes": 14,
           "migration_count": 22,
           "output_dir": "Codebase/Servers/Core/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.193Z",
+          "completed_at": "2026-04-24T11:30:40.034Z"
         },
         {
           "id": "DB-18",
@@ -397,10 +412,12 @@
           "orm_classes": 8,
           "migration_count": 24,
           "output_dir": "Codebase/Servers/InHouseGame/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending",
-          "note": "含 in_house_game_record migration"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "note": "含 in_house_game_record migration",
+          "started_at": "2026-04-24T09:29:37.208Z",
+          "completed_at": "2026-04-24T11:30:40.049Z"
         },
         {
           "id": "DB-19",
@@ -411,9 +428,11 @@
           "orm_classes": 10,
           "migration_count": 22,
           "output_dir": "Codebase/Servers/Rebate/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.223Z",
+          "completed_at": "2026-04-24T11:30:40.064Z"
         },
         {
           "id": "DB-20",
@@ -424,10 +443,12 @@
           "orm_classes": 7,
           "migration_count": 0,
           "output_dir": "Codebase/Servers/Sport/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending",
-          "note": "world_cup ORM 歸屬 Sport server"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "note": "world_cup ORM 歸屬 Sport server",
+          "started_at": "2026-04-24T09:29:37.239Z",
+          "completed_at": "2026-04-24T11:30:40.080Z"
         },
         {
           "id": "DB-21",
@@ -438,9 +459,11 @@
           "orm_classes": 8,
           "migration_count": 13,
           "output_dir": "Codebase/Servers/Chat/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.254Z",
+          "completed_at": "2026-04-24T11:30:40.094Z"
         },
         {
           "id": "DB-22",
@@ -451,9 +474,11 @@
           "orm_classes": 3,
           "migration_count": 11,
           "output_dir": "Codebase/Servers/PushNotification/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.270Z",
+          "completed_at": "2026-04-24T11:30:40.109Z"
         },
         {
           "id": "DB-23",
@@ -464,11 +489,15 @@
           "orm_classes": 4,
           "migration_count": 13,
           "output_dir": "Codebase/Servers/Wagering/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T09:29:37.285Z",
+          "completed_at": "2026-04-24T11:30:40.123Z"
         }
-      ]
+      ],
+      "started_at": "2026-04-24T09:29:37.162Z",
+      "completed_at": "2026-04-24T11:30:40.123Z"
     },
     "batch_4": {
       "status": "pending",
@@ -760,6 +789,6 @@
     "generate-indexes.ts": null,
     "build-backlinks.ts": null
   },
-  "notes_produced": 761,
+  "notes_produced": 884,
   "recovery_instructions": "恢復流程：1) Read 本檔確認各 package status；2) 找到第一個 status=pending 或 status=in_progress 的 package；3) 若 in_progress 則 git status 檢查已產出的殘檔，判斷接續或重派；4) 若 pending 則正常派 agent 開始"
 }
