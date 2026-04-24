@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-23T12:42:30.795Z",
+  "last_updated": "2026-04-24T01:18:54.619Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -579,25 +579,33 @@
             "completed_at": "2026-04-23T12:42:29.187Z"
           },
           "part_b": {
-            "status": "pending",
+            "status": "completed",
             "description": "otp / rebate 雙生態",
             "packages": [
               {
                 "id": "B3-B1",
                 "scope": "otp_code + otp_code_back_office",
-                "loc_estimate": 3112
+                "loc_estimate": 3112,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-B2",
                 "scope": "rebate + rebate_back_office",
-                "loc_estimate": 2850
+                "loc_estimate": 2850,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-B3",
                 "scope": "otp_sms_setting_manager + 小型 link / util manager（amount_link / ip_link / currency_link / duration_link）",
-                "loc_estimate": 1300
+                "loc_estimate": 1300,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-23T12:51:44.692Z",
+            "completed_at": "2026-04-24T01:18:52.555Z"
           },
           "part_c": {
             "status": "pending",
@@ -943,15 +951,30 @@
       "id": "B3-A3",
       "scope": "vip_setting_manager + user_manager",
       "completed_at": "2026-04-23"
+    },
+    {
+      "id": "B3-B1",
+      "scope": "otp_code + otp_code_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-B2",
+      "scope": "rebate + rebate_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-B3",
+      "scope": "otp_sms_setting_manager + 小型 link / util manager（amount_link / ip_link / currency_link / duration_link）",
+      "completed_at": "2026-04-24"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-23T12:42:30.728Z",
-    "build-overview-aggregates.ts": "2026-04-23T12:42:30.743Z",
-    "generate-call-chain.ts": "2026-04-23T12:42:30.756Z",
-    "generate-indexes.ts": "2026-04-23T12:42:30.782Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-23T12:42:30.769Z",
-    "check-orphan-notes.ts": "2026-04-23T12:42:30.795Z"
+    "build-backlinks.ts": "2026-04-24T01:18:54.536Z",
+    "build-overview-aggregates.ts": "2026-04-24T01:18:54.554Z",
+    "generate-call-chain.ts": "2026-04-24T01:18:54.571Z",
+    "generate-indexes.ts": "2026-04-24T01:18:54.603Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-24T01:18:54.587Z",
+    "check-orphan-notes.ts": "2026-04-24T01:18:54.619Z"
   }
 }
