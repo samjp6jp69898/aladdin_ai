@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-24T03:09:46.145Z",
+  "last_updated": "2026-04-24T07:32:55.212Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -716,30 +716,40 @@
             "completed_at": "2026-04-24T03:09:46.060Z"
           },
           "part_f": {
-            "status": "pending",
+            "status": "completed",
             "description": "雜項小 server / 小 manager 清尾",
             "packages": [
               {
                 "id": "B3-F1",
                 "scope": "in_house_game_consumer + payment_consumer",
-                "loc_estimate": 1743
+                "loc_estimate": 1743,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-F2",
                 "scope": "verification_code + gate 相關小 server",
-                "loc_estimate": 1500
+                "loc_estimate": 1500,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-F3",
                 "scope": "app_back_office + admin + control_center + fund_adjustment_back_office + wallet_back_office + security_restriction_back_office",
-                "loc_estimate": 3700
+                "loc_estimate": 3700,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-F4",
                 "scope": "剩餘所有 <500 LOC 小 server (audit, chat, encryption, event, live, live_back_office, location, model_persistence, app_packager, scheduler, sensitive_word*, batch_operation, file_post_process, external_stream_back_office, inventory, activity servers 剩餘, 以及全部未涵蓋的小 manager)",
-                "loc_estimate": 4000
+                "loc_estimate": 4000,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-24T07:00:35.971Z",
+            "completed_at": "2026-04-24T07:32:50.592Z"
           }
         },
         "note": "6 個 part，以 LOC ≤ 10K 為主要約束"
@@ -1056,15 +1066,35 @@
       "id": "B3-E4",
       "scope": "audit_back_office server",
       "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-F1",
+      "scope": "in_house_game_consumer + payment_consumer",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-F2",
+      "scope": "verification_code + gate 相關小 server",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-F3",
+      "scope": "app_back_office + admin + control_center + fund_adjustment_back_office + wallet_back_office + security_restriction_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-F4",
+      "scope": "剩餘所有 <500 LOC 小 server (audit, chat, encryption, event, live, live_back_office, location, model_persistence, app_packager, scheduler, sensitive_word*, batch_operation, file_post_process, external_stream_back_office, inventory, activity servers 剩餘, 以及全部未涵蓋的小 manager)",
+      "completed_at": "2026-04-24"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-24T03:09:46.076Z",
-    "build-overview-aggregates.ts": "2026-04-24T03:09:46.090Z",
-    "generate-call-chain.ts": "2026-04-24T03:09:46.104Z",
-    "generate-indexes.ts": "2026-04-24T03:09:46.131Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-24T03:09:46.118Z",
-    "check-orphan-notes.ts": "2026-04-24T03:09:46.145Z"
+    "build-backlinks.ts": "2026-04-24T07:32:55.140Z",
+    "build-overview-aggregates.ts": "2026-04-24T07:32:55.158Z",
+    "generate-call-chain.ts": "2026-04-24T07:32:55.172Z",
+    "generate-indexes.ts": "2026-04-24T07:32:55.199Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-24T07:32:55.186Z",
+    "check-orphan-notes.ts": "2026-04-24T07:32:55.212Z"
   }
 }
