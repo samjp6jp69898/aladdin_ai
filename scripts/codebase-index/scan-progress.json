@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-24T02:23:52.250Z",
+  "last_updated": "2026-04-24T03:09:46.145Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -680,30 +680,40 @@
             "completed_at": "2026-04-24T02:23:52.250Z"
           },
           "part_e": {
-            "status": "pending",
+            "status": "completed",
             "description": "roulette + point + ranking 系列",
             "packages": [
               {
                 "id": "B3-E1",
                 "scope": "roulette + roulette_back_office",
-                "loc_estimate": 1694
+                "loc_estimate": 1694,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-E2",
                 "scope": "point + point_back_office + point_consumer + point_manager",
-                "loc_estimate": 1767
+                "loc_estimate": 1767,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-E3",
                 "scope": "ranking + ranking_back_office + ranking_consumer",
-                "loc_estimate": 774
+                "loc_estimate": 774,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-E4",
                 "scope": "audit_back_office server",
-                "loc_estimate": 2617
+                "loc_estimate": 2617,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-24T02:47:52.413Z",
+            "completed_at": "2026-04-24T03:09:46.060Z"
           },
           "part_f": {
             "status": "pending",
@@ -1026,15 +1036,35 @@
       "id": "B3-D4",
       "scope": "core_back_office server",
       "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-E1",
+      "scope": "roulette + roulette_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-E2",
+      "scope": "point + point_back_office + point_consumer + point_manager",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-E3",
+      "scope": "ranking + ranking_back_office + ranking_consumer",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-E4",
+      "scope": "audit_back_office server",
+      "completed_at": "2026-04-24"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-24T02:23:47.718Z",
-    "build-overview-aggregates.ts": "2026-04-24T02:23:47.734Z",
-    "generate-call-chain.ts": "2026-04-24T02:23:47.749Z",
-    "generate-indexes.ts": "2026-04-24T02:23:47.777Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-24T02:23:47.763Z",
-    "check-orphan-notes.ts": "2026-04-24T02:23:47.790Z"
+    "build-backlinks.ts": "2026-04-24T03:09:46.076Z",
+    "build-overview-aggregates.ts": "2026-04-24T03:09:46.090Z",
+    "generate-call-chain.ts": "2026-04-24T03:09:46.104Z",
+    "generate-indexes.ts": "2026-04-24T03:09:46.131Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-24T03:09:46.118Z",
+    "check-orphan-notes.ts": "2026-04-24T03:09:46.145Z"
   }
 }
