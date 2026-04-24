@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-24T01:53:54.316Z",
+  "last_updated": "2026-04-24T02:23:52.250Z",
   "milestone_1": {
     "status": "completed",
     "completed_at": "2026-04-21",
@@ -644,30 +644,40 @@
             "completed_at": "2026-04-24T01:53:49.193Z"
           },
           "part_d": {
-            "status": "pending",
+            "status": "completed",
             "description": "gate + platform + external_stream + core_back_office",
             "packages": [
               {
                 "id": "B3-D1",
                 "scope": "gate server",
-                "loc_estimate": 1607
+                "loc_estimate": 1607,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-D2",
                 "scope": "platform server + platform_manager",
-                "loc_estimate": 1900
+                "loc_estimate": 1900,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-D3",
                 "scope": "external_stream + external_stream_back_office",
-                "loc_estimate": 1375
+                "loc_estimate": 1375,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               },
               {
                 "id": "B3-D4",
                 "scope": "core_back_office server",
-                "loc_estimate": 960
+                "loc_estimate": 960,
+                "phase_1_status": "completed",
+                "phase_2_status": "completed"
               }
-            ]
+            ],
+            "started_at": "2026-04-24T01:56:08.747Z",
+            "completed_at": "2026-04-24T02:23:52.250Z"
           },
           "part_e": {
             "status": "pending",
@@ -996,15 +1006,35 @@
       "id": "B3-C4",
       "scope": "information_manager + marquee_manager",
       "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-D1",
+      "scope": "gate server",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-D2",
+      "scope": "platform server + platform_manager",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-D3",
+      "scope": "external_stream + external_stream_back_office",
+      "completed_at": "2026-04-24"
+    },
+    {
+      "id": "B3-D4",
+      "scope": "core_back_office server",
+      "completed_at": "2026-04-24"
     }
   ],
   "packages_in_progress": [],
   "scripts_last_run": {
-    "build-backlinks.ts": "2026-04-24T01:53:54.247Z",
-    "build-overview-aggregates.ts": "2026-04-24T01:53:54.263Z",
-    "generate-call-chain.ts": "2026-04-24T01:53:54.277Z",
-    "generate-indexes.ts": "2026-04-24T01:53:54.303Z",
-    "generate-cross-server-rpc-graph.ts": "2026-04-24T01:53:54.290Z",
-    "check-orphan-notes.ts": "2026-04-24T01:53:54.316Z"
+    "build-backlinks.ts": "2026-04-24T02:23:47.718Z",
+    "build-overview-aggregates.ts": "2026-04-24T02:23:47.734Z",
+    "generate-call-chain.ts": "2026-04-24T02:23:47.749Z",
+    "generate-indexes.ts": "2026-04-24T02:23:47.777Z",
+    "generate-cross-server-rpc-graph.ts": "2026-04-24T02:23:47.763Z",
+    "check-orphan-notes.ts": "2026-04-24T02:23:47.790Z"
   }
 }
