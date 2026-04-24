@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "description": "DB Schema & ORM 文件化進度追蹤。每個 work package 對應一個 database_types 檔案 + 對應的 migration 目錄。",
-  "last_updated": "2026-04-24T11:30:45.467Z",
+  "last_updated": "2026-04-24T11:40:12.527Z",
   "total_databases": 47,
   "total_orm_classes": 563,
   "total_orm_loc": 9365,
@@ -109,7 +109,28 @@
     "world_cup",
     "chat",
     "push_notification",
-    "wagering"
+    "wagering",
+    "setting",
+    "fund_adjustment",
+    "roulette",
+    "point",
+    "user_level_back_office",
+    "otp_code",
+    "export",
+    "telegram",
+    "app",
+    "live",
+    "risk",
+    "external_stream",
+    "sport",
+    "scheduler",
+    "event",
+    "ranking",
+    "sensitive_word",
+    "control_center",
+    "platform",
+    "batch_operation",
+    "admin"
   ],
   "batches": {
     "batch_1": {
@@ -500,7 +521,7 @@
       "completed_at": "2026-04-24T11:30:40.123Z"
     },
     "batch_4": {
-      "status": "pending",
+      "status": "completed",
       "theme": "小型 DB（<100 LOC）— 簡單表 + 共用/外部",
       "packages": [
         {
@@ -512,10 +533,12 @@
           "orm_classes": 2,
           "migration_count": 0,
           "output_dir": "Codebase/Common/databases/",
-          "status": "pending",
-          "orm_status": "pending",
+          "status": "completed",
+          "orm_status": "completed",
           "schema_status": "skipped",
-          "note": "無專屬 migration，只有 ORM"
+          "note": "無專屬 migration，只有 ORM",
+          "started_at": "2026-04-24T11:31:54.097Z",
+          "completed_at": "2026-04-24T11:36:14.226Z"
         },
         {
           "id": "DB-25",
@@ -526,9 +549,11 @@
           "orm_classes": 3,
           "migration_count": 1,
           "output_dir": "Codebase/Servers/FundAdjustment/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.116Z",
+          "completed_at": "2026-04-24T11:36:14.241Z"
         },
         {
           "id": "DB-26",
@@ -539,9 +564,11 @@
           "orm_classes": 6,
           "migration_count": 12,
           "output_dir": "Codebase/Servers/Roulette/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.134Z",
+          "completed_at": "2026-04-24T11:36:14.256Z"
         },
         {
           "id": "DB-27",
@@ -552,9 +579,11 @@
           "orm_classes": 4,
           "migration_count": 8,
           "output_dir": "Codebase/Servers/Point/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.150Z",
+          "completed_at": "2026-04-24T11:36:14.270Z"
         },
         {
           "id": "DB-28",
@@ -565,10 +594,12 @@
           "orm_classes": 6,
           "migration_count": 0,
           "output_dir": "Codebase/Servers/UserLevelBackOffice/databases/",
-          "status": "pending",
-          "orm_status": "pending",
+          "status": "completed",
+          "orm_status": "completed",
           "schema_status": "skipped",
-          "note": "無專屬 migration，可能共用 vip 或 app_user"
+          "note": "無專屬 migration，可能共用 vip 或 app_user",
+          "started_at": "2026-04-24T11:31:54.165Z",
+          "completed_at": "2026-04-24T11:36:14.286Z"
         },
         {
           "id": "DB-29",
@@ -579,9 +610,11 @@
           "orm_classes": 6,
           "migration_count": 17,
           "output_dir": "Codebase/Servers/OtpCode/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.179Z",
+          "completed_at": "2026-04-24T11:36:14.301Z"
         },
         {
           "id": "DB-30",
@@ -592,9 +625,11 @@
           "orm_classes": 1,
           "migration_count": 4,
           "output_dir": "Codebase/Servers/ExportBackOffice/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.194Z",
+          "completed_at": "2026-04-24T11:36:14.315Z"
         },
         {
           "id": "DB-31",
@@ -608,10 +643,12 @@
           "orm_classes": 7,
           "migration_count": 0,
           "output_dir": "Codebase/Servers/_External/databases/",
-          "status": "pending",
-          "orm_status": "pending",
+          "status": "completed",
+          "orm_status": "completed",
           "schema_status": "skipped",
-          "note": "telegram + telegram_mini_game 合併處理，無 migration"
+          "note": "telegram + telegram_mini_game 合併處理，無 migration",
+          "started_at": "2026-04-24T11:31:54.209Z",
+          "completed_at": "2026-04-24T11:36:14.330Z"
         },
         {
           "id": "DB-32",
@@ -622,9 +659,11 @@
           "orm_classes": 5,
           "migration_count": 10,
           "output_dir": "Codebase/Servers/App/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.224Z",
+          "completed_at": "2026-04-24T11:36:14.344Z"
         },
         {
           "id": "DB-33",
@@ -635,9 +674,11 @@
           "orm_classes": 6,
           "migration_count": 6,
           "output_dir": "Codebase/Servers/Live/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:31:54.239Z",
+          "completed_at": "2026-04-24T11:36:14.358Z"
         },
         {
           "id": "DB-34",
@@ -648,9 +689,11 @@
           "orm_classes": 4,
           "migration_count": 15,
           "output_dir": "Codebase/Servers/Risk/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.084Z",
+          "completed_at": "2026-04-24T11:40:03.780Z"
         },
         {
           "id": "DB-35",
@@ -661,9 +704,11 @@
           "orm_classes": 4,
           "migration_count": 7,
           "output_dir": "Codebase/Servers/ExternalStream/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.100Z",
+          "completed_at": "2026-04-24T11:40:03.797Z"
         },
         {
           "id": "DB-36",
@@ -674,9 +719,11 @@
           "orm_classes": 1,
           "migration_count": 13,
           "output_dir": "Codebase/Servers/Sport/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.115Z",
+          "completed_at": "2026-04-24T11:40:03.812Z"
         },
         {
           "id": "DB-37",
@@ -687,9 +734,11 @@
           "orm_classes": 2,
           "migration_count": 2,
           "output_dir": "Codebase/Servers/Scheduler/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.131Z",
+          "completed_at": "2026-04-24T11:40:03.827Z"
         },
         {
           "id": "DB-38",
@@ -700,9 +749,11 @@
           "orm_classes": 1,
           "migration_count": 1,
           "output_dir": "Codebase/Servers/Event/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.146Z",
+          "completed_at": "2026-04-24T11:40:03.842Z"
         },
         {
           "id": "DB-39",
@@ -713,9 +764,11 @@
           "orm_classes": 1,
           "migration_count": 4,
           "output_dir": "Codebase/Servers/Ranking/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.161Z",
+          "completed_at": "2026-04-24T11:40:03.856Z"
         },
         {
           "id": "DB-40",
@@ -726,9 +779,11 @@
           "orm_classes": 2,
           "migration_count": 5,
           "output_dir": "Codebase/Servers/SensitiveWord/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.175Z",
+          "completed_at": "2026-04-24T11:40:03.869Z"
         },
         {
           "id": "DB-41",
@@ -739,9 +794,11 @@
           "orm_classes": 1,
           "migration_count": 1,
           "output_dir": "Codebase/Servers/ControlCenter/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.189Z",
+          "completed_at": "2026-04-24T11:40:03.884Z"
         },
         {
           "id": "DB-42",
@@ -752,9 +809,11 @@
           "orm_classes": 1,
           "migration_count": 21,
           "output_dir": "Codebase/Servers/Platform/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.204Z",
+          "completed_at": "2026-04-24T11:40:03.899Z"
         },
         {
           "id": "DB-43",
@@ -765,9 +824,11 @@
           "orm_classes": 1,
           "migration_count": 3,
           "output_dir": "Codebase/Servers/BatchOperation/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.218Z",
+          "completed_at": "2026-04-24T11:40:03.914Z"
         },
         {
           "id": "DB-44",
@@ -778,17 +839,21 @@
           "orm_classes": 1,
           "migration_count": 17,
           "output_dir": "Codebase/Servers/Admin/databases/",
-          "status": "pending",
-          "orm_status": "pending",
-          "schema_status": "pending"
+          "status": "completed",
+          "orm_status": "completed",
+          "schema_status": "completed",
+          "started_at": "2026-04-24T11:36:20.232Z",
+          "completed_at": "2026-04-24T11:40:03.928Z"
         }
-      ]
+      ],
+      "started_at": "2026-04-24T11:31:54.097Z",
+      "completed_at": "2026-04-24T11:40:03.928Z"
     }
   },
   "scripts_last_run": {
     "generate-indexes.ts": null,
     "build-backlinks.ts": null
   },
-  "notes_produced": 884,
+  "notes_produced": 1030,
   "recovery_instructions": "恢復流程：1) Read 本檔確認各 package status；2) 找到第一個 status=pending 或 status=in_progress 的 package；3) 若 in_progress 則 git status 檢查已產出的殘檔，判斷接續或重派；4) 若 pending 則正常派 agent 開始"
 }
