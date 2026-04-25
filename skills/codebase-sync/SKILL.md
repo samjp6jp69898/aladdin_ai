@@ -124,6 +124,41 @@ bun run sync-from-git.ts --finalize
 - 人類直接編輯筆記時 `last_scanned` 保留原值
 - AI 下次掃描遇到 `human_edited: true` 需跳過或謹慎確認
 
+## 冪等性保證
+
+Pipeline 的所有階段都是冪等的，可安全重跑：
+
+### Commit-based 去重
+
+`sync-state.json` 的 `processed_commits` 記錄已處理過的 commit hash。Stage 1 收集 commit 後會自動過濾已處理的，確保不會產生重複的 action。
+
+- `--dry-run` 不寫入 `processed_commits`（預覽無副作用）
+- live mode 完成後立即寫入，不需等 finalize
+- finalize 時自動清理超過 30 天的記錄
+
+### Action Status 追蹤
+
+`pending-actions.json` 每個 action 有 `status` 欄位：
+
+| Status | 含義 |
+|--------|------|
+| `pending` | 待處理（Stage 1 產生時的初始狀態） |
+| `processed` | 已由 AI 處理完成 |
+| `skipped` | AI 判斷不需處理（diff 太小、純 comment 等） |
+
+Stage 2 處理時只處理 `status === "pending"` 的 action，處理完逐條標記為 `processed` 並回寫 JSON。中斷後重啟只會繼續處理剩餘的 pending action。
+
+**向後相容**：若 `pending-actions.json` 中的 action 沒有 `status` 欄位（舊格式），視為 `"pending"`。
+
+### 重跑行為
+
+| 場景 | 行為 |
+|------|------|
+| 同樣 `--since` 範圍重跑 Stage 1 | 去重後跳過已處理的 commit |
+| Stage 2 中途中斷後重啟 | 只處理 `status=pending` 的 action |
+| finalize 跑多次 | 腳本全量重建（天然冪等） |
+| `--dry-run` 跑多次 | 無副作用 |
+
 ## 絕對規則
 
 1. **不得猜測**：遇到不懂的程式碼留 `[TBD: 需開發者補充]`
