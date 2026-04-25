@@ -7,7 +7,10 @@
     "generate-call-chain": "bun run generate-call-chain.ts",
     "check-broken-links": "bun run check-broken-links.ts",
     "check-orphan-notes": "bun run check-orphan-notes.ts",
-    "generate-indexes": "bun run generate-indexes.ts"
+    "generate-indexes": "bun run generate-indexes.ts",
+    "sync": "bun run sync-from-git.ts",
+    "sync-dry": "bun run sync-from-git.ts --dry-run",
+    "sync-finalize": "bun run sync-from-git.ts --finalize"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"
