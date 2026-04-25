@@ -1,7 +1,11 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "agrabah_last_sync_commit": null,
   "rajah_last_sync_commit": null,
   "last_sync_date": null,
+  "processed_commits": {
+    "agrabah": {},
+    "rajah": {}
+  },
   "sync_history": []
 }
