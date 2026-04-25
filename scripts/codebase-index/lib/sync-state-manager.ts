@@ -22,12 +22,19 @@ export interface SyncState {
 }
 
 export async function loadSyncState(): Promise<SyncState> {
-    const raw = JSON.parse(await readFile(SYNC_STATE_PATH, 'utf-8'));
+    let raw: any;
+    try {
+        raw = JSON.parse(await readFile(SYNC_STATE_PATH, 'utf-8'));
+    } catch {
+        raw = {};
+    }
 
     if (!raw.schema_version || raw.schema_version < 2) {
         raw.schema_version = 2;
         raw.processed_commits = raw.processed_commits ?? { agrabah: {}, rajah: {} };
     }
+    raw.sync_history = raw.sync_history ?? [];
+    raw.last_sync_date = raw.last_sync_date ?? null;
 
     return raw as SyncState;
 }

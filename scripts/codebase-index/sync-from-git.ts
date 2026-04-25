@@ -69,12 +69,14 @@ async function main() {
 
     const agrabahCollectedHashes = agrabahCommits.map(c => c.hash);
     const agrabahDedup = filterNewCommits(agrabahCollectedHashes, syncState.processed_commits.agrabah);
-    const agrabahNew = agrabahCommits.filter(c => agrabahDedup.newHashes.includes(c.hash));
+    const agrabahNewSet = new Set(agrabahDedup.newHashes);
+    const agrabahNew = agrabahCommits.filter(c => agrabahNewSet.has(c.hash));
     console.log(`agrabah: ${agrabahCommits.length} collected, ${agrabahDedup.skippedCount} already processed, ${agrabahNew.length} new`);
 
     const rajahCollectedHashes = rajahCommits.map(c => c.hash);
     const rajahDedup = filterNewCommits(rajahCollectedHashes, syncState.processed_commits.rajah);
-    const rajahNew = rajahCommits.filter(c => rajahDedup.newHashes.includes(c.hash));
+    const rajahNewSet = new Set(rajahDedup.newHashes);
+    const rajahNew = rajahCommits.filter(c => rajahNewSet.has(c.hash));
     console.log(`rajah: ${rajahCommits.length} collected, ${rajahDedup.skippedCount} already processed, ${rajahNew.length} new`);
 
     if (agrabahNew.length === 0 && rajahNew.length === 0) {
