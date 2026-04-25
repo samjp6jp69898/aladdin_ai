@@ -1,9 +1,22 @@
 ---
 name: method-call-graph
-description: "分析指定 service method 的完整呼叫鏈：同 server caller、跨 server gRPC caller、前端 caller、三方回調觸發路徑。Use when: 分析方法呼叫鏈、列出 caller、找 method 被誰呼叫、呼叫鏈分析、method-call-graph、who calls this method、find callers。"
+description: "分析指定 service method 的完整呼叫鏈：同 server caller、跨 server gRPC caller、前端 caller、三方回調觸發路徑。Use when: 分析方法呼叫鏈、列出 caller、找 method 被誰呼叫、呼叫鏈分析、method-call-graph、who calls this method、find callers、table CRUD 追蹤、哪些方法操作這張表。"
 ---
 
 # Method Call Graph
+
+支援兩種模式：
+
+| 模式 | 指令 | 用途 |
+|------|------|------|
+| **Service Method 模式**（預設） | `/method-call-graph <ServiceClass>.<method>` | 四維度完整呼叫鏈分析 |
+| **Table CRUD 模式** | `/method-call-graph table <server> <table_name>` | 追蹤指定 server 中哪些方法操作該表 + 同 server BFS caller |
+
+**模式判斷**：若第一個 arg 為 `table` → Table CRUD 模式，否則 → Service Method 模式。
+
+---
+
+# 模式一：Service Method 模式
 
 分析 agrabah 中指定 service method 的完整呼叫鏈，涵蓋四個維度：
 
@@ -519,3 +532,312 @@ visited 總數: V
 ```
 
 **最後，結束。不需要額外的解釋或建議**，使用者看完就知道呼叫關係。
+
+---
+
+# 模式二：Table CRUD 模式
+
+追蹤指定 server 中哪些 method 會 CRUD 某張表，並對每個操作點做同 server BFS caller 追蹤。
+
+## Input Format
+
+```
+/method-call-graph table <server> <table_name>
+```
+
+| 參數 | 說明 | 範例 |
+|------|------|------|
+| `<server>` | agrabah server 名稱 | `message_board`、`payment` |
+| `<table_name>` | 表名稱，支援 snake_case 精確或模糊匹配 | `user_detail_review_items`、`UserDetail`、`deposit_orders` |
+
+---
+
+## Execution Flow
+
+### Step T0: 定位 Db* Class
+
+**目的**：從使用者輸入的表名找出所有對應的 Db* ORM class。
+
+#### 1. 精確匹配
+
+```bash
+grep -rn "static readonly tableName = '<table_name>'" /Users/user/aladdin/agrabah/src/database_types/ --include="*.ts"
+```
+
+若命中 → 記錄所有命中的 Db* class 名稱，進入步驟 3。
+
+#### 2. 若精確匹配失敗 → 三階段 fallback
+
+**階段 A — 常數引用搜尋**
+
+搜尋表名字串是否定義為常數：
+```bash
+grep -rn "= '<table_name>'" /Users/user/aladdin/agrabah/src/database_types/ --include="*.ts"
+```
+
+若找到常數（如 `const DbPostsTableName = 'posts'`）→ 追蹤哪些 class 引用了該常數：
+```bash
+grep -rn "<常數名>" /Users/user/aladdin/agrabah/src/database_types/ --include="*.ts"
+```
+
+**階段 B — 模糊匹配（用戶輸入非 snake_case）**
+
+將用戶輸入轉為 snake_case（如 `UserDetail` → `user_detail`），再做 prefix 搜尋：
+```bash
+grep -rn "static readonly tableName = '<snake_case_prefix>" /Users/user/aladdin/agrabah/src/database_types/ --include="*.ts"
+```
+
+若命中多個表（如 `user_details`、`user_detail_review_items`、`user_detail_review_info`）→ 列出所有候選，詢問用戶要追蹤哪一張。
+
+**階段 C — Obsidian Codebase 知識庫 fallback**
+
+```bash
+grep -rn "<table_name>" /Users/user/aladdin/obsidian/Codebase/ --include="*.md"
+```
+
+若找到相關筆記，Read 該筆記嘗試找到對應 Db* class。
+
+**全部失敗** → 回報錯誤：「找不到表 `<table_name>`，請確認表名是否正確。可用 snake_case 精確表名重試。」並停止。
+
+#### 3. 收集完整 Db* class 清單（含繼承鏈）
+
+對步驟 1 或 2 找到的每個 Db* class，追蹤繼承鏈中其他共享同一 tableName 的 class：
+```bash
+grep -rn "tableName = <DbClassName>.tableName\|tableName = <DbBaseClassName>.tableName" /Users/user/aladdin/agrabah/src/database_types/ --include="*.ts"
+```
+
+記錄完整的 Db* class 清單（如 `DbPosts`、`DbPostsBackOffice`、`DbPostsClientListItem`、`DbActivePost` 都指向 `posts` 表）。
+
+#### 4. 記錄 reconnaissance 結果
+
+```
+tableName: user_detail_review_items
+dbClasses: [DbUserDetailReviewItems]
+targetServer: message_board
+scanScope: agrabah/src/servers/message_board/ + agrabah/src/managers/
+```
+
+### Step T1: 掃描 CRUD 操作點
+
+**目的**：在 `servers/<server>/` + `managers/` 範圍內找出所有操作該表的程式碼位置，按 CRUD 分類。
+
+掃描分兩波執行。
+
+#### 波 1 — Db* class 名稱搜尋（主要）
+
+對 Step T0 找到的每個 Db* class（如 `DbUserDetailReviewItems`），在 scope 內 grep：
+
+```bash
+grep -rn "DbUserDetailReviewItems" /Users/user/aladdin/agrabah/src/servers/<server>/ /Users/user/aladdin/agrabah/src/managers/ --include="*.ts"
+```
+
+排除：
+- import 行（`import {`）
+- 註解行（`//`、`*`）
+- 型別定義行（`type `、`interface `）
+- generated 檔案（`/generated/`）
+
+對每個命中行，Read 上下文（±10 行），判斷 CRUD 類型：
+
+| CRUD | 判斷依據 |
+|------|---------|
+| **C (Create)** | `insertObject(dbVar)` / `insertObjects(dbVars)` — 其中 dbVar 的型別或 `new` 宣告為目標 Db* class；或 raw SQL 含 `INSERT INTO.*<tableName>` |
+| **R (Read)** | `loadObject(DbXxx, ...)` / `loadObjects(DbXxx, ...)` / `count(DbXxx.tableName, ...)` / raw SQL 含 `SELECT.*FROM.*<tableName>` 或 `SELECT.*${DbXxx.tableName}` |
+| **U (Update)** | `updateObject(dbVar, ...)` — dbVar 型別為目標 Db* class；或 raw SQL 含 `UPDATE.*<tableName>` 或 `UPDATE.*${DbXxx.tableName}` |
+| **D (Delete)** | raw SQL 含 `DELETE FROM.*<tableName>` 或 `DELETE FROM.*${DbXxx.tableName}`；或 `updateStatus` 軟刪除（SET status = deleted） |
+
+**insertObject / updateObject 型別追蹤**：
+- 若命中行為 `transaction.insertObject(someVar)` → 往上找 `someVar` 的宣告（`new DbXxx()` 或 `someVar: DbXxx`），確認型別匹配目標 Db* class
+- 若命中行為 `new DbXxx()` → 往下找最近的 `insertObject` / `updateObject` 呼叫，確認是 C 或 U
+
+**一個 method 可能同時屬於多個 CRUD 類型**（如先 R 再 U）。
+
+記錄格式：`file:line — ClassName.methodName — CRUD類型 — 操作描述`
+
+#### 波 2 — 字串表名搜尋（補充）
+
+搜尋直接使用字串表名（未透過 Db* class）的情況：
+
+```bash
+grep -rn "'<table_name>'" /Users/user/aladdin/agrabah/src/servers/<server>/ /Users/user/aladdin/agrabah/src/managers/ --include="*.ts"
+```
+
+排除已被波 1 捕獲的行（透過 `DbXxx.tableName` 引用的不會命中此 pattern）。
+對命中行同樣判斷 CRUD 類型。
+
+#### 整理操作點清單
+
+去重後按 CRUD 分組，每個操作點記錄：
+- `file:line`
+- `ClassName.methodName`
+- CRUD 類型（可多個）
+- 操作方式描述（如 `loadObjects 查詢`、`transaction.insertObject 新增`、`UPDATE SQL 更新 status`）
+
+### Step T2: 對每個操作點做同 server BFS
+
+**目的**：對 Step T1 找到的每個 CRUD method，追蹤其在同 server 範圍內的完整 caller chain。
+
+#### 派遣策略
+
+將所有去重後的 method（同一 method 可能屬於多個 CRUD 類型，但 BFS 只需做一次）作為 target，使用 Agent tool 並行派遣 sub-agent。
+
+每個 sub-agent 為 `Explore` type（subagent_type: "Explore"），執行模式一 Agent 1 的完整 BFS 邏輯。
+
+**Scope**：
+- `agrabah/src/servers/<server>/**/*.ts`
+- `agrabah/src/managers/**/*.ts`
+
+**若操作點不超過 4 個** → 每個 method 一個 sub-agent，全部並行。
+
+**若操作點超過 4 個** → 合併為一個 sub-agent，在 prompt 中列出所有 target method，讓 sub-agent 依序處理。
+
+**Sub-agent prompt**（每個 target method 的 BFS 邏輯與模式一 Agent 1 完全相同）：
+
+~~~
+你的任務是找出以下 method 在同 server 範圍內的所有 caller（含 transitive，BFS 無深度限制）。
+
+## Targets
+<列出所有 target method，格式：file:line — ClassName.methodName>
+
+## Scope
+- `/Users/user/aladdin/agrabah/src/servers/<server>/**/*.ts`
+- `/Users/user/aladdin/agrabah/src/managers/**/*.ts`
+
+## 方法
+
+對每個 target method，執行以下 BFS：
+
+### 第一層：找直接 caller
+
+1. 執行 grep 找出所有呼叫點：
+   ```bash
+   grep -rn "\.<methodName>\s*(" <scope> --include="*.ts"
+   ```
+
+2. 排除：
+   - 目標方法自身的定義行
+   - 註解行（以 `//` 或 `*` 開頭的行）
+   - import 語句
+   - 字串內容
+
+### 型別驗證（每個 grep 命中都必做）
+
+對每個命中行，Read 該檔案的命中行上下文（±30 行），判斷 receiver 變數的型別：
+
+| 呼叫形式 | 驗證方式 | 判定 |
+|---------|---------|------|
+| `this.<method>()` | 看當前 class 的 `extends` / `implements`，確認繼承鏈包含目標 class | 繼承鏈匹配 = 真命中 |
+| `this._someField.<method>()` | 往上找 `_someField: TypeName` 或 constructor 中 `this._someField = xxx` 的型別 | TypeName 匹配 = 真命中 |
+| `obj.<method>()` | 往上找 `const/let obj: TypeName`、`obj: TypeName`（參數）、`obj = new TypeName()` | TypeName 匹配 = 真命中 |
+| `context.remote.*.<method>()` | 跨 server gRPC 呼叫，排除 | 排除 |
+| receiver type 不匹配 | 排除 | 排除 |
+| 無法判定 receiver type | 標註「無法靜態解析」 | 回報但標記 |
+
+### BFS 展開
+
+4. 對每個「真命中」的 caller，記錄其 `CallerClass.callerMethod`（連同 file:line）
+5. 將每個 caller 作為新的 target，重複步驟 1-3 找其 caller
+6. 維護 visited set，防止循環
+7. 持續直到無新 caller
+
+### 輸出格式
+
+對每個 target method 獨立輸出：
+
+```
+TARGET: <ClassName>.<methodName> (<file>:<line>)
+CALLERS:
+[直接] <file>:<line> — <CallerClass>.<callerMethod>
+[L2]   <file>:<line> — <CallerClass2>.<callerMethod2>
+  └─ 被 <CallerClass>.<callerMethod> 呼叫
+...
+STATS: 直接 caller: N, transitive: M, BFS 最深: K
+```
+
+若某個 target 無 caller，輸出：
+```
+TARGET: <ClassName>.<methodName> (<file>:<line>)
+CALLERS: 無
+```
+~~~
+
+### Step T3: 整合輸出
+
+等待所有 sub-agent 回報後，整合為以下格式輸出到對話中（不寫檔案）：
+
+```
+# Table CRUD 追蹤：<table_name>
+
+對應 ORM Class：<DbClass1>, <DbClass2>, ...
+所屬 Server：<server>
+掃描範圍：servers/<server>/ + managers/
+
+═══════════════════════════════════════════════════════
+🟢 CREATE（共 N 筆）
+═══════════════════════════════════════════════════════
+
+▸ ManagerClass.createSomething (managers/xxx_manager.ts:123)
+  操作：transaction.insertObject(dbVar)
+  callers:
+    [直接] ServiceClass.handleCreate (servers/<server>/services/xxx.ts:45)
+    [L2]   ServiceClass.publicMethod (servers/<server>/services/xxx.ts:30)
+
+▸ AnotherManager.batchInsert (managers/yyy_manager.ts:456)
+  操作：insertObjects(dbVars)
+  callers:
+    [直接] JobClass.handleJob (servers/<server>/jobs/yyy.ts:78)
+
+═══════════════════════════════════════════════════════
+🔵 READ（共 N 筆）
+═══════════════════════════════════════════════════════
+
+▸ ManagerClass.getSomething (managers/xxx_manager.ts:200)
+  操作：loadObjects(DbXxx, ...)
+  callers:
+    [直接] ServiceClass.listItems (servers/<server>/services/xxx.ts:90)
+
+▸ ManagerClass.countSomething (managers/xxx_manager.ts:300)
+  操作：count(DbXxx.tableName, ...)
+  callers: 無
+
+═══════════════════════════════════════════════════════
+🟡 UPDATE（共 N 筆）
+═══════════════════════════════════════════════════════
+
+▸ ManagerClass.updateStatus (managers/xxx_manager.ts:400)
+  操作：UPDATE ${DbXxx.tableName} SET status = ?
+  callers:
+    [直接] ServiceClass.reviewItem (servers/<server>/services/xxx.ts:150)
+    [L2]   ServiceClass.batchReview (servers/<server>/services/xxx.ts:120)
+
+═══════════════════════════════════════════════════════
+🔴 DELETE（共 N 筆）
+═══════════════════════════════════════════════════════
+
+（若無：「無 DELETE 操作。」）
+
+═══════════════════════════════════════════════════════
+統計
+═══════════════════════════════════════════════════════
+- ORM Class 數：X（<列出 class 名>）
+- CRUD 操作點：🟢C(a) 🔵R(b) 🟡U(c) 🔴D(d)，共 N 個 method
+- BFS 追蹤 caller 總數：M
+- 無法靜態解析 case：U
+```
+
+**若 U > 0**，在統計之後追加：
+
+```
+═══════════════════════════════════════════════════════
+⚠️  無法靜態解析的 case（共 U 筆）
+═══════════════════════════════════════════════════════
+- <file>:<line> — 原因：<reason>
+```
+
+**提示用戶**：在統計之後追加：
+
+```
+💡 可使用 /method-call-graph <ClassName>.<methodName> 對感興趣的方法做完整四維度分析（跨 server / 前端 / 三方回調）
+```
+
+**最後，結束。不需要額外的解釋或建議。**
