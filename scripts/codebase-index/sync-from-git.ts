@@ -6,6 +6,7 @@ import { buildNoteIndex } from './lib/file-to-note-mapper.ts';
 import { classifyChanges, deduplicateActions, type ChangeAction } from './lib/change-classifier.ts';
 import { batchCheck, hasErrors } from './lib/note-integrity-checker.ts';
 import { buildDailyReport, type DailyReportData } from './lib/daily-report-builder.ts';
+import { loadSyncState, saveSyncState, filterNewCommits, markCommitsProcessed, gcProcessedCommits } from './lib/sync-state-manager.ts';
 import { $ } from 'bun';
 
 const AGRABAH_REPO = '/Users/user/aladdin/agrabah';
@@ -13,7 +14,6 @@ const RAJAH_REPO = '/Users/user/aladdin/rajah';
 const OBSIDIAN_ROOT = '/Users/user/aladdin/obsidian';
 const SCRIPTS_DIR = `${OBSIDIAN_ROOT}/scripts/codebase-index`;
 const NOISE_RULES_PATH = `${SCRIPTS_DIR}/noise-rules.json`;
-const SYNC_STATE_PATH = `${SCRIPTS_DIR}/sync-state.json`;
 const CODEBASE_ROOT = `${OBSIDIAN_ROOT}/Codebase`;
 
 // ─── CLI args ───
@@ -34,7 +34,7 @@ async function main() {
     console.log('=== Incremental Codebase Sync ===');
     console.log(`Mode: ${dryRun ? 'DRY RUN' : finalizeOnly ? 'FINALIZE ONLY' : 'LIVE'}`);
 
-    const syncState = JSON.parse(await readFile(SYNC_STATE_PATH, 'utf-8'));
+    const syncState = await loadSyncState();
     const effectiveSince = since ?? syncState.last_sync_date ?? '2026-04-21 20:00';
     const effectiveUntil = until ?? new Date().toISOString();
     const today = new Date().toISOString().split('T')[0];
@@ -64,10 +64,28 @@ async function main() {
     });
     console.log(`rajah: ${rajahCommits.length} commits`);
 
+    // ─── Dedup: remove already-processed commits ───
+    console.log('\n--- Dedup: filtering processed commits ---');
+
+    const agrabahCollectedHashes = agrabahCommits.map(c => c.hash);
+    const agrabahDedup = filterNewCommits(agrabahCollectedHashes, syncState.processed_commits.agrabah);
+    const agrabahNew = agrabahCommits.filter(c => agrabahDedup.newHashes.includes(c.hash));
+    console.log(`agrabah: ${agrabahCommits.length} collected, ${agrabahDedup.skippedCount} already processed, ${agrabahNew.length} new`);
+
+    const rajahCollectedHashes = rajahCommits.map(c => c.hash);
+    const rajahDedup = filterNewCommits(rajahCollectedHashes, syncState.processed_commits.rajah);
+    const rajahNew = rajahCommits.filter(c => rajahDedup.newHashes.includes(c.hash));
+    console.log(`rajah: ${rajahCommits.length} collected, ${rajahDedup.skippedCount} already processed, ${rajahNew.length} new`);
+
+    if (agrabahNew.length === 0 && rajahNew.length === 0) {
+        console.log('\nNo new commits to process.');
+        return;
+    }
+
     // ─── Filter noise ───
     console.log('\n--- Filtering noise ---');
-    const agrabahFiltered = await filterCommits(agrabahCommits, AGRABAH_REPO, NOISE_RULES_PATH);
-    const rajahFiltered = await filterCommits(rajahCommits, RAJAH_REPO, NOISE_RULES_PATH);
+    const agrabahFiltered = await filterCommits(agrabahNew, AGRABAH_REPO, NOISE_RULES_PATH);
+    const rajahFiltered = await filterCommits(rajahNew, RAJAH_REPO, NOISE_RULES_PATH);
 
     console.log(`agrabah: kept=${agrabahFiltered.kept.length}, skipped=${agrabahFiltered.skipped.length}, mixed=${agrabahFiltered.mixedSignal.length}`);
     console.log(`rajah: kept=${rajahFiltered.kept.length}, skipped=${rajahFiltered.skipped.length}`);
@@ -109,8 +127,16 @@ async function main() {
 
         const reportData = buildReportData(
             today, effectiveSince, effectiveUntil,
-            agrabahCommits.length, rajahCommits.length,
-            agrabahFiltered, actions, [], 0
+            agrabahNew.length, rajahNew.length,
+            agrabahFiltered, actions, [], 0,
+            {
+                agrabahCollected: agrabahCommits.length,
+                agrabahSkipped: agrabahDedup.skippedCount,
+                agrabahNew: agrabahNew.length,
+                rajahCollected: rajahCommits.length,
+                rajahSkipped: rajahDedup.skippedCount,
+                rajahNew: rajahNew.length,
+            },
         );
         const reportPath = await buildDailyReport(reportData);
         console.log(`\nDry-run report: ${reportPath}`);
@@ -123,6 +149,8 @@ async function main() {
 
     const serializableActions = actions.map(a => ({
         type: a.type,
+        status: 'pending' as const,
+        processedAt: null as string | null,
         commitHash: a.commit.hash,
         commitMessage: a.commit.message,
         filePath: a.file.path,
@@ -158,16 +186,30 @@ async function main() {
         today,
         effectiveSince,
         effectiveUntil,
-        agrabahCommitCount: agrabahCommits.length,
-        rajahCommitCount: rajahCommits.length,
+        agrabahCommitCount: agrabahNew.length,
+        rajahCommitCount: rajahNew.length,
         filterResult: {
             kept: agrabahFiltered.kept.map(c => ({ hash: c.hash, message: c.message, author: c.author })),
             skipped: agrabahFiltered.skipped.map(s => ({ commit: { hash: s.commit.hash, message: s.commit.message }, reason: s.reason })),
             mixedSignal: agrabahFiltered.mixedSignal.map(m => ({ commit: { hash: m.commit.hash, message: m.commit.message }, note: m.note })),
         },
         actionSummary: serializableActions,
+        dedupStats: {
+            agrabahCollected: agrabahCommits.length,
+            agrabahSkipped: agrabahDedup.skippedCount,
+            agrabahNew: agrabahNew.length,
+            rajahCollected: rajahCommits.length,
+            rajahSkipped: rajahDedup.skippedCount,
+            rajahNew: rajahNew.length,
+        },
     };
     await writeFile(`${SCRIPTS_DIR}/sync-partial-meta.json`, JSON.stringify(partialMeta, null, 2));
+
+    // ─── Mark commits as processed ───
+    markCommitsProcessed(syncState, 'agrabah', agrabahNew.map(c => c.hash), today);
+    markCommitsProcessed(syncState, 'rajah', rajahNew.map(c => c.hash), today);
+    await saveSyncState(syncState);
+    console.log(`Marked ${agrabahNew.length + rajahNew.length} commits as processed`);
 
     console.log('\n=== Stage 1 complete. Dispatch agents for Stage 2, then run --finalize ===');
 }
@@ -249,12 +291,13 @@ async function runFinalize(today: string, since: string, until: string) {
         })),
         integrityIssues,
         brokenLinksCount,
+        partialMeta.dedupStats,
     );
     const reportPath = await buildDailyReport(reportData);
     console.log(`Daily report: ${reportPath}`);
 
-    // Update sync state
-    const syncState = JSON.parse(await readFile(SYNC_STATE_PATH, 'utf-8'));
+    // Update sync state + GC
+    const syncState = await loadSyncState();
     syncState.last_sync_date = until;
     syncState.sync_history.push({
         date: today,
@@ -263,7 +306,13 @@ async function runFinalize(today: string, since: string, until: string) {
         actions: partialMeta.actionSummary.length,
         report: reportPath,
     });
-    await writeFile(SYNC_STATE_PATH, JSON.stringify(syncState, null, 2));
+
+    const gcRemoved = gcProcessedCommits(syncState);
+    if (gcRemoved > 0) {
+        console.log(`GC: removed ${gcRemoved} processed commits older than 30 days`);
+    }
+
+    await saveSyncState(syncState);
 
     console.log('\n=== Sync finalized ===');
 }
@@ -278,6 +327,7 @@ function buildReportData(
     actions: any[],
     integrityIssues: any[],
     brokenLinksCount: number,
+    dedupStats?: DailyReportData['dedupStats'],
 ): DailyReportData {
     return {
         date,
@@ -294,6 +344,7 @@ function buildReportData(
         agentDispatches: actions.filter((a: any) =>
             ['new_file', 'update_existing', 'rajah_new_method', 'rajah_signature'].includes(a.type)
         ).length,
+        dedupStats,
     };
 }
 

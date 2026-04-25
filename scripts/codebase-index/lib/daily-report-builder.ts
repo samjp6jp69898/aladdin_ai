@@ -23,6 +23,14 @@ export interface DailyReportData {
     notesDeprecated: string[];
     rejectedUpdates: Array<{ note: string; reason: string }>;
     agentDispatches: number;
+    dedupStats?: {
+        agrabahCollected: number;
+        agrabahSkipped: number;
+        agrabahNew: number;
+        rajahCollected: number;
+        rajahSkipped: number;
+        rajahNew: number;
+    };
 }
 
 const REPORT_BASE_DIR = '/Users/user/aladdin/obsidian/Codebase/_index/daily-sync-reports';
@@ -75,6 +83,18 @@ export async function buildDailyReport(data: DailyReportData): Promise<string> {
         sections.push(`| ${escapeCell(metric)} | ${escapeCell(value)} |`);
     }
     sections.push('');
+
+    // 2.5 Dedup Stats
+    if (data.dedupStats) {
+        const ds = data.dedupStats;
+        sections.push('## Dedup Statistics');
+        sections.push('');
+        sections.push('| Repo | Collected | Already Processed | New |');
+        sections.push('|------|-----------|-------------------|-----|');
+        sections.push(`| agrabah | ${ds.agrabahCollected} | ${ds.agrabahSkipped} | ${ds.agrabahNew} |`);
+        sections.push(`| rajah | ${ds.rajahCollected} | ${ds.rajahSkipped} | ${ds.rajahNew} |`);
+        sections.push('');
+    }
 
     // 3. Commits Processed
     if (data.filterResult.kept.length > 0) {
