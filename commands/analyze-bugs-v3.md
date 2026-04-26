@@ -6,13 +6,13 @@ user-invocable: true
 
 # Bug Batch Analysis Workflow v3
 
-Reads `pending` tasks from the bug tracker in memory, claims them, and dispatches each one to `/analyze-single-bug-v3` to run the full analysis pipeline (report → screenshot → worktree → trace fix → spec → evaluate → validate → upload).
+Reads `pending` and `rerun` tasks from the bug tracker in memory, claims them (rerun first), and dispatches each one to `/analyze-single-bug-v3` to run the full analysis pipeline (report → screenshot → worktree → trace fix → spec → evaluate → validate → upload).
 
 ## Parameters
 
 **No parameters required.** Simply run `/analyze-bugs-v3`.
 
-The bug list to be analyzed is pre-imported into the tracker by a query script. This skill is only responsible for claiming `pending` tasks and dispatching them for analysis.
+The bug list to be analyzed is pre-imported into the tracker by a query script. This skill is only responsible for claiming `pending` / `rerun` tasks and dispatching them for analysis.
 
 ---
 
@@ -30,6 +30,7 @@ This file is generated and maintained by the `bun scripts/notion-bug-query.ts` s
 | FAQ-1841 | https://www.notion.so/... | P1重點 | pending | 2026-03-27 |  |
 | FAQ-1807 | https://www.notion.so/... | P1重點 | in_progress | 2026-03-27 |  |
 | FAQ-1722 | https://www.notion.so/... | P1重點 | done | 2026-03-27 | 20260327 1430 |
+| FAQ-1690 | https://www.notion.so/... | P2較高 | rerun | 2026-04-22 |  |
 ```
 
 ### Status Reference
@@ -37,6 +38,7 @@ This file is generated and maintained by the `bun scripts/notion-bug-query.ts` s
 | Status | Meaning |
 |--------|---------|
 | `pending` | Not yet processed; available to claim |
+| `rerun` | Previously analyzed but flagged `需要重跑` in Notion AI分析; reset from `done`/`failed` by the query script. Semantically equivalent to `pending` but **processed first** within a batch |
 | `in_progress` | Claimed by a session and currently being processed (prevents multiple sessions from grabbing the same ticket) |
 | `done` | Analysis complete |
 | `failed` | Analysis failed (exceeded retry limit or other error) |
@@ -71,29 +73,37 @@ mkdir -p /Users/user/aladdin/worktrees
    ```
 3. Parse all rows in the table
 
-### Step 2: Filter Pending Tasks
+### Step 2: Filter Pending Tasks (Rerun First)
 
-Filter all bugs with **status = `pending`** from the tracker, sorted by ticket number descending (newest first), **up to 5 tickets**.
+Filter all bugs with **status = `rerun` OR status = `pending`** from the tracker.
 
-If there are no `pending` bugs, report to the user and stop:
+Sort order (**rerun bugs are processed first**):
+
+1. `rerun` first, then `pending`
+2. Within each group, sort by ticket number descending (newest first)
+
+Take **up to 5 tickets** from the sorted list.
+
+If there are no `rerun` or `pending` bugs, report to the user and stop:
 ```
-No pending bugs to process (all tasks are in_progress/done/failed).
+No pending/rerun bugs to process (all tasks are in_progress/done/failed).
 To query new bugs, run: bun scripts/notion-bug-query.ts <severity>
 ```
 
 ### Step 3: Display Pending List
 
-Show the filtered list to the user:
+Show the filtered list to the user (rerun tickets marked explicitly):
 
 ```
 ## Pending Bug List
 
-N tickets to analyze (up to 5):
+N tickets to analyze (up to 5; rerun first):
 
-| # | 單號 | 嚴重性 | Notion 連結 |
-|---|------|--------|-------------|
-| 1 | FAQ-1841 | P1重點 | https://... |
-| 2 | FAQ-1807 | P1重點 | https://... |
+| # | 單號 | 嚴重性 | 來源 | Notion 連結 |
+|---|------|--------|------|-------------|
+| 1 | FAQ-1690 | P2較高 | rerun   | https://... |
+| 2 | FAQ-1841 | P1重點 | pending | https://... |
+| 3 | FAQ-1807 | P1重點 | pending | https://... |
 
 Starting analysis one by one.
 ```
@@ -115,7 +125,7 @@ bash scripts/bug-lock.sh claim FAQ-{ticket_id}
 - **Exit code 0** (output `CLAIMED`) → claim successful, proceed to 4b
 - **Exit code 1** (output `LOCKED`) → already claimed by another session, **skip this ticket and go to 4e to refill**
 
-After a successful claim, use the Edit tool to change the tracker status for that ticket from `pending` to `in_progress`.
+After a successful claim, use the Edit tool to change the tracker status for that ticket from `pending` or `rerun` to `in_progress`.
 
 #### 4b. Dispatch Analysis
 
@@ -164,9 +174,9 @@ Check the following conditions:
 2. **List check**: If there are still unprocessed bugs in the current working list → return to **4a** for the next ticket
 3. **Refill**: If the current working list is exhausted but `completed counter < 5`:
    - Re-read the tracker file to get a fresh snapshot
-   - Filter all bugs with **status = `pending`** (excluding any ticket already in the current working list)
-   - If new pending tickets exist → add them to the working list (up to `5 - completed` tickets) and return to **4a**
-   - If no new pending tickets exist → proceed to **Step 5** (all available work is exhausted)
+   - Filter all bugs with **status = `rerun` OR status = `pending`** (excluding any ticket already in the current working list), applying the same `rerun`-first sort as Step 2
+   - If new tickets exist → add them to the working list (up to `5 - completed` tickets) and return to **4a**
+   - If no new tickets exist → proceed to **Step 5** (all available work is exhausted)
 
 **Important: After completing each ticket, automatically continue to the next — no need to wait for user instruction. The entire loop is fully automatic.**
 
@@ -199,6 +209,7 @@ git worktree remove /Users/user/aladdin/worktrees/{ticket_id}
 2. **Atomic lock mechanism**: Use `bash scripts/bug-lock.sh claim FAQ-{ticket_id}` for atomic claiming (backed by `mkdir`, which the OS guarantees to be atomic). 8 parallel sessions will not claim the same ticket. Always `release` after completion or failure.
 3. **Fully automatic loop**: After completing each ticket, automatically claim the next — no user input needed. Continues until the list is empty.
 4. **Serial processing**: Only one ticket is processed at a time; wait for `/analyze-single-bug-v3` to finish completely before processing the next.
-5. **Maximum 5 tickets per run**: Each session targets exactly 5 completed tickets. If initial candidates are locked by other sessions, the tracker is re-read to refill with new pending tickets until 5 are completed or no pending tickets remain.
+5. **Maximum 5 tickets per run**: Each session targets exactly 5 completed tickets. If initial candidates are locked by other sessions, the tracker is re-read to refill with new `pending`/`rerun` tickets until 5 are completed or no available tickets remain.
 6. **Tracker is the single source of truth**: The query script imports Notion data into the tracker; this skill only reads from the tracker.
-7. **Lock cleanup**: If a session crashes and leaves locks unreleased, manually run `bash scripts/bug-lock.sh cleanup` to clear all locks, or `bash scripts/bug-lock.sh release FAQ-{ticket_id}` to release a specific lock.
+7. **`rerun` priority**: Tickets flagged `AI分析 = 需要重跑` in Notion get status `rerun` in the tracker (reset from previous `done`/`failed` by the query script). They are always processed before regular `pending` tickets within a batch. Upon successful completion, their status becomes `done` just like any other ticket.
+8. **Lock cleanup**: If a session crashes and leaves locks unreleased, manually run `bash scripts/bug-lock.sh cleanup` to clear all locks, or `bash scripts/bug-lock.sh release FAQ-{ticket_id}` to release a specific lock.

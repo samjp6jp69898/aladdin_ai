@@ -116,6 +116,16 @@
 10. **Dimension 清單是下限，不是上限**：每個 dimension 的檢查項是「必須覆蓋的最低要求」。你必須基於資深架構師的專業判斷，主動發現清單之外的問題 — 包括但不限於 JavaScript 語言陷阱、業務邏輯漏洞、跨 commit 的不一致、隱含的資料正確性問題等。清單未列出的問題不代表不需要審查。
 11. **每個 commit 的每個修改點都必須獨立審查**：不可因 commit 數量多而跳過或簡略帶過任何 commit。每個 diff hunk 都必須逐一檢視，確保問題覆蓋面的完整性。特別注意跨 commit 之間的時序依賴和中間狀態問題。
 12. **刪除操作必須追查引用點**：當 commit 刪除元件、路由、函式、變數時，必須主動搜索（Grep/Glob）是否有其他檔案仍在引用被刪除的目標。殘留的引用會導致 runtime crash、白屏、404 等嚴重問題，屬於 P0/P1 級別。
+13. **Author 身份比對必須用 email（`%ae`），不是名字（`%an`）**：收集某 author 的 commits 一律用 `git log --author="<email>"`。報告檔名雖用 `%an`，但檔名本身不是身份證 — 實際審查內容必須以 `%ae` 為鎖定鍵。補掃 / 更新既有報告時：
+    - (a) **先用 email 查 git**，確認 commits 實際屬於該人；
+    - (b) 再用 email 確認既有 `<%an>_YYYYMMDD.md` 檔案的身份（讀檔內既有 agrabah/abu/lago/rajah 段的 commit hash，反查 `%ae`）；
+    - (c) 若既有檔案的 `%ae` 與目前要補的 commits 的 `%ae` 不一致，**絕對不可 append，必須另開新檔**。
+    已知高風險混淆對（歷史踩坑紀錄，請更新到這個列表）：
+    - `Jeffrey`（`pkh_ian.h@photons.com.tw`）vs `JeffKuo`（`pkh_jeffrey@photons.com.tw`）— 不同人，email prefix 反而像對方名字。
+    - `JLee` / `jonathan` 共用 `pkh_aceryue@photons.com.tw` — 同一人兩個 `%an`。
+    - `Kevin Kung KHH` / `Kevin` 共用 `pkh_kevin@photons.com.tw` — 同一人兩個 `%an`。
+    - `maxyeh` 有 `pkh_maxeh666` 與 `pkh_maxyeh666` 兩個 email（typo）— 同一人。
+    `pkh_<name>` 形式的 email prefix **不保證** 等於 git `%an`；永遠以 `%ae` 為準。
 
 ---
 

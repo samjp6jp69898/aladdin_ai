@@ -47,6 +47,33 @@ FLAG_FILE="/Users/user/aladdin/review/.$TODAY.bootstrap_ready"
 
 ---
 
+### Step 1.5: Per-Repo Sanity Check (Commit Freshness)
+
+Bootstrap flag only proves `daily_bootstrap.sh` finished — it does not prove every repo was actually pulled (e.g. a `git-lfs` hook failure inside `git pull` can leave `HEAD` stuck on an old commit while `update.sh` still returns 0). Before scanning, verify that each repo has all remote commits for the review date. If not, pull it in-place. Do **not** abort.
+
+For each repo in `agrabah`, `abu`, `lago`, `rajah`:
+
+```bash
+REPO_DIR=/Users/user/aladdin/<repo>
+git -C "$REPO_DIR" fetch --quiet origin
+UPSTREAM=$(git -C "$REPO_DIR" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)
+
+LOCAL_COUNT=$(git -C "$REPO_DIR" log --oneline \
+  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59" | wc -l | tr -d ' ')
+REMOTE_COUNT=$(git -C "$REPO_DIR" log --oneline "$UPSTREAM" \
+  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59" | wc -l | tr -d ' ')
+```
+
+| Situation | Action |
+|-----------|--------|
+| `REMOTE_COUNT == LOCAL_COUNT` | OK, continue |
+| `REMOTE_COUNT > LOCAL_COUNT` | Log the gap, then `git -C "$REPO_DIR" pull --ff-only`; if FF fails, `git reset --hard "$UPSTREAM"`. Do NOT abort the review. |
+| `pull / reset still fails` | Log the failure with repo name, continue scanning other repos; note in final CSV that this repo was skipped |
+
+After all 4 repos are reconciled, proceed to Step 2.
+
+---
+
 ### Step 2: Scan All Repos — Collect Author Workload Data
 
 Run git log with `--numstat` on all 4 repos to get author + commit count + lines changed in one pass:
@@ -67,7 +94,38 @@ Parse the output to build a workload table per author:
 **Parsing rules:**
 - Lines starting with `COMMIT_START|` mark a new commit → extract author, email, repo
 - Subsequent lines with `<added>\t<deleted>\t<filepath>` are numstat → sum added+deleted per author
-- Deduplicate by author name (`%an`)
+- **Deduplicate by `%ae` (email), NOT by `%an`**. The canonical display name is the most recent `%an` observed for that email.
+- When collecting an author's commits in later steps, always filter by `%ae`, never by `%an`.
+
+---
+
+### Step 2.1: Author Identity Disambiguation (MANDATORY)
+
+Before grouping, verify the author table against the known identity-collision hazards in this repo. These have bitten us before — do not skip.
+
+**Case A: Same email used by multiple `%an` values** (usually same person; one `git config` mistake)
+```bash
+# detect: any email with >1 distinct %an this scan
+```
+Action: merge into one logical author; use the most recent `%an` as the canonical name; record the alias list in the report header note.
+
+**Case B: Different emails that look similar to another author's name** (DIFFERENT people — the Jeffrey/JeffKuo trap)
+Known confusing pairs — treat each as distinct author and NEVER merge:
+
+| `%an` | `%ae` | Note |
+|-------|-------|------|
+| `Jeffrey` | `pkh_ian.h@photons.com.tw` | NOT the same person as JeffKuo |
+| `JeffKuo` | `pkh_jeffrey@photons.com.tw` | email prefix `pkh_jeffrey` ≠ `%an` Jeffrey |
+| `ian` | `pkh_ian.lin@photons.com.tw` | shares "ian" prefix with Jeffrey's email — still distinct |
+| `Dylan` | `pkh_yotsai@photons.com.tw` | email prefix `yotsai` also appears as a separate `%an` `yotsai` (gmail); confirm both when present |
+| `yotsai` | `r8613266@gmail.com` | external gmail, distinct from Dylan |
+| `JLee` / `jonathan` | `pkh_aceryue@photons.com.tw` | Case A — same person using two names |
+| `Kevin Kung KHH` / `Kevin` | `pkh_kevin@photons.com.tw` | Case A — same person |
+| `maxyeh` | `pkh_maxeh666` / `pkh_maxyeh666` | typo'd email — same person; prefer newer address |
+
+**General rule: the `pkh_<name>` email prefix is NOT a reliable identity signal.** Always key off the full `%ae`, and when writing report filenames use the `%an` that actually appears on the commits you are reviewing.
+
+**Report filename rule:** `<%an>_<REVIEW_DATE>.md`. If two distinct emails happen to produce the same sanitized `%an` (extremely rare in this repo — not currently observed), disambiguate by appending the email local-part: `<%an>.<email-local>_<REVIEW_DATE>.md`. Before finalizing filenames, run a collision check and alert if any two distinct emails resolve to the same file.
 
 ---
 

@@ -1,7 +1,13 @@
 /**
  * Notion Bug List 查詢腳本
  *
- * 固定篩選：狀態=待處理,待上版,仍有問題,處理中,待測試 AI分析=待分析
+ * 固定篩選：狀態=待處理,仍有問題,處理中 AI分析=待分析,需要重跑
+ *
+ * 寫入 tracker 的規則：
+ *   - AI分析=待分析：新單以 `pending` 加入；已存在於 tracker 則略過（不覆寫現有狀態）
+ *   - AI分析=需要重跑：若 tracker 已有紀錄（通常 status=done/failed），重設為 `rerun`
+ *     並更新加入時間、清空完成時間；若尚未有紀錄則以 `rerun` 新增。`rerun` 為
+ *     `pending` 的優先子型別，/analyze-bugs-v3 會先處理。
  *
  * 用法：
  *   bun scripts/notion-bug-query.ts <嚴重性> [選項]
@@ -92,12 +98,15 @@ function buildFilter(severity: string): object {
     const conditions: (NotionFilter | NotionOrGroup)[] = [];
 
     // 狀態固定篩選多值
-    const statusValues = ['待處理', '待上版', '仍有問題', '處理中', '待測試'];
+    const statusValues = ['待處理', '仍有問題', '處理中'];
     conditions.push({
         or: statusValues.map(v => ({ property: '狀態', select: { equals: v } })),
     });
-    // AI分析 固定
-    conditions.push({ property: 'AI分析', select: { equals: '待分析' } });
+    // AI分析 固定：待分析（新單）或 需要重跑（重送分析）
+    const aiAnalysisValues = ['待分析', '需要重跑'];
+    conditions.push({
+        or: aiAnalysisValues.map(v => ({ property: 'AI分析', select: { equals: v } })),
+    });
 
     // 嚴重性支援逗號分隔多值
     const severityValues = severity.split(',').map(s => s.trim());
@@ -222,7 +231,8 @@ function printTable(items: BugItem[]) {
 
     console.log(`\n  共 ${items.length} 筆\n`);
     for (const item of items) {
-        console.log(`  FAQ-${item.faqNumber}  |  ${item.url}`);
+        const rerunMark = item.aiAnalysis === '需要重跑' ? ' [需要重跑]' : '';
+        console.log(`  FAQ-${item.faqNumber}${rerunMark}  |  ${item.url}`);
     }
     console.log();
 }
@@ -233,7 +243,7 @@ interface TrackerEntry {
     faqNumber: number;
     url: string;
     severity: string;
-    status: 'pending' | 'in_progress' | 'done' | 'failed';
+    status: 'pending' | 'rerun' | 'in_progress' | 'done' | 'failed';
     addedAt: string;
     doneAt?: string;
 }
@@ -282,26 +292,52 @@ type: project
     writeFileSync(TRACKER_PATH, header + rows.join('\n') + '\n', 'utf-8');
 }
 
-function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
+function mergeToTracker(items: BugItem[]): {
+    added: number;
+    addedRerun: number;
+    reset: number;
+    skipped: number;
+} {
     const existing = readTracker();
-    const existingFaqs = new Set(existing.map(e => e.faqNumber));
+    const existingByFaq = new Map(existing.map(e => [e.faqNumber, e]));
     const today = new Date().toISOString().slice(0, 10);
 
     let added = 0;
+    let addedRerun = 0;
+    let reset = 0;
     let skipped = 0;
 
     for (const item of items) {
-        if (existingFaqs.has(item.faqNumber)) {
-            skipped++;
+        const isRerun = item.aiAnalysis === '需要重跑';
+        const entry = existingByFaq.get(item.faqNumber);
+
+        if (entry) {
+            if (isRerun) {
+                // 重送分析：一律把既有紀錄拉回處理佇列，不論原本是 done/failed/pending
+                entry.status = 'rerun';
+                entry.severity = item.severity;
+                entry.url = item.url;
+                entry.addedAt = today;
+                entry.doneAt = undefined;
+                reset++;
+            } else {
+                // 待分析 + 已存在：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
+                skipped++;
+            }
         } else {
+            // 全新單
             existing.push({
                 faqNumber: item.faqNumber,
                 url: item.url,
                 severity: item.severity,
-                status: 'pending',
+                status: isRerun ? 'rerun' : 'pending',
                 addedAt: today,
             });
-            added++;
+            if (isRerun) {
+                addedRerun++;
+            } else {
+                added++;
+            }
         }
     }
 
@@ -309,7 +345,7 @@ function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
     existing.sort((a, b) => b.faqNumber - a.faqNumber);
     writeTracker(existing);
 
-    return { added, skipped };
+    return { added, addedRerun, reset, skipped };
 }
 
 // ── 主程式 ──
@@ -317,7 +353,7 @@ function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=待處理,待上版,仍有問題,處理中,待測試 | AI分析=待分析 | 嚴重性=${args.severity} | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=待處理,仍有問題,處理中 | AI分析=待分析,需要重跑 | 嚴重性=${args.severity} | 上限=${args.limit}`);
 
     const filter = buildFilter(args.severity);
     const results = await queryDatabase(filter, args.limit);
@@ -330,8 +366,11 @@ async function main() {
     }
 
     // 寫入 tracker
-    const { added, skipped } = mergeToTracker(items);
-    console.log(`  Tracker 更新: 新增 ${added} 筆, 略過 ${skipped} 筆（已存在）`);
+    const { added, addedRerun, reset, skipped } = mergeToTracker(items);
+    console.log(
+        `  Tracker 更新: 新增 ${added} 筆 (pending), 新增 ${addedRerun} 筆 (rerun), `
+        + `重置 ${reset} 筆 (既有→rerun), 略過 ${skipped} 筆（已存在且未標記重跑）`
+    );
     console.log(`  檔案: ${TRACKER_PATH}\n`);
 }
 
