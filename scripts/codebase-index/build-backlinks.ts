@@ -1,8 +1,10 @@
 import { Glob } from 'bun';
 import { parseNote, type ParsedNote } from './lib/note-parser.ts';
 import { readFile, writeFile } from 'node:fs/promises';
+import { basename } from 'node:path';
 
 const ROOT = '/Users/user/aladdin/obsidian/Codebase';
+const VAULT_ROOT = '/Users/user/aladdin/obsidian';
 
 const AUTO_MARKER = '<!-- AUTO-GENERATED BACKLINKS -->';
 
@@ -50,6 +52,16 @@ async function main() {
         }
     }
 
+    // Vault-wide note names (without .md) for cross-area link validation.
+    // Links pointing outside Codebase/ but existing elsewhere in the vault
+    // are not broken — Obsidian resolves them globally.
+    const vaultNoteNames = new Set<string>();
+    const vaultGlob = new Glob('**/*.md');
+    for await (const rel of vaultGlob.scan(VAULT_ROOT)) {
+        if (rel.startsWith('.obsidian/')) continue;
+        vaultNoteNames.add(basename(rel, '.md'));
+    }
+
     const calledBy = new Map<string, Set<string>>();
     const usedBy = new Map<string, Set<string>>();
     const accessedBy = new Map<string, Set<string>>();
@@ -65,6 +77,8 @@ async function main() {
         if (notes.has(target)) return target;
         const viaAlias = aliasIndex.get(target);
         if (viaAlias && notes.has(viaAlias)) return viaAlias;
+        // Exists elsewhere in the vault (Projects/, Rules/, etc.) — not broken
+        if (vaultNoteNames.has(target)) return `__vault__:${target}`;
         return undefined;
     };
 
@@ -75,7 +89,9 @@ async function main() {
                 brokenLinks.push({ from: note.fqn, to: target, kind });
                 return;
             }
-            const targetType = notes.get(resolved)!.type;
+            const targetNote = notes.get(resolved);
+            if (!targetNote) return; // exists in vault but outside Codebase/
+            const targetType = targetNote.type;
             if (targetType === 'rpc-method' || targetType === 'manager-method') {
                 add(calledBy, resolved, note.fqn);
             } else if (targetType === 'model' || targetType === 'enum') {
@@ -95,7 +111,9 @@ async function main() {
         for (const link of note.otherOutgoingLinks) {
             const resolved = resolve(link);
             if (!resolved) continue;
-            const linkType = notes.get(resolved)!.type;
+            const resolvedNote = notes.get(resolved);
+            if (!resolvedNote) continue; // exists in vault but outside Codebase/
+            const linkType = resolvedNote.type;
             if (linkType === 'model' || linkType === 'enum') {
                 add(usedBy, resolved, note.fqn);
             } else if (linkType === 'db-orm') {
