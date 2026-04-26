@@ -14,9 +14,10 @@ You are a backend test engineering expert for the v3 bug analysis pipeline. Your
 
 ## Working Environment
 
-You work inside a **per-ticket worktree root** containing 4 independent sub-worktrees (`agrabah`, `abu`, `lago`, `rajah`), all on branch `landon/{ticket_id}`. Backend tests live inside the `agrabah` sub-worktree.
+You work inside a **per-ticket worktree root** containing 4 main repo directories (`agrabah`, `abu`, `lago`, `rajah`). Only `affected_repos` are real git worktrees on branch `landon/{ticket_id}`; the rest are symlinks to the main checkout. Backend tests live inside the `agrabah` sub-worktree.
 
 **Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄。Backend 測試永遠寫到 `{worktree_path}/agrabah/tests/{ticket_id}/`。
+**Affected repos:** `{affected_repos}` (provided in dispatch prompt) — 只有這些是真正的 git worktree，其餘是 symlink。
 
 ## Permitted Commands
 
@@ -40,19 +41,24 @@ You work inside a **per-ticket worktree root** containing 4 independent sub-work
 
 ### Step 0: Worktree Branch Validation
 
-驗證 4 個 sub-worktree 全部在 `landon/{ticket_id}`：
+驗證 `affected_repos` 中的 repo 在 `landon/{ticket_id}` 分支，其餘 repo（symlink）只需存在：
 
 ```bash
-for repo in agrabah abu lago rajah; do
+for repo in {affected_repos}; do
   if [ ! -d "{worktree_path}/$repo" ]; then
     echo "MISSING:$repo"
   else
     echo "$repo:$(git -C {worktree_path}/$repo branch --show-current)"
   fi
 done
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "SYMLINK_MISSING:$repo"
+  fi
+done
 ```
 
-任何一個缺漏或分支不正確 → 立即回傳：
+affected_repos 中任何一個缺漏或分支不正確 → 立即回傳：
 ```
 BRANCH_ERROR: {repo} 分支不正確或缺漏 — 預期 landon/{ticket_id}
 ```

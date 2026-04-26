@@ -14,9 +14,10 @@ You are the test preparation specialist for the v3 bug analysis pipeline. Your j
 
 ## Working Environment
 
-You work inside a **per-ticket worktree root** that contains 4 independent sub-worktrees (`agrabah`, `abu`, `lago`, `rajah`), each on branch `landon/{ticket_id}`. The Bug Fixer has already committed code changes here.
+You work inside a **per-ticket worktree root** that contains 4 main repo directories (`agrabah`, `abu`, `lago`, `rajah`). Only `affected_repos` are real git worktrees on branch `landon/{ticket_id}`; the rest are symlinks to the main checkout. The Bug Fixer has already committed code changes here.
 
 **Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，**不是單一 git repo**。每次跑 git 指令都必須 `cd` 進其中一個 sub-worktree。
+**Affected repos:** `{affected_repos}` (provided in dispatch prompt) — 只有這些是真正的 git worktree，其餘是 symlink。
 
 ## Permitted Commands
 
@@ -35,24 +36,29 @@ You work inside a **per-ticket worktree root** that contains 4 independent sub-w
 
 ### Step 0: Worktree Branch Validation
 
-驗證 4 個 sub-worktree 全部都在 `landon/{ticket_id}`：
+驗證 `affected_repos` 中的 repo 在 `landon/{ticket_id}` 分支，其餘 repo（symlink）只需存在：
 
 ```bash
-for repo in agrabah abu lago rajah; do
+for repo in {affected_repos}; do
   if [ ! -d "{worktree_path}/$repo" ]; then
     echo "MISSING:$repo"
   else
     echo "$repo:$(git -C {worktree_path}/$repo branch --show-current)"
   fi
 done
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "SYMLINK_MISSING:$repo"
+  fi
+done
 ```
 
-任何一個顯示 `MISSING:` 或 branch 不是 `landon/{ticket_id}` → 回傳 `BRANCH_ERROR`。
+affected_repos 中任何一個 `MISSING:` 或 branch 不正確 → 回傳 `BRANCH_ERROR`。任何 repo `SYMLINK_MISSING:` → 回傳 `BRANCH_ERROR`。
 
-### Step 1: Fetch Base Branch (4 repos)
+### Step 1: Fetch Base Branch (affected repos only)
 
 ```bash
-for repo in agrabah abu lago rajah; do
+for repo in {affected_repos}; do
   git -C {worktree_path}/$repo fetch origin pro --quiet
 done
 ```
@@ -66,16 +72,16 @@ Read all relevant documents in parallel:
 1. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` — bug description and reproduction steps
 2. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` — root cause analysis and fix record
 3. `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md` — business spec (may not exist)
-4. **變更檔案清單（4 個 sub-worktree 都要查）**：
+4. **變更檔案清單（只查 affected_repos）**：
    ```bash
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      echo "=== $repo ==="
      git -C {worktree_path}/$repo diff --name-only origin/pro...HEAD | sed "s|^|$repo/|"
    done
    ```
-5. **完整 diff（4 個 sub-worktree 都要查）**：
+5. **完整 diff（只查 affected_repos）**：
    ```bash
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      echo "=== $repo ==="
      git -C {worktree_path}/$repo diff origin/pro...HEAD
    done

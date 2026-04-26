@@ -108,36 +108,52 @@ ticket_id: {ticket_id}
 
 Read analysis-notes.md: if bug is confirmed already fixed (有「已修復紀錄」section with commit hash), **skip Steps 4-8** and go directly to Step 9.
 
+#### Extract affected_repos
+
+從 analysis-notes.md 的「修復策略」section 中，掃描所有修改檔案路徑的前綴，提取涉及的 repo 集合：
+
+- 路徑以 `agrabah/` 開頭 → `agrabah`
+- 路徑以 `abu/` 開頭 → `abu`
+- 路徑以 `lago/` 開頭 → `lago`
+- 路徑以 `rajah/` 開頭 → `rajah`
+
+Store as: `affected_repos`（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`）
+
+若解析不出任何 repo（例如 tracer 標記已修復），則 `affected_repos` 為空，Step 4 的 worktree 建立仍會執行（全部用 symlink），bootstrap 會在主工作區的 rajah 上跑。
+
 ---
 
-### Step 4: Create Worktrees (4 repos, nested layout)
+### Step 4: Create Worktrees (按需建立 + symlink 補齊)
 
-每張單會建立 4 個 sub-worktree，放在同一個 per-ticket 根目錄底下，目的是讓 `rajah/bootstrap.sh` 與 `generate-*.sh` 內的 `../agrabah` / `../abu` / `../lago` 相對路徑能正確解析到「同一張單對應的兄弟 worktree」。
+只為 `affected_repos` 中的 repo 建立真正的 git worktree（隔離環境），其餘 repo 用 symlink 指回主工作區。所有 7 個目錄（4 主 repo + 3 共用庫）都會出現在 per-ticket 根目錄下，確保 `rajah/bootstrap.sh` 與 `generate-*.sh` 內的相對路徑（`../agrabah`、`../abu`、`../lago`、`../jasmine` 等）在任何情境下都能正確解析。
 
-**目標結構：**
+**目標結構（以 affected_repos = ["agrabah"] 為例）：**
 ```
 /Users/user/aladdin/worktrees/{ticket_id}/
 ├── agrabah   (git worktree, branch landon/{ticket_id}, base origin/pro)
-├── abu       (git worktree, branch landon/{ticket_id}, base origin/pro)
-├── lago      (git worktree, branch landon/{ticket_id}, base origin/pro)
-└── rajah     (git worktree, branch landon/{ticket_id}, base origin/pro)
+├── abu       (symlink → /Users/user/aladdin/abu)
+├── lago      (symlink → /Users/user/aladdin/lago)
+├── rajah     (symlink → /Users/user/aladdin/rajah)
+├── jasmine   (symlink → /Users/user/aladdin/jasmine)
+├── genie     (symlink → /Users/user/aladdin/genie)
+└── jafar     (symlink → /Users/user/aladdin/jafar)
 ```
 
-**指令（4 個 repo 全部建立 + 驗證 + bootstrap）：**
+**指令（按需建立 worktree + symlink 補齊 + 驗證 + bootstrap）：**
 
 ```bash
 mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
 
-# 對 agrabah / abu / lago / rajah 4 個主 repo 逐一建立 worktree
-for repo in agrabah abu lago rajah; do
+# 對 affected_repos 中的 repo 建立真正的 git worktree
+for repo in {affected_repos}; do
   cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
   git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
     || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
 done
 
-# 強制驗證：4 個 sub-worktree 全部都必須在 landon/{ticket_id}
+# 驗證：affected_repos 中的 sub-worktree 全部都必須在 landon/{ticket_id}
 ALL_OK=1
-for repo in agrabah abu lago rajah; do
+for repo in {affected_repos}; do
   branch=$(git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current 2>/dev/null)
   if [ "$branch" != "landon/{ticket_id}" ]; then
     echo "WORKTREE_ERROR: $repo branch=$branch (expected landon/{ticket_id})"
@@ -146,32 +162,38 @@ for repo in agrabah abu lago rajah; do
 done
 [ "$ALL_OK" = "1" ] || exit 1
 
-# 為共用庫（jasmine / genie / jafar）建立 symlink 指回主工作區，
-# 讓 rajah/generate-*.sh 內寫死的 ../jasmine、../genie、../jafar 相對路徑能解析到真實目錄。
-# 這三個 repo 不在本單改動範圍，不需要獨立 worktree，用 symlink 即可。
+# 不在 affected_repos 中的主 repo 用 symlink 指回主工作區
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "/Users/user/aladdin/worktrees/{ticket_id}/$repo" ]; then
+    ln -sfn /Users/user/aladdin/$repo /Users/user/aladdin/worktrees/{ticket_id}/$repo
+  fi
+done
+
+# 共用庫（jasmine / genie / jafar）一律 symlink
 for shared in jasmine genie jafar; do
   ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
 done
 
-# 從 rajah 子 worktree 跑 bootstrap，相對路徑會解到兄弟 sub-worktree（agrabah/abu/lago）
-# 以及 symlink 指向的 jasmine/genie/jafar。
+# 從 rajah（可能是 worktree 或 symlink）跑 bootstrap
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
 ```
 
 Store worktree root: `worktree_path = /Users/user/aladdin/worktrees/{ticket_id}`
-（注意：本變數已不再指向單一 git repo，而是指向「包含 4 個 sub-worktree 的 per-ticket 根目錄」，這個語意必須傳遞給所有 sub-agent。）
+Store affected repos: `affected_repos`（必須傳遞給所有 sub-agent）
+
+（注意：`worktree_path` 指向「per-ticket 根目錄」，其中 `affected_repos` 是真正的 git worktree，其餘是 symlink。這個語意必須傳遞給所有 sub-agent。）
 
 **若任一 sub-worktree 建立或驗證失敗：**
 1. 先嘗試清掉殘留：
    ```bash
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      cd /Users/user/aladdin/$repo 2>/dev/null && git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
    done
    rm -rf /Users/user/aladdin/worktrees/{ticket_id}
    ```
 2. 再次執行整段建立 + 驗證指令。若仍失敗 → 進入 Pipeline Failure。
 
-如果 bootstrap.sh 失敗（例如 sync-all 連不到 DB），記錄錯誤但繼續流程；只有「4 個 sub-worktree 沒全部建立成功」才視為硬性失敗。
+如果 bootstrap.sh 失敗（例如 sync-all 連不到 DB），記錄錯誤但繼續流程；只有「affected_repos 中的 sub-worktree 沒全部建立成功」才視為硬性失敗。
 
 ---
 
@@ -191,6 +213,7 @@ Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer.md} as the prompt.
 analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 ticket_id: {ticket_id}
 ```
 
@@ -204,6 +227,7 @@ analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_
 evaluator feedback (backend): /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-backend-evaluator-report.md
 evaluator feedback (frontend): /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-frontend-evaluator-report.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 ticket_id: {ticket_id}
 
 Read the evaluator feedback carefully, modify the code on the same branch, and commit a new fix.
@@ -214,26 +238,32 @@ Read the evaluator feedback carefully, modify the code on the same branch, and c
 #### BRANCH_ERROR Handling
 
 If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
-1. 清除殘留並重建 4 個 sub-worktree：
+1. 清除殘留並重建 affected_repos 的 worktree + symlink：
    ```bash
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      cd /Users/user/aladdin/$repo 2>/dev/null && git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
    done
    rm -rf /Users/user/aladdin/worktrees/{ticket_id}
    mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
      git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
        || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
    done
-   # 共用庫 symlink（jasmine / genie / jafar）同樣要補回
+   # 不在 affected_repos 中的主 repo 用 symlink
+   for repo in agrabah abu lago rajah; do
+     if [ ! -d "/Users/user/aladdin/worktrees/{ticket_id}/$repo" ]; then
+       ln -sfn /Users/user/aladdin/$repo /Users/user/aladdin/worktrees/{ticket_id}/$repo
+     fi
+   done
+   # 共用庫 symlink
    for shared in jasmine genie jafar; do
      ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
    done
    ```
-2. 驗證 4 個 sub-worktree 全部都在 `landon/{ticket_id}`：
+2. 驗證 affected_repos 的 sub-worktree 都在 `landon/{ticket_id}`：
    ```bash
-   for repo in agrabah abu lago rajah; do
+   for repo in {affected_repos}; do
      git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current
    done
    ```
@@ -250,6 +280,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/env-preparer.md} as the prompt. Please analyze the bug fix changes, collect mock data from dev DB, and write the test description document.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 ```
 
 **Wait for completion.**
@@ -280,6 +311,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/backend-evaluator.md} as the prompt. Please write backend tests according to the test description and run them.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
 
 When done, output your final result on the last line:
@@ -295,6 +327,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/frontend-evaluator.md} as the prompt. Please write frontend tests according to the test description and run them.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
 
 When done, output your final result on the last line:
@@ -322,13 +355,14 @@ Extract `EVAL_RESULT` from each response. Set state:
 
 ### Step 8: Test Validator
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/test-validator-v2.md`:
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/test-validator.md`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/test-validator-v2.md} as the prompt. Please validate the test coverage against the test description.
+Use all text in {/Users/user/aladdin/.claude/agents/test-validator.md} as the prompt. Please validate the test coverage against the test description.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 ```
 
 **Wait for completion.**
@@ -348,6 +382,7 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/backend-evaluator.md} as the prompt. The test validator found gaps. Please supplement the tests based on the feedback.
 ticket_id: {ticket_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 test description path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-prepare-test-desc.md
 validation feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-validation-report.md
 
@@ -372,6 +407,7 @@ Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the pr
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 pipeline_status: success
 ```
 
@@ -394,7 +430,7 @@ drive-uploader 會根據 `pipeline_status` 將 Notion「AI分析」欄位更新�
 - Test Validator: passed (attempt {validator_attempt_count + 1})
 - Google Drive: {share link}
 - Notion comment: completed / failed
-- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (含 4 個 sub-worktree: agrabah / abu / lago / rajah，全部 branch: landon/{ticket_id})
+- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (affected_repos: {affected_repos} 為 git worktree on landon/{ticket_id}，其餘為 symlink)
 
 Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
@@ -417,6 +453,7 @@ Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the pr
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+affected_repos: {affected_repos}
 pipeline_status: failed
 failure_reason: {最後一次 evaluator / tracer / fixer 退回理由摘要}
 tracer_attempt_count: {tracer_attempt_count}

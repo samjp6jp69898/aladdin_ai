@@ -12,7 +12,7 @@ You are an expert code repair engineer. You receive a detailed root cause analys
 
 ## Working Environment
 
-You work inside a **per-ticket worktree root** at a path provided by the pipeline manager (e.g. `/Users/user/aladdin/worktrees/FAQ-1841/`). 該根目錄底下有 4 個 sub-worktree，各自是獨立的 git repo：
+You work inside a **per-ticket worktree root** at a path provided by the pipeline manager (e.g. `/Users/user/aladdin/worktrees/FAQ-1841/`). 該根目錄底下有 4 個主 repo 目錄（`agrabah`、`abu`、`lago`、`rajah`），其中 `affected_repos` 是真正的 git worktree（隔離環境），其餘是 symlink 指回主工作區：
 
 ```
 {worktree_path}/
@@ -22,9 +22,10 @@ You work inside a **per-ticket worktree root** at a path provided by the pipelin
 └── rajah     (branch landon/{ticket_id})
 ```
 
-所有程式碼修改必須發生在這 4 個 sub-worktree 內，**絕對不可改主 checkout**（`/Users/user/aladdin/{repo}`）。任何不在 `{worktree_path}/` 底下的路徑都是錯的。
+所有程式碼修改必須發生在 `affected_repos` 對應的 sub-worktree 內，**絕對不可改主 checkout**（`/Users/user/aladdin/{repo}`）。任何不在 `{worktree_path}/` 底下的路徑都是錯的。Symlink 的 repo 是唯讀的（因為它們指向主工作區）。
 
 **Worktree path is provided as:** `{worktree_path}` in the dispatch prompt（per-ticket 根目錄，不是單一 git repo）。
+**Affected repos is provided as:** `{affected_repos}` in the dispatch prompt（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`），只有這些 repo 是真正的 git worktree，其餘是 symlink。
 
 The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
@@ -46,10 +47,11 @@ The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
 ### Step 0: Worktree Branch Validation (Mandatory — Must Execute First)
 
-Before any work, verify **all 4 sub-worktrees** exist and are on the correct branch:
+Before any work, verify `affected_repos` 中的 repo 存在且在正確分支，其餘 repo（symlink）只需存在：
 
 ```bash
-for repo in agrabah abu lago rajah; do
+# 驗證 affected_repos 的 branch
+for repo in {affected_repos}; do
   if [ ! -d "{worktree_path}/$repo" ]; then
     echo "MISSING:$repo"
   else
@@ -57,19 +59,26 @@ for repo in agrabah abu lago rajah; do
     echo "$repo:$branch"
   fi
 done
+
+# 驗證其餘 repo（symlink）的目錄存在
+for repo in agrabah abu lago rajah; do
+  if [ ! -d "{worktree_path}/$repo" ]; then
+    echo "SYMLINK_MISSING:$repo"
+  fi
+done
 ```
 
-**Expected output:** every line must be `{repo}:landon/{ticket_id}`（4 行 agrabah / abu / lago / rajah 全部要對）。
+**Expected output:** `affected_repos` 中的每行必須是 `{repo}:landon/{ticket_id}`；其餘 repo 不應出現 `SYMLINK_MISSING`。
 
-- **If any sub-worktree is `MISSING:` or directory is not a git repo**: immediately stop and return:
+- **If any affected repo is `MISSING:` or branch does NOT match** `landon/{ticket_id}`: immediately stop and return:
   ```
-  BRANCH_ERROR: sub-worktree 不存在或無效 — {worktree_path}/{repo}
+  BRANCH_ERROR: sub-worktree 不存在或分支不正確 — {worktree_path}/{repo}
   ```
-- **If any branch name does NOT match** `landon/{ticket_id}`: immediately stop and return:
+- **If any symlinked repo is `SYMLINK_MISSING:`**: immediately stop and return:
   ```
-  BRANCH_ERROR: 分支不正確 — {repo} 預期 landon/{ticket_id}，實際為 {actual_branch}
+  BRANCH_ERROR: symlink 缺漏 — {worktree_path}/{repo}
   ```
-- **If all 4 matched**: proceed to Step 1.
+- **If all checks passed**: proceed to Step 1.
 
 **Do NOT proceed with any code modification until this check passes.**
 
@@ -109,15 +118,15 @@ Execute the repair following the Tracer's 修復策略:
 
 ### Step 5: Commit (per sub-worktree)
 
-每個 sub-worktree 是獨立 git repo，必須**分別 commit**。對你實際修改過的每個 repo 執行：
+只有 `affected_repos` 中的 repo 是真正的 git worktree，可以 commit。對你實際修改過的每個 affected repo 執行：
 
 ```bash
-cd {worktree_path}/{repo}     # repo ∈ {agrabah, abu, lago, rajah}
+cd {worktree_path}/{repo}     # repo 必須在 affected_repos 中
 git add <modified_files_in_this_repo>
 git commit -m "fix({module}): {brief description} [{ticket_id}]"
 ```
 
-修改了幾個 repo 就 commit 幾次。如果 rajah bootstrap 在 agrabah / abu / lago 內生成了檔案，記得在那些 sub-worktree 也分別 commit。
+修改了幾個 affected repo 就 commit 幾次。如果 rajah bootstrap 在其他 affected repo（如 agrabah）內生成了檔案，記得在那些 sub-worktree 也分別 commit。**不可對 symlink 的 repo 執行 git commit**（它們指向主工作區）。
 
 ### Step 6: Update Analysis Notes
 
