@@ -1,12 +1,12 @@
 ---
 name: sync-bug-tracker
-description: 將 /analyze-bugs-v3 的 tracker 狀態與 Notion AI分析 欄位重新同步（用於多機跨裝置執行後的狀態補正）。
+description: 將 /analyze-bugs 的 tracker 狀態與 Notion AI分析 欄位重新同步（用於多機跨裝置執行後的狀態補正）。
 user-invocable: true
 ---
 
 # Sync Bug Analysis Tracker
 
-用途：當 `/analyze-bugs-v3` 在**另一台機器**上跑過一批 bug 後，本機的
+用途：當 `/analyze-bugs` 在**另一台機器**上跑過一批 bug 後，本機的
 `bug_analysis_tracker.md` 並不會自動更新。此指令重新掃描 tracker，對每一筆
 狀態非 `done` 的 ticket 做三步驟核對並改狀態：
 

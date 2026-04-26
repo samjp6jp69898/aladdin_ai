@@ -1,6 +1,6 @@
 ---
 name: analyze-bugs
-description: Query pending, unanalyzed bugs from Notion Bug List by severity, then dispatch each one to analyze-single-bug for the full analysis pipeline.
+description: Batch pipeline — Query pending, unanalyzed bugs from Notion Bug List by severity, then dispatch each one to analyze-single-bug (L0/L1 tests only, no Agent Teams).
 user-invocable: true
 ---
 
