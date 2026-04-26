@@ -1,0 +1,188 @@
+import { Glob } from 'bun';
+import { parseNote, type ParsedNote } from './lib/note-parser.ts';
+import { readFile, writeFile } from 'node:fs/promises';
+import { basename } from 'node:path';
+
+const ROOT = '/Users/user/aladdin/obsidian/Codebase';
+const VAULT_ROOT = '/Users/user/aladdin/obsidian';
+
+const AUTO_MARKER = '<!-- AUTO-GENERATED BACKLINKS -->';
+
+function updateSection(raw: string, sectionHeader: string, newContent: string): string | null {
+    const lines = raw.split('\n');
+    const start = lines.findIndex(l => l.trim() === sectionHeader);
+    if (start === -1) return null;
+
+    const end = lines.findIndex((l, i) => i > start && /^#{1,4}\s/.test(l));
+    const realEnd = end === -1 ? lines.length : end;
+
+    // Replace the entire section body. Any obsolete placeholder comments
+    // (e.g., "<!-- Phase 3 will fill this -->") are intentionally dropped so
+    // readers aren't misled into thinking backlinks haven't been populated yet.
+    const before = lines.slice(0, start + 1).join('\n');
+    const after = lines.slice(realEnd).join('\n');
+    const body = [AUTO_MARKER, newContent].join('\n');
+    return [before, body, after].filter(s => s !== '').join('\n');
+}
+
+async function main() {
+    const glob = new Glob('**/*.md');
+    const notes = new Map<string, ParsedNote>();
+
+    for await (const rel of glob.scan(ROOT)) {
+        const path = `${ROOT}/${rel}`;
+        const note = await parseNote(path);
+        if (note) notes.set(note.fqn, note);
+    }
+    console.log(`Loaded ${notes.size} notes`);
+
+    // Alias index: `alias → canonical fqn`.
+    // Captures handwritten legacy link forms (e.g. PascalCase server or `Service`
+    // suffix still present) and lets build-backlinks resolve them instead of
+    // dumping them into broken-links-report.md.
+    const aliasIndex = new Map<string, string>();
+    for (const note of notes.values()) {
+        const aliases = (note.frontmatter as Record<string, unknown>).aliases;
+        if (Array.isArray(aliases)) {
+            for (const a of aliases) {
+                if (typeof a === 'string' && !aliasIndex.has(a)) {
+                    aliasIndex.set(a, note.fqn);
+                }
+            }
+        }
+    }
+
+    // Vault-wide note names (without .md) for cross-area link validation.
+    // Links pointing outside Codebase/ but existing elsewhere in the vault
+    // are not broken — Obsidian resolves them globally.
+    const vaultNoteNames = new Set<string>();
+    const vaultGlob = new Glob('**/*.md');
+    for await (const rel of vaultGlob.scan(VAULT_ROOT)) {
+        if (rel.startsWith('.obsidian/')) continue;
+        vaultNoteNames.add(basename(rel, '.md'));
+    }
+
+    const calledBy = new Map<string, Set<string>>();
+    const usedBy = new Map<string, Set<string>>();
+    const accessedBy = new Map<string, Set<string>>();
+
+    function add(map: Map<string, Set<string>>, target: string, source: string) {
+        if (!map.has(target)) map.set(target, new Set());
+        map.get(target)!.add(source);
+    }
+
+    const brokenLinks: Array<{ from: string; to: string; kind: string }> = [];
+
+    const resolve = (target: string): string | undefined => {
+        if (notes.has(target)) return target;
+        const viaAlias = aliasIndex.get(target);
+        if (viaAlias && notes.has(viaAlias)) return viaAlias;
+        // Exists elsewhere in the vault (Projects/, Rules/, etc.) — not broken
+        if (vaultNoteNames.has(target)) return `__vault__:${target}`;
+        return undefined;
+    };
+
+    for (const note of notes.values()) {
+        const recordCall = (target: string, kind: string) => {
+            const resolved = resolve(target);
+            if (!resolved) {
+                brokenLinks.push({ from: note.fqn, to: target, kind });
+                return;
+            }
+            const targetNote = notes.get(resolved);
+            if (!targetNote) return; // exists in vault but outside Codebase/
+            const targetType = targetNote.type;
+            if (targetType === 'rpc-method' || targetType === 'manager-method') {
+                add(calledBy, resolved, note.fqn);
+            } else if (targetType === 'model' || targetType === 'enum') {
+                add(usedBy, resolved, note.fqn);
+            } else if (targetType === 'db-orm') {
+                add(usedBy, resolved, note.fqn);
+            } else if (targetType === 'db-schema') {
+                add(accessedBy, resolved, note.fqn);
+            }
+        };
+
+        for (const c of note.calls.managerMethods) recordCall(c, 'manager-method');
+        for (const c of note.calls.rpcCrossServer) recordCall(c, 'rpc');
+        for (const c of note.calls.otherManagers) recordCall(c, 'manager-method');
+        for (const c of note.calls.dbOperations) recordCall(c, 'db-orm');
+
+        for (const link of note.otherOutgoingLinks) {
+            const resolved = resolve(link);
+            if (!resolved) continue;
+            const resolvedNote = notes.get(resolved);
+            if (!resolvedNote) continue; // exists in vault but outside Codebase/
+            const linkType = resolvedNote.type;
+            if (linkType === 'model' || linkType === 'enum') {
+                add(usedBy, resolved, note.fqn);
+            } else if (linkType === 'db-orm') {
+                add(usedBy, resolved, note.fqn);
+            } else if (linkType === 'db-schema') {
+                add(accessedBy, resolved, note.fqn);
+            }
+        }
+    }
+
+    let modifiedCount = 0;
+    for (const [targetFqn, targetNote] of notes) {
+        let raw = await readFile(targetNote.path, 'utf-8');
+        let modified = false;
+
+        if (targetNote.type === 'rpc-method' || targetNote.type === 'manager-method') {
+            const sources = [...(calledBy.get(targetFqn) ?? [])].sort();
+            const content = sources.length ? sources.map(s => `- [[${s}]]`).join('\n') : '（無後端呼叫者，可能是前端 entry point 或尚未被呼叫）';
+            const updated = updateSection(raw, '### Called By', content);
+            if (updated && updated !== raw) {
+                raw = updated;
+                modified = true;
+            }
+        }
+
+        if (targetNote.type === 'model' || targetNote.type === 'enum' || targetNote.type === 'db-orm') {
+            const sources = [...(usedBy.get(targetFqn) ?? [])].sort();
+            const content = sources.length ? sources.map(s => `- [[${s}]]`).join('\n') : '（無呼叫者記錄）';
+            let updated = updateSection(raw, '## Used By Methods', content);
+            if (!updated) updated = updateSection(raw, '## Used By', content);
+            if (updated && updated !== raw) {
+                raw = updated;
+                modified = true;
+            }
+        }
+
+        if (targetNote.type === 'db-schema') {
+            const sources = [...(accessedBy.get(targetFqn) ?? [])].sort();
+            const content = sources.length ? sources.map(s => `- [[${s}]]`).join('\n') : '（無讀寫記錄）';
+            const updated = updateSection(raw, '## Accessed By', content);
+            if (updated && updated !== raw) {
+                raw = updated;
+                modified = true;
+            }
+        }
+
+        if (modified) {
+            await writeFile(targetNote.path, raw);
+            modifiedCount++;
+        }
+    }
+
+    console.log(`Modified ${modifiedCount} files`);
+    console.log(`Broken links: ${brokenLinks.length}`);
+
+    const brokenReport = [
+        '# Broken Links Report',
+        '',
+        `Generated: ${new Date().toISOString()}`,
+        `Total broken: ${brokenLinks.length}`,
+        '',
+        '> 斷裂連結 = 來源筆記引用了尚未建立的目標筆記。目前僅建立 Milestone 1 完整範疇 + Milestone 2 部分範疇(見 scan-progress.json 查閱)。其他 server / manager 的連結會斷裂,屬預期行為,全面展開後會補齊。',
+        '',
+        '| Source FQN | Target FQN | Kind |',
+        '|------------|------------|------|',
+        ...brokenLinks.sort((a, b) => a.to.localeCompare(b.to)).map(b => `| \`${b.from}\` | \`${b.to}\` | ${b.kind} |`),
+    ].join('\n');
+    await writeFile(`${ROOT}/_index/broken-links-report.md`, brokenReport);
+    console.log(`Wrote broken links report`);
+}
+
+await main();

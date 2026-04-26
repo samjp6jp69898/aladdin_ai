@@ -1,0 +1,204 @@
+{
+  "today": "2026-04-26",
+  "effectiveSince": "2026-04-24",
+  "effectiveUntil": "2026-04-26T08:10:23.149Z",
+  "agrabahCommitCount": 2,
+  "rajahCommitCount": 0,
+  "filterResult": {
+    "kept": [
+      {
+        "hash": "1495030240d92b64e355784da0dd03379e921eaa",
+        "message": "feat(notification): remove TelegramBot server, clean up customer_info.ts",
+        "author": "Tao"
+      }
+    ],
+    "skipped": [
+      {
+        "commit": {
+          "hash": "8b01f499812291c6af37771f343ae4cf113ce8b4",
+          "message": "chore: bump version to 1.4.470"
+        },
+        "reason": "all_files_noise"
+      }
+    ],
+    "mixedSignal": []
+  },
+  "actionSummary": [
+    {
+      "type": "update_existing",
+      "status": "pending",
+      "processedAt": null,
+      "commitHash": "1495030240d92b64e355784da0dd03379e921eaa",
+      "commitMessage": "feat(notification): remove TelegramBot server, clean up customer_info.ts",
+      "filePath": "src/servers/customer_service/services/customer_info.ts",
+      "fileStatus": "M",
+      "additions": 0,
+      "deletions": 33,
+      "affectedNotes": [
+        {
+          "fqn": "CustomerService.CustomerInfo",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/_service.md",
+          "type": "service-overview"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawWithdrawList",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawWithdrawList.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawCreateTicket",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawCreateTicket.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawPlayerBalance",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawPlayerBalance.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawLoginInfo",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawLoginInfo.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawReviewTicket",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawReviewTicket.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawPlayerPayOrder",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawPlayerPayOrder.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawPlayerBettingList",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawPlayerBettingList.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawFraudRateTicket",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawFraudRateTicket.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawPlayerInfo",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawPlayerInfo.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawBlackPlayer",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawBlackPlayer.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawWithdrawDetailList",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawWithdrawDetailList.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawDepositDetailList",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawDepositDetailList.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawPlayerDetailData",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawPlayerDetailData.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "customerService.customerInfo.HandleRawDepositList",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/customerService.customerInfo.HandleRawDepositList.md",
+          "type": "rpc-method"
+        }
+      ],
+      "summary": "Modified src/servers/customer_service/services/customer_info.ts (+0/-33) → 15 note(s): CustomerService.CustomerInfo, customerService.customerInfo.HandleRawWithdrawList, customerService.customerInfo.HandleRawCreateTicket, customerService.customerInfo.HandleRawPlayerBalance, customerService.customerInfo.HandleRawLoginInfo, customerService.customerInfo.HandleRawReviewTicket, customerService.customerInfo.HandleRawPlayerPayOrder, customerService.customerInfo.HandleRawPlayerBettingList, customerService.customerInfo.HandleRawFraudRateTicket, customerService.customerInfo.HandleRawPlayerInfo, customerService.customerInfo.HandleRawBlackPlayer, customerService.customerInfo.HandleRawWithdrawDetailList, customerService.customerInfo.HandleRawDepositDetailList, customerService.customerInfo.HandleRawPlayerDetailData, customerService.customerInfo.HandleRawDepositList"
+    },
+    {
+      "type": "delete_file",
+      "status": "pending",
+      "processedAt": null,
+      "commitHash": "1495030240d92b64e355784da0dd03379e921eaa",
+      "commitMessage": "feat(notification): remove TelegramBot server, clean up customer_info.ts",
+      "filePath": "src/servers/telegram_bot/services/tg_group_platform.ts",
+      "fileStatus": "D",
+      "additions": 0,
+      "deletions": 546,
+      "affectedNotes": [
+        {
+          "fqn": "telegramBot.telegramPlatform.GetNotificationSettings",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.GetNotificationSettings.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.UpdateTgGroup",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.UpdateTgGroup.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.DeleteTgGroupChannel",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.DeleteTgGroupChannel.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.UpdateTgGroupChannelStatus",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.UpdateTgGroupChannelStatus.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.UpdateNotificationSettings",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.UpdateNotificationSettings.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.GetTgGroupChannels",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.GetTgGroupChannels.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.CreateTgGroup",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.CreateTgGroup.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.AddTgGroupChannel",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.AddTgGroupChannel.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.UpdateTgGroupStatus",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.UpdateTgGroupStatus.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.UpdateTgGroupChannel",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.UpdateTgGroupChannel.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.DeleteTgGroup",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.DeleteTgGroup.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.GetTgGroups",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.GetTgGroups.md",
+          "type": "rpc-method"
+        },
+        {
+          "fqn": "telegramBot.telegramPlatform.BatchDeleteTgGroupChannels",
+          "path": "/Users/user/aladdin/obsidian/Codebase/Servers/TelegramBot/services/TelegramPlatform/methods/telegramBot.telegramPlatform.BatchDeleteTgGroupChannels.md",
+          "type": "rpc-method"
+        }
+      ],
+      "summary": "Deleted src/servers/telegram_bot/services/tg_group_platform.ts → 13 note(s): telegramBot.telegramPlatform.GetNotificationSettings, telegramBot.telegramPlatform.UpdateTgGroup, telegramBot.telegramPlatform.DeleteTgGroupChannel, telegramBot.telegramPlatform.UpdateTgGroupChannelStatus, telegramBot.telegramPlatform.UpdateNotificationSettings, telegramBot.telegramPlatform.GetTgGroupChannels, telegramBot.telegramPlatform.CreateTgGroup, telegramBot.telegramPlatform.AddTgGroupChannel, telegramBot.telegramPlatform.UpdateTgGroupStatus, telegramBot.telegramPlatform.UpdateTgGroupChannel, telegramBot.telegramPlatform.DeleteTgGroup, telegramBot.telegramPlatform.GetTgGroups, telegramBot.telegramPlatform.BatchDeleteTgGroupChannels"
+    }
+  ],
+  "dedupStats": {
+    "agrabahCollected": 36,
+    "agrabahSkipped": 34,
+    "agrabahNew": 2,
+    "rajahCollected": 6,
+    "rajahSkipped": 6,
+    "rajahNew": 0
+  }
+}

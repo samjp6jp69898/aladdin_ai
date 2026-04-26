@@ -1,0 +1,37 @@
+{
+  "skip_commit_message_patterns": [
+    "^\\[Chg\\] version -> ",
+    "^VERSION ",
+    "^版號",
+    "^修改版號",
+    "^更新版號",
+    "^變更版號",
+    "^bump version",
+    "^version:",
+    "^update version",
+    "^chore\\(version\\)",
+    "^chore\\(release\\)"
+  ],
+  "skip_file_patterns": [
+    "package\\.json$",
+    "bun\\.lock$",
+    "yarn\\.lock$",
+    "CHANGELOG\\.md$",
+    "\\.gitignore$",
+    "node_modules/"
+  ],
+  "low_signal_keywords": [
+    "lint",
+    "format",
+    "prettier",
+    "eslint",
+    "style(",
+    "style:"
+  ],
+  "low_signal_diff_patterns": [
+    "^[-+]\\s*$",
+    "^[-+]\\s*//",
+    "^[-+]\\s*\\*",
+    "^[-+]\\s*import\\s"
+  ]
+}
