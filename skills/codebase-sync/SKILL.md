@@ -90,9 +90,10 @@ bun run sync-from-git.ts --finalize
 
 **執行內容**：
 1. 跑所有自動化腳本（backlinks、indexes、call-chain、cross-server-rpc-graph）
-2. 對本次修改的筆記做完整性檢查（frontmatter 完整度、連結正確性）
-3. 產出 daily report（存入 `Codebase/_index/daily-reports/`）
-4. 更新 `sync-state.json` 的 `last_sync_date`
+2. **重建三層索引**：`bun run /Users/user/aladdin/obsidian/Codebase/_index/generate-index.ts`（重建 L0-router.md + L1/*.md）
+3. 對本次修改的筆記做完整性檢查（frontmatter 完整度、連結正確性）
+4. 產出 daily report（存入 `Codebase/_index/daily-reports/`）
+5. 更新 `sync-state.json` 的 `last_sync_date`
 
 ## 關鍵檔案
 
@@ -103,6 +104,7 @@ bun run sync-from-git.ts --finalize
 | `pending-actions.json` | Stage 1 產生的待處理 action 清單 |
 | `noise-rules.json` | 噪音過濾規則（版號 commit、格式化 commit 等） |
 | `scan-progress.json` | 整體建構進度追蹤（milestone / batch 狀態） |
+| `Codebase/_index/generate-index.ts` | 三層索引生成腳本，finalize 時自動執行。查詢指南見 `Codebase/_index/query-guide.md` |
 
 ## 維護機制
 

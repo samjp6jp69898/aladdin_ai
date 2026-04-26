@@ -17,4 +17,5 @@
 | Skill | 用途 | 觸發詞 |
 |-------|------|--------|
 | `method-call-graph` | 分析指定 service method 的四維呼叫鏈（同 server / 跨 server gRPC / 前端 / 三方回調） | 分析方法呼叫鏈 / 列出 caller / 找 method 被誰呼叫 / 呼叫鏈分析 |
+| `deadlock-analyzer` | 分析指定 server 中哪些 transaction 持有指定 table 的鎖，並交叉比對 deadlock 風險 | deadlock 分析 / 死鎖排查 / transaction 鎖分析 / 找 deadlock / 哪些 transaction 鎖了這張表 |
 | `codebase-sync` | 根據 git 歷史紀錄增量更新 Obsidian Codebase 知識庫筆記（三階段 pipeline：收集 diff → AI 更新筆記 → finalize 腳本） | 更新 Codebase 知識庫 / sync-from-git / git 同步筆記 / 增量更新筆記 / codebase sync |
