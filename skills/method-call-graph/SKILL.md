@@ -16,7 +16,7 @@ description: 分析指定 service method 的完整呼叫鏈：同 server caller�
 | **Service Method 模式**（預設） | `/method-call-graph <ServiceClass>.<method>` | 四維度完整呼叫鏈分析 |
 | **Table CRUD 模式** | `/method-call-graph table <server> <table_name>` | 追蹤指定 server 中哪些方法操作該表 + BFS caller |
 
-**模式判斷**：若第一個 arg 為 `table` → Table CRUD ��式，否則 → Service Method 模式。
+**模式判斷**：若第一個 arg 為 `table` → Table CRUD 模式，否則 → Service Method 模式。
 
 ---
 
@@ -34,7 +34,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts r
 
 **推導 RPC method name**：`targetMethod` 如果以 `method` 開頭（如 `methodChangeUserBalance`），RPC name = 去掉 `method` 前綴的 PascalCase（`ChangeUserBalance`）。否則 RPC name = 首字母大寫的 `targetMethod`。
 
-## Step 1: 三方 Entry 偵測（Script 執���）
+## Step 1: 三方 Entry 偵測（Script 執行）
 
 ```bash
 bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts detect-entries
@@ -42,7 +42,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts d
 
 輸出 JSON：`{ callbackEntries: [{file, methods}], pullJobEntries: [{file, method}] }`
 
-將結果寫入暫存檔 `/tmp/entries.json` 供 Step 2 Agent 4 使用���
+將結果寫入暫存檔 `/tmp/entries.json` 供 Step 2 Agent 4 使用。
 
 ## Step 2: 並行執行 4 個 Script + 審核
 
@@ -90,74 +90,11 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts r
 
 ## Step 4: 整合輸出
 
-將 4 個 script 的結果整合為以下格式，直接輸出到對話中（不寫檔案）：
-
-```
-# 方法呼叫鏈分析：<targetClass>.<targetMethod>
-
-目標檔案：<relPath(targetFile)>:<targetLine>
-所屬 server：<targetServer>
-繼��鏈：<targetClass> extends <baseClass>（若無繼承則省略此行）
-
-═���═════════════════════════════════════════════════════
-① 同 server 呼叫（共 N 筆，BFS 完整追蹤）
-════════════���═════════════════════════════��════════════
-
-（從 same-server-callers 的 callers 陣列格式化：
-  [直接] <file>:<line> — <className>.<methodName>
-  [L2]   <file>:<line> — <className>.<methodName>
-    └─ 被 <calledBy> 呼叫
-按 level 排列，同 level 按 file:line 排列）
-
-═══════════════════════════════════════════════════════
-② 跨 server gRPC 呼叫（共 N 筆）
-════════��══════════════════════════════════════════════
-
-（從 cross-server-callers 的 callers 陣列格式化，按 server 分組：
-- server: <serverName>
-  <file>:<line> — <className>.<methodName>
-  gRPC path: <gRpcPath>
-
-過濾掉 gRpcPath 為 null 且 needsVerification 被排除的項目。
-過濾掉 content 只是 logger/error message 中包含 method name 的 false positive。）
-
-═��═════════════════════════════════���═══════════════════
-③ 前端���叫（共 N 筆）
-═════════════════���═════════════════════════════════════
-
-（從 frontend-callers 的 projects 陣列格式化：
-[project-name]  <file>:<line> — <content 摘要>
-若 hasMethod=false → generated client 中無此 method，已跳過）
-
-════���══════════════════════════════��═══════════════════
-④ 三方回調觸��鏈（共 N 條命中路徑）
-════════════════���══════════════════════════════════════
-
-（從 reverse-bfs-to-entries 的 matchedPaths 格式化：
-🎯 命中：<entryMethod>
-  鏈路：
-    [Entry] <chain[0].file>:<chain[0].line> — <chain[0].className>.<chain[0].methodName>
-       ↓
-    ... 中間節點 ...
-       ↓
-    <chain[-1].file>:<chain[-1].line> — target method
-  類型：<entryType>）
-
-═══════════════════════════════���═══════════════════════
-統計
-═══════════════════════════════════════════════════════
-- 同 server 直接 caller：X，transitive caller：Y
-- 跨 server gRPC caller：Z
-- 前端使用點：W
-- 三方回調入口：V
-- 無法靜態解析 case：U
-```
-
-**最後，結束。不需要額外的解釋或建議。**
+讀取 `output-format-method.md` 的模板，將 4 個 script 的結果整合後直接輸出到對話中（不寫檔案）。
 
 ---
 
-# ��式二：Table CRUD 模���
+# 模式二：Table CRUD 模式
 
 ## Step T0: 定位 Db* Class（Script 執行）
 
@@ -170,7 +107,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts t
 若 `dbClasses` 為空 → 回報找不到表，並停止。
 若有多個候選表 → 列出讓使用者選擇。
 
-## Step T1: 掃描 CRUD 操作點（Script 執��）
+## Step T1: 掃描 CRUD 操作點（Script 執行）
 
 ```bash
 bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts table-crud "<server>" "<tableName>" '<dbClassNamesJsonArray>'
@@ -194,52 +131,4 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts t
 
 **審核**：同模式一 Step 3，對 `needsVerification` 項目做型別驗證。
 
-**輸出格��**：
-
-```
-# Table CRUD 追蹤：<tableName>
-
-對應 ORM Class：<dbClass1>, <dbClass2>, ...
-所屬 Server：<server>
-掃描範圍：servers/<server>/ + managers/
-
-═════════════════════════════════════════���═════════════
-🟢 CREATE（共 N 筆）
-═══════��═══════════════════════════════════════════════
-
-（從 crud.C 格式化，每個 method 一個 ▸ 區塊：
-▸ <className>.<methodName> (<file>:<line>)
-  操作：<operation>
-  callers:
-    （從 table-bfs results 中找到對應 target 的 callers，格式化為：
-    [���接] <file>:<line> — <className>.<methodName>
-    [L2]   <file>:<line> — <className>.<methodName>
-      └─ 被 <calledBy> 呼叫）
-
-════════════════════════════════════��══════════════════
-🔵 READ（共 N 筆）
-══���═══════════════════════════════��════════════════════
-（同上格式）
-
-═══════════��════════════════════════��══════════════════
-🟡 UPDATE（共 N 筆）
-════��════════════════��═════════════════════════��═══════
-（同上格式。若同一 method 有多處 UPDATE SQL，列出每處的行號與 SQL 摘要）
-
-═══════════════════════════════════════════════════════
-🔴 DELETE（�� N 筆）
-════════════════════════���══════════════════════════════
-（若無：「無 DELETE 操作。」）
-
-═════════════════════════════════���═════════════════════
-統計
-════���═════════════════════════��════════════════════════
-- ORM Class 數：X（<列出 class 名>）
-- CRUD 操作點：🟢C(a) 🔵R(b) 🟡U(c) 🔴D(d)，共 N 個 method
-- BFS 追蹤 caller 總數：M
-- 無法靜態解析 case：U
-
-💡 可使用 /method-call-graph <ClassName>.<methodName> 對感興趣的方法做完整四維度分析（跨 server / 前端 / 三方回調）
-```
-
-**最後，結��。不需要額外的解釋或建議。**
+讀取 `output-format-table.md` 的模板，將結果整合後直接輸出到對話中（不寫檔案）。
