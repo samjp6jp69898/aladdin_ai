@@ -7,7 +7,7 @@ description: 分析指定 service method 的完整呼叫鏈：同 server caller�
 
 使用 Bun script 處理所有確定性操作（grep + 過濾 + BFS + 繼承鏈解析），agent 只負責審核 `needsVerification` 的 case 和最終格式化輸出。
 
-**Scanner script 位置**：`/Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts`
+**Scanner script 位置**：`call-graph-scanner.ts`
 
 支援兩種模式：
 
@@ -25,7 +25,7 @@ description: 分析指定 service method 的完整呼叫鏈：同 server caller�
 ## Step 0: Reconnaissance（Script 執行）
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts resolve-method "<input>"
+bun call-graph-scanner.ts resolve-method "<input>"
 ```
 
 輸出 JSON：`{ targetFile, targetLine, targetClass, baseClass, targetMethod, targetServer, rajahServiceName }`
@@ -37,7 +37,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts r
 ## Step 1: 三方 Entry 偵測（Script 執行）
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts detect-entries
+bun call-graph-scanner.ts detect-entries
 ```
 
 輸出 JSON：`{ callbackEntries: [{file, methods}], pullJobEntries: [{file, method}] }`
@@ -51,13 +51,13 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts d
 ### Agent 1 — 同 server caller
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts same-server-callers "<targetFile>" "<targetClass>" "<targetMethod>" "<targetServer>" --base-class=<baseClass> --base-method=<targetMethod>
+bun call-graph-scanner.ts same-server-callers "<targetFile>" "<targetClass>" "<targetMethod>" "<targetServer>" --base-class=<baseClass> --base-method=<targetMethod>
 ```
 
 ### Agent 2 — 跨 server gRPC caller
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts cross-server-callers "<RpcMethodName>" "<targetServer>" "<rajahServiceName>"
+bun call-graph-scanner.ts cross-server-callers "<RpcMethodName>" "<targetServer>" "<rajahServiceName>"
 ```
 
 注意：這裡用 **RPC method name**（PascalCase，無 `method` 前綴），因為跨 server 呼叫用的是 `context.remote.*.*.RpcMethodName()`。
@@ -65,13 +65,13 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts c
 ### Agent 3 — 前端 caller
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts frontend-callers "<RpcMethodName>"
+bun call-graph-scanner.ts frontend-callers "<RpcMethodName>"
 ```
 
 ### Agent 4 — 三方回調觸發鏈
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts reverse-bfs-to-entries "<targetFile>" "<targetClass>" "<targetMethod>" "<targetServer>" --entries-json=/tmp/entries.json --rpc-name=<RpcMethodName>
+bun call-graph-scanner.ts reverse-bfs-to-entries "<targetFile>" "<targetClass>" "<targetMethod>" "<targetServer>" --entries-json=/tmp/entries.json --rpc-name=<RpcMethodName>
 ```
 
 注意：`--rpc-name` 傳入 RPC method name（PascalCase），讓反向 BFS 同時搜尋 `methodXxx` 和 `Xxx` 兩種名稱。
@@ -99,7 +99,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts r
 ## Step T0: 定位 Db* Class（Script 執行）
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts table-locate "<server>" "<tableName>"
+bun call-graph-scanner.ts table-locate "<server>" "<tableName>"
 ```
 
 輸出 JSON：`{ tableName, dbClasses: [{name, file, line, tableName}], server }`
@@ -110,7 +110,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts t
 ## Step T1: 掃描 CRUD 操作點（Script 執行）
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts table-crud "<server>" "<tableName>" '<dbClassNamesJsonArray>'
+bun call-graph-scanner.ts table-crud "<server>" "<tableName>" '<dbClassNamesJsonArray>'
 ```
 
 其中 `<dbClassNamesJsonArray>` 例如 `'["DbPaymentDiscountRecord"]'`。
@@ -120,7 +120,7 @@ bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts t
 ## Step T2: BFS Caller 追蹤（Script 執行）
 
 ```bash
-bun /Users/user/aladdin/.claude/skills/method-call-graph/call-graph-scanner.ts table-bfs "<server>" '<bfsTargetsJsonArray>'
+bun call-graph-scanner.ts table-bfs "<server>" '<bfsTargetsJsonArray>'
 ```
 
 其中 `<bfsTargetsJsonArray>` = Step T1 輸出的 `bfsTargets` JSON 陣列。

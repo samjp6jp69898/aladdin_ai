@@ -16,10 +16,11 @@
 
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
-import { join, relative } from 'path';
+import { join, relative, resolve } from 'path';
 
-const ALADDIN_ROOT = '/Users/user/aladdin';
-const AGRABAH = join(ALADDIN_ROOT, 'agrabah');
+const SCRIPT_DIR = import.meta.dir;
+const AGRABAH = resolve(SCRIPT_DIR, '..', '..', '..');
+const ALADDIN_ROOT = resolve(AGRABAH, '..');
 const SERVERS_DIR = join(AGRABAH, 'src/servers');
 const MANAGERS_DIR = join(AGRABAH, 'src/managers');
 const DB_TYPES_DIR = join(AGRABAH, 'src/database_types');
