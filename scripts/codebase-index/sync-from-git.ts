@@ -120,6 +120,9 @@ async function main() {
         console.log('\n=== DRY RUN — Actions that would be taken ===\n');
         for (const action of actions) {
             console.log(`[${action.type}] ${action.summary}`);
+            if (action.newMethodHints && action.newMethodHints.length > 0) {
+                console.log(`  ⚠ NEW METHODS DETECTED: ${action.newMethodHints.join(', ')}`);
+            }
             if (action.affectedNotes.length > 0) {
                 for (const n of action.affectedNotes) {
                     console.log(`  → ${n.note.fqn} (${n.note.path})`);
@@ -171,6 +174,7 @@ async function main() {
             changeType: a.rajahImpact.changeType,
             diffSummary: a.rajahImpact.diffSummary,
         } : undefined,
+        newMethodHints: a.newMethodHints,
         summary: a.summary,
     }));
 

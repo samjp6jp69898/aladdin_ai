@@ -1,6 +1,9 @@
 import type { CommitInfo, FileChange } from './git-diff-collector.ts';
+import { getDiffContent } from './git-diff-collector.ts';
 import { findNotesForFile, type NoteMatch } from './file-to-note-mapper.ts';
 import { filterFilesByScope } from './noise-filter.ts';
+
+const AGRABAH_REPO = '/Users/user/aladdin/agrabah';
 
 // ──────────────────────────────────────────────
 // Types
@@ -30,6 +33,7 @@ export interface ChangeAction {
     file: FileChange;
     affectedNotes: NoteMatch[];
     rajahImpact?: RajahImpact;
+    newMethodHints?: string[];
     summary: string;
 }
 
@@ -84,6 +88,80 @@ function buildRajahFileChange(impact: RajahImpact): FileChange {
 }
 
 // ──────────────────────────────────────────────
+// New method detection from diff
+// ──────────────────────────────────────────────
+
+const RPC_METHOD_PATTERN = /^\+\s+async\s+method(\w+)\s*\(/;
+const CLASS_METHOD_PATTERN = /^\+\s+(?:public\s+)?(?:static\s+)?async\s+(\w+)\s*\(/;
+
+function isMethodCovered(methodName: string, existingNoteFqns: Set<string>): boolean {
+    const stripped = methodName.startsWith('method') ? methodName.slice(6) : methodName;
+    return [...existingNoteFqns].some(fqn =>
+        fqn.endsWith(`.${methodName}`) ||
+        fqn.endsWith(`.${stripped}`) ||
+        fqn.endsWith(`.method${methodName}`)
+    );
+}
+
+async function detectNewMethodsFromDiff(
+    commitHash: string,
+    filePath: string,
+    existingNoteFqns: Set<string>,
+): Promise<string[]> {
+    const diff = await getDiffContent(AGRABAH_REPO, commitHash, filePath);
+    if (!diff) return [];
+
+    const addedLines = new Set<string>();
+    const removedLines = new Set<string>();
+
+    for (const line of diff.split('\n')) {
+        if (line.startsWith('+') && !line.startsWith('+++')) {
+            addedLines.add(line);
+        } else if (line.startsWith('-') && !line.startsWith('---')) {
+            removedLines.add(line);
+        }
+    }
+
+    const newMethods: string[] = [];
+
+    for (const line of addedLines) {
+        const rpcMatch = line.match(RPC_METHOD_PATTERN);
+        if (rpcMatch) {
+            const methodName = rpcMatch[1];
+            if (!methodName || /^(constructor|init|super)$/.test(methodName)) continue;
+
+            const wasSignatureChange = [...removedLines].some(
+                rl => rl.match(new RegExp(`async\\s+method${methodName}\\s*\\(`))
+            );
+            if (wasSignatureChange) continue;
+
+            if (!isMethodCovered(`method${methodName}`, existingNoteFqns)) {
+                newMethods.push(`method${methodName}`);
+            }
+            continue;
+        }
+
+        const classMatch = line.match(CLASS_METHOD_PATTERN);
+        if (classMatch) {
+            const methodName = classMatch[1];
+            if (!methodName || /^(constructor|init|super)$/.test(methodName)) continue;
+            if (methodName.startsWith('method')) continue;
+
+            const wasSignatureChange = [...removedLines].some(
+                rl => rl.match(new RegExp(`async\\s+${methodName}\\s*\\(`))
+            );
+            if (wasSignatureChange) continue;
+
+            if (!isMethodCovered(methodName, existingNoteFqns)) {
+                newMethods.push(methodName);
+            }
+        }
+    }
+
+    return [...new Set(newMethods)];
+}
+
+// ──────────────────────────────────────────────
 // Public API
 // ──────────────────────────────────────────────
 
@@ -121,11 +199,21 @@ export async function classifyChanges(
                     type = 'uncovered';
             }
 
+            let newMethodHints: string[] | undefined;
+            if (type === 'update_existing' && file.path.endsWith('.ts')) {
+                const existingFqns = new Set(notes.map(n => n.note.fqn));
+                const detected = await detectNewMethodsFromDiff(commit.hash, file.path, existingFqns);
+                if (detected.length > 0) {
+                    newMethodHints = detected;
+                }
+            }
+
             actions.push({
                 type,
                 commit,
                 file,
                 affectedNotes: notes,
+                newMethodHints,
                 summary: buildFileSummary(type, file, notes),
             });
         }

@@ -75,6 +75,7 @@ bun run sync-from-git.ts            # 正式執行
 
 **處理原則**：
 - 每個 action 包含 `commitHash`、`filePath`、`affectedNotes`（受影響筆記清單）
+- **`newMethodHints`**：若 action 含有此欄位，表示 diff 中偵測到新增的 method（`async methodXxx`），AI agent **必須**為每個 hint 建立新筆記（參考同目錄下既有筆記格式）
 - 讀取原始碼的對應 diff，更新筆記中的描述、參數、呼叫關係等
 - 更新筆記 frontmatter 的 `last_scanned` 為今天日期
 - **不得覆寫 `human_edited: true` 的筆記**（除非使用者明確授權）
