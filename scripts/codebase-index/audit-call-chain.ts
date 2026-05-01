@@ -49,6 +49,48 @@ function lineToOffset(content: string, line1: number): number {
     return off;
 }
 
+function offsetToLine(content: string, offset: number): number {
+    let n = 1;
+    for (let i = 0; i < offset && i < content.length; i++) {
+        if (content[i] === '\n') n++;
+    }
+    return n;
+}
+
+/**
+ * Re-locate a method declaration by name when frontmatter source_line has drifted.
+ * Returns the actual line number of `async method<MethodName>(` if found, else original line.
+ *
+ * `methodName` is the FQN's last segment in PascalCase (e.g., `GetLevels`); source convention
+ * is `async methodGetLevels(` (lowercase 'm' + PascalCase). For Manager methods (no `method`
+ * prefix), fall back to bare `async <name>(` lookup.
+ */
+function relocateMethodLine(
+    content: string,
+    methodName: string,
+    originalLine: number,
+    isRpcMethod: boolean,
+): number {
+    const patterns = isRpcMethod
+        ? [
+            new RegExp(`\\basync\\s+method${methodName}\\s*[(<]`, 'm'),
+            new RegExp(`\\bmethod${methodName}\\s*\\(`, 'm'),
+        ]
+        : [
+            new RegExp(`\\basync\\s+${methodName}\\s*[(<]`, 'm'),
+            new RegExp(`\\b${methodName}\\s*\\(`, 'm'),
+        ];
+
+    for (const re of patterns) {
+        const m = re.exec(content);
+        if (m && typeof m.index === 'number') {
+            const newLine = offsetToLine(content, m.index);
+            return newLine;
+        }
+    }
+    return originalLine;
+}
+
 /**
  * Extract a TS method body starting at the declaration on `sourceLine`.
  * Strategy:
@@ -224,11 +266,12 @@ async function main() {
     let bodyFailures = 0;
     let sourceMissing = 0;
 
+    let relocated = 0;
     for (const { note, full } of rpcNotes) {
         if (!note) continue;
         const sourceFile = note.frontmatter.source_file;
-        const sourceLine = note.frontmatter.source_line;
-        if (typeof sourceFile !== 'string' || typeof sourceLine !== 'number' || sourceLine < 1) continue;
+        const originalLine = note.frontmatter.source_line;
+        if (typeof sourceFile !== 'string' || typeof originalLine !== 'number' || originalLine < 1) continue;
 
         const fullSourcePath = `${REPO_ROOT}/${sourceFile}`;
         let content: string;
@@ -238,6 +281,12 @@ async function main() {
             sourceMissing++;
             continue;
         }
+
+        // Re-locate method by name to defend against stale frontmatter source_line.
+        // FQN last segment is the RPC method name in PascalCase.
+        const methodName = note.fqn.split('.').pop() || '';
+        const sourceLine = relocateMethodLine(content, methodName, originalLine, /* isRpcMethod */ true);
+        if (sourceLine !== originalLine) relocated++;
 
         const body = extractMethodBody(content, sourceLine);
         if (!body || body.length < 2) {
@@ -314,10 +363,11 @@ async function main() {
         checked,
         bodyExtractionFailures: bodyFailures,
         sourceFileMissing: sourceMissing,
+        relocatedByName: relocated,
         issues,
     };
     writeFileSync(OUT_PATH, JSON.stringify(report, null, 2));
-    console.log(`[audit] rpc-method notes: ${totalRpcNotes}; checked: ${checked}; body fail: ${bodyFailures}; source missing: ${sourceMissing}`);
+    console.log(`[audit] rpc-method notes: ${totalRpcNotes}; checked: ${checked}; body fail: ${bodyFailures}; source missing: ${sourceMissing}; relocated: ${relocated}`);
     console.log(`[audit] issues: ${issues.length}`);
     const byKey: Record<string, number> = {};
     for (const i of issues) {
