@@ -183,11 +183,102 @@ function extractMethodBody(content: string, sourceLine: number): string {
 
 // ---- Call extraction ---------------------------------------------------------
 
+/**
+ * Scan all manager files in `agrabah/src/managers/` to build a class-hierarchy map:
+ *   ManagerClass → its parent ManagerClass (recursively).
+ * Used to expand `Manager.SubClass.method` to `[Manager.SubClass.method, Manager.Parent.method, ...]`
+ * for phantom/missing comparison — because methods may be defined on a parent and inherited.
+ */
+function buildManagerInheritance(): Map<string, string> {
+    const parentOf = new Map<string, string>();
+    const glob = new Glob('managers/**/*.ts');
+    const ROOT = `${REPO_ROOT}/agrabah/src`;
+    const re = /\bclass\s+([A-Z][a-zA-Z0-9]*Manager)\s+extends\s+([A-Z][a-zA-Z0-9]*Manager)\b/g;
+    for (const rel of (() => {
+        const arr: string[] = [];
+        // synchronous-ish scan via Bun.Glob
+        const it = glob.scanSync({ cwd: ROOT });
+        for (const x of it) arr.push(x);
+        return arr;
+    })()) {
+        const path = `${ROOT}/${rel}`;
+        let content: string;
+        try { content = readFileSync(path, 'utf-8'); }
+        catch { continue; }
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(content)) !== null) {
+            parentOf.set(m[1], m[2]);
+        }
+    }
+    return parentOf;
+}
+
+/** Walk the inheritance chain to enumerate `[self, parent, grandparent, ...]`. */
+function ancestors(cls: string, parentOf: Map<string, string>): string[] {
+    const chain = [cls];
+    let cur = cls;
+    const seen = new Set([cls]);
+    while (parentOf.has(cur)) {
+        const p = parentOf.get(cur)!;
+        if (seen.has(p)) break; // guard cycles
+        chain.push(p);
+        seen.add(p);
+        cur = p;
+    }
+    return chain;
+}
+
+/**
+ * Build a `fieldName → ManagerClassName` mapping from the source file by scanning:
+ *   - `private _xxxManager: YyyManager;` (instance field declaration)
+ *   - `protected xxxManager: YyyManager;`
+ *   - `private _xxxManager!: YyyManager;`  (definite-assignment)
+ *   - `xxxManager: YyyManager;`
+ *   - constructor params: `xxxManager: YyyManager`
+ *   - module-level: `const xxxManager = new YyyManager(`
+ *
+ * Stripped `_` from key so both `_userManager` and `userManager` look up to the same class.
+ */
+function buildFieldToClassMap(content: string): Map<string, string> {
+    const map = new Map<string, string>();
+
+    // Pattern A: field declaration (with optional access modifier, optional `!`/`?`, optional `=`)
+    //   private _userManager: AppUserManager;
+    //   protected fooManager!: BarManager;
+    //   activityConfigManager: ActivityConfigManager
+    const fieldRe = /(?:private|protected|public|readonly|\s)+\s*(_?[a-z][a-zA-Z0-9]*Manager)\s*[!?]?\s*:\s*([A-Z][a-zA-Z0-9]*Manager)\b/g;
+    let m: RegExpExecArray | null;
+    while ((m = fieldRe.exec(content)) !== null) {
+        const fieldKey = m[1].replace(/^_/, '');
+        map.set(fieldKey, m[2]);
+    }
+
+    // Pattern B: module-level / class-level `const xxxManager = new YyyManager(`
+    const constRe = /\b(?:const|let|var)\s+(_?[a-z][a-zA-Z0-9]*Manager)\s*=\s*new\s+([A-Z][a-zA-Z0-9]*Manager)\b/g;
+    while ((m = constRe.exec(content)) !== null) {
+        const fieldKey = m[1].replace(/^_/, '');
+        if (!map.has(fieldKey)) map.set(fieldKey, m[2]);
+    }
+
+    // Pattern C: untyped property assignment `this._xxxManager = yyyManager;` where
+    // yyyManager was declared elsewhere — covers cross-file injection. Skip; out of scope.
+
+    // Pattern D: constructor parameter `(xxxManager: YyyManager)` (overlaps Pattern A regex due to
+    // colon-typed token; already captured).
+
+    return map;
+}
+
 function extractCallsFromBody(
     body: string,
     rpcResolver: (server: string, accessor: string, method: string) => string,
-): { managerCalls: Set<string>; rpcCalls: Set<string> } {
-    const managerCalls = new Set<string>();
+    fieldToClass: Map<string, string>,
+    parentOf: Map<string, string>,
+): { managerCalls: Map<string, string[]>; rpcCalls: Set<string> } {
+    // managerCalls maps "primary FQN" → "expanded ancestor-FQN list" (incl. self).
+    // For phantom-check we ask: does note's listed FQN match any in the expanded list?
+    // For missing-check we ask: does note list any of the expanded list?
+    const managerCalls = new Map<string, string[]>();
     const rpcCalls = new Set<string>();
 
     // Manager call patterns observed in agrabah:
@@ -195,16 +286,19 @@ function extractCallsFromBody(
     //   2. `this.walletManager.foo(`  — instance field / getter
     //   3. `localizationManager.foo(` — module-level `const localizationManager = new LocalizationManager()`
     //   4. `walletManager.foo(`       — local variable / parameter
-    // Common shape: a token starting with lowercase, ending with `Manager`, optionally `_`-prefixed,
-    // followed by `.<method>(`. We strip leading `_` and capitalize first char to derive ManagerName.
+    // Resolution order: lookup in fieldToClass map (built from source-file declarations);
+    // if absent, fallback to capitalize-first-char heuristic.
     const mgrRe = /\b(_?[a-z][a-zA-Z0-9]*Manager)\.(\w+)\s*\(/g;
     let m: RegExpExecArray | null;
     while ((m = mgrRe.exec(body)) !== null) {
         let field = m[1];
         if (field.startsWith('_')) field = field.slice(1);
-        const mgr = field.charAt(0).toUpperCase() + field.slice(1);
+        const fromMap = fieldToClass.get(field);
+        const mgr = fromMap ?? (field.charAt(0).toUpperCase() + field.slice(1));
         const method = m[2];
-        managerCalls.add(`Manager.${mgr}.${method}`);
+        const primary = `Manager.${mgr}.${method}`;
+        const expanded = ancestors(mgr, parentOf).map(c => `Manager.${c}.${method}`);
+        if (!managerCalls.has(primary)) managerCalls.set(primary, expanded);
     }
 
     // RPC cross-server: `context.remote.<server>.<accessor>.<Method>(`
@@ -259,6 +353,9 @@ async function main() {
         return literal;
     }
 
+    // ---- Pass 1.5: build manager class-inheritance tree ----
+    const parentOf = buildManagerInheritance();
+
     // ---- Pass 2: audit each rpc-method note ----
     const issues: Issue[] = [];
     let totalRpcNotes = rpcNotes.length;
@@ -295,14 +392,22 @@ async function main() {
         }
         checked++;
 
-        const { managerCalls, rpcCalls } = extractCallsFromBody(body, rpcResolver);
+        const fieldToClass = buildFieldToClassMap(content);
+        const { managerCalls, rpcCalls } = extractCallsFromBody(body, rpcResolver, fieldToClass, parentOf);
 
         const noteMgr = new Set(note.calls.managerMethods);
         const noteRpc = new Set(note.calls.rpcCrossServer);
 
-        // missing_call : source has, note doesn't
-        for (const c of managerCalls) {
-            if (!noteMgr.has(c)) {
+        // For ancestor-aware match: a call is "covered" if note lists ANY of its ancestor FQNs.
+        // For "is note's listed FQN matched by any source call": iterate every source call's expanded
+        // ancestor list and union — if listed FQN is in that union, it's covered.
+        const allAncestorsFromSource = new Set<string>();
+        for (const expanded of managerCalls.values()) for (const x of expanded) allAncestorsFromSource.add(x);
+
+        // missing_call : source has a primary, but note lists no FQN in its ancestor chain.
+        for (const [primary, expanded] of managerCalls) {
+            const matched = expanded.some(x => noteMgr.has(x));
+            if (!matched) {
                 issues.push({
                     fqn: note.fqn,
                     notePath: full,
@@ -310,7 +415,7 @@ async function main() {
                     sourceLine,
                     type: 'missing_call',
                     category: 'manager',
-                    detail: `Code calls ${c}() but note doesn't list it`,
+                    detail: `Code calls ${primary}() but note doesn't list it (or any ancestor)`,
                 });
             }
         }
@@ -328,9 +433,9 @@ async function main() {
             }
         }
 
-        // phantom_call : note has, source doesn't
+        // phantom_call : note lists FQN, but no source call has it in its ancestor chain.
         for (const c of noteMgr) {
-            if (!managerCalls.has(c)) {
+            if (!allAncestorsFromSource.has(c)) {
                 issues.push({
                     fqn: note.fqn,
                     notePath: full,
@@ -338,7 +443,7 @@ async function main() {
                     sourceLine,
                     type: 'phantom_call',
                     category: 'manager',
-                    detail: `Note lists [[${c}]] but not found in source method body`,
+                    detail: `Note lists [[${c}]] but not found in source method body (or any subclass call)`,
                 });
             }
         }
