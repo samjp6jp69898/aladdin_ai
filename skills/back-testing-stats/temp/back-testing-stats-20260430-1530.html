@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 - 2026-04-30</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #333; padding: 24px; }
+.container { max-width: 960px; margin: 0 auto; }
+h1 { font-size: 24px; margin-bottom: 24px; color: #222; }
+h2 { font-size: 18px; margin-bottom: 16px; color: #444; }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+.card .label { font-size: 14px; color: #888; margin-bottom: 4px; }
+.card .big { font-size: 42px; font-weight: 700; }
+.card .sub { font-size: 13px; color: #999; margin-top: 4px; }
+.card .big.blue { color: #1976d2; }
+.card .big.green { color: #388e3c; }
+
+.progress-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+.progress-bar-container { display: flex; height: 32px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.progress-segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; min-width: 20px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+.table-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { background: #fafafa; padding: 10px 12px; text-align: center; border-bottom: 2px solid #e0e0e0; font-weight: 600; white-space: nowrap; }
+td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #eee; white-space: nowrap; }
+tr:hover td { background: #f9f9f9; }
+.sev-tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-weight: 600; font-size: 13px; color: #fff; }
+.sev-p1 { background: #e53935; }
+.sev-p2 { background: #fb8c00; }
+.sev-p3 { background: #fdd835; color: #333; }
+.sev-p4 { background: #1e88e5; }
+
+.chart-section { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+canvas { max-height: 400px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>回測統計報告</h1>
+
+<!-- Section 1: Overview Cards -->
+<div class="cards">
+  <div class="card">
+    <div class="label">總成功率</div>
+    <div class="big blue">81.2%</div>
+    <div class="sub">已完成 326 / 總數 326</div>
+  </div>
+  <div class="card">
+    <div class="label">完全成功率</div>
+    <div class="big green">47.8%</div>
+    <div class="sub">153 正確 / 320 有效樣本</div>
+  </div>
+</div>
+
+<div class="progress-section">
+  <h2>結論分布</h2>
+  <div class="progress-bar-container">
+    <div class="progress-segment" style="width:47.81%;background:#4caf50;" title="分析正確 153">153</div>
+    <div class="progress-segment" style="width:3.75%;background:#81c784;" title="部分正確A 12">12</div>
+    <div class="progress-segment" style="width:29.69%;background:#ffb74d;" title="部分正確B 95">95</div>
+    <div class="progress-segment" style="width:15.94%;background:#e53935;" title="分析錯誤 51">51</div>
+    <div class="progress-segment" style="width:2.81%;background:#9e9e9e;" title="無法比對 9">9</div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4caf50;"></div>分析正確 153 (47.8%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#81c784;"></div>部分正確A 等效替代 12 (3.8%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffb74d;"></div>部分正確B 不完整 95 (29.7%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e53935;"></div>分析錯誤 51 (15.9%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9e9e9e;"></div>無法比對 9 (2.8%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bdbdbd;"></div>不需修復 6 (不計入)</div>
+  </div>
+</div>
+
+<!-- Section 2: Per-Severity Table -->
+<div class="table-section">
+  <h2>各嚴重性等級成功率</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>嚴重性</th><th>總數</th><th>正確</th><th>部分A</th><th>部分B</th><th>錯誤</th><th>無法比對</th><th>不需修復</th><th>完全率</th><th>總成功率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="sev-tag sev-p1">P1重點</span></td>
+        <td>47</td><td>18</td><td>1</td><td>12</td><td>12</td><td>3</td><td>1</td>
+        <td><strong>39.1%</strong></td><td><strong>67.4%</strong></td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p2">P2較高</span></td>
+        <td>190</td><td>95</td><td>5</td><td>55</td><td>27</td><td>5</td><td>3</td>
+        <td><strong>50.8%</strong></td><td><strong>82.9%</strong></td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p3">P3一般</span></td>
+        <td>73</td><td>35</td><td>2</td><td>25</td><td>8</td><td>1</td><td>2</td>
+        <td><strong>49.3%</strong></td><td><strong>87.3%</strong></td>
+      </tr>
+      <tr>
+        <td><span class="sev-tag sev-p4">P4較低</span></td>
+        <td>16</td><td>5</td><td>4</td><td>3</td><td>4</td><td>0</td><td>0</td>
+        <td><strong>31.2%</strong></td><td><strong>75.0%</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Section 3: Cumulative Trend Chart -->
+<div class="chart-section">
+  <h2>累積成功率趨勢</h2>
+  <canvas id="trendChart"></canvas>
+</div>
+</div>
+
+<script>
+const data = [
+  {idx:1,ticket:"FAQ-1875",total:100.0,exact:100.0},
+  {idx:2,ticket:"FAQ-1864",total:100.0,exact:100.0},
+  {idx:3,ticket:"FAQ-1862",total:66.7,exact:66.7},
+  {idx:4,ticket:"FAQ-1860",total:50.0,exact:50.0},
+  {idx:5,ticket:"FAQ-1858",total:40.0,exact:40.0},
+  {idx:6,ticket:"FAQ-1843",total:33.3,exact:33.3},
+  {idx:7,ticket:"FAQ-1817",total:42.9,exact:28.6},
+  {idx:8,ticket:"FAQ-1813",total:37.5,exact:25.0},
+  {idx:9,ticket:"FAQ-1809",total:44.4,exact:33.3},
+  {idx:10,ticket:"FAQ-1805",total:40.0,exact:30.0},
+  {idx:11,ticket:"FAQ-1799",total:45.5,exact:36.4},
+  {idx:12,ticket:"FAQ-1798",total:50.0,exact:41.7},
+  {idx:13,ticket:"FAQ-1786",total:53.8,exact:46.2},
+  {idx:14,ticket:"FAQ-1796",total:57.1,exact:50.0},
+  {idx:15,ticket:"FAQ-1783",total:60.0,exact:53.3},
+  {idx:16,ticket:"FAQ-1779",total:62.5,exact:50.0},
+  {idx:17,ticket:"FAQ-1777",total:64.7,exact:52.9},
+  {idx:18,ticket:"FAQ-1774",total:66.7,exact:55.6},
+  {idx:19,ticket:"FAQ-1759",total:68.4,exact:52.6},
+  {idx:20,ticket:"FAQ-1731",total:70.0,exact:55.0},
+  {idx:21,ticket:"FAQ-1730",total:71.4,exact:52.4},
+  {idx:22,ticket:"FAQ-1727",total:72.7,exact:54.5},
+  {idx:23,ticket:"FAQ-1726",total:73.9,exact:56.5},
+  {idx:24,ticket:"FAQ-1725",total:75.0,exact:58.3},
+  {idx:25,ticket:"FAQ-1724",total:76.0,exact:56.0},
+  {idx:26,ticket:"FAQ-1722",total:73.1,exact:53.8},
+  {idx:27,ticket:"FAQ-1721",total:74.1,exact:51.9},
+  {idx:28,ticket:"FAQ-1719",total:75.0,exact:53.6},
+  {idx:29,ticket:"FAQ-1718",total:72.4,exact:51.7},
+  {idx:30,ticket:"FAQ-1704",total:73.3,exact:53.3},
+  {idx:31,ticket:"FAQ-1703",total:74.2,exact:54.8},
+  {idx:32,ticket:"FAQ-1702",total:75.0,exact:56.2},
+  {idx:33,ticket:"FAQ-1701",total:75.8,exact:57.6},
+  {idx:34,ticket:"FAQ-1698",total:76.5,exact:58.8},
+  {idx:35,ticket:"FAQ-1694",total:77.1,exact:60.0},
+  {idx:36,ticket:"FAQ-1916",total:77.8,exact:58.3},
+  {idx:37,ticket:"FAQ-1949",total:78.4,exact:59.5},
+  {idx:38,ticket:"FAQ-1942",total:78.9,exact:57.9},
+  {idx:39,ticket:"FAQ-1960",total:79.5,exact:59.0},
+  {idx:40,ticket:"FAQ-1934",total:80.0,exact:57.5},
+  {idx:41,ticket:"FAQ-1965",total:78.0,exact:56.1},
+  {idx:42,ticket:"FAQ-1975",total:78.6,exact:57.1},
+  {idx:43,ticket:"FAQ-1932",total:76.7,exact:55.8},
+  {idx:44,ticket:"FAQ-2020",total:77.3,exact:56.8},
+  {idx:45,ticket:"FAQ-2011",total:77.8,exact:55.6},
+  {idx:46,ticket:"FAQ-653",total:78.3,exact:54.3},
+  {idx:47,ticket:"FAQ-1961",total:76.6,exact:53.2},
+  {idx:48,ticket:"FAQ-1912",total:77.1,exact:54.2},
+  {idx:49,ticket:"FAQ-1887",total:77.6,exact:53.1},
+  {idx:50,ticket:"FAQ-1820",total:78.0,exact:54.0},
+  {idx:51,ticket:"FAQ-1819",total:78.4,exact:54.9},
+  {idx:52,ticket:"FAQ-1720",total:78.8,exact:55.8},
+  {idx:53,ticket:"FAQ-1695",total:79.2,exact:54.7},
+  {idx:54,ticket:"FAQ-2015",total:79.6,exact:55.6},
+  {idx:55,ticket:"FAQ-1939",total:80.0,exact:56.4},
+  {idx:56,ticket:"FAQ-1918",total:80.4,exact:57.1},
+  {idx:57,ticket:"FAQ-399",total:80.7,exact:57.9},
+  {idx:58,ticket:"FAQ-2052",total:81.0,exact:56.9},
+  {idx:59,ticket:"FAQ-2008",total:81.4,exact:57.6},
+  {idx:60,ticket:"FAQ-2005",total:81.7,exact:58.3},
+  {idx:61,ticket:"FAQ-1995",total:82.0,exact:59.0},
+  {idx:62,ticket:"FAQ-1929",total:80.6,exact:58.1},
+  {idx:63,ticket:"FAQ-1892",total:81.0,exact:58.7},
+  {idx:64,ticket:"FAQ-2038",total:79.7,exact:57.8},
+  {idx:65,ticket:"FAQ-2035",total:80.0,exact:58.5},
+  {idx:66,ticket:"FAQ-2017",total:80.3,exact:57.6},
+  {idx:67,ticket:"FAQ-2006",total:79.1,exact:56.7},
+  {idx:68,ticket:"FAQ-1917",total:79.4,exact:57.4},
+  {idx:69,ticket:"FAQ-1885",total:79.7,exact:58.0},
+  {idx:70,ticket:"FAQ-2045",total:80.0,exact:57.1},
+  {idx:71,ticket:"FAQ-1952",total:78.9,exact:56.3},
+  {idx:72,ticket:"FAQ-1870",total:79.2,exact:56.9},
+  {idx:73,ticket:"FAQ-2019",total:79.5,exact:56.2},
+  {idx:74,ticket:"FAQ-2065",total:79.7,exact:56.8},
+  {idx:75,ticket:"FAQ-2069",total:80.0,exact:56.0},
+  {idx:76,ticket:"FAQ-1811",total:80.3,exact:55.3},
+  {idx:77,ticket:"FAQ-2037",total:80.5,exact:55.8},
+  {idx:78,ticket:"FAQ-2055",total:80.8,exact:56.4},
+  {idx:79,ticket:"FAQ-2110",total:81.0,exact:55.7},
+  {idx:80,ticket:"FAQ-2093",total:81.2,exact:56.2},
+  {idx:81,ticket:"FAQ-2095",total:81.5,exact:56.8},
+  {idx:82,ticket:"FAQ-2066",total:81.7,exact:57.3},
+  {idx:83,ticket:"FAQ-2012",total:81.9,exact:56.6},
+  {idx:84,ticket:"FAQ-1996",total:82.1,exact:56.0},
+  {idx:85,ticket:"FAQ-2103",total:81.2,exact:55.3},
+  {idx:86,ticket:"FAQ-2096",total:81.4,exact:55.8},
+  {idx:87,ticket:"FAQ-2097",total:81.6,exact:56.3},
+  {idx:88,ticket:"FAQ-2094",total:81.8,exact:55.7},
+  {idx:89,ticket:"FAQ-2088",total:80.9,exact:55.1},
+  {idx:90,ticket:"FAQ-2073",total:81.1,exact:55.6},
+  {idx:91,ticket:"FAQ-2092",total:81.3,exact:56.0},
+  {idx:92,ticket:"FAQ-2090",total:81.5,exact:56.5},
+  {idx:93,ticket:"FAQ-1978",total:81.7,exact:55.9},
+  {idx:94,ticket:"FAQ-2130",total:81.9,exact:56.4},
+  {idx:95,ticket:"FAQ-2100",total:82.1,exact:56.8},
+  {idx:96,ticket:"FAQ-2087",total:82.3,exact:56.2},
+  {idx:97,ticket:"FAQ-2082",total:82.5,exact:56.7},
+  {idx:98,ticket:"FAQ-2061",total:82.7,exact:56.1},
+  {idx:99,ticket:"FAQ-2054",total:82.8,exact:56.6},
+  {idx:100,ticket:"FAQ-2050",total:83.0,exact:57.0},
+  {idx:101,ticket:"FAQ-2021",total:83.2,exact:57.4},
+  {idx:102,ticket:"FAQ-2168",total:83.3,exact:57.8},
+  {idx:103,ticket:"FAQ-2057",total:83.5,exact:57.3},
+  {idx:104,ticket:"FAQ-2022",total:83.7,exact:57.7},
+  {idx:105,ticket:"FAQ-2163",total:83.8,exact:58.1},
+  {idx:106,ticket:"FAQ-2075",total:84.0,exact:58.5},
+  {idx:107,ticket:"FAQ-1911",total:84.1,exact:57.9},
+  {idx:108,ticket:"FAQ-2185",total:84.3,exact:57.4},
+  {idx:109,ticket:"FAQ-2028",total:84.4,exact:56.9},
+  {idx:110,ticket:"FAQ-2026",total:84.5,exact:57.3},
+  {idx:111,ticket:"FAQ-2189",total:84.7,exact:56.8},
+  {idx:112,ticket:"FAQ-2000",total:84.8,exact:57.1},
+  {idx:113,ticket:"FAQ-1998",total:85.0,exact:57.5},
+  {idx:114,ticket:"FAQ-2123",total:85.1,exact:57.9},
+  {idx:115,ticket:"FAQ-1839",total:85.2,exact:58.3},
+  {idx:116,ticket:"FAQ-2111",total:84.5,exact:57.8},
+  {idx:117,ticket:"FAQ-1977",total:84.6,exact:58.1},
+  {idx:118,ticket:"FAQ-1548",total:84.7,exact:58.5},
+  {idx:119,ticket:"FAQ-1507",total:84.9,exact:58.8},
+  {idx:120,ticket:"FAQ-1156",total:85.0,exact:59.2},
+  {idx:121,ticket:"FAQ-2169",total:85.1,exact:59.5},
+  {idx:122,ticket:"FAQ-2004",total:85.2,exact:59.8},
+  {idx:123,ticket:"FAQ-2182",total:85.4,exact:60.2},
+  {idx:124,ticket:"FAQ-2159",total:85.5,exact:60.5},
+  {idx:125,ticket:"FAQ-1893",total:85.6,exact:60.0},
+  {idx:126,ticket:"FAQ-1691",total:85.7,exact:59.5},
+  {idx:127,ticket:"FAQ-2204",total:85.8,exact:59.1},
+  {idx:128,ticket:"FAQ-2205",total:85.9,exact:58.6},
+  {idx:129,ticket:"FAQ-2207",total:86.0,exact:58.1},
+  {idx:130,ticket:"FAQ-2105",total:85.4,exact:57.7},
+  {idx:131,ticket:"FAQ-2108",total:85.5,exact:57.3},
+  {idx:132,ticket:"FAQ-2114",total:85.6,exact:56.8},
+  {idx:133,ticket:"FAQ-2136",total:85.7,exact:56.4},
+  {idx:134,ticket:"FAQ-2245",total:85.1,exact:56.0},
+  {idx:135,ticket:"FAQ-2137",total:85.2,exact:56.3},
+  {idx:136,ticket:"FAQ-2173",total:84.6,exact:55.9},
+  {idx:137,ticket:"FAQ-2248",total:84.7,exact:56.2},
+  {idx:138,ticket:"FAQ-2179",total:84.8,exact:56.5},
+  {idx:139,ticket:"FAQ-2188",total:84.9,exact:56.8},
+  {idx:140,ticket:"FAQ-2165",total:85.0,exact:57.1},
+  {idx:141,ticket:"FAQ-696",total:85.1,exact:56.7},
+  {idx:142,ticket:"FAQ-1572",total:84.5,exact:56.3},
+  {idx:143,ticket:"FAQ-2002",total:84.6,exact:56.6},
+  {idx:144,ticket:"FAQ-1814",total:84.7,exact:56.2},
+  {idx:145,ticket:"FAQ-2102",total:84.8,exact:56.6},
+  {idx:146,ticket:"FAQ-2040",total:84.9,exact:56.2},
+  {idx:147,ticket:"FAQ-2076",total:84.4,exact:55.8},
+  {idx:148,ticket:"FAQ-1737",total:83.8,exact:55.4},
+  {idx:149,ticket:"FAQ-1685",total:83.2,exact:55.0},
+  {idx:150,ticket:"FAQ-1706",total:83.3,exact:54.7},
+  {idx:151,ticket:"FAQ-1710",total:82.8,exact:54.3},
+  {idx:152,ticket:"FAQ-1705",total:82.2,exact:53.9},
+  {idx:153,ticket:"FAQ-1723",total:81.7,exact:53.6},
+  {idx:154,ticket:"FAQ-2269",total:81.8,exact:53.9},
+  {idx:155,ticket:"FAQ-2167",total:81.9,exact:54.2},
+  {idx:156,ticket:"FAQ-2154",total:82.1,exact:54.5},
+  {idx:157,ticket:"FAQ-2144",total:81.5,exact:54.1},
+  {idx:158,ticket:"FAQ-2106",total:81.6,exact:53.8},
+  {idx:159,ticket:"FAQ-2104",total:81.8,exact:53.5},
+  {idx:160,ticket:"FAQ-1729",total:81.2,exact:53.1},
+  {idx:161,ticket:"FAQ-1686",total:81.4,exact:52.8},
+  {idx:162,ticket:"FAQ-2295",total:81.5,exact:53.1},
+  {idx:163,ticket:"FAQ-2260",total:81.6,exact:53.4},
+  {idx:164,ticket:"FAQ-2266",total:81.7,exact:53.7},
+  {idx:165,ticket:"FAQ-2256",total:81.8,exact:53.9},
+  {idx:166,ticket:"FAQ-2138",total:81.9,exact:53.6},
+  {idx:167,ticket:"FAQ-1735",total:82.0,exact:53.3},
+  {idx:168,ticket:"FAQ-2127",total:82.1,exact:53.6},
+  {idx:169,ticket:"FAQ-2438",total:82.2,exact:53.8},
+  {idx:170,ticket:"FAQ-2420",total:82.4,exact:54.1},
+  {idx:171,ticket:"FAQ-2385",total:81.9,exact:53.8},
+  {idx:172,ticket:"FAQ-2319",total:82.0,exact:54.1},
+  {idx:173,ticket:"FAQ-2293",total:82.1,exact:54.3},
+  {idx:174,ticket:"FAQ-2259",total:81.6,exact:54.0},
+  {idx:175,ticket:"FAQ-2183",total:81.1,exact:53.7},
+  {idx:176,ticket:"FAQ-2158",total:80.7,exact:53.4},
+  {idx:177,ticket:"FAQ-2142",total:80.8,exact:53.1},
+  {idx:178,ticket:"FAQ-2101",total:80.3,exact:52.8},
+  {idx:179,ticket:"FAQ-2501",total:79.9,exact:52.5},
+  {idx:180,ticket:"FAQ-2357",total:80.0,exact:52.2},
+  {idx:181,ticket:"FAQ-2343",total:79.6,exact:51.9},
+  {idx:182,ticket:"FAQ-2244",total:79.7,exact:51.6},
+  {idx:183,ticket:"FAQ-2206",total:79.8,exact:51.4},
+  {idx:184,ticket:"FAQ-2098",total:79.9,exact:51.1},
+  {idx:185,ticket:"FAQ-1959",total:80.0,exact:51.4},
+  {idx:186,ticket:"FAQ-1935",total:80.1,exact:51.1},
+  {idx:187,ticket:"FAQ-1789",total:80.2,exact:50.8},
+  {idx:188,ticket:"FAQ-1547",total:80.3,exact:50.5},
+  {idx:189,ticket:"FAQ-2489",total:80.4,exact:50.8},
+  {idx:190,ticket:"FAQ-2427",total:80.5,exact:50.5},
+  {idx:191,ticket:"FAQ-2425",total:80.6,exact:50.3},
+  {idx:192,ticket:"FAQ-2305",total:80.7,exact:50.0},
+  {idx:193,ticket:"FAQ-2196",total:80.8,exact:49.7},
+  {idx:194,ticket:"FAQ-2470",total:80.9,exact:50.0},
+  {idx:195,ticket:"FAQ-2469",total:81.0,exact:50.3},
+  {idx:196,ticket:"FAQ-2527",total:80.6,exact:50.0},
+  {idx:197,ticket:"FAQ-2461",total:80.7,exact:50.3},
+  {idx:198,ticket:"FAQ-2458",total:80.8,exact:50.5},
+  {idx:199,ticket:"FAQ-2365",total:80.9,exact:50.8},
+  {idx:200,ticket:"FAQ-2347",total:81.0,exact:51.0},
+  {idx:201,ticket:"FAQ-2554",total:81.1,exact:51.2},
+  {idx:202,ticket:"FAQ-2545",total:81.2,exact:51.5},
+  {idx:203,ticket:"FAQ-2543",total:81.3,exact:51.7},
+  {idx:204,ticket:"FAQ-2519",total:81.4,exact:52.0},
+  {idx:205,ticket:"FAQ-2513",total:81.5,exact:52.2},
+  {idx:206,ticket:"FAQ-2497",total:81.6,exact:52.4},
+  {idx:207,ticket:"FAQ-2496",total:81.6,exact:52.7},
+  {idx:208,ticket:"FAQ-2495",total:81.2,exact:52.4},
+  {idx:209,ticket:"FAQ-2482",total:81.3,exact:52.2},
+  {idx:210,ticket:"FAQ-2480",total:81.4,exact:51.9},
+  {idx:211,ticket:"FAQ-2472",total:81.5,exact:52.1},
+  {idx:212,ticket:"FAQ-2471",total:81.6,exact:52.4},
+  {idx:213,ticket:"FAQ-2467",total:81.7,exact:52.6},
+  {idx:214,ticket:"FAQ-2465",total:81.8,exact:52.8},
+  {idx:215,ticket:"FAQ-2466",total:81.9,exact:52.6},
+  {idx:216,ticket:"FAQ-2464",total:81.9,exact:52.3},
+  {idx:217,ticket:"FAQ-2463",total:82.0,exact:52.5},
+  {idx:218,ticket:"FAQ-2460",total:82.1,exact:52.8},
+  {idx:219,ticket:"FAQ-2441",total:81.7,exact:52.5},
+  {idx:220,ticket:"FAQ-2434",total:81.8,exact:52.7},
+  {idx:221,ticket:"FAQ-2430",total:81.9,exact:52.5},
+  {idx:222,ticket:"FAQ-2429",total:82.0,exact:52.3},
+  {idx:223,ticket:"FAQ-2411",total:82.1,exact:52.5},
+  {idx:224,ticket:"FAQ-2396",total:81.7,exact:52.2},
+  {idx:225,ticket:"FAQ-2406",total:81.8,exact:52.0},
+  {idx:226,ticket:"FAQ-2358",total:81.9,exact:52.2},
+  {idx:227,ticket:"FAQ-2621",total:81.9,exact:52.4},
+  {idx:228,ticket:"FAQ-2355",total:81.6,exact:52.2},
+  {idx:229,ticket:"FAQ-2642",total:81.7,exact:52.4},
+  {idx:230,ticket:"FAQ-2572",total:81.3,exact:52.2},
+  {idx:231,ticket:"FAQ-2539",total:81.4,exact:52.4},
+  {idx:232,ticket:"FAQ-2349",total:81.5,exact:52.2},
+  {idx:233,ticket:"FAQ-2530",total:81.5,exact:52.4},
+  {idx:234,ticket:"FAQ-2330",total:81.6,exact:52.1},
+  {idx:235,ticket:"FAQ-2297",total:81.3,exact:51.9},
+  {idx:236,ticket:"FAQ-2529",total:81.4,exact:51.7},
+  {idx:237,ticket:"FAQ-2278",total:81.4,exact:51.5},
+  {idx:238,ticket:"FAQ-2490",total:81.5,exact:51.7},
+  {idx:239,ticket:"FAQ-2338",total:81.6,exact:51.5},
+  {idx:240,ticket:"FAQ-2273",total:81.2,exact:51.2},
+  {idx:241,ticket:"FAQ-2433",total:81.3,exact:51.0},
+  {idx:242,ticket:"FAQ-2025",total:81.4,exact:50.8},
+  {idx:243,ticket:"FAQ-2416",total:81.5,exact:50.6},
+  {idx:244,ticket:"FAQ-2333",total:81.6,exact:50.4},
+  {idx:245,ticket:"FAQ-2332",total:81.6,exact:50.2},
+  {idx:246,ticket:"FAQ-2318",total:81.7,exact:50.0},
+  {idx:247,ticket:"FAQ-2287",total:81.4,exact:49.8},
+  {idx:248,ticket:"FAQ-2194",total:81.5,exact:50.0},
+  {idx:249,ticket:"FAQ-2161",total:81.5,exact:49.8},
+  {idx:250,ticket:"FAQ-1958",total:81.6,exact:49.6},
+  {idx:251,ticket:"FAQ-1840",total:81.7,exact:49.4},
+  {idx:252,ticket:"FAQ-1800",total:81.3,exact:49.2},
+  {idx:253,ticket:"FAQ-1794",total:81.4,exact:49.4},
+  {idx:254,ticket:"FAQ-1627",total:81.1,exact:49.2},
+  {idx:255,ticket:"FAQ-1626",total:80.8,exact:49.0},
+  {idx:256,ticket:"FAQ-2707",total:80.9,exact:49.2},
+  {idx:257,ticket:"FAQ-2747",total:80.9,exact:49.0},
+  {idx:258,ticket:"FAQ-2705",total:80.6,exact:48.8},
+  {idx:259,ticket:"FAQ-2659",total:80.7,exact:49.0},
+  {idx:260,ticket:"FAQ-2605",total:80.8,exact:49.2},
+  {idx:261,ticket:"FAQ-2632",total:80.5,exact:49.0},
+  {idx:262,ticket:"FAQ-2600",total:80.2,exact:48.9},
+  {idx:263,ticket:"FAQ-2599",total:80.2,exact:49.0},
+  {idx:264,ticket:"FAQ-2582",total:80.3,exact:48.9},
+  {idx:265,ticket:"FAQ-2579",total:80.4,exact:49.1},
+  {idx:266,ticket:"FAQ-2581",total:80.5,exact:48.9},
+  {idx:267,ticket:"FAQ-2576",total:80.1,exact:48.7},
+  {idx:268,ticket:"FAQ-2575",total:80.2,exact:48.9},
+  {idx:269,ticket:"FAQ-2574",total:80.3,exact:49.1},
+  {idx:270,ticket:"FAQ-2560",total:80.4,exact:49.3},
+  {idx:271,ticket:"FAQ-2556",total:80.4,exact:49.4},
+  {idx:272,ticket:"FAQ-2573",total:80.5,exact:49.3},
+  {idx:273,ticket:"FAQ-2542",total:80.6,exact:49.5},
+  {idx:274,ticket:"FAQ-2540",total:80.7,exact:49.6},
+  {idx:275,ticket:"FAQ-2504",total:80.4,exact:49.5},
+  {idx:276,ticket:"FAQ-2486",total:80.1,exact:49.3},
+  {idx:277,ticket:"FAQ-2485",total:80.1,exact:49.1},
+  {idx:278,ticket:"FAQ-2479",total:79.9,exact:48.9},
+  {idx:279,ticket:"FAQ-2474",total:79.9,exact:49.1},
+  {idx:280,ticket:"FAQ-2475",total:79.6,exact:48.9},
+  {idx:281,ticket:"FAQ-2473",total:79.4,exact:48.8},
+  {idx:282,ticket:"FAQ-2419",total:79.4,exact:48.6},
+  {idx:283,ticket:"FAQ-2392",total:79.5,exact:48.4},
+  {idx:284,ticket:"FAQ-1941",total:79.2,exact:48.2},
+  {idx:285,ticket:"FAQ-1895",total:79.3,exact:48.1},
+  {idx:286,ticket:"FAQ-1857",total:79.4,exact:47.9},
+  {idx:287,ticket:"FAQ-1855",total:79.4,exact:47.7},
+  {idx:288,ticket:"FAQ-1736",total:79.5,exact:47.6},
+  {idx:289,ticket:"FAQ-2793",total:79.6,exact:47.8},
+  {idx:290,ticket:"FAQ-2788",total:79.3,exact:47.6},
+  {idx:291,ticket:"FAQ-2775",total:79.4,exact:47.4},
+  {idx:292,ticket:"FAQ-2769",total:79.5,exact:47.6},
+  {idx:293,ticket:"FAQ-2768",total:79.2,exact:47.4},
+  {idx:294,ticket:"FAQ-2767",total:79.3,exact:47.6},
+  {idx:295,ticket:"FAQ-2745",total:79.3,exact:47.8},
+  {idx:296,ticket:"FAQ-2741",total:79.4,exact:48.0},
+  {idx:297,ticket:"FAQ-2703",total:79.5,exact:48.1},
+  {idx:298,ticket:"FAQ-2676",total:79.5,exact:48.3},
+  {idx:299,ticket:"FAQ-2797",total:79.6,exact:48.2},
+  {idx:300,ticket:"FAQ-2672",total:79.7,exact:48.3},
+  {idx:301,ticket:"FAQ-2668",total:79.7,exact:48.5},
+  {idx:302,ticket:"FAQ-2663",total:79.8,exact:48.3},
+  {idx:303,ticket:"FAQ-2649",total:79.9,exact:48.2},
+  {idx:304,ticket:"FAQ-2647",total:79.6,exact:48.0},
+  {idx:305,ticket:"FAQ-2646",total:79.7,exact:47.9},
+  {idx:306,ticket:"FAQ-2630",total:79.7,exact:47.7},
+  {idx:307,ticket:"FAQ-2628",total:79.8,exact:47.9},
+  {idx:308,ticket:"FAQ-2507",total:79.9,exact:47.7},
+  {idx:309,ticket:"FAQ-2503",total:79.9,exact:47.9},
+  {idx:310,ticket:"FAQ-2488",total:79.7,exact:47.7},
+  {idx:311,ticket:"FAQ-2476",total:79.4,exact:47.6},
+  {idx:312,ticket:"FAQ-2428",total:79.2,exact:47.4},
+  {idx:313,ticket:"FAQ-1825",total:79.2,exact:47.3},
+  {idx:314,ticket:"FAQ-1566",total:79.3,exact:47.5},
+  {idx:315,ticket:"FAQ-1545",total:79.4,exact:47.3},
+  {idx:316,ticket:"FAQ-2778",total:79.4,exact:47.2},
+  {idx:317,ticket:"FAQ-2610",total:79.5,exact:47.0},
+  {idx:318,ticket:"FAQ-2549",total:79.6,exact:47.2},
+  {idx:319,ticket:"FAQ-2512",total:79.6,exact:47.3},
+  {idx:320,ticket:"FAQ-2499",total:79.7,exact:47.2},
+  {idx:321,ticket:"FAQ-2379",total:79.8,exact:47.0},
+  {idx:322,ticket:"FAQ-2326",total:79.8,exact:46.9},
+  {idx:323,ticket:"FAQ-2315",total:79.9,exact:46.7},
+  {idx:324,ticket:"FAQ-2294",total:79.9,exact:46.9},
+  {idx:325,ticket:"FAQ-1905",total:80.0,exact:47.1},
+  {idx:326,ticket:"FAQ-1289",total:79.8,exact:46.9}
+];
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: data.map(d => d.idx),
+    datasets: [
+      {
+        label: '總成功率',
+        data: data.map(d => d.total),
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25,118,210,0.08)',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: '完全成功率',
+        data: data.map(d => d.exact),
+        borderColor: '#388e3c',
+        backgroundColor: 'rgba(56,142,60,0.08)',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: '累積成功率趨勢', font: { size: 16 } },
+      legend: { display: true, position: 'top' },
+      tooltip: {
+        callbacks: {
+          title: function(items) {
+            const idx = items[0].dataIndex;
+            return data[idx].ticket;
+          },
+          label: function(context) {
+            return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0,
+        max: 100,
+        title: { display: true, text: '成功率 (%)' },
+        ticks: { callback: v => v + '%' }
+      },
+      x: {
+        title: { display: true, text: '完成順序' },
+        ticks: {
+          maxTicksLimit: 20,
+          callback: function(val) { return data[val] ? data[val].idx : ''; }
+        }
+      }
+    },
+    interaction: { mode: 'index', intersect: false }
+  }
+});
+</script>
+</body>
+</html>

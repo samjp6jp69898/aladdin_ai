@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回測統計報告 — 20260429</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 24px;
+    line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 20px; color: #1a1a1a; }
+  h2 { font-size: 1.2rem; margin: 28px 0 14px; color: #444; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .card .label { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
+  .card .big { font-size: 2.4rem; font-weight: 700; color: #1a73e8; }
+  .card .sub { font-size: 0.82rem; color: #999; margin-top: 4px; }
+
+  .progress-bar-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+  }
+  .progress-bar {
+    display: flex;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 10px 0 14px;
+  }
+  .progress-bar .seg { display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #fff; font-weight: 600; white-space: nowrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 20px; font-size: 0.82rem; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  .table-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #fafafa; padding: 10px 8px; text-align: center; font-weight: 600; border-bottom: 2px solid #eee; }
+  td { padding: 9px 8px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+  tr:last-child td { border-bottom: none; }
+  .sev-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; color: #fff;
+  }
+  .sev-p1 { background: #e53935; }
+  .sev-p2 { background: #fb8c00; }
+  .sev-p3 { background: #fdd835; color: #333; }
+  .sev-p4 { background: #42a5f5; }
+
+  .chart-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  canvas { max-height: 400px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>回測統計報告</h1>
+
+<!-- Section 1: Overview Cards -->
+<div class="cards">
+  <div class="card">
+    <div class="label">總成功率</div>
+    <div class="big">80.9%</div>
+    <div class="sub">已完成 315 / 315 張</div>
+  </div>
+  <div class="card">
+    <div class="label">完全成功率</div>
+    <div class="big" style="color:#2e7d32;">48.2%</div>
+    <div class="sub">有效樣本 309 張（排除 6 張不需修復）</div>
+  </div>
+</div>
+
+<div class="progress-bar-container">
+  <div style="font-weight:600; font-size:0.9rem; margin-bottom: 2px;">結論分布</div>
+  <div class="progress-bar">
+    <div class="seg" style="width:48.2%;background:#4caf50;" title="分析正確 149 (48.2%)">149</div>
+    <div class="seg" style="width:2.6%;background:#81c784;" title="部分正確A 8 (2.6%)">8</div>
+    <div class="seg" style="width:30.1%;background:#ffb74d;" title="部分正確B 93 (30.1%)">93</div>
+    <div class="seg" style="width:16.2%;background:#e53935;" title="分析錯誤 50 (16.2%)">50</div>
+    <div class="seg" style="width:2.9%;background:#9e9e9e;" title="無法比對 9 (2.9%)"></div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4caf50;"></div>分析正確 149 (48.2%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#81c784;"></div>部分正確A 等效替代 8 (2.6%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffb74d;"></div>部分正確B 不完整 93 (30.1%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e53935;"></div>分析錯誤 50 (16.2%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9e9e9e;"></div>無法比對 9 (2.9%)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bdbdbd;"></div>不需修復 6 (不計入)</div>
+  </div>
+</div>
+
+<!-- Section 2: Per-Severity Table -->
+<h2>各嚴重性等級成功率</h2>
+<div class="table-container">
+<table>
+  <thead>
+    <tr>
+      <th>嚴重性</th><th>總數</th><th>正確</th><th>部分A</th><th>部分B</th><th>錯誤</th><th>無法比對</th><th>不需修復</th><th>完全率</th><th>總成功率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="sev-tag sev-p1">P1重點</span></td>
+      <td>47</td><td>18</td><td>1</td><td>12</td><td>12</td><td>3</td><td>1</td>
+      <td>39.1%</td><td>67.4%</td>
+    </tr>
+    <tr>
+      <td><span class="sev-tag sev-p2">P2較高</span></td>
+      <td>183</td><td>93</td><td>2</td><td>54</td><td>26</td><td>5</td><td>3</td>
+      <td>51.7%</td><td>82.8%</td>
+    </tr>
+    <tr>
+      <td><span class="sev-tag sev-p3">P3一般</span></td>
+      <td>71</td><td>33</td><td>2</td><td>25</td><td>8</td><td>1</td><td>2</td>
+      <td>47.8%</td><td>87.0%</td>
+    </tr>
+    <tr>
+      <td><span class="sev-tag sev-p4">P4較低</span></td>
+      <td>14</td><td>5</td><td>3</td><td>2</td><td>4</td><td>0</td><td>0</td>
+      <td>35.7%</td><td>71.4%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Section 3: Cumulative Trend Chart -->
+<h2>累積成功率趨勢</h2>
+<div class="chart-container">
+  <canvas id="trendChart"></canvas>
+</div>
+
+</div>
+
+<script>
+const labels = ["FAQ-1875","FAQ-1864","FAQ-1862","FAQ-1860","FAQ-1858","FAQ-1843","FAQ-1817","FAQ-1813","FAQ-1809","FAQ-1805","FAQ-1799","FAQ-1798","FAQ-1786","FAQ-1796","FAQ-1783","FAQ-1779","FAQ-1777","FAQ-1774","FAQ-1759","FAQ-1731","FAQ-1730","FAQ-1727","FAQ-1726","FAQ-1725","FAQ-1724","FAQ-1722","FAQ-1721","FAQ-1719","FAQ-1718","FAQ-1704","FAQ-1703","FAQ-1702","FAQ-1701","FAQ-1698","FAQ-1694","FAQ-1916","FAQ-1949","FAQ-1942","FAQ-1960","FAQ-1934","FAQ-1965","FAQ-1975","FAQ-1932","FAQ-2020","FAQ-2011","FAQ-653","FAQ-1961","FAQ-1912","FAQ-1887","FAQ-1820","FAQ-1819","FAQ-1720","FAQ-1695","FAQ-2015","FAQ-1939","FAQ-1918","FAQ-399","FAQ-2052","FAQ-2008","FAQ-2005","FAQ-1995","FAQ-1929","FAQ-1892","FAQ-2038","FAQ-2035","FAQ-2017","FAQ-2006","FAQ-1917","FAQ-1885","FAQ-2045","FAQ-1952","FAQ-1870","FAQ-2019","FAQ-2065","FAQ-2069","FAQ-1811","FAQ-2037","FAQ-2055","FAQ-2110","FAQ-2093","FAQ-2095","FAQ-2066","FAQ-2012","FAQ-1996","FAQ-2103","FAQ-2096","FAQ-2097","FAQ-2094","FAQ-2088","FAQ-2073","FAQ-2092","FAQ-2090","FAQ-1978","FAQ-2130","FAQ-2100","FAQ-2087","FAQ-2082","FAQ-2061","FAQ-2054","FAQ-2050","FAQ-2021","FAQ-2168","FAQ-2057","FAQ-2022","FAQ-2163","FAQ-2075","FAQ-1911","FAQ-2185","FAQ-2028","FAQ-2026","FAQ-2189","FAQ-2000","FAQ-1998","FAQ-2123","FAQ-1839","FAQ-2111","FAQ-1977","FAQ-1548","FAQ-1507","FAQ-1156","FAQ-2169","FAQ-2004","FAQ-2182","FAQ-2159","FAQ-1893","FAQ-1691","FAQ-2204","FAQ-2205","FAQ-2207","FAQ-2105","FAQ-2108","FAQ-2114","FAQ-2136","FAQ-2245","FAQ-2137","FAQ-2173","FAQ-2248","FAQ-2179","FAQ-2188","FAQ-2165","FAQ-696","FAQ-1572","FAQ-2002","FAQ-1814","FAQ-2102","FAQ-2040","FAQ-2076","FAQ-1737","FAQ-1685","FAQ-1706","FAQ-1710","FAQ-1705","FAQ-1723","FAQ-2269","FAQ-2167","FAQ-2154","FAQ-2144","FAQ-2106","FAQ-2104","FAQ-1729","FAQ-1686","FAQ-2295","FAQ-2260","FAQ-2266","FAQ-2256","FAQ-2138","FAQ-1735","FAQ-2127","FAQ-2438","FAQ-2420","FAQ-2385","FAQ-2319","FAQ-2293","FAQ-2259","FAQ-2183","FAQ-2158","FAQ-2142","FAQ-2101","FAQ-2501","FAQ-2357","FAQ-2343","FAQ-2244","FAQ-2206","FAQ-2098","FAQ-1959","FAQ-1935","FAQ-1789","FAQ-1547","FAQ-2489","FAQ-2427","FAQ-2425","FAQ-2305","FAQ-2196","FAQ-2470","FAQ-2469","FAQ-2527","FAQ-2461","FAQ-2458","FAQ-2365","FAQ-2347","FAQ-2554","FAQ-2545","FAQ-2543","FAQ-2519","FAQ-2513","FAQ-2497","FAQ-2496","FAQ-2495","FAQ-2482","FAQ-2480","FAQ-2472","FAQ-2471","FAQ-2467","FAQ-2465","FAQ-2466","FAQ-2464","FAQ-2463","FAQ-2460","FAQ-2441","FAQ-2434","FAQ-2430","FAQ-2429","FAQ-2411","FAQ-2396","FAQ-2406","FAQ-2358","FAQ-2621","FAQ-2355","FAQ-2642","FAQ-2572","FAQ-2539","FAQ-2349","FAQ-2530","FAQ-2330","FAQ-2297","FAQ-2529","FAQ-2278","FAQ-2490","FAQ-2338","FAQ-2273","FAQ-2433","FAQ-2025","FAQ-2416","FAQ-2333","FAQ-2332","FAQ-2318","FAQ-2287","FAQ-2194","FAQ-2161","FAQ-1958","FAQ-1840","FAQ-1800","FAQ-1794","FAQ-1627","FAQ-1626","FAQ-2707","FAQ-2747","FAQ-2705","FAQ-2659","FAQ-2605","FAQ-2632","FAQ-2600","FAQ-2599","FAQ-2582","FAQ-2579","FAQ-2581","FAQ-2576","FAQ-2575","FAQ-2574","FAQ-2560","FAQ-2556","FAQ-2573","FAQ-2542","FAQ-2540","FAQ-2504","FAQ-2486","FAQ-2485","FAQ-2479","FAQ-2474","FAQ-2475","FAQ-2473","FAQ-2419","FAQ-2392","FAQ-1941","FAQ-1895","FAQ-1857","FAQ-1855","FAQ-1736","FAQ-2793","FAQ-2788","FAQ-2775","FAQ-2769","FAQ-2768","FAQ-2767","FAQ-2745","FAQ-2741","FAQ-2703","FAQ-2676","FAQ-2797","FAQ-2672","FAQ-2668","FAQ-2663","FAQ-2649","FAQ-2647","FAQ-2646","FAQ-2630","FAQ-2628","FAQ-2507","FAQ-2503","FAQ-2488","FAQ-2476","FAQ-2428","FAQ-1825","FAQ-1566","FAQ-1545"];
+const totalRates = [100.0,100.0,66.7,50.0,40.0,33.3,42.9,37.5,44.4,40.0,45.5,50.0,53.8,57.1,60.0,62.5,64.7,66.7,68.4,70.0,71.4,72.7,73.9,75.0,76.0,73.1,74.1,75.0,72.4,73.3,74.2,75.0,75.8,76.5,77.1,77.8,78.4,78.9,79.5,80.0,78.0,78.6,76.7,77.3,77.8,78.3,76.6,77.1,77.6,78.0,78.4,78.8,79.2,79.6,80.0,80.4,80.7,81.0,81.4,81.7,82.0,80.6,81.0,79.7,80.0,80.3,79.1,79.4,79.7,80.0,78.9,79.2,79.5,79.7,80.0,80.3,80.5,80.8,81.0,81.2,81.5,81.7,81.9,82.1,81.2,81.4,81.6,81.8,80.9,81.1,81.3,81.5,81.7,81.9,82.1,82.3,82.5,82.7,82.8,83.0,83.2,83.3,83.5,83.7,83.8,84.0,84.1,84.3,84.4,84.5,84.7,84.8,85.0,85.1,85.2,84.5,84.6,84.7,84.9,85.0,85.1,85.2,85.4,85.5,85.6,85.7,85.8,85.9,86.0,85.4,85.5,85.6,85.7,85.1,85.2,85.2,85.3,85.4,85.5,85.6,85.7,85.1,85.2,85.3,85.4,85.5,85.5,85.5,84.9,85.0,84.5,83.9,83.3,83.4,83.6,83.7,83.1,83.2,83.3,82.8,82.9,83.0,83.1,83.2,83.3,83.4,83.5,83.6,83.7,83.8,83.3,83.4,83.5,83.0,82.6,82.1,82.2,81.7,81.7,81.8,81.4,81.5,81.6,81.7,81.8,81.9,82.0,82.1,82.2,82.3,82.4,82.4,82.5,82.6,82.7,82.3,82.4,82.5,82.6,82.7,82.7,82.8,82.9,83.0,83.1,83.2,83.3,82.8,82.9,83.0,83.1,83.2,83.3,83.3,83.4,83.5,83.6,83.6,83.3,83.3,83.4,83.5,83.6,83.2,83.3,83.3,83.4,83.4,83.5,83.1,83.2,83.3,83.3,83.4,83.0,83.1,83.2,83.3,83.3,83.0,83.1,83.1,83.2,83.3,83.3,83.4,83.1,83.1,83.2,83.3,83.3,83.0,83.1,82.7,82.4,82.5,82.5,82.2,82.3,82.4,82.0,81.7,81.8,81.9,81.9,82.0,81.7,81.7,81.8,81.9,82.0,82.0,82.1,82.2,81.9,81.5,81.6,81.3,81.4,81.1,80.8,80.9,80.9,80.6,80.7,80.8,80.9,80.9,81.0,81.0,81.1,81.1,80.8,80.9,81.0,81.0,81.1,81.2,81.2,81.3,81.4,81.4,81.5,81.2,81.3,81.3,81.4,81.5,81.5,81.2,81.0,80.7,80.8,80.8,80.9];
+const exactRates = [100.0,100.0,66.7,50.0,40.0,33.3,28.6,25.0,33.3,30.0,36.4,41.7,46.2,50.0,53.3,50.0,52.9,55.6,52.6,55.0,52.4,54.5,56.5,58.3,56.0,53.8,51.9,53.6,51.7,53.3,54.8,56.2,57.6,58.8,60.0,58.3,59.5,57.9,59.0,57.5,56.1,57.1,55.8,56.8,55.6,54.3,53.2,54.2,53.1,54.0,54.9,55.8,54.7,55.6,56.4,57.1,57.9,56.9,57.6,58.3,59.0,58.1,58.7,57.8,58.5,57.6,56.7,57.4,58.0,57.1,56.3,56.9,56.2,56.8,56.0,55.3,55.8,56.4,55.7,56.2,56.8,57.3,56.6,56.0,55.3,55.8,56.3,55.7,55.1,55.6,56.0,56.5,55.9,56.4,56.8,56.2,56.7,56.1,56.6,57.0,57.4,57.8,57.3,57.7,58.1,58.5,57.9,57.4,56.9,57.3,56.8,57.1,57.5,57.9,58.3,57.8,58.1,58.5,58.8,59.2,59.5,59.8,60.2,60.5,60.0,59.5,59.1,58.6,58.1,57.7,57.3,56.8,56.4,56.0,56.3,56.3,56.6,56.9,57.2,57.6,57.1,56.7,57.0,56.6,56.9,56.6,56.6,56.6,56.2,55.8,55.4,55.0,54.7,55.0,55.3,55.6,55.2,54.8,54.5,54.1,53.8,54.1,54.4,54.7,54.9,54.6,54.3,54.5,54.8,55.1,54.8,55.0,55.3,55.0,54.7,54.3,54.0,53.7,53.7,53.4,53.1,52.8,52.5,52.2,52.5,52.2,51.9,51.6,51.9,51.6,51.3,51.1,50.8,51.1,51.3,51.0,51.3,51.5,51.8,52.0,52.3,52.5,52.8,53.0,53.2,53.5,53.7,53.4,53.2,52.9,53.1,53.4,53.6,53.8,53.6,53.3,53.5,53.7,53.5,53.7,53.5,53.2,53.4,53.2,52.9,53.2,53.4,53.4,53.6,53.3,53.5,53.3,53.5,53.3,53.0,52.8,52.6,52.8,52.6,52.3,52.1,51.9,51.7,51.5,51.2,51.0,50.8,51.0,50.8,50.6,50.4,50.2,50.4,50.2,50.0,50.2,50.0,49.8,50.0,50.2,50.0,49.8,50.0,49.8,50.0,49.8,49.6,49.8,50.0,50.2,50.4,50.2,50.4,50.6,50.4,50.2,50.0,49.8,50.0,49.8,49.6,49.5,49.3,49.1,48.9,48.8,48.6,48.4,48.6,48.6,48.4,48.6,48.4,48.6,48.8,49.0,49.1,49.3,49.1,49.3,49.5,49.3,49.2,49.0,48.8,48.7,48.8,48.7,48.8,48.7,48.5,48.4,48.2,48.4,48.2];
+
+const indices = labels.map((_, i) => i + 1);
+
+const ctx = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: indices,
+    datasets: [
+      {
+        label: '總成功率',
+        data: totalRates,
+        borderColor: '#1a73e8',
+        backgroundColor: 'rgba(26,115,232,0.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+      },
+      {
+        label: '完全成功率',
+        data: exactRates,
+        borderColor: '#2e7d32',
+        backgroundColor: 'rgba(46,125,50,0.06)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      title: { display: true, text: '累積成功率趨勢', font: { size: 15 } },
+      tooltip: {
+        callbacks: {
+          title: (items) => labels[items[0].dataIndex],
+          label: (item) => `${item.dataset.label}: ${item.raw}%`
+        }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: '完成順序' }, ticks: { maxTicksLimit: 20 } },
+      y: { title: { display: true, text: '成功率 (%)' }, min: 0, max: 100 }
+    }
+  }
+});
+</script>
+</body>
+</html>
