@@ -286,6 +286,7 @@ function extractCallsFromBody(
     //   2. `this.walletManager.foo(`  — instance field / getter
     //   3. `localizationManager.foo(` — module-level `const localizationManager = new LocalizationManager()`
     //   4. `walletManager.foo(`       — local variable / parameter
+    //   5. `LocalizationManager.foo(` — static class call (PascalCase identifier)
     // Resolution order: lookup in fieldToClass map (built from source-file declarations);
     // if absent, fallback to capitalize-first-char heuristic.
     const mgrRe = /\b(_?[a-z][a-zA-Z0-9]*Manager)\.(\w+)\s*\(/g;
@@ -301,6 +302,17 @@ function extractCallsFromBody(
         if (!managerCalls.has(primary)) managerCalls.set(primary, expanded);
     }
 
+    // Static class call: `LocalizationManager.foo(` — PascalCase identifier ending in Manager.
+    // (No `this.` / no leading lowercase). e.g., `RoleConfigManager.syncRoleConfigs(...)`.
+    const staticMgrRe = /(?<![\w.])([A-Z][a-zA-Z0-9]*Manager)\.(\w+)\s*\(/g;
+    while ((m = staticMgrRe.exec(body)) !== null) {
+        const mgr = m[1];
+        const method = m[2];
+        const primary = `Manager.${mgr}.${method}`;
+        const expanded = ancestors(mgr, parentOf).map(c => `Manager.${c}.${method}`);
+        if (!managerCalls.has(primary)) managerCalls.set(primary, expanded);
+    }
+
     // RPC cross-server: `context.remote.<server>.<accessor>.<Method>(`
     // The runtime accessor (e.g. `main`) often differs from the rajah service name (e.g. `platform`),
     // so we resolve through rpcResolver against the rpc-method note inventory.
@@ -310,6 +322,91 @@ function extractCallsFromBody(
     }
 
     return { managerCalls, rpcCalls };
+}
+
+/**
+ * Find a same-file helper method declaration body by name.
+ * Looks for: `async #foo(`, `async _foo(`, `async foo(`, `#foo(`, `_foo(`, `foo(` — first match wins.
+ * Returns method body (incl. braces) or empty string if not found.
+ */
+function findHelperBody(content: string, helperName: string): string {
+    const esc = helperName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Note: bare `foo(` is too permissive (matches arbitrary call sites). We anchor on
+    // `(public|private|protected|async)?\s+#?_?<name>\s*[(<]` to require it to look like a declaration.
+    const re = new RegExp(
+        `\\b(?:public|private|protected|static|async|\\s)*\\s+(?:#|_)?${esc}\\s*[(<]`,
+        'g',
+    );
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(content)) !== null) {
+        // Require the match to be followed by something that looks like a fn signature:
+        // we already require `[(<]` at end so this is OK.
+        const line = offsetToLine(content, m.index);
+        const body = extractMethodBody(content, line);
+        if (body && body.length > 1) return body;
+    }
+    return '';
+}
+
+/**
+ * Extract calls (manager + rpc) from a method body, recursively descending into
+ * same-file helper invocations of form `this.#foo(` / `this._foo(` / `this.foo(`.
+ *
+ * Helpers ending in `Manager` are skipped (already covered by the field-map regex);
+ * helpers already visited are also skipped (cycle guard).
+ *
+ * Depth limited to 2 (main → helper → helper-of-helper) to bound runtime.
+ */
+function extractCallsRecursive(
+    body: string,
+    sourceContent: string,
+    rpcResolver: (server: string, accessor: string, method: string) => string,
+    fieldToClass: Map<string, string>,
+    parentOf: Map<string, string>,
+    depth: number = 0,
+    visited: Set<string> = new Set(),
+): { managerCalls: Map<string, string[]>; rpcCalls: Set<string> } {
+    const direct = extractCallsFromBody(body, rpcResolver, fieldToClass, parentOf);
+    if (depth >= 2) return direct;
+
+    // Find helper invocations: `this.#foo(` / `this._foo(` / `this.foo(`
+    const helperRe = /\bthis\.([#_]?[a-zA-Z][a-zA-Z0-9]*)\s*\(/g;
+    let m: RegExpExecArray | null;
+    while ((m = helperRe.exec(body)) !== null) {
+        const raw = m[1];
+        // Strip leading # or _ for both visited-set and lookup
+        const clean = raw.replace(/^[#_]/, '');
+
+        // Skip non-helper field method calls — anything that ends with Manager is treated as
+        // `this.fooManager.bar(...)` whose bar() is on a different class, not a helper.
+        // (But the regex above only captures `this.X(` not `this.X.Y(`, so `this.fooManager.bar(`
+        //  won't trigger here. However bare `this.foo(` where foo is a non-method getter to a
+        //  Manager (e.g. `get foo() { return this._fooManager }`) wouldn't be a helper either.
+        //  We let it fall through — findHelperBody will return '' if no method named foo exists.)
+
+        if (clean.endsWith('Manager')) continue;
+        if (visited.has(clean)) continue;
+        visited.add(clean);
+
+        const helperBody = findHelperBody(sourceContent, clean);
+        if (!helperBody) continue;
+
+        const sub = extractCallsRecursive(
+            helperBody,
+            sourceContent,
+            rpcResolver,
+            fieldToClass,
+            parentOf,
+            depth + 1,
+            visited,
+        );
+        for (const [k, v] of sub.managerCalls) {
+            if (!direct.managerCalls.has(k)) direct.managerCalls.set(k, v);
+        }
+        for (const r of sub.rpcCalls) direct.rpcCalls.add(r);
+    }
+
+    return direct;
 }
 
 // ---- Main --------------------------------------------------------------------
@@ -393,7 +490,7 @@ async function main() {
         checked++;
 
         const fieldToClass = buildFieldToClassMap(content);
-        const { managerCalls, rpcCalls } = extractCallsFromBody(body, rpcResolver, fieldToClass, parentOf);
+        const { managerCalls, rpcCalls } = extractCallsRecursive(body, content, rpcResolver, fieldToClass, parentOf);
 
         const noteMgr = new Set(note.calls.managerMethods);
         const noteRpc = new Set(note.calls.rpcCrossServer);
