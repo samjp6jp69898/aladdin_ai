@@ -18,8 +18,26 @@ import { readFileSync, readdirSync, existsSync } from 'fs';
 import { execSync } from 'child_process';
 import { join, relative, resolve } from 'path';
 
+// Resolve agrabah root robustly: works both from agrabah/.claude/skills/method-call-graph/
+// (SCRIPT_DIR/../../.. = agrabah) AND from obsidian/skills/method-call-graph/ where that
+// relative path lands outside agrabah. Walk up looking for a directory that contains
+// `src/servers` and `rajah/`; fall back to absolute /Users/user/aladdin/agrabah.
 const SCRIPT_DIR = import.meta.dir;
-const AGRABAH = resolve(SCRIPT_DIR, '..', '..', '..');
+function findAgrabahRoot(): string {
+    let dir = SCRIPT_DIR;
+    for (let i = 0; i < 6; i++) {
+        const candidate = resolve(dir);
+        try {
+            const fs = require('fs');
+            if (fs.existsSync(join(candidate, 'src/servers')) && fs.existsSync(join(candidate, 'rajah/base_server.json'))) {
+                return candidate;
+            }
+        } catch {}
+        dir = resolve(dir, '..');
+    }
+    return '/Users/user/aladdin/agrabah';
+}
+const AGRABAH = findAgrabahRoot();
 const ALADDIN_ROOT = resolve(AGRABAH, '..');
 const SERVERS_DIR = join(AGRABAH, 'src/servers');
 const MANAGERS_DIR = join(AGRABAH, 'src/managers');
