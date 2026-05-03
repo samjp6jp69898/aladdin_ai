@@ -52,25 +52,103 @@ If you catch yourself thinking any of these, STOP:
 
 ## Execution Steps
 
+### Step -1: 時間點 worktree 錨定(V5 強制)
+
+**目的**:讓你看到的 source 是「ticket 報案當時」的版本,而非主目錄的 post-fix 最新 source — 避免 V3/V4 暴露的 wrong-side anchoring(看到 main 已修好的 code 就判該層 NOT APPLICABLE)。
+
+**步驟**:
+
+1. **抓 ticketDate**:從 `analytics.md` 萃取 ticket 建立 / 報案日期(YYYY-MM-DD)。若 analytics 無明確日期,用 ticket folder 內檔案最早 mtime 作 fallback。
+
+2. **建四 repo worktree**(agrabah / abu / lago / rajah):
+
+   ```bash
+   TICKET_ID=<從 prompt 取>
+   TICKET_DATE=<上一步抓到的 YYYY-MM-DD>
+   WT_ROOT=/tmp/bug-tracer-worktrees/$TICKET_ID
+   mkdir -p $WT_ROOT
+
+   for repo in agrabah abu lago rajah; do
+       cd /Users/user/aladdin/$repo
+       hash=$(git log --until="$TICKET_DATE 23:59:59" -1 --format="%H")
+       if [ -z "$hash" ]; then
+           echo "WARN: $repo 在 $TICKET_DATE 之前無 commit,使用 main HEAD"
+           hash=$(git rev-parse HEAD)
+       fi
+       # 用唯一 branch 名避免衝突
+       git worktree add -d "$WT_ROOT/$repo" "$hash" 2>&1 || echo "worktree create failed for $repo (可能已存在,繼續)"
+   done
+
+   export ALADDIN_ROOT_AT_DATE=$WT_ROOT
+   echo "ALADDIN_ROOT_AT_DATE=$ALADDIN_ROOT_AT_DATE"
+   ```
+
+3. **後續所有 skill 腳本呼叫**必須在當前 shell session 內(已 `export` env),腳本會自動讀 `ALADDIN_ROOT_AT_DATE` 指向 worktree。**直接 Read source file 時也要從 `$WT_ROOT/<repo>/...` 路徑讀**,而非 `/Users/user/aladdin/<repo>/...`。
+
+4. **若 worktree 建立失敗或 ticketDate 抓不到**:在 analysis-notes.md 開頭明示「V5 worktree 錨定 SKIPPED,原因:<具體原因>;以下分析基於主目錄當前 source」,然後仍按 V4 規範繼續。
+
+5. **完成分析後清理**:
+
+   ```bash
+   for repo in agrabah abu lago rajah; do
+       cd /Users/user/aladdin/$repo
+       git worktree remove "$WT_ROOT/$repo" --force 2>&1 || true
+   done
+   rm -rf $WT_ROOT
+   ```
+
+   清理放在 analysis-notes 寫入完成後執行。**就算分析中斷,worktree 也是孤立 read-only,可以晚點手動清**。
+
+6. **重要例外**:obsidian/ 知識庫 / Notion ticket / docs/ 等檔案不在 worktree 內,仍從主目錄 `/Users/user/aladdin/obsidian/...` 讀。只有 source repo(agrabah / abu / lago / rajah)走 worktree。
+
 ### Step 0: Initial Data Collection (Parallelize ALL)
 
 並行執行(同 V1):
-1. Read `analytics.md`
-2. Read `spec.md`
-3. Read 對應子專案 CLAUDE.md
-4. **Anchor Search**:錯誤碼、unique 字串
-5. **backTesting Search**:Grep 模塊名 / 元件名 / 錯誤關鍵字 → Read 命中筆記 → 1 層 link tracing → 把發現記錄到「backTesting 參考」section
-6. Grep `Rules/` 找開發規範
+1. Read `analytics.md`(從主目錄讀 — 這是 ticket 文件不在 worktree 內)
+2. Read `spec.md`(從主目錄讀)
+3. Read 對應子專案 CLAUDE.md(**從 worktree 讀**:`$ALADDIN_ROOT_AT_DATE/<repo>/CLAUDE.md`)
+4. **Anchor Search**:錯誤碼、unique 字串(grep `$ALADDIN_ROOT_AT_DATE` 而非主目錄)
+5. **backTesting Search**:Grep 模塊名 / 元件名 / 錯誤關鍵字 → Read 命中筆記 → 1 層 link tracing → 把發現記錄到「backTesting 參考」section(主目錄)
+6. Grep `Rules/` 找開發規範(主目錄)
 
 ### Step 1: Phase 1 — Symptom Mapping(只到「症狀對應到哪些檔案」,不下根因結論)
 
 1. **Read Error Messages Carefully**:從 analytics 和 screenshot 萃取所有錯誤證據
 2. **Confirm Reproduction Path**:測試步驟 → 路由 → 元件檔案
-3. **Check Recent Changes(Git History — Mandatory)**:
-   - `git log --oneline -20 -- {relevant_path}` 找最近修復
-   - **V2 修改:即使找到 fix commit,不准在此 STOP**。必須繼續走 Step 2 五角度,在五角度結束後才能判定「已修復」
+3. **Check Recent Changes — 雙路徑強制候選表(V3 強制)**:
+
+   不准只查單一 repo。必須對下列四個 repo 各跑一次 `git log`,並產出**雙路徑候選表**才能進 Step 2:
+
+   ```
+   | Repo / 路徑 | 命令 | 找到的候選 commit hash + 一句話描述 |
+   |-------------|------|------------------------------------|
+   | agrabah/src | git log --since="<ticket 報案日期 - 14 天>" --oneline -- agrabah/src | <commit, 描述> 或 <無相關 commit + grep 子目錄關鍵字驗證結果> |
+   | abu | git log --since="<ticket 報案日期 - 14 天>" --oneline -- abu | ... |
+   | lago | git log --since="<ticket 報案日期 - 14 天>" --oneline -- lago | ... |
+   | rajah | git log --since="<ticket 報案日期 - 14 天>" --oneline -- rajah | ... |
+   ```
+
+   **Hard rule**:任一 row 為空且未填「無相關 commit + grep 驗證」,輸出視為無效。
+   `ticket 報案日期`從 analytics.md 的 ticket 建立時間取得;若無明確日期,預設用「今天 - 14 天」。
+
+   - **V2 修改**(保留):即使找到 fix commit,不准在此 STOP。必須繼續走 Step 2 五角度,在五角度結束後才能判定「已修復」。
+   - **V3 修改**:雙路徑表必填 — 找到單側 commit 不准 anchor,必須在另一側也跑完 git log + grep 驗證後才能進 Step 2。
 4. **List Suspicious Files Per Angle**:不下結論,只列出每個角度可能相關的檔案
    - 例:「FE 候選:GiftSetting.vue;BE 候選:methodEditGift;rajah 候選:message_board_platform.rajah」
+
+### Step 1.5: **症狀分類觸發器**(V3 強制)
+
+回答下列三題 yes / no:
+
+- **Q1**:症狀是否為「使用者在 A 處修改後,B 處顯示仍是舊值 / fallback」?
+- **Q2**:症狀是否為「特定操作後出現非預期 toast / errorCode,但其他類似操作正常」?
+- **Q3**:症狀是否為「彈窗 / 頁面切換後資料異常」?
+
+**任一 Q 為 yes** → 強制 Read `/Users/user/aladdin/obsidian/Debug/checklists/frontend-state-sync-checklist.md`,並在 Step 2「前端」angle 中**逐項列三段 yes / no + file:line 證據**(state sync / object reference / cache invalidation)。
+
+**任一 Q 為 yes 且前端 angle 仍判 NOT APPLICABLE** → NOT APPLICABLE 排除理由必須**逐項回應 checklist 三段**,不能只給一條 file:line。
+
+三題全 no → 跳過 checklist。
 
 ### Step 2: **Mandatory Five-Angle Enumeration**(V2 核心步驟)
 
@@ -152,6 +230,117 @@ If you catch yourself thinking any of these, STOP:
 - [ ] **Intent Check**:這是 bug 還是有意的安全 / 業務約束?
 - [ ] **i18n Check**:toast 訊息是否為缺失的 i18n key?
 
+### Step 3.6: Ticket 後 commit 反向檢查(V6 強制)
+
+**目的**:破除「看到 source 卻仍 anchor 錯誤」的 reasoning bug。針對 Step 2 列為 **NOT APPLICABLE** 的每個 angle,驗證「ticket 後 main HEAD 是否有 commit 動到該 angle 的入口檔」 — 若有,代表「該 angle 本來就有問題,只是 V5 worktree 看到的是 buggy 原貌沒被修」。
+
+**步驟**(對 NOT APPLICABLE 的每個 angle 各跑一次):
+
+1. **列出該 angle 的入口檔**(NOT APPLICABLE 排除理由裡引用的那個 file:line 對應的檔案路徑)
+2. **跑 ticket-後 git log**(注意:這次是針對「主目錄」而非 worktree,因為要看 ticket 之後的演化):
+   ```bash
+   cd /Users/user/aladdin/<repo>  # 主目錄,不是 $ALADDIN_ROOT_AT_DATE
+   git log --since="$TICKET_DATE" --oneline --all -- <relative-path>
+   ```
+3. **判定**:
+   - 若 0 commit → 該 angle 確實 NOT APPLICABLE,維持結論
+   - 若 ≥ 1 commit → **強制重新評估該 angle**:
+     - 對每個 commit 跑 `git show <hash> -- <file>` 看 diff
+     - 問:這個 diff 是否解決了 ticket 描述的症狀?如果是,那此 angle 應該 APPLICABLE
+     - 若 commit message 含 ticket id(例如 `[FAQ-2768]`、`(FAQ-2768)`),這是強訊號 — 必須升 APPLICABLE
+     - 若 commit message 描述的修復方向跟 ticket 症狀對齊(例如 ticket 講「重置後 toast」,commit 講「採用雙重獨立深拷貝避免資料影響」),也必須升 APPLICABLE
+
+4. **產出 Step 3.6 表格**(必填,寫入 analysis-notes.md):
+
+   ```
+   | Angle(原 NOT APPLICABLE) | 入口檔 | ticket 後 commit 數 | 最近 commit hash + message | 是否強制升 APPLICABLE | 升的理由 |
+   |--|--|--|--|--|--|
+   | 前端 | abu/.../X.vue | 2 | b66aa1e9 採用雙重獨立深拷貝避免資料影響 | YES | commit message 與 ticket 症狀對齊 |
+   | ... | ... | ... | ... | ... | ... |
+   ```
+
+5. **若有任一 angle 升 APPLICABLE**:回到 Step 3 重做 hypothesis selection,主因可能改判到該 angle。
+
+**Hard rule**:
+- Step 3.6 表必填(所有 NOT APPLICABLE 的 angle 都要列一 row)
+- 任一 row 的「ticket 後 commit 數 ≥ 1 且 commit 對齊症狀」但「是否強制升 APPLICABLE = NO」者,**輸出視為無效** — 必須給出強排除理由(例如「該 commit 是 unrelated fix to 另一個 ticket」並引用 commit message 證明)
+
+### Step 3.7: 主因 + 入口檔反向擴查(V7 強制)
+
+**目的**:破除 R1(Step 3.6)的兩個盲點 — (a) fix commit 早於 ticket、(b) 主因 angle 已被 Step 2 標 APPLICABLE 但根因錯指。
+
+**步驟**:
+
+#### 3.7.1 主因 angle 入口檔的 ticket 後反向(R3)
+
+對 Step 3 選定的**主因 angle**(無論已 APPLICABLE / 連帶 / 主因)涉及的入口檔/資料夾,跑:
+
+```bash
+cd /Users/user/aladdin/<repo>  # 主目錄
+git log --since="$TICKET_DATE" --oneline --all -- <主因 angle 入口檔>
+```
+
+對每個 commit:
+- **若 commit message 含 ticket id**(`FAQ-XXXX`)或描述對齊 ticket 主題(例如 ticket 是「審核開通合營」,commit 是「審核自動派發問題修正」),**強制 read 該 commit diff**
+- 對比 commit diff 修改的具體 file:line 與根因函式,**判斷子代理目前的根因 hypothesis 是否與 commit 修改的路徑一致**
+- **若不一致 → 強制重做 Step 3**:以 commit 修改的路徑作為新 hypothesis 候選
+
+#### 3.7.2 主因 angle 入口檔的 ticket 前 14 天反向(R2)
+
+只在 **3.7.1 ticket 後 git log 0 命中** 時觸發:
+
+```bash
+git log --since="$(date -d "$TICKET_DATE - 14 days" +%Y-%m-%d)" --until="$TICKET_DATE" --oneline -- <主因 angle 入口檔>
+```
+
+(若 macOS 不支援 `date -d`,直接寫 14 天前的 YYYY-MM-DD;`date -v-14d` 為 BSD 寫法)
+
+對每個 commit:
+- **若 commit message 是 `refactor:` / `fix:` / `feat:` 且動到的檔剛好是子代理在 NOT APPLICABLE angle 排除理由中引用的入口檔**,代表「fix 在 ticket 前 1-14 天已合入,V5 worktree 已含修復版,子代理因此排除該 angle 但其實該 angle 才是真正修復方向」
+- **強制升那個 angle 為 APPLICABLE 並回 Step 3 重做**:以該 commit 為「fix 已存在於 ticket 前」的證據
+
+#### 3.7.3 必填表
+
+```
+| 主因 angle | 入口檔 | ticket 後 commit | 對齊?|  ticket 前 14 天 commit | 對齊? | 是否觸發 Step 3 重做 |
+|--|--|--|--|--|--|--|
+| 後端 | agent_general_manager.ts | bab0b7426 [審核自動派發問題修正] | YES |  | | YES — 重做 Step 3 |
+```
+
+**Hard rule**:
+- 任一 commit 對齊但未觸發 Step 3 重做 → 輸出視為無效
+- 「對齊」判定:commit message 含 ticket id 或主題關鍵字,**或** commit diff 動到的檔屬於子代理已引用的 root cause 路徑
+
+#### 3.7.4 強制 commit diff inspection(V8 新):破除子代理「字面對齊」主觀排除
+
+V7 暴露的問題:子代理憑 commit message 的字面相似度判斷對齊,容易把「業務描述聽起來不同但實際路徑重疊」的 commit 誤排除(FAQ-2428 子代理把 ground truth `bab0b7426 [agent_back_office]審核自動派發問題修正` 當作「全民代理 commission audit」業務排除)。
+
+**強制條件**(同時滿足兩條時,**不准用 message 字面排除,必須 read diff**):
+
+1. commit 動到的檔在主因 angle 路徑上(例如主因 = 後端,則 commit 動 `src/managers/` 或 `src/servers/<server>/`)
+2. commit message 含**任一**下列:
+   - ticket id (`FAQ-XXXX`)
+   - ticket 主題的核心動詞 / 名詞 token(從 ticket 標題抽取,例如「代理審核開通合營數據不明錯誤」抽:`審核` / `派發` / `開通` / `創建失敗` / `代理` / `不明錯誤`)
+   - `fix(...)` 或 `[<server>]<...>` 類前綴
+
+**篩選命令範例**(以 FAQ-2428 為例):
+
+```bash
+cd /Users/user/aladdin/agrabah
+TICKET_KEYWORDS="派發|開通|審核|創建失敗|代理|不明錯誤"
+git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_DATE" '+%Y-%m-%d')" --oneline --all -- 'src/managers/' \
+    | grep -iE "$TICKET_KEYWORDS"
+```
+
+**對篩選後的每個 commit**:`git show <hash> -- <主因 angle 路徑檔>` 讀 diff。比對 diff 修的具體函式:
+- 若 diff 修了你目前 root cause 推理沒涵蓋的函式 → **強制把該函式列為新 root cause 候選**,Step 3 重做
+- 即使 commit message 看似「不對齊」(例如「全民代理 audit」vs ticket「審核開通合營」),**diff 裡的具體 file:line 才是判定依據**
+- 若 diff 是純 style/refactor 沒改邏輯,可排除
+
+**Hard rule**:
+- 篩選後任一 commit 未 read diff → 輸出視為無效
+- 不准用「業務描述聽起來不一樣」當排除理由 — diff 才是事實
+
 ### Step 4: Already-Fixed Verification(V2 改寫)
 
 只有完成 Step 2 五角度後,才能評估「已修復」claim:
@@ -167,6 +356,41 @@ If you catch yourself thinking any of these, STOP:
 
 ```markdown
 ## Bug 分析摘要 — {ticket_id}
+
+### 時間點錨定紀錄(V5 強制)
+
+- Ticket 報案日期:<YYYY-MM-DD>
+- agrabah worktree commit:<hash>(<commit date>)
+- abu worktree commit:<hash>(<commit date>)
+- lago worktree commit:<hash>(<commit date>)
+- rajah worktree commit:<hash>(<commit date>)
+- 若 SKIPPED:寫明原因,例如「analytics.md 無日期」或「worktree create failed: <error>」
+
+### Git log 雙路徑候選表(V3 強制)
+
+(從 Step 1.3 表格貼過來;四個 repo 各一 row,每 row 必填)
+
+### 症狀分類觸發器(V3 強制)
+
+- Q1 修改後另一處顯示舊值: yes / no → checklist 引用: <若 yes,逐項列三段結論;若 no 留空>
+- Q2 特定操作 errorCode 但類似操作正常: yes / no → ...
+- Q3 彈窗 / 頁面切換後資料異常: yes / no → ...
+
+### Ticket 後 commit 反向檢查(V6 強制)
+
+| Angle(原 NOT APPLICABLE) | 入口檔 | ticket 後 commit 數 | 最近 commit hash + message | 是否強制升 APPLICABLE | 升的理由 / 排除理由 |
+|--|--|--|--|--|--|
+| ... | ... | ... | ... | ... | ... |
+
+(每個 NOT APPLICABLE 的 angle 都要列一 row;若全升 APPLICABLE 則回到 Step 3 重做 hypothesis selection)
+
+### 主因 + 入口檔反向擴查(V7 強制)
+
+| 主因 angle | 入口檔 | ticket 後 commit | 對齊? | ticket 前 14 天 commit | 對齊? | 是否觸發 Step 3 重做 |
+|--|--|--|--|--|--|--|
+| ... | ... | ... | ... | ... | ... | ... |
+
+(主因 angle 無論已 APPLICABLE 或主因都要列;ticket 後對齊一定要重做 Step 3;ticket 後 0 命中才查 ticket 前 14 天)
 
 ### 推理過程紀錄
 (完整調查路徑 — 含每步 search、發現、被排除的假設與排除原因)
@@ -239,3 +463,6 @@ If you catch yourself thinking any of these, STOP:
 | 寫「前端不太可能有問題,因為 ...」就排除前端 | 沒 file:line = 用直覺;V2 的 NOT APPLICABLE 必須有具體證據 |
 | 把 framework-claim 當「不能驗證」就略過 | Vue/Vant 行為可以查文件 + 程式碼確認;略過 = 假設 |
 | 五角度填「不確定」 | 不能是不確定;不確定就再去查;查了還是不確定就標 APPLICABLE 並列為主因候選 |
+| 只查單一 repo 的 git log,對另一邊「我覺得不會有 commit」 | 這是 anchoring 的源頭(FAQ-2428、FAQ-2488 失敗模式);Step 1.3 雙路徑表格就是為了結構性破除 |
+| 看到 errorCode 後直接追後端 RPC 呼叫鏈,不檢驗前端寫入後 state-sync | wrong-side 高頻失敗(FAQ-2488 / FAQ-2768);Step 1.5 trigger 強制檢查 |
+| 找到一條 plausible migration commit 就標「已修復」 | 越精細的 source-first 證據越會 anchor(FAQ-2428 V3 失敗);Step 4 必須對 FE + BE 雙路徑候選 commit 逐一驗證 |
