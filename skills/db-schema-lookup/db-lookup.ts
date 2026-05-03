@@ -18,7 +18,8 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
 
-const ALADDIN = '/Users/user/aladdin';
+// V5: 支援 ALADDIN_ROOT_AT_DATE env 變數
+const ALADDIN = process.env.ALADDIN_ROOT_AT_DATE ?? '/Users/user/aladdin';
 const MIGRATIONS_DIR = join(ALADDIN, 'agrabah/migrations');
 const DB_TYPES_DIR = join(ALADDIN, 'agrabah/src/database_types');
 

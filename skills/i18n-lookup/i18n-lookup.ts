@@ -22,7 +22,8 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
-const ALADDIN = '/Users/user/aladdin';
+// V5: 支援 ALADDIN_ROOT_AT_DATE env 變數
+const ALADDIN = process.env.ALADDIN_ROOT_AT_DATE ?? '/Users/user/aladdin';
 const LOCALES = [ 'zh-TW', 'zh-CN', 'en-US' ];
 
 interface Project {
@@ -43,10 +44,53 @@ const PROJECTS: Project[] = [
 
 const cache = new Map<string, any>();
 
+// V3:lago localizations 是 base64 keys + base64+XOR-128 加密 values。
+// 演算法移植自 genie/src/common/code_helper.ts:28 Uint8ArrayEncodeDecode。
+// WARNING:此演算法若日後改動,此處同步維護。
+function xorDecodeMod128(buf: Buffer): Buffer {
+    const out = Buffer.alloc(buf.length);
+    for (let i = 0; i < buf.length; i += 1) {
+        out[i] = buf[i] ^ (i % 128);
+    }
+    return out;
+}
+
+function isLikelyBase64Key(key: string): boolean {
+    return /^[A-Za-z0-9+/]+=*$/.test(key) && key.length >= 4 && key.length % 4 === 0;
+}
+
+function tryDecryptLagoLocalization(raw: any): any {
+    if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) { return raw; }
+    const keys = Object.keys(raw);
+    if (keys.length === 0) { return raw; }
+    const obfuscatedRatio = keys.filter(isLikelyBase64Key).length / keys.length;
+    if (obfuscatedRatio < 0.8) { return raw; }
+    const decoded: Record<string, any> = {};
+    for (const encKey of keys) {
+        try {
+            // V3:keys 也是 base64+XOR-128(同 values)。
+            const decKey = xorDecodeMod128(Buffer.from(encKey, 'base64')).toString('utf-8');
+            const value = raw[encKey];
+            if (typeof value === 'string') {
+                const decBuf = xorDecodeMod128(Buffer.from(value, 'base64'));
+                decoded[decKey] = decBuf.toString('utf-8');
+            } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                decoded[decKey] = tryDecryptLagoLocalization(value);
+            } else {
+                decoded[decKey] = value;
+            }
+        } catch {
+            decoded[encKey] = raw[encKey];
+        }
+    }
+    return decoded;
+}
+
 function loadJson(file: string): any {
     if (cache.has(file)) { return cache.get(file); }
     if (!existsSync(file)) { return null; }
-    const json = JSON.parse(readFileSync(file, 'utf-8'));
+    const raw = JSON.parse(readFileSync(file, 'utf-8'));
+    const json = tryDecryptLagoLocalization(raw);
     cache.set(file, json);
     return json;
 }
@@ -230,9 +274,7 @@ function lookupKey(input: string) {
 
 // ─── Subcommand: list-projects ───
 function listProjects() {
-    // A project is "plaintext" if it has the standard top-level sections (error/enum/...).
-    // lago projects ship base64-obfuscated keys + obfuscated values, so this skill cannot
-    // resolve their translations — flag them explicitly so callers know.
+    // V3:lago projects 是 base64+XOR-128 加密,本 skill 已內建解密(loadJson 自動偵測)。
     const KNOWN_SECTIONS = new Set([ 'error', 'enum', 'model', 'common', 'menu', 'permission', 'route', 'country', 'user' ]);
     const result = PROJECTS.map(p => {
         const dir = join(ALADDIN, p.localizations);
@@ -240,9 +282,17 @@ function listProjects() {
             ? readdirSync(dir).filter(f => f.endsWith('.json')).map(f => f.replace('.json', ''))
             : [];
         let topSections: string[] = [];
+        let wasObfuscated = false;
         const tw = join(dir, 'zh-TW.json');
         if (existsSync(tw)) {
-            try { topSections = Object.keys(JSON.parse(readFileSync(tw, 'utf-8'))); } catch {}
+            try {
+                const rawObj = JSON.parse(readFileSync(tw, 'utf-8'));
+                const rawKeys = Object.keys(rawObj);
+                wasObfuscated = rawKeys.length > 0
+                    && rawKeys.filter(isLikelyBase64Key).length / rawKeys.length >= 0.8;
+                const decoded = loadJson(tw);
+                topSections = Object.keys(decoded ?? {});
+            } catch {}
         }
         const plaintext = topSections.some(s => KNOWN_SECTIONS.has(s));
         return {
@@ -251,7 +301,10 @@ function listProjects() {
             locales,
             topSections,
             plaintext,
-            note: plaintext ? null : 'OBFUSCATED — keys/values are base64-encoded and further obfuscated; this skill cannot resolve translations for this project.',
+            wasObfuscated,
+            note: plaintext
+                ? (wasObfuscated ? 'OBFUSCATED (now decryptable) — base64+XOR-128 auto-decoded by skill v3.' : null)
+                : 'OBFUSCATED — keys/values are base64-encoded and further obfuscated; this skill cannot resolve translations for this project.',
         };
     });
     const plaintextCount = result.filter(p => p.plaintext).length;
@@ -261,7 +314,7 @@ function listProjects() {
             total: result.length,
             plaintext: plaintextCount,
             obfuscated: result.length - plaintextCount,
-            note: 'This skill only resolves translations for plaintext projects (abu-admin, abu-platform). Lago projects are obfuscated.',
+            note: 'V3 skill auto-decrypts lago obfuscated localizations via base64+XOR-128.',
         },
     }, null, 2));
 }

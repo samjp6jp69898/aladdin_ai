@@ -26,7 +26,8 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'fs';
 import { join, basename } from 'path';
 
-const ALADDIN = '/Users/user/aladdin';
+// V5: 支援 ALADDIN_ROOT_AT_DATE env 變數
+const ALADDIN = process.env.ALADDIN_ROOT_AT_DATE ?? '/Users/user/aladdin';
 const AGRABAH = join(ALADDIN, 'agrabah');
 const SERVERS = join(AGRABAH, 'src/servers');
 

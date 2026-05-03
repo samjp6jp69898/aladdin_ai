@@ -37,8 +37,9 @@ function findAgrabahRoot(): string {
     }
     return '/Users/user/aladdin/agrabah';
 }
-const AGRABAH = findAgrabahRoot();
-const ALADDIN_ROOT = resolve(AGRABAH, '..');
+// V5: 支援 ALADDIN_ROOT_AT_DATE env 變數,讓 bug-tracer 可指向 ticket 時間點的 worktree 集合
+const ALADDIN_ROOT = process.env.ALADDIN_ROOT_AT_DATE ?? resolve(findAgrabahRoot(), '..');
+const AGRABAH = join(ALADDIN_ROOT, 'agrabah');
 const SERVERS_DIR = join(AGRABAH, 'src/servers');
 const MANAGERS_DIR = join(AGRABAH, 'src/managers');
 const DB_TYPES_DIR = join(AGRABAH, 'src/database_types');
@@ -112,9 +113,11 @@ interface GrepHit {
 }
 
 function parseGrepLine(raw: string): GrepHit | null {
-    const m = raw.match(/^(.+?):(\d+):(.*)$/);
+    // V9:strip 行尾 CR(處理 CRLF line endings — 部分舊檔如 abu/platform/src/initializes/reflection.ts 是 CRLF)
+    const cleaned = raw.replace(/\r$/, '');
+    const m = cleaned.match(/^(.+?):(\d+):(.*)$/);
     if (!m) { return null; }
-    return { file: m[1], line: parseInt(m[2]), content: m[3] };
+    return { file: m[1], line: parseInt(m[2]), content: m[3].replace(/\r$/, '') };
 }
 
 function filterHits(hits: GrepHit[], methodName: string, excludeFile?: string, excludeLine?: number): GrepHit[] {
@@ -516,6 +519,36 @@ function crossServerCallers(method: string, server: string, rajahServiceName: st
 
 // ─── Subcommand: frontend-callers ───
 
+function normalizeMethodCandidates(method: string): { candidates: string[]; warnings: string[] } {
+    // V9:介面誤用容錯 — input 含空格、逗號、斜線時拆 token,各自跑 normalize 後合併
+    const warnings: string[] = [];
+    const tokens = method.split(/[\s,\/]+/).filter(Boolean);
+    if (tokens.length > 1) {
+        warnings.push(`input contains ${ tokens.length } whitespace-separated tokens; treating each as a candidate method name`);
+    }
+
+    const candidates = new Set<string>();
+    for (const tok of tokens) {
+    // 拆 namespace dot path:除了取最後一段,也試「中段」「整段去點」三種
+        const segments = tok.split('.').filter(Boolean);
+        const segmentSources: string[] = [];
+        if (segments.length === 0) { continue; }
+        segmentSources.push(segments[segments.length - 1]);   // last
+        if (segments.length >= 2) {
+            segmentSources.push(segments.join(''));               // dotPathStripped (e.g. ApplicationsPlatformActivateAgent)
+        }
+        for (const seg of segmentSources) {
+            if (!seg || !/^\w+$/.test(seg)) { continue; }
+            candidates.add(seg);
+            // PascalCase → camelCase
+            candidates.add(seg[0].toLowerCase() + seg.slice(1));
+            // camelCase → PascalCase
+            candidates.add(seg[0].toUpperCase() + seg.slice(1));
+        }
+    }
+    return { candidates: Array.from(candidates), warnings };
+}
+
 function frontendCallers(method: string) {
     const frontendProjects = [
         { name: 'abu-admin', generated: join(ALADDIN_ROOT, 'abu/admin/src/generated/remote.gen.ts'), src: join(ALADDIN_ROOT, 'abu/admin/src') },
@@ -528,41 +561,68 @@ function frontendCallers(method: string) {
         { name: 'lago-common', generated: join(ALADDIN_ROOT, 'lago/common/generated/remote.gen.ts'), src: join(ALADDIN_ROOT, 'lago/common') },
     ];
 
+    const { candidates, warnings } = normalizeMethodCandidates(method);
+
     interface FrontendHit {
         project: string;
         hasMethod: boolean;
+        matchedAs: string[];
         hits: { file: string; line: number; content: string }[];
+        note?: string;
     }
 
     const results: FrontendHit[] = [];
 
     for (const proj of frontendProjects) {
-        // Check generated client
         let hasMethod = false;
+        const matchedAs: string[] = [];
         if (existsSync(proj.generated)) {
-            try {
-                const out = execSync(`grep -c "async ${ method }\\b" "${ proj.generated }"`, { encoding: 'utf-8' });
-                hasMethod = parseInt(out.trim()) > 0;
-            } catch {
-                hasMethod = false;
+            for (const cand of candidates) {
+                try {
+                    const out = execSync(`grep -c "async ${ cand }\\b" "${ proj.generated }"`, { encoding: 'utf-8' });
+                    if (parseInt(out.trim()) > 0) {
+                        hasMethod = true;
+                        matchedAs.push(cand);
+                    }
+                } catch {
+                    // grep no match returns exit 1
+                }
             }
         }
 
-        const projResult: FrontendHit = { project: proj.name, hasMethod, hits: [] };
+        const projResult: FrontendHit = { project: proj.name, hasMethod, matchedAs, hits: [] };
 
         if (hasMethod) {
-            const rawHits = grepVue(`\\.${ method }\\s*(`, [ proj.src ]);
-            const parsed = rawHits.map(parseGrepLine).filter(Boolean) as GrepHit[];
-            const filtered = parsed.filter(h => {
+            const allHits: GrepHit[] = [];
+            for (const cand of matchedAs) {
+                const rawHits = grepVue(`\\.${ cand }\\s*(`, [ proj.src ]);
+                const parsed = rawHits.map(parseGrepLine).filter(Boolean) as GrepHit[];
+                allHits.push(...parsed);
+            }
+            const filtered = allHits.filter(h => {
                 if (h.file.includes('/generated/')) { return false; }
                 if (isCommentOrImport(h.content)) { return false; }
                 return true;
             });
-            projResult.hits = filtered.map(h => ({
+            const seen = new Set<string>();
+            const dedup: GrepHit[] = [];
+            for (const h of filtered) {
+                const key = `${ h.file }:${ h.line }`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    dedup.push(h);
+                }
+            }
+            projResult.hits = dedup.map(h => ({
                 file: relative(ALADDIN_ROOT, h.file),
                 line: h.line,
                 content: h.content.trim(),
             }));
+        }
+
+        // V9:當 generated 看到 method 但 src 無實際 caller,加 note 提醒(避免子代理誤判 totalHits=0 為「方法不存在」)
+        if (projResult.hasMethod && projResult.hits.length === 0) {
+            projResult.note = 'RPC stub exists in this project\'s generated client but no src caller found — method may be server-only or shared via another project';
         }
 
         results.push(projResult);
@@ -570,10 +630,22 @@ function frontendCallers(method: string) {
 
     const totalHits = results.reduce((sum, r) => sum + r.hits.length, 0);
     const projectsWithMethod = results.filter(r => r.hasMethod).map(r => r.project);
+    const projectsWithHits = results.filter(r => r.hits.length > 0).map(r => r.project);
+
+    // V9:輸出層級 hint — 區分「真實 0 hit」與「找不到 method 名」兩種失敗模式
+    const hints: string[] = [ ...warnings ];
+    if (projectsWithMethod.length === 0) {
+        hints.push('no project\'s generated client contains a method matching the candidates — verify the method name (PascalCase RPC name expected, e.g. ChangeUserBalance not methodChangeUserBalance)');
+    } else if (projectsWithHits.length === 0) {
+        hints.push('candidates exist as RPC stubs but no src caller found in any frontend project — method may be server-only / dead RPC, or check if caller uses an alias');
+    }
 
     console.log(JSON.stringify({
+        input: method,
+        candidates,
         projects: results,
-        stats: { totalHits, projectsWithMethod },
+        stats: { totalHits, projectsWithMethod, projectsWithHits },
+        hints,
     }));
 }
 
@@ -888,10 +960,19 @@ interface CrudHit {
     methodName: string | null;
     crudType: string;
     operation: string;
+    confidence: 'high' | 'medium' | 'low';
+    hint?: string;
     content: string;
 }
 
-function classifyWithContext(file: string, line: number, content: string, dbClasses: string[]): { crudType: string; operation: string } {
+interface CrudClassification {
+    crudType: string;
+    operation: string;
+    confidence: 'high' | 'medium' | 'low';
+    hint?: string;
+}
+
+function classifyWithContext(file: string, line: number, content: string, dbClasses: string[]): CrudClassification {
     const lines = readLines(file);
     const contextRadius = 5;
     const start = Math.max(0, line - 1 - contextRadius);
@@ -900,35 +981,39 @@ function classifyWithContext(file: string, line: number, content: string, dbClas
     const trimmed = content.trim();
 
     if (trimmed.includes('insertObject') || trimmed.includes('insertObjects')) {
-        return { crudType: 'C', operation: trimmed.includes('insertObjects') ? 'insertObjects' : 'insertObject' };
+        return { crudType: 'C', operation: trimmed.includes('insertObjects') ? 'insertObjects' : 'insertObject', confidence: 'high' };
     }
+    // V3:`new Db...()` 或 `Db....create(`(廠場 / factory)在當行視為 C_candidate(medium)
     for (const dc of dbClasses) {
         if (trimmed.includes(`new ${ dc }`)) {
-            return { crudType: 'C_candidate', operation: `new ${ dc }()` };
+            return { crudType: 'C_candidate', operation: `new ${ dc }()`, confidence: 'medium', hint: 'check if followed by insertObject within same method' };
+        }
+        if (trimmed.includes(`${ dc }.create(`)) {
+            return { crudType: 'C_candidate', operation: `${ dc }.create()`, confidence: 'medium', hint: 'check if followed by insertObject within same method' };
         }
     }
     if (trimmed.includes('loadObject') || trimmed.includes('loadObjects')) {
-        return { crudType: 'R', operation: trimmed.includes('loadObjects') ? 'loadObjects' : 'loadObject' };
+        return { crudType: 'R', operation: trimmed.includes('loadObjects') ? 'loadObjects' : 'loadObject', confidence: 'high' };
     }
     if (trimmed.includes('count(') && !trimmed.includes('retry_count')) {
-        return { crudType: 'R', operation: 'count' };
+        return { crudType: 'R', operation: 'count', confidence: 'high' };
     }
     if (trimmed.includes('updateObject')) {
-        return { crudType: 'U', operation: 'updateObject' };
+        return { crudType: 'U', operation: 'updateObject', confidence: 'high' };
     }
 
-    if (/SELECT/i.test(trimmed) || /COALESCE/i.test(trimmed) || /SUM\s*\(/i.test(trimmed)) { return { crudType: 'R', operation: 'SELECT SQL' }; }
-    if (/UPDATE\s+/i.test(trimmed) && /SET\s+/i.test(trimmed)) { return { crudType: 'U', operation: 'UPDATE SQL' }; }
-    if (/UPDATE\s+/i.test(trimmed) && !/SET\s+/i.test(trimmed) && /SET/i.test(context)) { return { crudType: 'U', operation: 'UPDATE SQL' }; }
-    if (/DELETE\s+FROM/i.test(trimmed)) { return { crudType: 'D', operation: 'DELETE SQL' }; }
-    if (/INSERT\s+INTO/i.test(trimmed)) { return { crudType: 'C', operation: 'INSERT SQL' }; }
+    if (/SELECT/i.test(trimmed) || /COALESCE/i.test(trimmed) || /SUM\s*\(/i.test(trimmed)) { return { crudType: 'R', operation: 'SELECT SQL', confidence: 'high' }; }
+    if (/UPDATE\s+/i.test(trimmed) && /SET\s+/i.test(trimmed)) { return { crudType: 'U', operation: 'UPDATE SQL', confidence: 'high' }; }
+    if (/UPDATE\s+/i.test(trimmed) && !/SET\s+/i.test(trimmed) && /SET/i.test(context)) { return { crudType: 'U', operation: 'UPDATE SQL', confidence: 'high' }; }
+    if (/DELETE\s+FROM/i.test(trimmed)) { return { crudType: 'D', operation: 'DELETE SQL', confidence: 'high' }; }
+    if (/INSERT\s+INTO/i.test(trimmed)) { return { crudType: 'C', operation: 'INSERT SQL', confidence: 'high' }; }
 
     // Context-aware: check surrounding lines for multi-line expressions
     if (context.includes('loadObject(') || context.includes('loadObjects(')) {
         const aboveLines = lines.slice(start, line - 1);
         for (let i = aboveLines.length - 1; i >= 0; i--) {
             if (aboveLines[i].includes('loadObject(') || aboveLines[i].includes('loadObjects(')) {
-                return { crudType: 'R', operation: aboveLines[i].includes('loadObjects') ? 'loadObjects (multi-line)' : 'loadObject (multi-line)' };
+                return { crudType: 'R', operation: aboveLines[i].includes('loadObjects') ? 'loadObjects (multi-line)' : 'loadObject (multi-line)', confidence: 'high' };
             }
         }
     }
@@ -936,25 +1021,33 @@ function classifyWithContext(file: string, line: number, content: string, dbClas
         const belowLines = lines.slice(line, end);
         for (const bl of belowLines) {
             if (bl.includes('insertObject(') || bl.includes('insertObjects(')) {
-                return { crudType: 'C', operation: bl.includes('insertObjects') ? 'insertObjects (multi-line)' : 'insertObject (multi-line)' };
+                return { crudType: 'C', operation: bl.includes('insertObjects') ? 'insertObjects (multi-line)' : 'insertObject (multi-line)', confidence: 'high' };
             }
         }
     }
 
-    // Check if `new DbClass()` followed by insertObject within same method
+    // V3:檢查同 method body 共現「new DbClass() / DbClass.create()」與「insertObject」
     for (const dc of dbClasses) {
-        if (trimmed.includes(`new ${ dc }`)) {
+        const triggerCtor = trimmed.includes(`new ${ dc }`);
+        const triggerFactory = trimmed.includes(`${ dc }.create(`);
+        if (triggerCtor || triggerFactory) {
             const belowLines = lines.slice(line, Math.min(lines.length, line + 20));
             for (const bl of belowLines) {
                 if (bl.includes('insertObject(') || bl.includes('insertObjects(')) {
-                    return { crudType: 'C_candidate', operation: `new ${ dc }() → insertObject` };
+                    const op = triggerFactory ? `${ dc }.create() → insertObject` : `new ${ dc }() → insertObject`;
+                    return {
+                        crudType: 'C_candidate',
+                        operation: op,
+                        confidence: 'medium',
+                        hint: 'indirect: create + insertObject pattern, please verify same variable',
+                    };
                 }
                 if (bl.match(/^\s*\}/)) { break; } // end of block
             }
         }
     }
 
-    return { crudType: 'ref', operation: 'reference' };
+    return { crudType: 'ref', operation: 'reference', confidence: 'low' };
 }
 
 function tableCrud(server: string, tableName: string, dbClassesJson: string) {
@@ -980,15 +1073,17 @@ function tableCrud(server: string, tableName: string, dbClassesJson: string) {
             if (seenKeys.has(key)) { continue; }
             seenKeys.add(key);
 
-            const { crudType, operation } = classifyWithContext(hit.file, hit.line, hit.content, dbClasses);
+            const cls = classifyWithContext(hit.file, hit.line, hit.content, dbClasses);
 
             results.push({
                 file: relPath(hit.file),
                 line: hit.line,
                 className,
                 methodName,
-                crudType,
-                operation,
+                crudType: cls.crudType,
+                operation: cls.operation,
+                confidence: cls.confidence,
+                hint: cls.hint,
                 content,
             });
         }
@@ -1035,15 +1130,17 @@ function tableCrud(server: string, tableName: string, dbClassesJson: string) {
             const methodName = extractMethodAtLine(hit.file, hit.line);
             const content = hit.content.trim();
 
-            const { crudType, operation } = classifyWithContext(hit.file, hit.line, hit.content, dbClasses);
+            const cls = classifyWithContext(hit.file, hit.line, hit.content, dbClasses);
 
             results.push({
                 file: relPath(hit.file),
                 line: hit.line,
                 className,
                 methodName,
-                crudType,
-                operation,
+                crudType: cls.crudType,
+                operation: cls.operation,
+                confidence: cls.confidence,
+                hint: cls.hint,
                 content,
             });
         }
@@ -1178,9 +1275,24 @@ function tableBfs(server: string, targetsJson: string) {
 const args = process.argv.slice(2);
 const cmd = args[0];
 
+function safeRun(label: string, fn: () => void) {
+    try {
+        fn();
+    } catch (err: any) {
+        // V3 fix:dispatcher 層 try/catch 防護,輸出可解析 JSON 而非整個 process abort
+        console.log(JSON.stringify({
+            error: 'subcommand_failed',
+            subcommand: label,
+            message: err?.message ?? String(err),
+            stack: err?.stack?.split('\n').slice(0, 5).join('\n'),
+        }));
+        process.exit(2);
+    }
+}
+
 switch (cmd) {
     case 'resolve-method':
-        resolveMethod(args[1]);
+        safeRun('resolve-method', () => resolveMethod(args[1]));
         break;
 
     case 'same-server-callers': {
@@ -1190,16 +1302,16 @@ switch (cmd) {
         const server = args[4];
         const baseClassArg = args.find(a => a.startsWith('--base-class='));
         const baseMethodArg = args.find(a => a.startsWith('--base-method='));
-        sameServerCallers(file, cls, method, server, baseClassArg?.split('=')[1], baseMethodArg?.split('=')[1]);
+        safeRun('same-server-callers', () => sameServerCallers(file, cls, method, server, baseClassArg?.split('=')[1], baseMethodArg?.split('=')[1]));
         break;
     }
 
     case 'cross-server-callers':
-        crossServerCallers(args[1], args[2], args[3]);
+        safeRun('cross-server-callers', () => crossServerCallers(args[1], args[2], args[3]));
         break;
 
     case 'frontend-callers':
-        frontendCallers(args[1]);
+        safeRun('frontend-callers', () => frontendCallers(args[1]));
         break;
 
     case 'detect-entries':
