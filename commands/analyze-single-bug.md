@@ -1,7 +1,5 @@
 ---
-name: analyze-single-bug
 description: Analyzes, traces root cause, fixes code in worktree, validates with L0/L1 tests only (no server startup). env-preparer writes test description, evaluators write tests, test-validator audits coverage.
-user-invocable: true
 argument-hint: "<NotionURL> [ticket_id]"
 ---
 
