@@ -1,18 +1,16 @@
 ---
-name: analyze-bugs-v3
-description: V3 batch pipeline — Query pending, unanalyzed bugs from Notion Bug List by severity, then dispatch each one to analyze-single-bug-v3 (L0/L1 tests only, no Agent Teams).
-user-invocable: true
+description: Batch pipeline — Query pending, unanalyzed bugs from Notion Bug List by severity, then dispatch each one to /analyze-single-bug (L0/L1 tests only, no Agent Teams).
 ---
 
-# Bug Batch Analysis Workflow v3
+# Bug Batch Analysis Workflow 
 
-Reads `pending` and `rerun` tasks from the bug tracker in memory, claims them (rerun first), and dispatches each one to `/analyze-single-bug-v3` to run the full analysis pipeline (report → screenshot → worktree → trace fix → spec → evaluate → validate → upload).
+Reads `pending` and `rerun` tasks from the bug tracker in memory, claims them (rerun first), and dispatches each one to `/analyze-single-bug` to run the full analysis pipeline (report → screenshot → worktree → trace fix → spec → evaluate → validate → upload).
 
 ## Parameters
 
-**No parameters required.** Simply run `/analyze-bugs-v3`.
+**No parameters required.** Simply run `/analyze-bugs`.
 
-The bug list to be analyzed is pre-imported into the tracker by a query script. This skill is only responsible for claiming `pending` / `rerun` tasks and dispatching them for analysis.
+The bug list to be analyzed is pre-imported into the tracker by a query script. This command is only responsible for claiming `pending` / `rerun` tasks and dispatching them for analysis.
 
 ---
 
@@ -129,14 +127,13 @@ After a successful claim, use the Edit tool to change the tracker status for tha
 
 #### 4b. Dispatch Analysis
 
-Use the `Skill` tool to call `/analyze-single-bug-v3`, passing in the Notion page URL and ticket number:
+Use the `SlashCommand` tool to call `/analyze-single-bug`, passing in the Notion page URL and ticket number:
 
 ```
-skill: "analyze-single-bug-v3"
-args: "{NotionURL} {ticket_id}"
+command: "/analyze-single-bug {NotionURL} {ticket_id}"
 ```
 
-**Wait for `/analyze-single-bug-v3` to complete fully.**
+**Wait for `/analyze-single-bug` to complete fully.**
 
 #### 4c. Record Completion Status
 
@@ -154,7 +151,7 @@ Report progress to the user:
 
 #### 4d. Error Handling
 
-If `/analyze-single-bug-v3` encounters an error or fails:
+If `/analyze-single-bug` encounters an error or fails:
 
 1. Release the lockfile:
    ```bash
@@ -183,7 +180,7 @@ Check the following conditions:
 ### Step 5: Completion Report
 
 ```
-## Batch Analysis Complete (v3)
+## Batch Analysis Complete
 
 - Total processed: {completed} tickets
 
@@ -208,8 +205,8 @@ git worktree remove /Users/user/aladdin/worktrees/{ticket_id}
 1. **No longer uses Notion search**: All pending bug lists are read from the tracker memory file; Notion is not queried directly.
 2. **Atomic lock mechanism**: Use `bash scripts/bug-lock.sh claim FAQ-{ticket_id}` for atomic claiming (backed by `mkdir`, which the OS guarantees to be atomic). 8 parallel sessions will not claim the same ticket. Always `release` after completion or failure.
 3. **Fully automatic loop**: After completing each ticket, automatically claim the next — no user input needed. Continues until the list is empty.
-4. **Serial processing**: Only one ticket is processed at a time; wait for `/analyze-single-bug-v3` to finish completely before processing the next.
+4. **Serial processing**: Only one ticket is processed at a time; wait for `/analyze-single-bug` to finish completely before processing the next.
 5. **Maximum 5 tickets per run**: Each session targets exactly 5 completed tickets. If initial candidates are locked by other sessions, the tracker is re-read to refill with new `pending`/`rerun` tickets until 5 are completed or no available tickets remain.
-6. **Tracker is the single source of truth**: The query script imports Notion data into the tracker; this skill only reads from the tracker.
+6. **Tracker is the single source of truth**: The query script imports Notion data into the tracker; this command only reads from the tracker.
 7. **`rerun` priority**: Tickets flagged `AI分析 = 需要重跑` in Notion get status `rerun` in the tracker (reset from previous `done`/`failed` by the query script). They are always processed before regular `pending` tickets within a batch. Upon successful completion, their status becomes `done` just like any other ticket.
 8. **Lock cleanup**: If a session crashes and leaves locks unreleased, manually run `bash scripts/bug-lock.sh cleanup` to clear all locks, or `bash scripts/bug-lock.sh release FAQ-{ticket_id}` to release a specific lock.
