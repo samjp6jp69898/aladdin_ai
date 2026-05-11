@@ -10,7 +10,9 @@
     "^version:",
     "^update version",
     "^chore\\(version\\)",
-    "^chore\\(release\\)"
+    "^chore\\(release\\)",
+    "將 obsidian 註解以 JSDoc 寫回",
+    "obsidian.*JSDoc.*寫回 source"
   ],
   "skip_file_patterns": [
     "package\\.json$",
