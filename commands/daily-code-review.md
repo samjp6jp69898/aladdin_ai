@@ -51,6 +51,8 @@ FLAG_FILE="/Users/user/aladdin/review/.$TODAY.bootstrap_ready"
 
 Bootstrap flag only proves `daily_bootstrap.sh` finished — it does not prove every repo was actually pulled (e.g. a `git-lfs` hook failure inside `git pull` can leave `HEAD` stuck on an old commit while `update.sh` still returns 0). Before scanning, verify that each repo has all remote commits for the review date. If not, pull it in-place. Do **not** abort.
 
+**Scope of this check:** Only the local `pro` branch (current HEAD) needs reconciliation, because that is the only branch `update.sh` actually checks out and pulls. The scan in Step 2 reads `origin/dev` and `origin/feature/*` directly via remote refs — the `git fetch --quiet origin` below updates those refs, so no separate checkout/pull is required for them.
+
 For each repo in `agrabah`, `abu`, `lago`, `rajah`:
 
 ```bash
@@ -76,15 +78,25 @@ After all 4 repos are reconciled, proceed to Step 2.
 
 ### Step 2: Scan All Repos — Collect Author Workload Data
 
-Run git log with `--numstat` on all 4 repos to get author + commit count + lines changed in one pass:
+Run git log with `--numstat` on all 4 repos to get author + commit count + lines changed in one pass. Scan across `origin/pro` + `origin/dev` + all `origin/feature/*` branches; `git log` walks the commit graph and outputs each unique SHA only once across the supplied refs (automatic dedup).
 
 ```bash
 REVIEW_DATE_FMT="${REVIEW_DATE:0:4}-${REVIEW_DATE:4:2}-${REVIEW_DATE:6:2}"
 
 # Run on each repo: agrabah, abu, lago, rajah
+# Note: refs are expanded inline via command substitution (`$(...)`) so word
+# splitting works in both bash and zsh. Do NOT assign for-each-ref output to
+# an intermediate variable and then expand `$REFS` — zsh does not word-split
+# parameter expansion by default, which would pass the whole list as one arg.
 git -C /Users/user/aladdin/<repo> log --format="COMMIT_START|%an|%ae|%H|%s" --numstat \
-  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59"
+  --after="${REVIEW_DATE_FMT} 00:00:00" --before="${REVIEW_DATE_FMT} 23:59:59" \
+  $(git -C /Users/user/aladdin/<repo> for-each-ref --format='%(refname)' \
+    refs/remotes/origin/pro \
+    refs/remotes/origin/dev \
+    'refs/remotes/origin/feature/*' 2>/dev/null)
 ```
+
+`for-each-ref` silently skips missing refs (e.g. `abu` / `rajah` currently have no `feature/*`), so the same command works uniformly on all 4 repos.
 
 Parse the output to build a workload table per author:
 
@@ -237,13 +249,23 @@ Process authors ONE AT A TIME. Complete ALL steps (1→5) for one author, write 
 
 ### 1. Collect commits for the CURRENT author only
 
-For each repo, run with the **current author's email**:
+For each repo, scan `origin/pro` + `origin/dev` + all `origin/feature/*` branches with the **current author's email**. `git log` walks the commit graph across the supplied refs and outputs each unique SHA only once (automatic dedup), so commits that exist on multiple branches are not double-counted.
 
 ```bash
+# Refs are expanded inline via command substitution (`$(...)`) so word
+# splitting works in both bash and zsh. Do NOT assign to an intermediate
+# variable and then expand `$REFS` — zsh does not word-split parameter
+# expansion by default, which would pass the whole list as one arg.
 git -C /Users/user/aladdin/<repo> log --format="%H|%s|%ai" \
   --after="{REVIEW_DATE_FMT} 00:00:00" --before="{REVIEW_DATE_FMT} 23:59:59" \
-  --author="{AUTHOR_EMAIL}"
+  --author="{AUTHOR_EMAIL}" \
+  $(git -C /Users/user/aladdin/<repo> for-each-ref --format='%(refname)' \
+    refs/remotes/origin/pro \
+    refs/remotes/origin/dev \
+    'refs/remotes/origin/feature/*' 2>/dev/null)
 ```
+
+`for-each-ref` silently skips missing refs (e.g. `abu` / `rajah` currently have no `feature/*`), so the same command works uniformly on all 4 repos.
 
 Skip repos with no commits from this author.
 

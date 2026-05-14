@@ -109,6 +109,9 @@ If you catch yourself thinking any of these, STOP:
 4. **Anchor Search**:錯誤碼、unique 字串(grep `$ALADDIN_ROOT_AT_DATE` 而非主目錄)
 5. **backTesting Search**:Grep 模塊名 / 元件名 / 錯誤關鍵字 → Read 命中筆記 → 1 層 link tracing → 把發現記錄到「backTesting 參考」section(主目錄)
 6. Grep `Rules/` 找開發規範(主目錄)
+7. **Consistency Check**:比對 `analytics.md` 中「APP Page / Backend Path / 測試步驟」與 ticket 原文(含截圖 OCR 文字)是否一致。若有歧異 → **以 ticket 原文 + 截圖為準**,並在 analysis-notes 開頭標 `⚠️ analytics 描述歧異:<具體歧異>`(避免 FAQ-2856 那種 analytics 寫錯頁面導致整套五角度建立在錯誤戰場)
+8. **Spec 完整性 Check**:讀 `spec.md` 開頭的「規格完整性」section。若 `SPEC_INCOMPLETE`,**禁止照抄「待補」結論** — 必須從 analytics 截圖 + Step 1.3 的 git log commit message 反向補規格資訊
+9. **Related FAQ IDs Check**:讀 `analytics.md` 的「Related FAQ IDs in Recent Commits」section。若有命中,Step 1.3 git log 必須涵蓋這些 FAQ id 對應的 commit,並在 Step 4 Already-Fixed Verification 時納入考慮(這些 commit 可能與本 ticket 在同 PR 處理)
 
 ### Step 1: Phase 1 — Symptom Mapping(只到「症狀對應到哪些檔案」,不下根因結論)
 
@@ -419,6 +422,28 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
 ### 修復策略
 - 修改檔案列表(每個檔案改哪個函式 / 怎麼改 / 為什麼)
 
+### 主要修復路徑 (primary_fix_paths) — 機讀格式
+
+必填,pipeline 用此判斷是否走 manual-handoff branch。
+
+```yaml
+primary_fix_paths:
+  - repo: abu | lago | agrabah | rajah
+    file: <relative path from repo root>
+    reason: <one line>
+```
+
+**特殊狀況**:若所有 `primary_fix_paths` 都在 `localizations/*.json`,額外列出至少 1 個 `alternative_paths`(換 API / 換 enum / 架構繞道),避免「只能由人工執行 i18n 匯入」的低槓桿結論:
+
+```yaml
+alternative_paths:
+  - approach: change-api | change-enum | architectural-bypass
+    description: <one line>
+    target_files: [<paths>]
+```
+
+若主要修復路徑全為 i18n 且 `alternative_paths` 列空,Tracer 必須在 reason 中明示「業務上無 code-level 等效方案」並附證據。
+
 ### 業務規則上下文
 (從 spec.md 提取的相關規則)
 
@@ -435,6 +460,30 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
   - 框架:...
 - 結論:(commit 完整涵蓋所有 APPLICABLE 角度,無未修殘留)
 ```
+
+## Pre-Conclusion Evidence Gate
+
+在 analysis-notes.md 產出最終根因之前,每個結論段落必須通過三個證據準入條件。未通過 = 該段落視為猜測,必須補資料或標 `[NEEDS-VERIFICATION]` 再走 skill 確認。
+
+### 1. APPLICABLE 主因 → 必附副作用追蹤
+
+描述根因後緊接一段:
+> 假設此 fix apply 後,從症狀觸發點(使用者點擊 / API 呼叫 / 排程 job)往下游 trace 1-2 層 reactive state / cache / downstream callers,每個分支是否都會切換到正確行為?
+
+列出至少 2 個下游節點 + file:line + 預期行為。**找到主因就停筆 = 屬於早閉合,輸出無效。**
+
+### 2. NOT APPLICABLE → 必附反證假設
+
+排除理由不能只寫「該元件不渲染此資料」「該函式邏輯正確」。必須補一句:
+> 若這個角度其實是主因,bug 應發生在 <file:line> 的 <具體機制>;我有 <file:line 原文證據> 顯示這個機制沒被觸發。
+
+無反證假設 = 該角度排除無效。
+
+### 3. codebase state 引用 → 必附 file:line + 原文
+
+任何「已經有 X 函式」「該欄位已初始化」「default 值已設」類陳述,必須附 file:line + 該行原文(透過 Read tool 真讀過)。僅憑記憶 / 訓練資料 / 命名直覺推斷 = 違反 Source-First 紀律,該段落視為無效。
+
+若引用 enum / model / DB schema,必須走 skill(`bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts <subcommand>` / `bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand>`)並貼結果摘要。
 
 ## Being Recalled After Evaluator Rejection / Challenger Rejection
 
@@ -465,3 +514,7 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
 | 只查單一 repo 的 git log,對另一邊「我覺得不會有 commit」 | 這是 anchoring 的源頭;Step 1.3 雙路徑表格就是為了結構性破除 |
 | 看到 errorCode 後直接追後端 RPC 呼叫鏈,不檢驗前端寫入後 state-sync | wrong-side 高頻失敗;Step 1.5 trigger 強制檢查 |
 | 找到一條 plausible migration commit 就標「已修復」 | 越精細的 source-first 證據越會 anchor;Step 4 必須對 FE + BE 雙路徑候選 commit 逐一驗證 |
+| APPLICABLE 主因下定論時沒做下游 trace | 屬於早閉合;~30 張歷史失敗(FAQ-2475 / FAQ-2170 / FAQ-2593 等)都跟這個有關 |
+| 「已經有 X」類陳述沒附 file:line 原文 | LLM 補完幻覺;FAQ-2587 / FAQ-2301 / FAQ-2255 都因此誤判 |
+| analytics 描述與 ticket 原文 / 截圖歧異仍照 analytics 走 | FAQ-2856 整套五角度在錯誤頁面打轉 |
+| spec.md 含 SPEC_INCOMPLETE 但 Tracer 照抄「待補」結論 | FAQ-2830 漏 export 等配套;需從截圖 + commit 反向補規格 |

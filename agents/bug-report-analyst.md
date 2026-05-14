@@ -81,6 +81,40 @@ Actual Result:
 Expected Result: 
 
 Auxiliary Document Links: 
+
+## All Comments
+
+逐筆 dump Notion comments（**禁止摘要 / 翻譯 / 加註解**），格式：
+- [YYYY-MM-DD HH:MM] @{author}: {comment text 原文}
+
+從 Step 4 抓到的 comments JSON parse 出來，含 QA / PO / 工程師所有留言。
+若無 comments，寫「(無)」。
+
+## Ticket Status History
+
+從 page properties 萃取（若有以下欄位則列出）：
+- 嚴重性（severity）
+- Bug 狀態（含曾標 WON'T FIX / 暫不處理 / 規格待補 / 已完成 等）
+- 影響模塊 / 影響端口
+- 建立時間 / 最後更新時間
+
+特別標記：若 Bug 狀態為「WON'T FIX」或內文出現「暫不處理 / 不修 / by design」字眼，在本 section 開頭加 `⚠️ 業務狀態：可能非 bug，Tracer 必須先驗證`
+
+## Related FAQ IDs in Recent Commits
+
+跑下列指令，列出 ticket 建立日 ±14 天內 commit message 含**其他** FAQ id 的記錄（用於 Tracer 判斷本 ticket 是否與其他 PR 合併處理）：
+
+```bash
+TICKET_DATE=<從 page properties 取得的建立日 YYYY-MM-DD,若無則用今日>
+SINCE=$(date -v-14d -j -f '%Y-%m-%d' "$TICKET_DATE" '+%Y-%m-%d')
+UNTIL=$(date -v+14d -j -f '%Y-%m-%d' "$TICKET_DATE" '+%Y-%m-%d')
+for repo in agrabah abu lago rajah; do
+  echo "=== $repo ==="
+  cd /Users/user/aladdin/$repo && git log --since="$SINCE" --until="$UNTIL" --grep="FAQ-" --oneline 2>/dev/null | grep -v "{TicketID}" | head -20
+done
+```
+
+把每個 repo 的命中（≠ 本 ticket id）列在本 section。無命中寫「(無)」。
 ```
 
 **Field Descriptions:**
@@ -88,6 +122,7 @@ Auxiliary Document Links:
 - List test steps sequentially; the number of steps should increase or decrease based on actual content.
 - Auxiliary document links include screenshots, videos, attachments, and all other relevant links. **Image URLs must retain the full query string signature parameters** (including X-Amz-Algorithm, X-Amz-Credential, X-Amz-Signature, etc.) and must not be truncated.
 - Strictly follow the original text of the bug report; do not add any speculation or judgment.
+- **All Comments / Ticket Status History / Related FAQ IDs** 三個 pass-through section 是 Tracer 後續判斷業務脈絡的關鍵 signal，禁止省略；若資料缺，明確寫「(無)」。
 
 ---
 
