@@ -109,7 +109,7 @@ PR_URL=$(gh pr create \
 
 # 若 fail 因 PR 已存在,改取現有 PR
 if echo "$PR_URL" | grep -q "already exists"; then
-  PR_URL=$(gh pr view --json url -q .url)
+  PR_URL=$(gh pr view --json url --jq '.url')
 fi
 
 echo "$repo PR: $PR_URL"
@@ -119,7 +119,19 @@ echo "$repo PR: $PR_URL"
 
 ### Step 3: 合併 Drive link + PR links 寫 Notion 留言
 
-組裝 rich_text payload（每個 PR 一行）。範例（2 個 repo 的情況）：
+組裝 rich_text payload（每個 PR 一行）。
+
+**重要 — JSON 安全**：在把 `{bug_summary}`、`{drive_link}`、各 `{repo}_pr_url` 插入 heredoc 之前,**必須**用 `jq -Rn --arg` 或手動跳脫雙引號 `"` → `\"`、反斜線 `\` → `\\`、換行 `\n` → 字面 `\\n`。簡易方式:用 `jq -n --arg s "$VAR" '$s'` 把每個變數安全地嵌入 JSON,不要直接字串拼接。
+
+**重要 — PR URL 驗證**：在把 `PR_URL` 寫入 Notion payload 之前,先驗證它真的是 https URL:
+```bash
+if [[ ! "$PR_URL" =~ ^https://github.com/ ]]; then
+  PR_URL="N/A (gh pr create / view failed)"
+fi
+```
+未驗證直接寫入會把 gh 錯誤訊息塞進 Notion 留言。
+
+範例（2 個 repo 的情況,僅示意,實際必須動態建構 — 見下方）：
 
 ```bash
 cat > /tmp/{ticket_id}-notion-comment.json <<EOF
@@ -143,6 +155,8 @@ curl -s -X POST "https://api.notion.com/v1/comments" \
   -d @/tmp/{ticket_id}-notion-comment.json
 ```
 
+**動態建構提醒**：上方 heredoc 範例硬寫了 `agrabah` 與 `rajah` 兩個 repo,實際 agent 必須依 `{affected_repos}` 動態建構 rich_text array — 每個成功 push + 開出 PR 的 repo 對應「兩個」rich_text item（一個顯示 repo 名,一個顯示 PR URL 並附 link）。affected_repos 可能是 1 個 / 2 個 / 3 個 / 4 個,不可硬寫。
+
 若 `drive_link == N/A`,把「分析報告：」段改為「分析報告：（Drive 上傳失敗,請見 worktree 內 solution.md）」並省略 Drive link 那段 rich_text item。
 
 若 push / PR 全部失敗（pr_links 為空）：留言改為失敗摘要：
@@ -165,7 +179,15 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
   -d '{"properties": {"AI分析": {"select": {"name": "分析成功"}}}}'
 ```
 
-若 push / PR 全部失敗,改為 `"分析失敗"`。
+**設定值決策矩陣**：
+
+| Step 1 (push) | Step 2 (PR create) | Step 3 (Notion comment) | AI分析 欄位設值 |
+|---|---|---|---|
+| 至少 1 repo 成功 | 至少 1 repo 成功 | ok 或 failed | `"分析成功"` |
+| 全部 repo 失敗 | (不會到此步) | failed | `"分析失敗"` |
+| 至少 1 repo 成功 | 全部 PR create 失敗 | failed | `"分析失敗"` |
+
+換言之:**只有當「沒有任何 PR 成功送出」時才設「分析失敗」**。Step 3 的 Notion 留言失敗不會影響欄位值（分析已成功,只是通知失敗）。
 
 ### Step 5: Report
 
