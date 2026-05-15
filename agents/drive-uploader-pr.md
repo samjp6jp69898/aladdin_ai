@@ -93,10 +93,10 @@ This is the NEW step. Compile the final solution document from all pipeline outp
    for repo in {affected_repos}; do
      echo "=== $repo (code) ==="
      case $repo in
-       agrabah) git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!tests/' ;;
-       abu)     git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!*/test/' ;;
-       lago)    git -C {worktree_path}/$repo diff origin/pro...HEAD -- . ':!*/test/' ;;
-       rajah)   git -C {worktree_path}/$repo diff origin/pro...HEAD ;;
+       agrabah) git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!tests/' ;;
+       abu)     git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!*/test/' ;;
+       lago)    git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!*/test/' ;;
+       rajah)   git -C {worktree_path}/$repo diff origin/dev...HEAD ;;
      esac
    done
    ```
@@ -105,19 +105,19 @@ This is the NEW step. Compile the final solution document from all pipeline outp
    # 只對 affected_repos 中存在的 repo 執行
    for repo in {affected_repos}; do
      case $repo in
-       agrabah) git -C {worktree_path}/agrabah diff origin/pro...HEAD -- tests/ ;;
-       abu)     git -C {worktree_path}/abu diff origin/pro...HEAD -- '*/test/' ;;
-       lago)    git -C {worktree_path}/lago diff origin/pro...HEAD -- '*/test/' ;;
+       agrabah) git -C {worktree_path}/agrabah diff origin/dev...HEAD -- tests/ ;;
+       abu)     git -C {worktree_path}/abu diff origin/dev...HEAD -- '*/test/' ;;
+       lago)    git -C {worktree_path}/lago diff origin/dev...HEAD -- '*/test/' ;;
      esac
    done
    ```
-4. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-backend-evaluator-report.md` 與 `/Users/user/aladdin/obsidian/Debug/{id}/{id}-frontend-evaluator-report.md` — test results and coverage（v3 已拆成 backend / frontend 兩份）
+4. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-reviewer-report.md` — solution-reviewer's 5-dimension verification (bun test results, coverage, lint, edge case coverage)
 5. Read `/Users/user/aladdin/obsidian/Debug/{id}/{id}-spec.md` — spec summary
 6. **Commit 歷史（只列 affected_repos）**：
    ```bash
    for repo in {affected_repos}; do
      echo "=== $repo ==="
-     git -C {worktree_path}/$repo log --oneline origin/pro..HEAD
+     git -C {worktree_path}/$repo log --oneline origin/dev..HEAD
    done
    ```
 
@@ -137,7 +137,7 @@ metadata: v2
 （來自 analysis-notes.md 的修復策略、修復紀錄、Fixer 備註）
 
 ### 修正代碼
-（git diff main...HEAD 的完整內容，排除測試檔案）
+（git diff origin/dev...HEAD 的完整內容，排除測試檔案）
 （每個改動標註目的說明）
 
 ### 測試檔案
@@ -146,17 +146,17 @@ metadata: v2
 ### 測試案例
 | # | 案例描述 | 測試數據來源 | 預期結果 | 實際結果 |
 |---|---------|-------------|---------|---------|
-（從 evaluator-report.md 提取）
+（從 reviewer-report.md 提取）
 
 ### 測試覆蓋率
-（從 evaluator-report.md 提取 coverage 結果）
+（從 reviewer-report.md 提取 coverage 結果）
 
 ### 企劃規格書參照
 （從 spec.md 提取關鍵業務規則段落）
 
 ### Branch 資訊
 - Branch：landon/{id}
-- Commits：（git log --oneline main..HEAD 結果）
+- Commits：（git log --oneline origin/dev..HEAD 結果）
 ```
 
 ### Step 1: Confirm Documents Exist
