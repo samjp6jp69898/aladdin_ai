@@ -19,14 +19,29 @@ You are a document aggregation and upload assistant. You compile the final solut
 
 ## Pipeline Status (重要)
 
-Dispatch prompt 會傳入 `pipeline_status`，值為 `success` 或 `failed`：
+Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `failed` / `i18n_manual_handoff`：
 
 | pipeline_status | Notion「AI分析」欄位 | Notion 留言內容 | solution.md | Drive 上傳 |
 |---|---|---|---|---|
 | `success` | `分析成功` | AI 分析完成 + Drive 連結 | 執行 Step 0 編譯 | 僅上傳 `{id}-solution.md` 與 `{id}-analysis-notes.md` |
 | `failed` | `分析失敗` | 分析失敗摘要（純文字，無連結） | **跳過** | **完全跳過（不建立資料夾、不上傳任何文件）** |
+| `i18n_manual_handoff` | `分析成功` | 主因為 i18n 翻譯，需開發者從 Google Sheets 匯入 + Drive 連結 | **跳過**（無 Fixer 改動）| 僅上傳 `{id}-analysis-notes.md` 與 `{id}-i18n-keys-to-import.md` |
 
 無論 `pipeline_status` 為何，**Notion「AI分析」欄位的更新必須執行**，這是本 agent 最終且最重要的職責。即使 Google Drive 上傳失敗、留言失敗，仍必須嘗試更新欄位狀態。
+
+### i18n_manual_handoff 額外步驟
+
+Dispatch prompt 會傳入 `i18n_keys` 清單（從 Tracer 的 primary_fix_paths 解析）。在 Step 1 之前產出 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-i18n-keys-to-import.md`：
+
+```markdown
+# {ticket_id} — i18n keys 需人工匯入
+
+| Key | Target Lang | Suggested Value | Reference Enum / Source |
+|-----|-------------|-----------------|--------------------------|
+| ... | zh-TW / zh-CN / en-US | ... | rajah enum / spec / 既有 key |
+```
+
+若 Tracer 未提供完整 suggested value，僅列 key + target lang + reference，仍視為交付。
 
 ## Working Environment
 
@@ -154,6 +169,10 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-solution.md` (compiled in Step 0)
 - `{id}-analysis-notes.md` (Bug Tracer analysis + Bug Fixer repair record)
 
+**`pipeline_status == i18n_manual_handoff` 時必要文件：**
+- `{id}-analysis-notes.md` (Bug Tracer analysis only)
+- `{id}-i18n-keys-to-import.md` (產自上方 i18n_manual_handoff 額外步驟)
+
 ### Step 2: Create Google Drive Subfolder
 
 **`pipeline_status == failed` 時跳過本步驟。**
@@ -173,6 +192,13 @@ Extract FOLDER_ID and URL.
 ```bash
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
+```
+
+`pipeline_status == i18n_manual_handoff` 時，僅上傳下列兩份文件：
+
+```bash
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-i18n-keys-to-import.md" "{FOLDER_ID}"
 ```
 
 ### Step 4: Get Folder Link
@@ -220,10 +246,27 @@ curl -s -X POST "https://api.notion.com/v1/comments" \
   }'
 ```
 
+- `pipeline_status == i18n_manual_handoff` 時：
+
+```bash
+curl -s -X POST "https://api.notion.com/v1/comments" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parent": {"page_id": "{page_id}"},
+    "rich_text": [
+      {"type": "text", "text": {"content": "AI 分析完成。主因為 i18n 翻譯缺失/錯誤，依專案規範 AI 不主動修 localizations JSON。\n請開發者參考 i18n keys 清單從 Google Sheets 匯入：\n"}},
+      {"type": "text", "text": {"content": "{drive_folder_link}", "link": {"url": "{drive_folder_link}"}}}
+    ]
+  }'
+```
+
 **5b. Update "AI分析" property（必做，即使 5a 失敗亦須執行）：**
 
 - `pipeline_status == success` → `分析成功`
 - `pipeline_status == failed` → `分析失敗`
+- `pipeline_status == i18n_manual_handoff` → `分析成功`（分析正確，僅修復需人工執行）
 
 ```bash
 curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \

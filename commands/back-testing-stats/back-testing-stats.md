@@ -75,12 +75,16 @@ From `done` rows:
 
 Rates (denominator = `done` total **excluding `no_fix`**):
 - `effective` = done - no_fix (有效樣本數，排除不需修復)
-- **完全成功率** = correct / effective
-- **總成功率** = (correct + partial) / effective
+- **嚴格正確率** = correct / effective（僅照 commit 對齊的完全一致）
+- **完全成功率（含等效）** = (correct + partial_A) / effective（**主要指標** — partial_A 等效替代解法視為正確：AI 已找對根因，僅實作風格與開發者不同，工程價值等同）
+- **總成功率** = (correct + partial) / effective（含等效 + 不完整，最寬鬆指標）
 
 #### Per-severity counts
 
-For each severity (P1重點 / P2較高 / P3一般 / P4較低), compute the same breakdown and three rates from `done` rows only (excluding `no_fix` from denominator).
+For each severity (P1重點 / P2較高 / P3一般 / P4較低), compute the same breakdown and three rates from `done` rows only (excluding `no_fix` from denominator):
+- 嚴格正確率 = correct / effective
+- 完全成功率(含等效) = (correct + partial_A) / effective
+- 總成功率 = (correct + partial) / effective
 
 ---
 
@@ -108,18 +112,19 @@ Output the following two blocks:
 ➖ 不需修復    {no_fix}  (不計入正確率)
 
 有效樣本數：{effective}（排除 {no_fix} 張不需修復）
-完全成功率：{correct/effective %}
-總成功率　：{(correct+partial)/effective %}
+嚴格正確率　　　：{correct/effective %}（僅完全照 commit 對齊）
+完全成功率(含等效)：{(correct+partial_A)/effective %}（**主要指標**，partial_A 視為正確）
+總成功率　　　　：{(correct+partial)/effective %}（含部分正確 B 不完整）
 ```
 
 **Block 2: Per-Severity Breakdown**
 
 ```
-         總數  正確  部分A  部分B  錯誤  無法比對  不需修復  完全率  總成功率
-P1重點     18    10     2      1     4      1          55.6%   72.2%
-P2較高     15     8     2      1     3      1          53.3%   73.3%
-P3一般      9     4     1      1     2      1          44.4%   66.7%
-P4較低      0     —     —      —     —      —      —       —       —
+         總數  正確  部分A  部分B  錯誤  無法比對  不需修復  嚴格率  含等效率  總成功率
+P1重點     18    10     2      1     4      1          55.6%   66.7%    72.2%
+P2較高     15     8     2      1     3      1          53.3%   66.7%    73.3%
+P3一般      9     4     1      1     2      1          44.4%   55.6%    66.7%
+P4較低      0     —     —      —     —      —      —       —       —        —
 ```
 
 Rows with 0 done tickets show `—` for all rate columns.
@@ -133,9 +138,10 @@ Rows with 0 done tickets show `—` for all rate columns.
 Take all `done` rows with a valid `完成時間`. Sort ascending by `完成時間`.
 
 For each ticket in order, compute running totals at that point:
-- cumulative `correct`, `partial`, `done_so_far`
+- cumulative `correct`, `partial_A`, `partial`, `done_so_far`
+- **累積嚴格正確率** = correct / done_so_far × 100
+- **累積完全成功率(含等效)** = (correct + partial_A) / done_so_far × 100（**主要趨勢線**）
 - **累積總成功率** = (correct + partial) / done_so_far × 100
-- **累積完全成功率** = correct / done_so_far × 100
 
 X-axis labels: ticket index (1, 2, 3 … N) with ticket ID as tooltip label.
 
@@ -159,27 +165,30 @@ HTML structure:
 - **HTML 必須包含完整的統計摘要，不能只有圖表。** 頁面由上而下依序包含：
 
 #### Section 1: 總覽卡片
-- 兩張卡片並排 (CSS grid 2-column)：
-  - 左卡：**總成功率** (大字) + 已完成 / 總數
-  - 右卡：**完全成功率** (大字) + 已完成數與有效樣本數
+- 三張卡片並排 (CSS grid 3-column)：
+  - 左卡：**完全成功率(含等效)** (大字，**主要指標**) + 已完成 / 有效樣本
+  - 中卡：**嚴格正確率** (大字) + 僅完全對齊 commit 的張數
+  - 右卡：**總成功率** (大字) + 含部分正確 B 不完整
 - 下方以 progress bar 顯示結論分布（分析正確 / 部分正確A / 部分正確B / 分析錯誤 / 無法比對 / 不需修復）含數量與百分比
-- 部分正確 A（等效替代）使用淺綠色 (#81c784)
-- 部分正確 B（不完整）使用橙色 (#ffb74d)
+- 部分正確 A（等效替代）使用淺綠色 (#81c784) — 視覺上接近「正確」綠色，表示計入完全成功率
+- 部分正確 B（不完整）使用橙色 (#ffb74d) — 表示僅計入總成功率
 
 #### Section 2: 各嚴重性等級成功率表格
 - HTML `<table>` 呈現 Step 3 Block 2 的完整內容
-- 欄位：嚴重性 | 總數 | 正確 | 部分A | 部分B | 錯誤 | 無法比對 | 不需修復 | 完全率 | 總成功率
+- 欄位：嚴重性 | 總數 | 正確 | 部分A | 部分B | 錯誤 | 無法比對 | 不需修復 | 嚴格率 | 含等效率 | 總成功率
 - 嚴重性使用顏色標籤 (P1 紅 / P2 橙 / P3 黃 / P4 藍)
+- 「含等效率」欄位加粗顯示（主要指標）
 
 #### Section 3: 累積趨勢圖表
-- Two lines on the same chart:
-  - 總成功率 (blue)
-  - 完全成功率 (green)
+- Three lines on the same chart:
+  - 嚴格正確率 (gray, dashed) — 僅完全對齊 commit
+  - **完全成功率(含等效)** (green, solid, thicker) — 主要指標
+  - 總成功率 (blue, solid) — 含部分正確 B
 - Chart title: `累積成功率趨勢`
 - Y-axis: 0–100%, label `成功率 (%)`
 - X-axis: ticket index, label `完成順序`
 - Legend displayed
-- Tooltip shows: ticket ID, 總成功率, 完全成功率
+- Tooltip shows: ticket ID, 嚴格正確率, 含等效率, 總成功率
 
 All chart data is embedded inline as a JSON literal in a `<script>` tag — no external data files.
 
@@ -206,6 +215,7 @@ back-testing-stats-{YYYYMMDD-HHmm}.html
 
 1. **Rates are always based on `done` count** — pending/failed/in_progress tickets are excluded from all accuracy calculations
 2. **Tickets with empty `完成時間`** are excluded from the trend chart but still counted in the snapshot
-3. **Two-line chart**: 總成功率 / 完全成功率 are plotted as separate cumulative lines; A/B breakdown is shown in the table instead
-4. **Temp directory is ephemeral**: always created fresh, deleted after user confirms viewing
-5. **Does not modify the tracker** or any Notion properties
+3. **Three-line chart**: 嚴格正確率 / 完全成功率(含等效) / 總成功率 are plotted as separate cumulative lines; A/B breakdown is shown in the table instead
+4. **「完全成功率(含等效)」是主要對外指標** — partial_A（等效替代解法）等同正確：AI 已找對根因，僅實作風格與開發者偏好不同，工程價值等同。partial_B（不完整）才是真正的部分修復。
+5. **Temp directory is ephemeral**: always created fresh, deleted after user confirms viewing
+6. **Does not modify the tracker** or any Notion properties

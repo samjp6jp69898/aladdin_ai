@@ -149,6 +149,13 @@ Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`:
 ```
 ## 企劃規格書摘要 — {ticket_id}
 
+### 規格完整性 (Tracer 必讀)
+
+- 狀態: ⚠️ SPEC_INCOMPLETE / ✅ SPEC_COMPLETE
+- 原因（若 INCOMPLETE）: 未找到相關規格書 / 規格書自承「待補」 / 規格書未涵蓋此功能 / 規格在外部工具（Google Sheets / Figma / axshare）
+
+若 SPEC_INCOMPLETE，Tracer 必須從 analytics 的截圖 + commit message 反向補規格資訊，不得照抄缺失。
+
 ### 來源
 - Notion 頁面：（連結）
 - 模塊：（影響模塊名稱）
@@ -160,8 +167,14 @@ Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`:
 （如規格書有定義驗收條件，列出）
 
 ### 備註
-（「未找到相關規格書」或「規格書未涵蓋此功能」等情況說明）
+（其他補充說明）
 ```
+
+**完整性判定規則**：
+- 規格書找到且含「相關業務規則」≥ 3 條 → `SPEC_COMPLETE`
+- 規格書找到但內文含「待補」「待確認」「TBD」「未定義」字眼 → `SPEC_INCOMPLETE`，原因寫「規格書自承待補」
+- 規格書頁面只有外部連結（Google Sheets / Figma / axshare）無內文 → `SPEC_INCOMPLETE`，原因寫「規格在外部工具」並附連結
+- 所有候選關鍵字 0 命中 → `SPEC_INCOMPLETE`，原因寫「未找到相關規格書（已嘗試關鍵字：...）」
 
 ## Failure Handling
 

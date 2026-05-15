@@ -106,6 +106,16 @@ ticket_id: {ticket_id}
 
 Read analysis-notes.md: if bug is confirmed already fixed (有「已修復紀錄」section with commit hash), **skip Steps 4-8** and go directly to Step 9.
 
+#### Check primary_fix_paths — i18n Manual Handoff Detection
+
+從 analysis-notes.md 解析 `primary_fix_paths` YAML block。若**所有** `file` 都符合 `localizations/.*\.json$` pattern：
+
+- 設定 `pipeline_status = i18n_manual_handoff`
+- **跳過 Steps 4-8**（不建 worktree、不派 Fixer / Evaluator / Validator）
+- 直接進 Step 9 drive-uploader，傳入 `pipeline_status: i18n_manual_handoff` 並附 primary_fix_paths 解析後的 i18n key 清單
+
+若 primary_fix_paths 為混合（部分 i18n、部分 code）：保持正常流程，但在 Step 5 Bug Fixer dispatch prompt 中明示「i18n JSON 路徑禁止寫入，僅修 code 部分」，並要求 Fixer 把 i18n key 清單寫入 `{ticket_id}-i18n-keys-to-import.md`。
+
 #### Extract affected_repos
 
 從 analysis-notes.md 的「修復策略」section 中，掃描所有修改檔案路徑的前綴，提取涉及的 repo 集合：
@@ -399,6 +409,8 @@ Wait for completion, then **return to Step 8**.
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
 
+**一般成功路徑（`pipeline_status = success`）：**
+
 ```
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. Please compile the solution document, upload to Google Drive, and comment on Notion.
@@ -407,6 +419,19 @@ Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
 affected_repos: {affected_repos}
 pipeline_status: success
+```
+
+**i18n manual handoff 路徑（`pipeline_status = i18n_manual_handoff`，跳過 Steps 4-8 時）：**
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. Tracer 已確認主因為 i18n 翻譯缺失/錯誤，依專案規範 AI 不修 localizations JSON。請產出 i18n keys 清單檔、上傳至 Google Drive、並在 Notion 留言。
+ticket_id: {ticket_id}
+Notion URL: {Notion URL from $ARGUMENTS}
+worktree_path: N/A
+affected_repos: []
+pipeline_status: i18n_manual_handoff
+i18n_keys: <從 analysis-notes.md 的 primary_fix_paths 解析出的 i18n key 清單，含 file / suggested value / reference enum，若 Tracer 未提供 suggested value 則僅列 key + lang + reference>
 ```
 
 **Wait for completion.**
