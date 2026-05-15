@@ -33,6 +33,7 @@ pipeline_status = ""          # success / already_fixed / i18n_manual_handoff / 
 drive_link = ""
 pr_links = []
 affected_repos = []
+worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id} after Step 4
 ```
 
 ---
@@ -132,7 +133,7 @@ ticket_id: {ticket_id}
 
 Read analysis-notes.md：
 
-- 若 bug 確認已修復（有「已修復紀錄」section + commit hash） → 設 `pipeline_status = already_fixed`,跳過 Steps 4-6,直接進 Step 7（**只跑 7a drive-uploader-pr,不跑 7b pr-pusher**)
+- 若 bug 確認已修復（有「已修復紀錄」section + commit hash） → 設 `pipeline_status = already_fixed`,從 analysis-notes.md「已修復紀錄」段抽取 commit hash 存為 `fixed_commit`（給 Step 7c Notion 留言用）,跳過 Steps 4-6,直接進 Step 7（**只跑 7a drive-uploader-pr,不跑 7b pr-pusher**)
 
 #### Check primary_fix_paths — i18n Manual Handoff Detection
 
@@ -155,7 +156,7 @@ Read analysis-notes.md：
 
 Store as: `affected_repos`（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`）
 
-若解析不出任何 repo（例如 tracer 標記已修復），則 `affected_repos` 為空，Step 4 的 worktree 建立仍會執行（全部用 symlink），bootstrap 會在主工作區的 rajah 上跑。
+若解析不出任何 repo（tracer 分析完整但修復策略未涉及任何 code repo — 例如純文件修改或框架層說明），則 `affected_repos` 為空，Step 4 的 worktree 建立仍會執行（全部用 symlink），bootstrap 會在主工作區的 rajah 上跑。
 
 ---
 
@@ -335,7 +336,7 @@ Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report
 | review_result | Action |
 |---|---|
 | PASSED | Set `pipeline_status = success`,proceed to Step 7 |
-| FAILED | Increment fixer_attempt_count + total_attempt_count. If fixer < 3 AND total ≤ 5 → return to Step 5（re-dispatch bug-fixer-with-tests with reviewer feedback）. If fixer ≥ 3 OR total > 5 → Pipeline Failure. |
+| FAILED | If `fixer_attempt_count < 3` AND `total_attempt_count ≤ 5` → return to Step 5（re-dispatch bug-fixer-with-tests with reviewer feedback；Step 5 entry 會負責 increment counts,本表不重複加）. If `fixer_attempt_count ≥ 3` OR `total_attempt_count > 5` → Pipeline Failure. |
 
 ---
 
@@ -360,9 +361,9 @@ failed 路徑 → drive-uploader-pr 會回傳 `DRIVE_LINK: N/A`。
 
 ### Step 7b: PR Pusher（僅 pipeline_status == success）
 
-**只有 `pipeline_status == success` 才執行本步驟。** already_fixed / i18n_manual_handoff / failed 路徑直接跳到 Step 7c。
+**只有 `pipeline_status == success` 才執行本步驟。** already_fixed / i18n_manual_handoff / failed 路徑：完成 Step 7a 後**跳過本步驟**,直接進 Step 7c 由 manager 自處 Notion。
 
-從 analytics.md 抽取一句話 `bug_summary`（< 60 字,用於 PR title）。
+從 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` 的「Bug 描述 / 標題」段抽取一句話 `bug_summary`（≤ 60 字,用於 PR title）。若該段超過 60 字,取第一句並改寫為動詞開頭簡潔描述。範例：「修復商城兌換點數時餘額顯示舊值的問題」。
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/pr-pusher.md`：
 
@@ -431,6 +432,8 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 ```
 
 #### failed
+
+**`{failure_reason}` 由 manager 在進入 Step 7c 前準備**：從最後一次 reviewer/tracer/fixer 退回報告抽 5-10 行摘要,字面替換進下方 curl payload。`{review_result}` 由 Step 6 結果直接代入；若 reviewer 未跑（tracer 階段就失敗）則填 `N/A`。
 
 ```bash
 curl -s -X POST "https://api.notion.com/v1/comments" \
