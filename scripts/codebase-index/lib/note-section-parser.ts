@@ -9,8 +9,8 @@ const NOTE_SECTION_MAP: Record<string, keyof Pick<ParsedJsdoc, 'description' | '
 };
 
 function normalizeText(text: string): string {
-    // [[link]] or [[link|alias]] -> 「link」 (or alias)
-    text = text.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, link, alias) => {
+    // [[link]] or [[link|alias]] -> 「link」 (or alias), stripping adjacent whitespace
+    text = text.replace(/\s*\[\[([^\]|]+)(?:\|([^\]]+))?\]\]\s*/g, (_, link, alias) => {
         return `「${(alias ?? link).trim()}」`;
     });
     // `code` -> code

@@ -40,7 +40,7 @@ describe('parseNote', () => {
             '- 參考 [[註冊欄位驗證 checklist]]',
         ].join('\n');
         const result = parseNote(note);
-        expect(result.rules.bullets).toEqual(['參考 「註冊欄位驗證 checklist」']);
+        expect(result.rules.bullets).toEqual(['參考「註冊欄位驗證 checklist」']);
     });
 
     test('strips backticks and bold markers from content', () => {
