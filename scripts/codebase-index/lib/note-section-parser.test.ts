@@ -43,6 +43,30 @@ describe('parseNote', () => {
         expect(result.rules.bullets).toEqual(['參考「註冊欄位驗證 checklist」']);
     });
 
+    test('preserves newlines between bullets that end with wikilinks', () => {
+        const note = [
+            '## 相關規則與踩坑',
+            '- rule one ends with [[Foo]]',
+            '- rule two',
+        ].join('\n');
+        const result = parseNote(note);
+        // Must be 2 separate bullets, not 1 concatenated bullet
+        expect(result.rules.bullets).toEqual([
+            'rule one ends with「Foo」',
+            'rule two',
+        ]);
+    });
+
+    test('still strips spaces and tabs adjacent to wikilinks', () => {
+        const note = [
+            '## 業務場景',
+            '前 [[X]] 中 [[Y]] 後',
+        ].join('\n');
+        const result = parseNote(note);
+        // bare paragraph -> single bullet; spaces around 「X」 and 「Y」 must be eaten
+        expect(result.scenarios.bullets).toEqual(['前「X」中「Y」後']);
+    });
+
     test('strips backticks and bold markers from content', () => {
         const note = [
             '## 業務場景',

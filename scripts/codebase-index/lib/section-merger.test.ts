@@ -20,6 +20,15 @@ describe('mergeBullets', () => {
         expect(mergeBullets(source, note)).toEqual(['用 `Bun.password.verify`']);
     });
 
+    test('trailing period or other punctuation does not produce duplicate', () => {
+        // Note expresses a bullet as a paragraph (with trailing 。);
+        // source has it as a bullet (no trailing 。). Should be ONE bullet, not two.
+        const source = ['App / H5 前台註冊表單提交'];
+        const note   = ['App / H5 前台註冊表單提交。'];
+        expect(mergeBullets(source, note)).toEqual(['App / H5 前台註冊表單提交']);
+        // source wins on key match → keeps source's no-period form
+    });
+
     test('preserves backticks etc. when source-only', () => {
         const source = ['`backticked` content'];
         const note: string[] = [];

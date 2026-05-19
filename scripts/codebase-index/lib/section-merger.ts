@@ -8,6 +8,7 @@ export function normalizeKey(text: string): string {
         .replace(/\*\*([^*]+)\*\*/g, '$1')
         .replace(/[（(]/g, '(').replace(/[)）]/g, ')')
         .replace(/\s+/g, ' ')
+        .replace(/[。、，；,.;\s]+$/u, '')
         .trim()
         .toLowerCase();
 }
