@@ -138,7 +138,7 @@ Store as: `affected_repos`（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`）
 **目標結構（以 affected_repos = ["agrabah"] 為例）：**
 ```
 /Users/user/aladdin/worktrees/{ticket_id}/
-├── agrabah   (git worktree, branch landon/{ticket_id}, base origin/pro)
+├── agrabah   (git worktree, branch landon/{ticket_id}, base origin/dev)
 ├── abu       (symlink → /Users/user/aladdin/abu)
 ├── lago      (symlink → /Users/user/aladdin/lago)
 ├── rajah     (symlink → /Users/user/aladdin/rajah)
@@ -154,8 +154,8 @@ mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
 
 # 對 affected_repos 中的 repo 建立真正的 git worktree
 for repo in {affected_repos}; do
-  cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
-  git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
+  cd /Users/user/aladdin/$repo && git fetch origin dev --quiet
+  git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/dev 2>/dev/null \
     || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
 done
 
@@ -254,8 +254,8 @@ If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
    rm -rf /Users/user/aladdin/worktrees/{ticket_id}
    mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
    for repo in {affected_repos}; do
-     cd /Users/user/aladdin/$repo && git fetch origin pro --quiet
-     git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/pro 2>/dev/null \
+     cd /Users/user/aladdin/$repo && git fetch origin dev --quiet
+     git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/dev 2>/dev/null \
        || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
    done
    # 不在 affected_repos 中的主 repo 用 symlink
