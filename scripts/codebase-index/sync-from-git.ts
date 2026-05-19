@@ -24,6 +24,7 @@ function getArg(name: string): string | undefined {
 }
 const dryRun = args.includes('--dry-run');
 const finalizeOnly = args.includes('--finalize');
+const skipWriteback = args.includes('--skip-writeback');
 const since = getArg('since');
 const until = getArg('until');
 const commitArg = getArg('commits');
@@ -319,6 +320,30 @@ async function runFinalize(today: string, since: string, until: string) {
     }
 
     await saveSyncState(syncState);
+
+    // ─── Stage 4: Writeback JSDoc to source ───
+    if (!skipWriteback) {
+        console.log('\n--- Stage 4: Writing JSDoc back to source ---');
+        try {
+            const { runWriteback, loadProcessedActions } = await import('./writeback-jsdoc.ts');
+            const writebackActions = await loadProcessedActions();
+            const writebackReport = await runWriteback(writebackActions, { dryRun: false });
+            await Bun.write(
+                `${SCRIPTS_DIR}/writeback-report.json`,
+                JSON.stringify(writebackReport, null, 2),
+            );
+            console.log(`  ✓ ${writebackReport.summary.files_modified} files modified`);
+            console.log(`  − ${writebackReport.summary.actions_unchanged} unchanged`);
+            console.log(`  ⊘ ${writebackReport.summary.actions_skipped} skipped`);
+            if (writebackReport.summary.files_modified > 0) {
+                console.log(`  Please review: cd /Users/user/aladdin/agrabah && git diff`);
+            }
+        } catch (e) {
+            console.error('  WARNING: Stage 4 writeback failed:', e);
+        }
+    } else {
+        console.log('\n--- Stage 4: SKIPPED (--skip-writeback) ---');
+    }
 
     console.log('\n=== Sync finalized ===');
 }
