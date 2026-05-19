@@ -1,0 +1,16 @@
+
+export class FakeService {
+
+    /**
+     * App 會員註冊主流程。詳細步驟：1) prepareProviderData 守衛；15) 清 otp session、送 trackEvent(userRegister, success) 埋點、送 RecordUserLogin(register, loginSuccess) job、updatePlatformStatistic(registerMembers)。
+     *
+     * **業務場景**
+     * - App / H5 前台註冊表單提交
+     *
+     * **備註**
+     * - trackEvent、updatePlatformStatistic、RecordUserLogin 都是 fire-and-forget（.then()），主流程不等待
+     */
+
+    async methodRegister(): Promise<void> {
+    }
+}
