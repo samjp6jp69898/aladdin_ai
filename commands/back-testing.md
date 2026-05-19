@@ -75,6 +75,19 @@ Report: `✓ Stage 1 complete — {ticket_id} ticket info collected`
 
 ---
 
+### Step 1.5: 注入 FIX-AUTHORITY IRON LAW 至 staging
+
+把共用鐵律檔複製進 staging,供 Stage 2(commit-analyzer)在其既有允許路徑內讀取(防汙染防火牆 bright-line 不破 —— staging 本就是其允許範圍):
+
+```bash
+cp /Users/user/aladdin/.claude/agents/_shared/fix-authority-ironlaw.md /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/fix-authority-ironlaw.md
+ls /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/fix-authority-ironlaw.md
+```
+
+**If Step 1.5 failed** (cp failed or source file `/Users/user/aladdin/.claude/agents/_shared/fix-authority-ironlaw.md` missing): report the error and stop. Leave the staging directory intact for debugging. Stage 2 (commit-analyzer) requires this file as its fix-authority criterion and must not run without it.
+
+---
+
 ### Step 2: Dispatch Stage 2 — Commit Finder & Independent Analyzer
 
 Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md`:

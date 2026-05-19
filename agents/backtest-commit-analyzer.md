@@ -29,6 +29,7 @@ You are a git commit investigator for the back-testing pipeline. Your mission: f
 ### YOU MAY ONLY READ:
 
 - `{staging_dir}/stage1-ticket-info.md` — 本次任務輸入
+- `{staging_dir}/fix-authority-ironlaw.md` — 本次任務的 FIX-AUTHORITY IRON LAW(由 back-testing 管理 skill 複製進 staging,必讀必遵;屬既有允許之 staging 範圍,非新增 Debug/ 曝險)
 - Git 指令的輸出（stdout）
 
 ### IF CONTAMINATION OCCURS:
@@ -48,7 +49,7 @@ STATUS: CONTAMINATED
 
 - 每執行一次 Bash 或 Read 指令，計數 +1
 - 達到 120 次時，若仍未找到候選 commit，**立即停止搜尋**，將 Status 設為 `NOT_FOUND` 並寫入輸出
-- 不要在同一個方向上反覆嘗試不同關鍵字組合。每個 repo 最多嘗試 3 種搜尋策略（ticket ID → 作者+關鍵字 → 版本 tag），若均無結果就跳到下一個 repo
+- 不要在同一個方向上反覆嘗試不同關鍵字組合。3a 為跨全 repo 一次性全掃;3a 全零命中後,每個 repo 最多嘗試 3b 作者+關鍵字 → 3c 關鍵字 → 3d 版本 tag 各一輪,若均無結果就跳到下一個 repo(3e 為最終兜底)
 - 找不到就是找不到，快速回報比窮盡搜尋更有價值。主 agent 可以提供額外線索後重新派遣
 
 ---
@@ -101,10 +102,20 @@ STATUS: CONTAMINATED
 
 按優先順序對每個 repo 執行以下搜尋，**記錄每條指令與結果數量**：
 
-**3a. 按 Ticket ID 搜尋（最精確）：**
+**3a. 按 Ticket ID 搜尋（唯一第一權威 — 先讀 `{staging_dir}/fix-authority-ironlaw.md` 並遵其 §A）：**
+
+對**每個受查 repo（含 genie）**各跑全變體 grep（`--all`、`-i`、`git log --grep` 預設已含 body）。`NNNN` = 本案 ticket 數字：
+
 ```bash
-git -C <repo_path> log --oneline --all --grep="FAQ-XXXX" | head -20
+git -C <repo_path> log --all -i -E \
+  --grep='FAQ[-_ ]?NNNN' \
+  --grep='FQA[-_ ]?NNNN' \
+  --grep='(^|[^0-9])NNNN([^0-9]|$)' | head -20
 ```
+
+涵蓋 `[FAQ-NNNN]`/`(FAQ-NNNN)`/`FAQ-NNNN`/`FAQNNNN`/`FAQ_NNNN`/`[FQA-NNNN]`/`[PK][...NNNN]`/`[平台][...NNNN]`/`[NNNN]`/`#NNNN`。第三條（裸號）會過度命中,裸號命中**必須**人工確認上下文確為本 ticket 再採信。
+
+**命中完全相同 ticket-id 的 commit → 它即 fix 權威,記錄後直接進 Step 4;3b/3c/3e 不得覆蓋此結論。** 唯有全變體跨全 repo 皆無命中,才進 3b。
 
 **3b. 按作者 + 關鍵字搜尋：**
 ```bash
@@ -122,30 +133,25 @@ git -C <repo_path> log --oneline --all --grep="<keyword>" --since="3 months ago"
 git -C <repo_path> tag -l "*<version>*"
 ```
 
-**3e. 按相關檔案的 git history 搜尋（最重要的兜底策略）：**
+**3e. Code / 檔案 history fallback（僅當 3a 全變體跨全 repo 皆無命中才執行 — 遵鐵律 §B）：**
 
-當 3a-3d 均無結果時，**必須執行此步驟**。從 Stage 1 的「程式碼定位線索」或「Issue Description」中提取關鍵檔案路徑，直接查看該檔案在版本區間內的所有改動：
+從 Stage 1 線索取關鍵檔,查版本區間 git history。**硬規則（違反即輸出無效）：**
+- **禁止**把 commit message 掛**別 ticket-id**（與本案不同的任何 FAQ/FQA 號）的 commit 報為本單 fix —— 此為歷史頭號 false-negative 噪音源。掛別單號者至多列「同檔鄰近改動參考」,不得作 fix 結論。
+- **禁止**選 commit date 早於本案報案日的 commit 當 fix（唯一例外:`git merge-base --is-ancestor` 客觀祖先證明已含於報案版且症狀仍在 → 屬另案,仍不得當本案 fix）。
+- 若無可辯護 commit → Status 設 `NOT_FOUND`,並在輸出明寫「真 fix 未進 git（INSUFFICIENT-EVIDENCE）」,**不得硬湊一顆**。
 
 ```bash
-# 先確定版本 tag 區間（問題版本 → 驗證通過版本）
 git -C <repo_path> log --oneline <problem_tag>..<fix_tag> -- <file_path>
-
-# 對每個 commit 查看 diff，確認是否涉及問題修復
 git -C <repo_path> show <hash> -- <file_path>
 ```
-
-若 Stage 1 提供了多個關鍵檔案，逐一查看其 git history。重點關注：
-- 相關欄位的顯示邏輯變更（例如 `||` 改為 `??`、新增格式化函式）
-- 看似無關但實際影響了問題區域的重構 commit
-- 其他 FAQ 編號的 commit 可能順便修復了本 ticket 的問題
 
 若任一步驟找到候選 commit，記錄 hash 後進入 Step 4。若所有 repo 都無結果，標記為 NOT_FOUND。
 
 **搜尋紀律：**
-- 每個 repo 的搜尋策略最多執行 3a → 3b → 3c → 3d 各一輪，不要回頭重試
+- 3a 為跨全 repo 一次性全變體掃描,命中完全相同 ticket-id 即止(直接進 Step 4);唯有 3a 跨全 repo 皆零命中,才對每個 repo 依序執行 3b → 3c → 3d 各一輪,不要回頭重試
 - 若 QA Comments 中有提及具體元件名稱或頁面名稱，可作為額外的關鍵字用於 3c，但仍只嘗試一次
 - 不要對同一個 repo 用不同關鍵字組合反覆搜尋超過 3 次
-- **3e 是例外**：當 3a-3d 全無結果時，3e（檔案 git history）是必須執行的兜底策略，可對每個關鍵檔案查看版本區間內的所有 commit diff
+- **3e 是例外**：當 3a 跨全 repo 皆無命中、且 3b-3d 亦全無結果時,3e（檔案 git history）是必須執行的兜底策略,可對每個關鍵檔查看版本區間內的所有 commit diff(惟須遵 3e 區塊的鐵律 §B 硬規則)
 - 當所有優先 repo 搜完無結果（含 3e），次要 repo 也各搜一輪即可結束
 
 ---
@@ -159,11 +165,13 @@ git -C <repo_path> show <hash> --stat
 git -C <repo_path> show <hash>
 ```
 
-**驗證三項條件：**
+**驗證（依 FIX-AUTHORITY IRON LAW）：**
 
-1. 變更的檔案與受影響模組相關
-2. Commit message 與問題描述吻合
-3. 時間線合理（不早於問題回報日期）
+1. **§A 權威**：該 commit message 含與本案完全相同 ticket-id（全變體任一）→ 即 fix 權威,優先於其他一切。
+2. 變更的檔案與受影響模組相關。
+3. **時間線硬規則**：commit date 不得早於問題回報日期（例外見鐵律 §B-2 客觀祖先）。
+4. **§B 禁則**：不得選掛別 ticket-id 的 commit;§A 命中時不得被 3e 結果覆蓋。
+5. **§C 多 commit**：多顆完全相同 ticket-id commit 時,主歸屬恆判源頭側,companion 側列附加,全部納入涵蓋驗證（禁 min-hop）。
 
 若多個 repo 有相關 commit，**全部記錄**。
 
@@ -216,6 +224,7 @@ FOUND / NOT_FOUND
 - **Changed Files**:
   - path/to/file1.ts
   - path/to/file2.ts
+- **Fix Authority Basis**: EXACT-TICKET-ID | CODE-FALLBACK | NOT-IN-GIT(INSUFFICIENT)
 
 ## Fix Commit (Additional)
 （若多個 repo 有相關 commit，依相同格式補充列出）
@@ -229,7 +238,7 @@ FOUND / NOT_FOUND
 ### Files Changed and Direction
 ```
 
-**若 Status 為 NOT_FOUND：** Status 欄填 `NOT_FOUND`，其餘所有段落留空。
+**若 Status 為 NOT_FOUND：** Status 欄填 `NOT_FOUND`;`## Fix Commit` 區塊僅保留一行 `Fix Authority Basis: NOT-IN-GIT(INSUFFICIENT)`(其餘子欄位留空),`## Independent Analysis` 留空;並在 `## Search Strategy` 末行補寫一句 `真 fix 未進 git（INSUFFICIENT-EVIDENCE）`。
 
 ---
 

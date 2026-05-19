@@ -84,7 +84,12 @@ If you catch yourself thinking any of these, STOP:
 
 3. **後續所有 skill 腳本呼叫**必須在當前 shell session 內(已 `export` env),腳本會自動讀 `ALADDIN_ROOT_AT_DATE` 指向 worktree。**直接 Read source file 時也要從 `$WT_ROOT/<repo>/...` 路徑讀**,而非 `/Users/user/aladdin/<repo>/...`。
 
-4. **若 worktree 建立失敗或 ticketDate 抓不到**:在 analysis-notes.md 開頭明示「worktree 錨定 SKIPPED,原因:<具體原因>;以下分析基於主目錄當前 source」,然後仍按下列規範繼續。
+4. **強制錨定鏈（不可 SKIP）—— 刪除舊「標 SKIPPED 仍續跑」逃生口**:
+
+   - **ticketDate 必得**:analytics 日期 → 否則取 `{ticket}/` 資料夾檔案最早 mtime。此鏈必出一個日期 ——「ticketDate 抓不到」不再是 SKIP 觸發條件。
+   - **每 repo worktree 強制建立 + 自我修復重試**:沿用上方 point 2 的 `git worktree add -d`(detached,不另建 branch);建立失敗時依序 `git worktree prune` → 若目標路徑 `$WT_ROOT/<repo>` 殘留先 `git worktree remove --force` 再 `rm -rf` 該路徑 → 重試建立,重試上限 3 次以吸收暫態 lock / 殘留路徑。
+   - **「該 repo 報案前無任何 commit」≠ 失敗**:錨到該 repo **最早一筆 commit**(`git log --reverse --format=%H | head -1`),並在 notes 記「repo <X> 報案前無歷史,錨至首 commit」。此為確定性、非 HEAD 的錨定,不污染。
+   - **真正建不起來才硬中止**:對「機械性失敗」(lock / disk / path,非『報案前無碼』)重試 3 次後仍失敗 → 該分析以 `[ANCHOR-FAILED:<repo>:<reason>]` 標 INVALID 並**停止**,交 pipeline 重派 / 人工介入。**嚴禁改用主目錄當前 source 續跑**。
 
 5. **完成分析後清理**:
 
@@ -118,6 +123,24 @@ If you catch yourself thinking any of these, STOP:
 1. **Read Error Messages Carefully**:從 analytics 和 screenshot 萃取所有錯誤證據
 2. **Confirm Reproduction Path**:測試步驟 → 路由 → 元件檔案
 3. **Check Recent Changes — 雙路徑強制候選表**:
+
+   **§A ticket-id 權威前置 pass(強制,先於下方時間窗雙路徑候選表執行)** —— 此為 commit-analyzer 3a「全變體跨全 repo ticket-id 權威 pass」在 tracer 端的對稱補位,缺此即歷史 wrong-attribution 根因:
+
+   - 先 Read 共用鐵律 `/Users/user/aladdin/.claude/agents/_shared/fix-authority-ironlaw.md` 全文(與 Step 4 同檔同路徑;此處提前 Read,Step 4 沿用不重讀),嚴格遵 §A / §C。
+   - 依 §A 全變體 pattern 跨全部受查 repo(agrabah / abu / lago / rajah)grep 本 ticket 的 ticket-id(`NNNN` = 本案 ticket 數字;指令形式比照 commit-analyzer 3a)(此 git log 針對主目錄全歷史 `--all`,非 `$ALADDIN_ROOT_AT_DATE` worktree —— §A 須看報案後才合入的 fix commit,與 Step 3.6/3.7 同理;此為 commit 發現,不屬 Step -1 所禁的「用主目錄 source 跑五角度」):
+
+     ```bash
+     for repo in agrabah abu lago rajah; do
+       git -C /Users/user/aladdin/$repo log --all -i -E \
+         --grep='FAQ[-_ ]?NNNN' --grep='FQA[-_ ]?NNNN' \
+         --grep='(^|[^0-9])NNNN([^0-9]|$)' | head -20
+     done
+     ```
+
+     涵蓋標準 `[FAQ-NNNN]`/`(FAQ-NNNN)`/`FAQ-NNNN`、裸號 `[NNNN]`/`#NNNN`、複合前綴 `[品牌][...NNNN]`、拼字變體 `[FQA-NNNN]`/`FAQNNNN`/`FAQ_NNNN`、body 內 ticket-id。裸號命中須人工確認上下文確為本 ticket。若某 repo `head -20` 已滿(回 20 行,裸號變體常過度命中),必須對該 repo 改只用精確變體 `--grep='FAQ[-_ ]?NNNN' --grep='FQA[-_ ]?NNNN'`(去掉裸號 `--grep`,精確變體不會過度命中)重跑一次,確認沒有掛完全相同 ticket-id 的 commit 被截斷漏掉,才可判該 repo 無 §A 命中。
+   - 產出獨立「§A 權威候選表」(寫入 analysis-notes.md,與下方時間窗雙路徑表並列、不取代):每命中 commit 記 repo / hash / message / date,並 `git show <hash>` 讀 diff。
+   - **硬規則(gating)**:命中完全相同 ticket-id(任一變體)之 commit = 「§A 權威源頭候選」,必讀其 diff。下方時間窗雙路徑表照常跑、不得省略(保留既有覆蓋);但時間窗候選、及任何**不帶本 ticket-id 的下游 commit**,**不得用以排除或蓋過** §A 權威源頭候選(鏡像 3a「3b/3c/3e 不得覆蓋此結論」)。Step 3 主因判定依其下「§A 權威源頭 gating」硬規則處理。
+   - §A 全變體跨全 repo 皆無命中 → 無 §A 權威候選,照常續跑下方時間窗雙路徑表與五角度(不退步、不強造)。
 
    不准只查單一 repo。必須對下列四個 repo 各跑一次 `git log`,並產出**雙路徑候選表**才能進 Step 2:
 
@@ -218,6 +241,12 @@ If you catch yourself thinking any of these, STOP:
 **Hard rule**:任何一個 row 缺漏 / 寫「不確定」/ 沒有 file:line,都不准進 Step 3。
 
 ### Step 3: Phase 3 — Hypothesis Selection From Multi-Angle Evidence
+
+> **§A 權威源頭 gating(硬規則,凌駕本步驟下方啟發式)**:
+> - 若 Step 1.3 §A 權威前置 pass 產出 ≥1 §A 權威源頭候選,主因角度**必須**依共用鐵律 §C 對該權威 commit diff 判**源頭側**(資料被首次錯誤產生/轉換/寫入處,或契約/schema/協議定義處)為主因;偵測點、下游消費點、症狀渲染點即使五角度看似更貼近,只列連帶。
+> - 要以五角度 worktree 證據推翻 §A 權威候選為主因,門檻 = 附 file:line 反證證明「該 §A 權威 commit 並非本 ticket 症狀之 fix」(比照鐵律 §A.3 / §B 同級 file:line 嚴謹度);**禁止**以「下游也有寫死資料/下游也 APPLICABLE,故判下游為主因」這類 min-hop 理由覆蓋。
+> - 多顆 §A 權威候選 → 全讀 diff,依 §C 主因恆歸源頭側、companion 列連帶。
+> - Step 3.6 / 3.7 反向檢查維持,但其「不帶 ticket-id 的下游 commit 對齊」不得蓋過 §A 權威源頭候選。
 
 從 Step 2 列為 APPLICABLE 的角度中,選擇最具體、證據最強的那個作為 root cause。
 
@@ -345,6 +374,8 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
 
 ### Step 4: Already-Fixed Verification
 
+> **FIX-AUTHORITY IRON LAW(必讀必遵)**:在做任何「已修復 / 哪顆 commit 是 fix」判定前,必須 Read `/Users/user/aladdin/.claude/agents/_shared/fix-authority-ironlaw.md` 全文並嚴格遵守。其 §A(完全相同 ticket-id = 唯一第一權威,全變體跨四 repo grep)、§B(找不到才查 code,fallback 禁選別單/報案前 commit)、§C(多 commit 源頭優先,禁 min-hop)凌駕本 agent 任何「commit 字面像不像 fix」舊啟發式。Step 1.3 候選表蒐集 commit 時即適用 §A 全變體 grep;Step 3.6 / 3.7 反向檢查的 ticket-id 命中改判一律依本鐵律。
+
 只有完成 Step 2 五角度後,才能評估「已修復」claim:
 
 1. 從 Step 1.3 的 git log 中找到候選 fix commit
@@ -366,11 +397,19 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
 - abu worktree commit:<hash>(<commit date>)
 - lago worktree commit:<hash>(<commit date>)
 - rajah worktree commit:<hash>(<commit date>)
-- 若 SKIPPED:寫明原因,例如「analytics.md 無日期」或「worktree create failed: <error>」
+- 若任一 repo 報案前無歷史:寫明「repo <X> 錨至首 commit <hash>」(非 SKIP — Step -1 已無 SKIP 逃生口;真正錨定失敗為 [ANCHOR-FAILED] 硬中止,不產出本 notes)
 
 ### Git log 雙路徑候選表
 
 (從 Step 1.3 表格貼過來;四個 repo 各一 row,每 row 必填)
+
+### §A 權威候選表
+
+(從 Step 1.3 §A 權威前置 pass 貼過來;每命中 commit 一 row:repo / hash / message / date / 已讀 diff;若 §A 全變體跨全 repo 皆無命中,寫「無 §A 權威候選」)
+
+| repo | commit | message | date | 已讀 diff |
+|------|--------|---------|------|-----------|
+| ... | ... | ... | ... | ... |
 
 ### 症狀分類觸發器
 
@@ -518,3 +557,5 @@ alternative_paths:
 | 「已經有 X」類陳述沒附 file:line 原文 | LLM 補完幻覺;FAQ-2587 / FAQ-2301 / FAQ-2255 都因此誤判 |
 | analytics 描述與 ticket 原文 / 截圖歧異仍照 analytics 走 | FAQ-2856 整套五角度在錯誤頁面打轉 |
 | spec.md 含 SPEC_INCOMPLETE 但 Tracer 照抄「待補」結論 | FAQ-2830 漏 export 等配套;需從截圖 + commit 反向補規格 |
+| 多顆同 ticket-id commit 取「離症狀產出點最近 / hop 最小」者當主因 | 源頭優先;偵測點/下游不得因字面接近蓋過源頭。min-hop/hop≤1 守衛會反錨下游、重演 wrong-side(複驗抓到的反向矯枉過正教訓);依共用鐵律 §C |
+| Step 1.3 只跑時間窗 git log、不跑 §A 全變體跨全 repo ticket-id grep;或用不帶 ticket-id 的下游 commit 蓋過 §A 權威源頭 commit | tracer 對 commit-analyzer 3a 的對稱性缺口 = 歷史 wrong-attribution 根因(行為複驗抓到的 wrong-attribution 模式);依共用鐵律 §A 必前置全變體跨 repo 權威 pass,§C 源頭優先,下游不得蓋源頭 |
