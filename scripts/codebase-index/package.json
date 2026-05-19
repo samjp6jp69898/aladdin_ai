@@ -10,7 +10,10 @@
     "generate-indexes": "bun run generate-indexes.ts",
     "sync": "bun run sync-from-git.ts",
     "sync-dry": "bun run sync-from-git.ts --dry-run",
-    "sync-finalize": "bun run sync-from-git.ts --finalize"
+    "sync-finalize": "bun run sync-from-git.ts --finalize",
+    "test": "bun test",
+    "writeback-jsdoc": "bun run writeback-jsdoc.ts",
+    "writeback-jsdoc-dry": "bun run writeback-jsdoc.ts --dry-run"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"
