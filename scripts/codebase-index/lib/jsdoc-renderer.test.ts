@@ -87,4 +87,24 @@ describe('renderJsdoc', () => {
             ' */',
         ].join('\n'));
     });
+
+    test('inserts blank * separator between bullets and tags (idempotency for real methods)', () => {
+        const out = renderJsdoc({
+            description: { sentences: ['Desc.'] },
+            scenarios: { bullets: ['s1'] },
+            rules: { bullets: [] },
+            notes: { bullets: [] },
+            tags: { raw: '@param foo - the foo' },
+        }, '');
+        expect(out).toBe([
+            '/**',
+            ' * Desc.',
+            ' *',
+            ' * **業務場景**',
+            ' * - s1',
+            ' *',
+            ' * @param foo - the foo',
+            ' */',
+        ].join('\n'));
+    });
 });

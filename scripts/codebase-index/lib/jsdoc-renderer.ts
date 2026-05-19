@@ -31,6 +31,13 @@ export function renderJsdoc(parsed: ParsedJsdoc, indent: string): string {
     }
 
     if (parsed.tags.raw.trim()) {
+        const anyBulletRendered =
+            parsed.scenarios.bullets.length > 0 ||
+            parsed.rules.bullets.length > 0 ||
+            parsed.notes.bullets.length > 0;
+        if (anyBulletRendered) {
+            out.push(prefixBare);
+        }
         for (const line of parsed.tags.raw.split('\n')) {
             if (line.trim()) out.push(`${prefix}${line}`);
         }
