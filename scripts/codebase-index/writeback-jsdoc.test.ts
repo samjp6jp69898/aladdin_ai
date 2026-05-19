@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
-import { runWriteback, type WritebackAction } from './writeback-jsdoc.ts';
-import { readFile, copyFile } from 'node:fs/promises';
+import { runWriteback, loadProcessedActions, type WritebackAction } from './writeback-jsdoc.ts';
+import { readFile, writeFile, copyFile, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const FIXTURES = resolve(__dirname, 'lib/test-fixtures');
@@ -55,5 +55,25 @@ describe('runWriteback (trackEvent regression case)', () => {
         await runWriteback([action], { dryRun: true });
         const after = await readFile(SOURCE_WORK, 'utf-8');
         expect(after).toBe(before);
+    });
+});
+
+describe('loadProcessedActions parses pending-actions.json', () => {
+    test('handles bare array format without throwing', async () => {
+        // Save original pending-actions.json, write a minimal one, restore.
+        const ORIG_PATH = '/Users/user/aladdin/obsidian/scripts/codebase-index/pending-actions.json';
+        const BAK_PATH = ORIG_PATH + '.bak-test';
+        const orig = await readFile(ORIG_PATH, 'utf-8');
+        await writeFile(BAK_PATH, orig);
+        try {
+            await writeFile(ORIG_PATH, '[]');
+            const { loadProcessedActions } = await import('./writeback-jsdoc.ts');
+            const actions = await loadProcessedActions();
+            expect(Array.isArray(actions)).toBe(true);
+            expect(actions.length).toBe(0);
+        } finally {
+            await writeFile(ORIG_PATH, orig);
+            await rm(BAK_PATH);
+        }
     });
 });

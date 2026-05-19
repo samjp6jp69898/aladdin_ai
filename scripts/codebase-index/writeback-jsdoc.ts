@@ -58,7 +58,7 @@ function detectIndent(sourceText: string, jsdocStartLine: number): string {
 
 async function isFileDirty(filePath: string): Promise<boolean> {
     try {
-        const out = await $`git diff --quiet -- ${filePath}`.cwd(AGRABAH_REPO).quiet().nothrow();
+        const out = await $`git diff HEAD --quiet -- ${filePath}`.cwd(AGRABAH_REPO).quiet().nothrow();
         return out.exitCode !== 0;
     } catch {
         return false;
@@ -69,6 +69,16 @@ export async function runWriteback(
     actions: WritebackAction[],
     opts: WritebackOptions = {},
 ): Promise<WritebackReport> {
+    // Sort by source path, then by declarationLine DESCENDING so writes to higher
+    // line numbers don't shift the declarationLine of unprocessed actions in the
+    // same file.
+    const sortedActions = [...actions].sort((a, b) => {
+        if (a.sourceAbsPath !== b.sourceAbsPath) {
+            return a.sourceAbsPath.localeCompare(b.sourceAbsPath);
+        }
+        return b.declarationLine - a.declarationLine;
+    });
+
     const report: WritebackReport = {
         timestamp: new Date().toISOString(),
         summary: { actions_total: actions.length, files_modified: 0, actions_unchanged: 0, actions_skipped: 0 },
@@ -77,7 +87,7 @@ export async function runWriteback(
         skipped: [],
     };
 
-    for (const action of actions) {
+    for (const action of sortedActions) {
         const noteContent = await readFile(action.noteAbsPath, 'utf-8');
         const noteMatter = matter(noteContent);
 
@@ -148,16 +158,16 @@ interface PendingAction {
 
 export async function loadProcessedActions(): Promise<WritebackAction[]> {
     const raw = await readFile(PENDING_ACTIONS_PATH, 'utf-8');
-    const data = JSON.parse(raw) as { actions: PendingAction[] };
+    const data = JSON.parse(raw) as PendingAction[];
     const result: WritebackAction[] = [];
 
-    for (const action of data.actions) {
+    for (const action of data) {
         const status = action.status ?? 'pending';
         if (status !== 'processed') continue;
         if (!action.affectedNotes || action.affectedNotes.length === 0) continue;
 
         for (const note of action.affectedNotes) {
-            if (note.type !== 'rpc-method' && note.type !== 'service') continue;
+            if (note.type !== 'rpc-method' && note.type !== 'service-overview') continue;
             const noteAbsPath = note.path.startsWith('/') ? note.path : resolve(OBSIDIAN_ROOT, note.path);
             const noteContent = await readFile(noteAbsPath, 'utf-8');
             const fm = matter(noteContent).data;
