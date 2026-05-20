@@ -18,24 +18,26 @@ description: "根據 git 歷史紀錄增量更新 Obsidian Codebase 知識庫筆
 |------|------|
 | `bun run sync-from-git.ts --dry-run` | 預覽：列出會產生哪些 action，不實際修改 |
 | `bun run sync-from-git.ts` | 正式執行 Stage 1：收集 diff → 過濾噪音 → 分類 action → 輸出 `pending-actions.json` |
-| `bun run sync-from-git.ts --finalize` | 執行 Stage 3-4：跑自動化腳本 + 完整性檢查 + 產出報告 |
+| `bun run sync-from-git.ts --finalize` | 執行 Stage 3 + Stage 4：跑自動化腳本 + 完整性檢查 + 產出報告 + 寫回 JSDoc |
+| `bun run sync-from-git.ts --finalize --skip-writeback` | 跑 Stage 3 但跳過 Stage 4 寫回 |
+| `bun run writeback-jsdoc.ts --dry-run` | 獨立執行 Stage 4 預覽（不寫檔） |
 | `bun run sync-from-git.ts --since="2026-04-24" --until="2026-04-25"` | 指定時間範圍 |
 | `bun run sync-from-git.ts --commits=abc1234,def5678` | 指定特定 commit |
 
 所有指令的工作目錄：`obsidian/scripts/codebase-index/`
 
-## 完整工作流程（三階段）
+## 完整工作流程（四階段）
 
 ```
-Stage 1: sync-from-git.ts          Stage 2: AI Agent 處理          Stage 3: --finalize
-┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────────┐
-│ 收集 git diff       │     │ 讀 pending-actions   │     │ build-backlinks     │
-│ 過濾噪音 commit     │ ──► │ 按 action type 分派  │ ──► │ generate-indexes    │
-│ 解析 rajah 影響     │     │ 更新/新增筆記        │     │ generate-call-chain │
-│ 輸出 pending-actions│     │ 更新 last_scanned    │     │ 完整性檢查          │
-└─────────────────────┘     └──────────────────────┘     │ 產出 daily report   │
-                                                          │ 更新 sync-state     │
-                                                          └─────────────────────┘
+Stage 1: sync-from-git.ts          Stage 2: AI Agent 處理          Stage 3: --finalize              Stage 4: writeback-jsdoc
+┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────────┐     ┌─────────────────────────┐
+│ 收集 git diff       │     │ 讀 pending-actions   │     │ build-backlinks     │     │ 讀 status=processed     │
+│ 過濾噪音 commit     │ ──► │ 按 action type 分派  │ ──► │ generate-indexes    │ ──► │ rpc-method/service 筆記 │
+│ 解析 rajah 影響     │     │ 更新/新增筆記        │     │ generate-call-chain │     │ merge 回 source JSDoc   │
+│ 輸出 pending-actions│     │ 更新 last_scanned    │     │ 完整性檢查          │     │ source 優先、不 commit  │
+└─────────────────────┘     └──────────────────────┘     │ 產出 daily report   │     │ 寫 writeback-report.json│
+                                                          │ 更新 sync-state     │     │ 由 --finalize 自動觸發  │
+                                                          └─────────────────────┘     └─────────────────────────┘
 ```
 
 ### Stage 1：收集變更並分類
@@ -95,6 +97,43 @@ bun run sync-from-git.ts --finalize
 3. 對本次修改的筆記做完整性檢查（frontmatter 完整度、連結正確性）
 4. 產出 daily report（存入 `Codebase/_index/daily-reports/`）
 5. 更新 `sync-state.json` 的 `last_sync_date`
+6. **自動觸發 Stage 4 writeback**（除非帶 `--skip-writeback`）
+
+### Stage 4：寫回 source JSDoc
+
+```bash
+bun run writeback-jsdoc.ts --dry-run   # 預覽
+bun run writeback-jsdoc.ts             # 正式寫回
+```
+
+**自動觸發**：`sync-from-git.ts --finalize` 流程末尾會自動執行 Stage 4，可用 `--skip-writeback` 關閉。
+
+**邏輯**：讀 `pending-actions.json` 中 `status === "processed"` 的 action，對涉及的 `rpc-method` / `service-overview` 筆記，把內容合併寫回對應 source 檔案的 JSDoc 區塊。
+
+**合併策略**：
+- 對 `業務場景` / `相關規則與踩坑` / `備註` 三段：以 bullet 為單位做集合聯集；衝突時 source 版本贏（保留同事直接在 source 加的細節）
+- 對 `功能描述` 段：若 source 的每句都在 note 中 → 用 note（採用 Stage 2 改進）；若 source 含 note 沒有的句子 → 用 source（防止 trackEvent-style regression）
+- `@param` / `@returns` / `@throws` 等 `@` 標籤：從 source 整段原樣保留，不參與 merge
+
+**Section 對應表**：
+
+| Obsidian h2 | JSDoc section |
+|---|---|
+| `## 功能描述` | 主描述（單行內聯 `1) ... ；2) ...` 編號列表） |
+| `## 業務場景` | `**業務場景**` bullets |
+| `## 相關規則與踩坑` | `**相關規則與踩坑**` bullets |
+| `## 備註` | `**備註**` bullets |
+| 其他（輸入參數 / 回傳 / 呼叫關係 / 完整呼叫鏈 等） | 不寫回 JSDoc |
+
+**安全規則**：
+- 只動 working tree，**絕不 commit**；自行 `git diff` 確認後再 commit
+- `human_edited: true` 的筆記跳過
+- 對應 source 檔案在 working tree 有 uncommitted 改動（含 staged）→ 跳過該 action
+- source 上沒有 `/** */` JSDoc 區塊 → 跳過該 action（v1 不主動建立 JSDoc）
+- 跳過率 > 30% → 印 warning（但仍寫出已處理的部分）
+- 冪等：對相同 working tree 連跑兩次，第二次應全部 `unchanged`
+
+**輸出**：`obsidian/scripts/codebase-index/writeback-report.json`（git-ignored），包含 modified / unchanged / skipped 三個清單。
 
 ## 關鍵檔案
 
@@ -169,6 +208,7 @@ Stage 2 處理時只處理 `status === "pending"` 的 action，處理完逐條�
 3. **不得偽造連結**：`[[ ]]` 連結目標必須存在，或標記「待建立」
 4. **不得覆寫人類編輯**：`human_edited: true` 不可覆寫
 5. **不得跨 server 查 DB**：遵守微服務架構邊界
+6. **不得手工把 obsidian 內容貼回 source 當 JSDoc**：必須走 Stage 4 的 `writeback-jsdoc.ts` merge 流程；手工複製貼上會洗掉同事在 source 後加的註解（見 2026-05-19 trackEvent regression 事件，spec：`references/2026-05-19-jsdoc-writeback-design.md`）。
 
 ## 常見操作場景
 
