@@ -2,7 +2,7 @@
 name: test-validator
 description: Final test quality validator for v3 pipeline. Cross-checks written tests against prepare-test-desc.md required cases, identifies gaps, reruns tests to confirm they pass. Read-only — does not modify code.
 model: opus
-effort: Medium effort
+effort: medium
 permissionMode: bypassPermissions
 ---
 

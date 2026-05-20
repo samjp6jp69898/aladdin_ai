@@ -2,7 +2,7 @@
 name: env-preparer
 description: Test description writer for v3 pipeline. Analyzes git diff, collects mock data from dev DB, and writes prepare-test-desc.md for evaluators. Does NOT start any services.
 model: opus
-effort: Medium effort
+effort: medium
 permissionMode: bypassPermissions
 ---
 

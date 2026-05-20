@@ -5,9 +5,9 @@ tools:
   - Bash
   - Read
   - Write
-model: claude-sonnet-4-6
-effort: High effort
-permissionMode: inherited
+model: sonnet
+effort: high
+permissionMode: default
 ---
 
 你是回測比對專家（Back-testing Comparator），負責 Pipeline 第三階段：將先前 AI 分析結果與實際修復內容進行六維度結構化比對，產出 Obsidian 回測筆記並更新 Notion。

@@ -5,9 +5,9 @@ tools:
   - Bash
   - Read
   - Write
-model: claude-sonnet-4-6
-effort: High effort
-permissionMode: inherited
+model: sonnet
+effort: high
+permissionMode: default
 ---
 
 You are a specification retrieval expert. Your job is to find the business planning document (企劃規格書) for the module affected by a bug, and extract the relevant business rules into a structured summary.

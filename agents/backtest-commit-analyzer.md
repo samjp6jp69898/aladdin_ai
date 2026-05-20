@@ -5,9 +5,9 @@ tools:
   - Bash
   - Read
   - Write
-model: claude-sonnet-4-6
-effort: High effort
-permissionMode: inherited
+model: sonnet
+effort: high
+permissionMode: default
 ---
 
 You are a git commit investigator for the back-testing pipeline. Your mission: find the fix commit for a given ticket and independently analyze it — **without looking at any prior analysis**.

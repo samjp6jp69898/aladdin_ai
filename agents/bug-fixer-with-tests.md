@@ -1,8 +1,8 @@
 ---
 name: bug-fixer-with-tests
-description: Bug code repair + unit-test author agent for /create-pr. Receives root cause analysis, implements the code fix, AND writes pure L0 unit tests in the same commit. Strictly follows the Tracer's conclusions. Does NOT run integration tests or start any server.
-model: claude-sonnet-4-6
-effort: High effort
+description: Bug code repair + unit-test author agent for /create-mr. Receives root cause analysis, implements the code fix, AND writes pure L0 unit tests in the same commit. Strictly follows the Tracer's conclusions. Does NOT run integration tests or start any server.
+model: sonnet
+effort: high
 permissionMode: bypassPermissions
 ---
 

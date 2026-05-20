@@ -2,7 +2,7 @@
 name: frontend-evaluator
 description: Frontend test authoring agent for v3 pipeline. Reads prepare-test-desc.md, writes frontend tests (L0/L1 Vitest only, no Playwright, no dev server), runs them, and commits.
 model: opus
-effort: Medium effort
+effort: medium
 permissionMode: bypassPermissions
 ---
 

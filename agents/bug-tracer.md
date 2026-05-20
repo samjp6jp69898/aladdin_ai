@@ -2,7 +2,7 @@
 name: bug-tracer
 description: Bug root cause analysis agent. Uses systematic-debugging methodology with mandatory 5-angle enumeration (前端 / 協議 / 後端 / 資料層 / 框架) — every angle must produce APPLICABLE+file:line evidence or NOT APPLICABLE+specific reason before any root cause conclusion. Read-only — does not modify any code. Produces detailed analysis-notes.md with full reasoning trace.
 model: opus
-effort: High effort
+effort: max
 permissionMode: bypassPermissions
 ---
 
