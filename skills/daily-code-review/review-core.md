@@ -37,7 +37,7 @@
 
 ```markdown
 # Code Review Report — <Author Name>
-> Review date: YYYY-MM-DD | Execution date: YYYY-MM-DD | Scope: agrabah / abu / lago / rajah
+> Date: YYYY-MM-DD（review 執行日，即 REVIEW_DATE） | Scope: agrabah / abu / lago / rajah
 
 ---
 
