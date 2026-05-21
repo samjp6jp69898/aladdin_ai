@@ -1,9 +1,9 @@
 ---
-description: For 洋蔥 assigned tickets only. Analyzes, traces root cause (with mandatory method-call-graph evidence), fixes code + writes pure L0 unit tests in worktree (base = origin/dev), reviews via single solution-reviewer, then pushes branch and opens PR against dev. Skips ticket if not assigned to 洋蔥.
+description: For 洋蔥 assigned tickets only. Analyzes, traces root cause (with mandatory method-call-graph evidence), fixes code + writes pure L0 unit tests in worktree (base = origin/dev), reviews via single solution-reviewer, then pushes branch and opens MR against dev. Skips ticket if not assigned to 洋蔥.
 argument-hint: "<NotionURL> [ticket_id]"
 ---
 
-# /create-pr Pipeline (Analyze + Fix + Tests + PR)
+# /create-mr Pipeline (Analyze + Fix + Tests + MR)
 
 You are the pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch sub agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
 
@@ -11,7 +11,7 @@ You are the pipeline manager responsible for dispatching engineers. Your role is
 
 ## Parameters
 
-`$ARGUMENTS` format: `/analyze-single-bug <NotionURL> [ticket_id]`
+`$ARGUMENTS` format: `/create-mr <NotionURL> [ticket_id]`
 
 - **NotionURL** (required): The Notion URL of the bug ticket
 - **ticket_id** (optional): e.g. `FAQ-1702`; if not provided, parsed by Bug Report Analyst
@@ -31,7 +31,7 @@ total_attempt_count = 0
 review_result = ""            # PASSED / FAILED
 pipeline_status = ""          # success / already_fixed / i18n_manual_handoff / failed
 drive_link = ""
-pr_links = []
+mr_links = []
 affected_repos = []
 worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id} after Step 4
 ```
@@ -133,7 +133,7 @@ ticket_id: {ticket_id}
 
 Read analysis-notes.md：
 
-- 若 bug 確認已修復（有「已修復紀錄」section + commit hash） → 設 `pipeline_status = already_fixed`,從 analysis-notes.md「已修復紀錄」段抽取 commit hash 存為 `fixed_commit`（給 Step 7c Notion 留言用）,跳過 Steps 4-6,直接進 Step 7（**只跑 7a drive-uploader-pr,不跑 7b pr-pusher**)
+- 若 bug 確認已修復（有「已修復紀錄」section + commit hash） → 設 `pipeline_status = already_fixed`,從 analysis-notes.md「已修復紀錄」段抽取 commit hash 存為 `fixed_commit`（給 Step 7c Notion 留言用）,跳過 Steps 4-6,直接進 Step 7（**只跑 7a drive-uploader-mr,不跑 7b mr-pusher**)
 
 #### Check primary_fix_paths — i18n Manual Handoff Detection
 
@@ -141,7 +141,7 @@ Read analysis-notes.md：
 
 - 設定 `pipeline_status = i18n_manual_handoff`
 - 跳過 Steps 4-6（不建 worktree、不派 Fixer / Reviewer）
-- 直接進 Step 7（**只跑 7a drive-uploader-pr,不跑 7b pr-pusher**),傳入 `pipeline_status: i18n_manual_handoff` 並附 primary_fix_paths 解析後的 i18n key 清單
+- 直接進 Step 7（**只跑 7a drive-uploader-mr,不跑 7b mr-pusher**),傳入 `pipeline_status: i18n_manual_handoff` 並附 primary_fix_paths 解析後的 i18n key 清單
 
 若 primary_fix_paths 為混合（部分 i18n、部分 code）：保持正常流程,但在 Step 5 Bug Fixer dispatch prompt 中明示「i18n JSON 路徑禁止寫入,僅修 code 部分」,並要求 Fixer 把 i18n key 清單寫入 `{ticket_id}-i18n-keys-to-import.md`。
 
@@ -340,13 +340,13 @@ Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report
 
 ---
 
-### Step 7a: Drive Uploader PR
+### Step 7a: Drive Uploader MR
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader-pr.md`：
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader-mr.md`：
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader-pr.md} as the prompt. Please compile the solution document, upload to Google Drive, and return the Drive link.
+Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader-mr.md} as the prompt. Please compile the solution document, upload to Google Drive, and return the Drive link.
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
@@ -357,19 +357,19 @@ i18n_keys: {若 pipeline_status == i18n_manual_handoff,傳入 key 清單,否則 
 
 **Wait for completion.** 從輸出最後一行抽 `DRIVE_LINK: <url>`,存到 `drive_link`。
 
-failed 路徑 → drive-uploader-pr 會回傳 `DRIVE_LINK: N/A`。
+failed 路徑 → drive-uploader-mr 會回傳 `DRIVE_LINK: N/A`。
 
-### Step 7b: PR Pusher（僅 pipeline_status == success）
+### Step 7b: MR Pusher（僅 pipeline_status == success）
 
 **只有 `pipeline_status == success` 才執行本步驟。** already_fixed / i18n_manual_handoff / failed 路徑：完成 Step 7a 後**跳過本步驟**,直接進 Step 7c 由 manager 自處 Notion。
 
-從 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` 的「Bug 描述 / 標題」段抽取一句話 `bug_summary`（≤ 60 字,用於 PR title）。若該段超過 60 字,取第一句並改寫為動詞開頭簡潔描述。範例：「修復商城兌換點數時餘額顯示舊值的問題」。
+從 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` 的「Bug 描述 / 標題」段抽取一句話 `bug_summary`（≤ 60 字,用於 MR title）。若該段超過 60 字,取第一句並改寫為動詞開頭簡潔描述。範例：「修復商城兌換點數時餘額顯示舊值的問題」。
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/pr-pusher.md`：
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/mr-pusher.md`：
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/pr-pusher.md} as the prompt. Please push the worktree branch to origin, create a PR against dev, post a Notion comment with the Drive + PR links, and update the AI分析 field to 分析成功.
+Use all text in {/Users/user/aladdin/.claude/agents/mr-pusher.md} as the prompt. Please push the worktree branch to origin, create an MR against dev, post a Notion comment with the Drive + MR links, and update the AI分析 field to 分析成功.
 ticket_id: {ticket_id}
 page_id: {page_id}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
@@ -379,7 +379,7 @@ bug_summary: {bug_summary}
 solution_md_path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-solution.md
 ```
 
-**Wait for completion.** 抽 `PR_LINKS: [...]` 存到 `pr_links`,並從報告確認 `NOTION_AI_FIELD: ok`。
+**Wait for completion.** 抽 `MR_LINKS: [...]` 存到 `mr_links`,並從報告確認 `NOTION_AI_FIELD: ok`。
 
 ### Step 7c: Manager Notion Writeback（非 success 路徑）
 
@@ -459,7 +459,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 ### Step 8: Completion Report
 
 ```
-## {ticket_id} /create-pr Pipeline Complete
+## {ticket_id} /create-mr Pipeline Complete
 
 - Assignee check: PASSED (洋蔥 在當前指派)
 - Pipeline status: {pipeline_status}
@@ -468,8 +468,8 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 - Solution Reviewer: {review_result} at attempt {reviewer_attempt_count}
 - Total attempts: {total_attempt_count}
 - Google Drive: {drive_link}
-- PR(s):
-{對每個 affected_repo 列一行 "- {repo}: {pr_url}",若 pipeline_status != success 則整段顯示 "(N/A - {pipeline_status})"}
+- MR(s):
+{對每個 affected_repo 列一行 "- {repo}: {mr_url}",若 pipeline_status != success 則整段顯示 "(N/A - {pipeline_status})"}
 - Notion comment: completed
 - Notion AI分析: {分析成功 / 分析失敗}
 - Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (affected_repos: {affected_repos} 為 git worktree on landon/{ticket_id}，其餘為 symlink)
@@ -483,7 +483,7 @@ Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 
 ### Pipeline Failure
 
-任何步驟失敗（tracer / fixer / reviewer / drive-uploader-pr）超過重試上限,設定 `pipeline_status = failed`,跳過 Step 7b（pr-pusher）,進 Step 7c 由 manager 直接 curl Notion 留失敗訊息 + 「AI分析」=「分析失敗」。
+任何步驟失敗（tracer / fixer / reviewer / drive-uploader-mr）超過重試上限,設定 `pipeline_status = failed`,跳過 Step 7b（mr-pusher）,進 Step 7c 由 manager 直接 curl Notion 留失敗訊息 + 「AI分析」=「分析失敗」。
 
 **失敗路徑不上傳 Drive 文件、不開 PR、不留成功留言。**
 
