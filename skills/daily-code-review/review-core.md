@@ -28,7 +28,7 @@
 一份 Markdown 檔案 per author，存放於：
 
 ```
-/Users/user/aladdin/review/YYYYMMDD/<author_name>_YYYYMMDD.md
+/Users/user/aladdin/review/{REVIEW_LABEL}/<author_name>_{REVIEW_LABEL}.md
 ```
 
 ### 報告結構
@@ -37,7 +37,7 @@
 
 ```markdown
 # Code Review Report — <Author Name>
-> Date: YYYY-MM-DD（review 執行日，即 REVIEW_DATE） | Scope: agrabah / abu / lago / rajah
+> Review window: YYYY-MM-DD[ ~ YYYY-MM-DD] | Execution date: YYYY-MM-DD | Scope: agrabah / abu / lago / rajah
 
 ---
 

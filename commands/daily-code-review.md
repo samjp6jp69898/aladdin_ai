@@ -6,24 +6,32 @@ user-invocable: true
 
 # Daily Code Review v2 Workflow
 
-You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's **`feature/*` branches for commits not yet merged into `origin/pro`**, drop commits already recorded in the reviewed-commit ledger, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
+You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's **`feature/*` branches for commits not yet merged into `origin/pro` whose commit date falls within the requested date window**, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
 
 ## Review Scope
 
 - **Branches reviewed:** only `origin/feature/*` of `agrabah` / `abu` / `lago` / `rajah`. `origin/dev` is NOT reviewed. `origin/pro` is used only as the exclusion baseline.
-- **Commits reviewed:** every commit reachable from a `feature/*` branch but not from `origin/pro`, that is not yet in the reviewed-commit ledger. No date filter — each commit is reviewed exactly once, then recorded in the ledger.
+- **Commits reviewed:** every commit reachable from a `feature/*` branch but not from `origin/pro`, **whose commit date falls within the requested date window** (a single day or an inclusive range). Re-running a date window re-reviews it — there is no cross-run dedup.
 
 ## Parameters
 
-`$ARGUMENTS` format: `/daily-code-review [date] [concurrent]`
+`$ARGUMENTS` format: `/daily-code-review [date1] [date2] [concurrent]`
 
-- **date** (optional): Output label only, format `YYYYMMDD`. Names the report folder / files. Defaults to **today**. Does NOT affect which commits are reviewed.
-- **concurrent** (optional): Sub agents per batch, defaults to `5`.
+Arguments are position-free — each token is classified by shape:
+
+- **date1 / date2** (optional): 8-digit `YYYYMMDD`. Together they define the review date window (matched against **commit date**):
+  - **no date** → default to **yesterday** (single day)
+  - **one date** → that single day
+  - **two dates** → inclusive range; the earlier date is the start, the later the end (order is normalized — `20260520 20260515` also works)
+  - **three or more dates** → print usage and terminate
+- **concurrent** (optional): the non-8-digit number — sub agents per batch, defaults to `5`.
 
 Examples:
-- `/daily-code-review` → review all pending unmerged commits, output to today's folder, 5 per batch
-- `/daily-code-review 20260323` → same, output folder labelled 2026-03-23, 5 per batch
-- `/daily-code-review 20260323 3` → same, 3 per batch
+- `/daily-code-review` → review yesterday, 5 per batch
+- `/daily-code-review 20260520` → review 2026-05-20, 5 per batch
+- `/daily-code-review 20260515 20260520` → review 2026-05-15 ~ 2026-05-20, 5 per batch
+- `/daily-code-review 20260515 20260520 10` → same range, 10 per batch
+- `/daily-code-review 20260520 10` → review 2026-05-20, 10 per batch (`10` is not 8 digits → concurrent)
 
 ---
 
@@ -31,13 +39,20 @@ Examples:
 
 ### Step 0: Parse Parameters
 
-1. Parse `$ARGUMENTS`:
-   - First param is 8-digit number → `REVIEW_DATE`
-   - Second param is number → `CONCURRENT_COUNT`
-2. Defaults: `REVIEW_DATE` = today (macOS: `TZ=Asia/Taipei date +%Y%m%d`), `CONCURRENT_COUNT` = 5
-3. Derive `REVIEW_DATE_FMT="${REVIEW_DATE:0:4}-${REVIEW_DATE:4:2}-${REVIEW_DATE:6:2}"` (used only for the report header)
+1. Classify each whitespace-separated token in `$ARGUMENTS`:
+   - an 8-digit number → a **date**
+   - any other number → `CONCURRENT_COUNT`
+2. Resolve the **date window** from the collected dates:
+   - **0 dates** → `DATE_START = DATE_END =` yesterday (macOS: `TZ=Asia/Taipei date -v-1d +%Y%m%d`)
+   - **1 date** → `DATE_START = DATE_END =` that date
+   - **2 dates** → `DATE_START =` the earlier date, `DATE_END =` the later date (sort the pair)
+   - **≥3 dates** → print `Usage: /daily-code-review [date1] [date2] [concurrent]` and terminate
+3. `CONCURRENT_COUNT` defaults to `5` when no non-date number was given.
+4. Derive (with `fmt(d)` = `${d:0:4}-${d:4:2}-${d:6:2}`):
+   - `DATE_START_FMT = fmt(DATE_START)` and `DATE_END_FMT = fmt(DATE_END)` — `YYYY-MM-DD`, used for git date filtering and the report header
+   - `REVIEW_LABEL` = `DATE_START` for a single-day window, otherwise `${DATE_START}-${DATE_END}` (e.g. `20260520` or `20260515-20260520`)
 
-> **`REVIEW_DATE` is only an output label** — it names the report folder `review/{REVIEW_DATE}/`, the report filenames, and the CSV filename. It does NOT decide which commits are reviewed. Commit scope = "`origin/feature/*` branches not yet merged into `origin/pro`" minus the reviewed-commit ledger (see Step 2 / Step 2.2).
+> **`REVIEW_LABEL` only names the outputs** — the report folder `review/{REVIEW_LABEL}/`, the report filenames, and the CSV filename. The **date window `[DATE_START, DATE_END]`** decides which commits are reviewed: commit scope = "`origin/feature/*` branches not yet merged into `origin/pro`, with commit date inside the window" (see Step 2).
 
 ---
 
@@ -79,7 +94,7 @@ After all 4 repos are fetched, proceed to Step 2.
 
 ### Step 2: Scan All Repos — Collect Unmerged Commits + Author Workload
 
-For each of the 4 repos, list every commit reachable from an `origin/feature/*` branch but **not** reachable from `origin/pro`, with `--numstat` for line counts. `git log` walks the commit graph and emits each unique SHA only once across the supplied refs (automatic dedup); a `feature/*` branch already fully merged into `pro` contributes zero commits automatically.
+For each of the 4 repos, list every commit reachable from an `origin/feature/*` branch but **not** reachable from `origin/pro` **whose commit date is inside the date window**, with `--numstat` for line counts. `git log` walks the commit graph and emits each unique SHA only once across the supplied refs (automatic dedup); a `feature/*` branch already fully merged into `pro` contributes zero commits automatically.
 
 ```bash
 # Run on each repo: agrabah, abu, lago, rajah
@@ -89,13 +104,15 @@ For each of the 4 repos, list every commit reachable from an `origin/feature/*` 
 # word-split parameter expansion by default, which would pass the whole
 # list as one arg and silently yield zero commits.
 git -C /Users/user/aladdin/<repo> log --format="COMMIT_START|%an|%ae|%H|%s" --numstat \
+  --after="${DATE_START_FMT} 00:00:00" --before="${DATE_END_FMT} 23:59:59" \
   $(git -C /Users/user/aladdin/<repo> for-each-ref --format='%(refname)' \
     'refs/remotes/origin/feature/*' 2>/dev/null) \
   --not origin/pro
 ```
 
-- **No date filter** — commit scope is purely "in a `feature/*` branch, not in `pro`".
+- **Date filter** — `--after` / `--before` keep only commits whose **commit date** falls within `[DATE_START, DATE_END]`. For a single-day window `DATE_START_FMT` and `DATE_END_FMT` are the same date.
 - If a repo has zero `origin/feature/*` refs, the command has no positive ref → skip that repo (it contributes no commits).
+- If the scan yields zero commits across all 4 repos, print `[DONE] {REVIEW_LABEL} no commits in the date window to review.` and terminate.
 
 Parse the output to build a workload table per author:
 
@@ -107,7 +124,7 @@ Parse the output to build a workload table per author:
 - Subsequent lines with `<added>\t<deleted>\t<filepath>` are numstat → sum added+deleted per author
 - **Deduplicate by `%ae` (email), NOT by `%an`**. The canonical display name is the most recent `%an` observed for that email.
 - When collecting an author's commits in later steps, always filter by `%ae`, never by `%an`.
-- **Record the full SHA list per author per repo** — these drive the reviewed-commit ledger (Step 2.2) and each Review Agent's commit list (Step 5).
+- **Record the full SHA list per author per repo** — these drive each Review Agent's commit list (Step 5).
 
 ---
 
@@ -137,51 +154,7 @@ Known confusing pairs — treat each as distinct author and NEVER merge:
 
 **General rule: the `pkh_<name>` email prefix is NOT a reliable identity signal.** Always key off the full `%ae`, and when writing report filenames use the `%an` that actually appears on the commits you are reviewing.
 
-**Report filename rule:** `<%an>_<REVIEW_DATE>.md`. If two distinct emails happen to produce the same sanitized `%an` (extremely rare in this repo — not currently observed), disambiguate by appending the email local-part: `<%an>.<email-local>_<REVIEW_DATE>.md`. Before finalizing filenames, run a collision check and alert if any two distinct emails resolve to the same file.
-
----
-
-### Step 2.2: Reviewed-Commit Ledger — First-Run Seed or Filter
-
-The ledger guarantees each commit is reviewed exactly once across all runs, regardless of date.
-
-```bash
-LEDGER=/Users/user/aladdin/review/reviewed-commits.tsv
-```
-
-Format — one tab-separated line per reviewed commit, no header:
-
-```
-<repo>\t<full-sha>\t<run-date YYYYMMDD>
-```
-
-Dedup key = `<repo>` + `<full-sha>` (first two fields); the run-date is informational only. The file is a local, non-versioned working file — dedup is per-machine.
-
-**Branch on ledger existence:**
-
-| Situation | Action |
-|-----------|--------|
-| `$LEDGER` does NOT exist | **First run.** Append every commit collected in Step 2 to `$LEDGER` as `<repo>\t<sha>\t{REVIEW_DATE}`. Review nothing. Print the first-run message below and **terminate**. |
-| `$LEDGER` exists | For each Step 2 commit, drop it if a line whose first two fields equal `<repo>` + `<sha>` already exists in `$LEDGER`. Survivors = `PENDING_COMMITS`. |
-
-First-run message:
-
-```
-[FIRST RUN] Seeded ledger with N commits (agrabah a / abu b / lago c / rajah d).
-No review performed — all currently-unmerged commits are treated as the baseline.
-Subsequent runs review only newly-added unmerged commits.
-To force a full review instead: delete the ledger, `touch` an empty one, then re-run.
-```
-
-Existence check for one commit (matches if already reviewed):
-
-```bash
-grep -qF "$(printf '%s\t%s' "$repo" "$sha")" "$LEDGER"
-```
-
-After filtering:
-- If `PENDING_COMMITS` is empty → print `[DONE] {REVIEW_DATE} no new unmerged commits to review.` and terminate.
-- Otherwise trim the Step 2 workload table to `PENDING_COMMITS` only (recompute per-author commit counts and line totals), then proceed to Step 3.
+**Report filename rule:** `<%an>_<REVIEW_LABEL>.md`. If two distinct emails happen to produce the same sanitized `%an` (extremely rare in this repo — not currently observed), disambiguate by appending the email local-part: `<%an>.<email-local>_<REVIEW_LABEL>.md`. Before finalizing filenames, run a collision check and alert if any two distinct emails resolve to the same file.
 
 ---
 
@@ -231,9 +204,9 @@ For each agent, build the list of dimension files to read based on the group's D
 
 ### Step 4: Create Review Directory
 
-1. Ensure the directory exists: `/Users/user/aladdin/review/{REVIEW_DATE}/`
-2. Every author remaining after Step 2.2 has un-reviewed commits and must be reviewed — the reviewed-commit ledger is the authoritative dedup, so there is **no** separate "completed author" filter here. (Termination on an empty pending set is already handled in Step 2.2.)
-3. If a report file `{author}_{REVIEW_DATE}.md` already exists (e.g. a same-day re-run after new commits landed for an author already reported today), do NOT overwrite it — write this run's report with the next free suffix (`{author}_{REVIEW_DATE}_r2.md`, `_r3.md`, …) and track the actual filename for Steps 6–7.
+1. Ensure the directory exists: `/Users/user/aladdin/review/{REVIEW_LABEL}/`
+2. Every author from Step 2 has commits inside the date window and must be reviewed — there is **no** "completed author" filter. (Termination on an empty scan is already handled at the end of Step 2.)
+3. If a report file `{author}_{REVIEW_LABEL}.md` already exists (e.g. re-running the same date window), do NOT overwrite it — write this run's report with the next free suffix (`{author}_{REVIEW_LABEL}_r2.md`, `_r3.md`, …) and track the actual filename for Steps 6–7.
 
 ---
 
@@ -246,8 +219,7 @@ Take agents from the assignment list; each batch launches up to `CONCURRENT_COUN
 2. **Call multiple Agent tools simultaneously in a single message** — must not serialize
 3. Wait for all agents in batch to complete
 4. Confirm each author's report file exists
-5. **Append each confirmed author's reviewed commit SHAs to the ledger** — only after step 4 confirms the report file, append a line `<repo>\t<sha>\t{REVIEW_DATE}` to `/Users/user/aladdin/review/reviewed-commits.tsv` for every SHA collected for that author in Step 2 (skip SHAs already present)
-6. Repeat until all agents dispatched
+5. Repeat until all agents dispatched
 
 **Review Agent Prompt Template** (replace `{PLACEHOLDERS}` with actual values):
 
@@ -265,7 +237,7 @@ You are a senior code review expert for the Aladdin project. Follow the instruct
 
 ## Task Parameters
 - Authors: {AUTHOR_LIST} (format: "name|email" per line)
-- Review date label: {REVIEW_DATE_FMT} (REVIEW_DATE: {REVIEW_DATE}) — for the report header only
+- Review window: {DATE_START_FMT} ~ {DATE_END_FMT} (same date when a single day); REVIEW_LABEL: {REVIEW_LABEL} — for the report header only
 - Repo paths:
   - agrabah: /Users/user/aladdin/agrabah
   - abu: /Users/user/aladdin/abu
@@ -328,7 +300,7 @@ Cover all loaded review dimensions. Apply severity per the 5-level system in rev
 
 ### 5. Write this author's report BEFORE proceeding
 
-Write the report to: /Users/user/aladdin/review/{REVIEW_DATE}/{AUTHOR_NAME}_{REVIEW_DATE}.md
+Write the report to: /Users/user/aladdin/review/{REVIEW_LABEL}/{AUTHOR_NAME}_{REVIEW_LABEL}.md
 
 Follow the output format in review-core.md.
 
@@ -401,7 +373,7 @@ After ALL batches (Review + QA) are complete:
 2. Re-read each report file to get the final (post-QA) severity for each issue
 3. Only include P0 and P1 issues in the CSV
 
-Write to: `/Users/user/aladdin/review/{REVIEW_DATE}/CRITICAL_ISSUES_{REVIEW_DATE}.csv`
+Write to: `/Users/user/aladdin/review/{REVIEW_LABEL}/CRITICAL_ISSUES_{REVIEW_LABEL}.csv`
 
 **CSV Format:**
 
@@ -414,7 +386,7 @@ Rules:
 - Delimiter: comma `,`
 - If field contains comma, double-quote, or newline: wrap in double-quotes, escape internal double-quotes by doubling
 - Author field: author name (e.g. `ashliu`, `pkh_tom`)
-- Date field: the review run day = `REVIEW_DATE`, formatted `YYYY/MM/DD`
+- Date field: the review window — a single-day run uses `YYYY/MM/DD` (e.g. `2026/05/20`); a date-range run uses `YYYY/MM/DD-YYYY/MM/DD` (e.g. `2026/05/15-2026/05/20`)
 - 不需要 Severity 欄位（因為只收錄 P0 和 P1，級別已透過收錄門檻隱含）
 
 Example:
@@ -434,6 +406,5 @@ If file already exists, read current content, append new rows only (do not re-wr
 2. **Author deduplication**: Same author across multiple repos = one author, reviewed by one agent across all repos
 3. **Report naming**: Keep original author name from git `%an` even if it contains spaces/special chars
 4. **Agent independence**: Each sub agent reviews independently
-5. **Bootstrap flag**: Flag date = today (script execution date). `REVIEW_DATE` only labels the output folder / files — it does not affect which commits are reviewed
+5. **Bootstrap flag**: Flag date = today (script execution date), independent of the review window. The `date1` / `date2` arguments select which commits are reviewed (commit date inside the window); `REVIEW_LABEL` only names the output folder / files
 6. **QA is mandatory**: Every batch must go through QA before the next batch starts (but QA and the next batch's Review Agents can run in parallel if there are remaining batches)
-7. **Reviewed-commit ledger**: `review/reviewed-commits.tsv` is the single source of truth for "already reviewed". Append a commit's SHA only after its author's report file is confirmed written (Step 5). Never review a commit whose `<repo>\t<sha>` is already in the ledger
