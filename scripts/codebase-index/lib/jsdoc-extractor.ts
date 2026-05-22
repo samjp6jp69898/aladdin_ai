@@ -11,7 +11,7 @@ export interface JsdocBlock {
  */
 export function extractJsdocAbove(source: string, declarationLine: number): JsdocBlock | null {
     const lines = source.split('\n');
-    if (declarationLine < 2 || declarationLine > lines.length) {
+    if (!Number.isInteger(declarationLine) || declarationLine < 2 || declarationLine > lines.length) {
         return null;
     }
 

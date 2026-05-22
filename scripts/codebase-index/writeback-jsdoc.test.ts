@@ -1,5 +1,9 @@
 import { describe, test, expect } from 'bun:test';
 import { runWriteback, loadProcessedActions, type WritebackAction } from './writeback-jsdoc.ts';
+import { extractJsdocAbove } from './lib/jsdoc-extractor.ts';
+import { parseJsdoc } from './lib/jsdoc-parser.ts';
+import { renderJsdoc } from './lib/jsdoc-renderer.ts';
+import { normalizeKey, mergeBullets } from './lib/section-merger.ts';
 import { readFile, writeFile, copyFile, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -55,6 +59,70 @@ describe('runWriteback (trackEvent regression case)', () => {
         await runWriteback([action], { dryRun: true });
         const after = await readFile(SOURCE_WORK, 'utf-8');
         expect(after).toBe(before);
+    });
+});
+
+describe('merge engine bug fixes', () => {
+    test('single-line JSDoc: description carries no /** or */ literals', () => {
+        const source = [
+            'class X {',
+            '    /** 更新匯率 & 有效位數 & 顯示位數 */',
+            '    async methodUpdateRate() {}',
+            '}',
+        ].join('\n');
+        const block = extractJsdocAbove(source, 3);
+        expect(block).not.toBeNull();
+        const parsed = parseJsdoc(block!.text);
+        const desc = parsed.description.sentences.join('');
+        expect(desc).not.toContain('/**');
+        expect(desc).not.toContain('*/');
+        expect(desc).toContain('更新匯率');
+        // rendered output must not contain a nested open or a premature close
+        const inner = renderJsdoc(parsed, '    ').split('\n').slice(1, -1);
+        for (const l of inner) {
+            expect(l).not.toContain('*/');
+            expect(l).not.toContain('/**');
+        }
+    });
+
+    test('non-integer declarationLine returns null instead of crashing', () => {
+        const source = 'a\nb\nc';
+        expect(extractJsdocAbove(source, NaN)).toBeNull();
+        expect(extractJsdocAbove(source, '7' as unknown as number)).toBeNull();
+    });
+
+    test('normalizeKey: cosmetic variants compare equal', () => {
+        const a = normalizeKey('所有 method `@NoPublic`，不可由 Abu 直接呼叫，見 NoPublic、Internal Service。');
+        const b = normalizeKey('所有 method @NoPublic，不可由 Abu 直接呼叫，見「NoPublic」、「Internal Service」。');
+        expect(a).toBe(b);
+    });
+
+    test('mergeBullets: cosmetically reworded bullet does not duplicate', () => {
+        const source = ['所有 method `@NoPublic`，不可由 Abu 直接呼叫，見 NoPublic、Internal Service。'];
+        const note = ['所有 method @NoPublic，不可由 Abu 直接呼叫，見「NoPublic」、「Internal Service」。'];
+        const merged = mergeBullets(source, note);
+        expect(merged.length).toBe(1);
+        expect(merged[0]).toBe(source[0]); // exact match → source text preserved
+    });
+
+    test('mergeBullets: a note that strictly extends a source bullet wins, no dup', () => {
+        const source = ['置頂段只出現在第 1 頁：條件 is_pinned = 1 AND pin_expire_at > NOW()'];
+        const note = ['置頂段只出現在第 1 頁：條件 is_pinned = 1 AND pin_expire_at > NOW()，前提假設同時有效置頂量小於 pageSize'];
+        const merged = mergeBullets(source, note);
+        expect(merged.length).toBe(1);
+        expect(merged[0]).toBe(note[0]); // note extends source → note wins
+    });
+
+    test('mergeBullets: genuinely divergent bullets are both kept (conservative)', () => {
+        const source = ['冪等鍵 platform_id work_id 同一個 work_id 不會重發 見 notif_internal.ts:35'];
+        const note = ['冪等鍵 platform_id work_id 同一個 work_id 不會重發 見 notif_internal.ts:63'];
+        expect(mergeBullets(source, note).length).toBe(2);
+    });
+
+    test('parseJsdoc: a bare non-bullet line in a section is preserved', () => {
+        const jsdoc = ['/**', ' * **備註**', ' * [TBD: 需開發者補充]', ' */'].join('\n');
+        const parsed = parseJsdoc(jsdoc);
+        expect(parsed.notes.bullets).toContain('[TBD: 需開發者補充]');
     });
 });
 
