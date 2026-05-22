@@ -47,7 +47,7 @@ Dispatch prompt 會傳入 `i18n_keys` 清單（從 Tracer 的 primary_fix_paths 
 
 ## Working Environment
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，底下含 4 個主 repo 目錄：`agrabah`、`abu`、`lago`、`rajah`。其中 `affected_repos` 是真正的 git worktree 在 `landon/{ticket_id}` 分支，其餘是 symlink 指回主工作區。git diff 指令只對 `affected_repos` 中的 repo 執行（symlink 的 repo 沒有獨立的 git history）。
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，底下含 4 個主 repo 目錄：`agrabah`、`abu`、`lago`、`rajah`。其中 `affected_repos` 是真正的 git worktree 在 `mr/{ticket_id}` 分支，其餘是 symlink 指回主工作區。git diff 指令只對 `affected_repos` 中的 repo 執行（symlink 的 repo 沒有獨立的 git history）。
 **Affected repos:** `{affected_repos}` (provided in dispatch prompt) — 只有這些是真正的 git worktree。
 **Debug folder:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
 
@@ -155,7 +155,7 @@ metadata: v2
 （從 spec.md 提取關鍵業務規則段落）
 
 ### Branch 資訊
-- Branch：landon/{id}
+- Branch：mr/{id}
 - Commits：（git log --oneline origin/dev..HEAD 結果）
 ```
 

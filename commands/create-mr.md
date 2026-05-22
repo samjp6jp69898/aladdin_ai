@@ -167,7 +167,7 @@ Store as: `affected_repos`（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`）
 **目標結構（以 affected_repos = ["agrabah"] 為例）：**
 ```
 /Users/user/aladdin/worktrees/{ticket_id}/
-├── agrabah   (git worktree, branch landon/{ticket_id}, base origin/dev)
+├── agrabah   (git worktree, branch mr/{ticket_id}, base origin/dev)
 ├── abu       (symlink → /Users/user/aladdin/abu)
 ├── lago      (symlink → /Users/user/aladdin/lago)
 ├── rajah     (symlink → /Users/user/aladdin/rajah)
@@ -182,18 +182,21 @@ Store as: `affected_repos`（例如 `["agrabah"]` 或 `["agrabah", "rajah"]`）
 mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
 
 # 對 affected_repos 中的 repo 建立真正的 git worktree
+# 強制從最新 origin/dev 重建：先清掉殘留的舊 worktree 與舊分支，
+# 杜絕沿用落後 origin/dev 的 stale 分支（不再保留「沿用既有分支」的 fallback）
 for repo in {affected_repos}; do
   cd /Users/user/aladdin/$repo && git fetch origin dev --quiet
-  git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/dev 2>/dev/null \
-    || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+  git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
+  git branch -D mr/{ticket_id} 2>/dev/null
+  git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b mr/{ticket_id} origin/dev
 done
 
-# 驗證：affected_repos 中的 sub-worktree 全部都必須在 landon/{ticket_id}
+# 驗證：affected_repos 中的 sub-worktree 全部都必須在 mr/{ticket_id}
 ALL_OK=1
 for repo in {affected_repos}; do
   branch=$(git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current 2>/dev/null)
-  if [ "$branch" != "landon/{ticket_id}" ]; then
-    echo "WORKTREE_ERROR: $repo branch=$branch (expected landon/{ticket_id})"
+  if [ "$branch" != "mr/{ticket_id}" ]; then
+    echo "WORKTREE_ERROR: $repo branch=$branch (expected mr/{ticket_id})"
     ALL_OK=0
   fi
 done
@@ -283,8 +286,8 @@ If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
    mkdir -p /Users/user/aladdin/worktrees/{ticket_id}
    for repo in {affected_repos}; do
      cd /Users/user/aladdin/$repo && git fetch origin dev --quiet
-     git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/dev 2>/dev/null \
-       || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+     git branch -D mr/{ticket_id} 2>/dev/null
+     git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b mr/{ticket_id} origin/dev
    done
    # 不在 affected_repos 中的主 repo 用 symlink
    for repo in agrabah abu lago rajah; do
@@ -297,7 +300,7 @@ If Bug Fixer (or任何 sub-agent) returns `BRANCH_ERROR`:
      ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
    done
    ```
-2. 驗證 affected_repos 的 sub-worktree 都在 `landon/{ticket_id}`：
+2. 驗證 affected_repos 的 sub-worktree 都在 `mr/{ticket_id}`：
    ```bash
    for repo in {affected_repos}; do
      git -C /Users/user/aladdin/worktrees/{ticket_id}/$repo branch --show-current
@@ -362,6 +365,8 @@ failed 路徑 → drive-uploader-mr 會回傳 `DRIVE_LINK: N/A`。
 ### Step 7b: MR Pusher（僅 pipeline_status == success）
 
 **只有 `pipeline_status == success` 才執行本步驟。** already_fixed / i18n_manual_handoff / failed 路徑：完成 Step 7a 後**跳過本步驟**,直接進 Step 7c 由 manager 自處 Notion。
+
+> **分支基準新鮮度**：worktree 分支於 Step 4 從當下最新 `origin/dev` 建立,但本 pipeline 歷時可達數十分鐘,`origin/dev` 期間可能前進。mr-pusher 在 push 前會執行 Step 0.5「推前 rebase」重新校驗:落後則 rebase 到最新 `origin/dev` 再 push（衝突則 abort 並照原分支 push,於 Notion 留言標示需人工 rebase）。manager 無需額外傳參,此行為內建於 mr-pusher.md。
 
 從 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` 的「Bug 描述 / 標題」段抽取一句話 `bug_summary`（≤ 60 字,用於 MR title）。若該段超過 60 字,取第一句並改寫為動詞開頭簡潔描述。範例：「修復商城兌換點數時餘額顯示舊值的問題」。
 
@@ -472,7 +477,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 {對每個 affected_repo 列一行 "- {repo}: {mr_url}",若 pipeline_status != success 則整段顯示 "(N/A - {pipeline_status})"}
 - Notion comment: completed
 - Notion AI分析: {分析成功 / 分析失敗}
-- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (affected_repos: {affected_repos} 為 git worktree on landon/{ticket_id}，其餘為 symlink)
+- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (affected_repos: {affected_repos} 為 git worktree on mr/{ticket_id}，其餘為 symlink)
 
 Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```

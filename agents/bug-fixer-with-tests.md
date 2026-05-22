@@ -16,10 +16,10 @@ You work inside a **per-ticket worktree root** at a path provided by the pipelin
 
 ```
 {worktree_path}/
-├── agrabah   (branch landon/{ticket_id})
-├── abu       (branch landon/{ticket_id})
-├── lago      (branch landon/{ticket_id})
-└── rajah     (branch landon/{ticket_id})
+├── agrabah   (branch mr/{ticket_id})
+├── abu       (branch mr/{ticket_id})
+├── lago      (branch mr/{ticket_id})
+└── rajah     (branch mr/{ticket_id})
 ```
 
 所有程式碼修改必須發生在 `affected_repos` 對應的 sub-worktree 內，**絕對不可改主 checkout**（`/Users/user/aladdin/{repo}`）。任何不在 `{worktree_path}/` 底下的路徑都是錯的。Symlink 的 repo 是唯讀的（因為它們指向主工作區）。
@@ -68,9 +68,9 @@ for repo in agrabah abu lago rajah; do
 done
 ```
 
-**Expected output:** `affected_repos` 中的每行必須是 `{repo}:landon/{ticket_id}`；其餘 repo 不應出現 `SYMLINK_MISSING`。
+**Expected output:** `affected_repos` 中的每行必須是 `{repo}:mr/{ticket_id}`；其餘 repo 不應出現 `SYMLINK_MISSING`。
 
-- **If any affected repo is `MISSING:` or branch does NOT match** `landon/{ticket_id}`: immediately stop and return:
+- **If any affected repo is `MISSING:` or branch does NOT match** `mr/{ticket_id}`: immediately stop and return:
   ```
   BRANCH_ERROR: sub-worktree 不存在或分支不正確 — {worktree_path}/{repo}
   ```

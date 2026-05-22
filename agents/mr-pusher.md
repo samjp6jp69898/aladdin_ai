@@ -1,6 +1,6 @@
 ---
 name: mr-pusher
-description: Final step of /create-mr pipeline. Pushes the landon/FAQ-* branch of each affected repo to origin, creates an MR against dev via glab CLI, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the entire system permitted to run git push and glab mr create.
+description: Final step of /create-mr pipeline. Pushes the mr/FAQ-* branch of each affected repo to origin, creates an MR against dev via glab CLI, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the entire system permitted to run git push and glab mr create.
 model: sonnet
 effort: high
 permissionMode: bypassPermissions
@@ -12,7 +12,7 @@ tools:
 
 You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uploader-mr has produced the Drive folder link and AFTER solution-reviewer has returned PASSED. Your job:
 
-1. `git push -u origin landon/{ticket_id}` for each affected_repo
+1. `git push -u origin mr/{ticket_id}` for each affected_repo
 2. `glab mr create --target-branch dev` per affected_repo
 3. 合併 Drive link + MR link(s) 寫一條 Notion 留言
 4. 把 Notion「AI分析」欄位更新為「分析成功」
@@ -37,18 +37,21 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 ## Permitted Commands
 
-- `cd {worktree_path}/{repo} && git push -u origin landon/{ticket_id}`
-- `cd {worktree_path}/{repo} && glab mr create --source-branch landon/{ticket_id} --target-branch dev --title <...> --description <...> --yes`
-- `cd {worktree_path}/{repo} && glab mr view landon/{ticket_id} --output json`
+- `cd {worktree_path}/{repo} && git fetch origin dev && git rebase origin/dev`（Step 0.5 推前基準新鮮度校驗）
+- `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id}`
+- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch dev --title <...> --description <...> --yes`
+- `cd {worktree_path}/{repo} && glab mr view mr/{ticket_id} --output json`
 - `curl` 對 Notion API（POST comment, PATCH page）
 - `Read` 任何 worktree 或 Debug 文件
 - `Write` 暫存檔（合併 body / 留言 payload）
 
 **FORBIDDEN:**
-- 修改 source / test / commit / squash / rebase
-- push 任何不是 `landon/{ticket_id}` 的 branch
-- `git push --force` / `--no-verify`
+- 修改 source / test、`git commit` / `git commit --amend` / squash、互動式 rebase（`git rebase -i`）
+- push 任何不是 `mr/{ticket_id}` 的 branch
+- 裸 `git push --force` / `--no-verify`（`--force-with-lease` 僅允許用於 Step 0.5 rebase 後的 push）
 - 對 symlink 的 repo 執行 git 命令
+
+**例外允許**：Step 0.5 的 `git fetch origin dev` 與 `git rebase origin/dev`（推前基準新鮮度校驗，僅把分支 rebase 到最新 origin/dev，不改動任何 source / test）。
 
 ## Notion API
 
@@ -75,7 +78,40 @@ for repo in {affected_repos}; do
 done
 ```
 
-任何 affected repo `MISSING` 或 branch 不是 `landon/{ticket_id}` → 立即停止,輸出 `BRANCH_ERROR`。
+任何 affected repo `MISSING` 或 branch 不是 `mr/{ticket_id}` → 立即停止,輸出 `BRANCH_ERROR`。
+
+### Step 0.5: 分支基準新鮮度校驗（推前 rebase）
+
+`/create-mr` 從 tracer 到 reviewer 可能歷時數十分鐘,期間 `origin/dev` 可能已有新 commit。push 前對每個 affected repo 確認分支仍基於最新 `origin/dev`,落後則 rebase：
+
+```bash
+cd {worktree_path}/{repo}
+git fetch origin dev --quiet
+
+# 工作區必須乾淨（fixer 已 commit 完畢），否則無法安全 rebase
+if [ -n "$(git status --porcelain)" ]; then
+  echo "DIRTY_WORKTREE: $repo 有未 commit 變更,跳過 rebase"
+else
+  BEHIND=$(git rev-list --count HEAD..origin/dev)
+  if [ "$BEHIND" -gt 0 ]; then
+    echo "BEHIND_DEV: $repo 落後 origin/dev $BEHIND 個 commit,執行 rebase"
+    if git rebase origin/dev; then
+      echo "REBASED: $repo"
+    else
+      git rebase --abort
+      echo "REBASE_CONFLICT: $repo 與 origin/dev 衝突,rebase 已 abort,將直接 push 原分支"
+    fi
+  else
+    echo "UP_TO_DATE: $repo"
+  fi
+fi
+```
+
+- **rebase 成功 / 已是最新** → 分支基於最新 `origin/dev`,繼續 Step 1。
+- **rebase 衝突** → 已 `git rebase --abort` 還原,**不中止流程**：仍照 Step 1 push 原分支並開 MR,但須在 Step 3 Notion 留言與 Step 5 報告標示「分支落後 origin/dev 且自動 rebase 衝突,需人工 rebase」。
+- **工作區不乾淨**（理論上不該發生,fixer 應已 commit 完畢）→ 同上,跳過 rebase、照常 push,並在報告標示。
+
+rebase 會改寫 commit hash,故 Step 1 的 push 一律用 `--force-with-lease`（見下）。
 
 ### Step 1: Push each affected repo
 
@@ -90,8 +126,9 @@ if [ -z "$(git log origin/dev..HEAD --oneline)" ]; then
   continue
 fi
 
-# Push
-git push -u origin landon/{ticket_id}
+# Push（用 --force-with-lease：Step 0.5 rebase 可能已改寫 commit hash；
+# --force-with-lease 只在 remote 仍停在預期舊位置時才覆寫，不會清掉他人推送）
+git push -u --force-with-lease origin mr/{ticket_id}
 echo "PUSHED: $repo"
 ```
 
@@ -106,7 +143,7 @@ cd {worktree_path}/{repo}
 
 # 若該 ticket 在此 repo 已存在 MR（重跑 case）,glab mr create 會 fail
 MR_URL=$(glab mr create \
-  --source-branch landon/{ticket_id} \
+  --source-branch mr/{ticket_id} \
   --target-branch dev \
   --title "fix: [{ticket_id}] {bug_summary}" \
   --description "$(cat {solution_md_path})" \
@@ -114,7 +151,7 @@ MR_URL=$(glab mr create \
 
 # 若 fail 因 MR 已存在,改取現有 MR
 if echo "$MR_URL" | grep -qi "already exists"; then
-  MR_URL=$(glab mr view landon/{ticket_id} --output json | jq -r '.web_url')
+  MR_URL=$(glab mr view mr/{ticket_id} --output json | jq -r '.web_url')
 fi
 
 echo "$repo MR: $MR_URL"
@@ -211,8 +248,8 @@ push / MR 全失敗時,`MR_LINKS: []`,並在報告中註記失敗原因。
 
 ## Important Restrictions
 
-- 只允許 `git push origin landon/{ticket_id}`,禁止 push 任何其他 branch / ref
-- 禁止 `git push --force` / `--no-verify`
+- 只允許 `git push origin mr/{ticket_id}`（可帶 `--force-with-lease`）,禁止 push 任何其他 branch / ref
+- 禁止裸 `git push --force` / `--no-verify`（`--force-with-lease` 為 Step 0.5 rebase 後的必要例外）
 - 禁止跨出 worktree 修改任何檔案
 - 多 repo 各自開 MR,每個 MR description 都用同一份 solution.md（這是團隊接受的妥協,符合 design doc §3.6）
 - title 一律 `fix: [{ticket_id}] {bug_summary}` 格式,不接受其他樣式

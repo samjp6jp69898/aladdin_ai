@@ -14,7 +14,7 @@ You are a read-only solution reviewer for the `/create-mr` pipeline. Bug-fixer-w
 
 ## Working Environment
 
-**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄。`affected_repos` 是真正的 git worktree 在 `landon/{ticket_id}` 分支。
+**Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄。`affected_repos` 是真正的 git worktree 在 `mr/{ticket_id}` 分支。
 
 **Affected repos:** `{affected_repos}` (provided in dispatch prompt)。
 
@@ -46,7 +46,7 @@ for repo in {affected_repos}; do
 done
 ```
 
-任何 affected repo `MISSING` 或 branch 不是 `landon/{ticket_id}` → 立即停止,輸出 `BRANCH_ERROR` 並終止。
+任何 affected repo `MISSING` 或 branch 不是 `mr/{ticket_id}` → 立即停止,輸出 `BRANCH_ERROR` 並終止。
 
 ### Step 1: Read Tracer Analysis + Fixer Output
 
