@@ -15,12 +15,15 @@ const SECTION_HEADERS = {
 type SectionKey = 'description' | 'scenarios' | 'rules' | 'notes';
 
 function stripJsdocSyntax(jsdoc: string): string[] {
-    const raw = jsdoc.split('\n');
+    // Strip the block delimiters from the whole comment first, so a single-line
+    // `/** text */` — or text sharing a line with `/**` / `*/` — is handled,
+    // not only lines that are exactly `/**` or `*/`.
+    let body = jsdoc.trim();
+    if (body.startsWith('/**')) body = body.slice(3);
+    if (body.endsWith('*/')) body = body.slice(0, -2);
     const content: string[] = [];
-    for (const line of raw) {
-        const trimmed = line.trim();
-        if (trimmed === '/**' || trimmed === '*/') continue;
-        let stripped = trimmed;
+    for (const line of body.split('\n')) {
+        let stripped = line.trim();
         if (stripped.startsWith('* ')) stripped = stripped.slice(2);
         else if (stripped === '*') stripped = '';
         else if (stripped.startsWith('*')) stripped = stripped.slice(1);
@@ -71,9 +74,13 @@ export function parseJsdoc(jsdoc: string): ParsedJsdoc {
         if (current === 'description') {
             descLines.push(line);
         } else {
-            const m = line.match(/^- (.+)$/);
+            const m = line.match(/^-\s+(.+)$/);
             if (m) {
-                result[current].bullets.push(m[1]);
+                result[current].bullets.push(m[1].trim());
+            } else if (line.trim() && result[current].bullets.length === 0) {
+                // bare (non-`- `) line in a section — keep it instead of
+                // dropping it (e.g. a standalone `[TBD: ...]` note).
+                result[current].bullets.push(line.trim());
             }
         }
     }

@@ -1,41 +1,62 @@
 /**
- * Normalize a unit for key comparison: strip backticks/bold, unify full/half-width
- * parens, collapse whitespace, lowercase. Used only for matching, never for output.
+ * Reduce a unit to comparison form: drop all markup, quotes, brackets,
+ * whitespace and punctuation, keeping only letters/digits (incl. CJK), then
+ * lowercase. Used only for matching, never for output — this makes
+ * cosmetically reworded bullets (`code` vs 「code」, spacing, full/half-width
+ * punctuation) compare equal.
  */
 export function normalizeKey(text: string): string {
     return text
         .replace(/`([^`]+)`/g, '$1')
         .replace(/\*\*([^*]+)\*\*/g, '$1')
-        .replace(/[（(]/g, '(').replace(/[)）]/g, ')')
-        .replace(/\s+/g, ' ')
-        .replace(/[。、，；,.;\s]+$/u, '')
-        .trim()
+        .replace(/[^\p{L}\p{N}]/gu, '')
         .toLowerCase();
+}
+
+/**
+ * True when two normalized bullet keys denote the same bullet: identical, or
+ * (for long-enough keys) one fully contains the other — i.e. one side just
+ * appended detail to the other. The length floor stops a short generic bullet
+ * from spuriously matching inside an unrelated long one.
+ */
+function keysMatch(a: string, b: string): boolean {
+    if (!a || !b) return a === b;
+    if (a === b) return true;
+    if (Math.min(a.length, b.length) < 12) return false;
+    return a.includes(b) || b.includes(a);
 }
 
 /**
  * Bullet-level set union with source-priority on conflict.
  * Order: note's bullets first (keeps note order); source-only appended.
- * When a normalized key matches, source's exact text wins (preserves colleague edits).
+ * On a match: if the note bullet strictly extends the source bullet, the note
+ * version wins (it has source's content plus more); otherwise source's exact
+ * text wins (preserves colleague edits / detail the note lacks).
  */
 export function mergeBullets(sourceBullets: string[], noteBullets: string[]): string[] {
-    const sourceByKey = new Map<string, string>();
-    for (const u of sourceBullets) sourceByKey.set(normalizeKey(u), u);
-    const noteKeys = new Set(noteBullets.map(normalizeKey));
-
+    const sourceKeys = sourceBullets.map(normalizeKey);
+    const consumed = new Set<number>();
     const merged: string[] = [];
-    for (const u of noteBullets) {
-        const key = normalizeKey(u);
-        if (sourceByKey.has(key)) {
-            merged.push(sourceByKey.get(key)!);
+
+    for (const nb of noteBullets) {
+        const nk = normalizeKey(nb);
+        let matchIdx = -1;
+        for (let i = 0; i < sourceBullets.length; i++) {
+            if (consumed.has(i)) continue;
+            if (keysMatch(nk, sourceKeys[i])) { matchIdx = i; break; }
+        }
+        if (matchIdx === -1) {
+            merged.push(nb);
         } else {
-            merged.push(u);
+            consumed.add(matchIdx);
+            const sk = sourceKeys[matchIdx];
+            // note ⊋ source → note extended it → note wins; else keep source.
+            if (nk !== sk && nk.includes(sk)) merged.push(nb);
+            else merged.push(sourceBullets[matchIdx]);
         }
     }
-    for (const u of sourceBullets) {
-        if (!noteKeys.has(normalizeKey(u))) {
-            merged.push(u);
-        }
+    for (let i = 0; i < sourceBullets.length; i++) {
+        if (!consumed.has(i)) merged.push(sourceBullets[i]);
     }
     return merged;
 }

@@ -87,6 +87,17 @@ export async function runWriteback(
         skipped: [],
     };
 
+    // Snapshot which source files are dirty BEFORE any writes. A file we write
+    // to becomes dirty mid-run; a live `git status` check would then wrongly
+    // skip that file's remaining JSDoc blocks. The descending-line sort above
+    // keeps every declarationLine valid across multiple writes to one file.
+    const dirtyAtStart = new Set<string>();
+    for (const src of new Set(sortedActions.map((a) => a.sourceAbsPath))) {
+        if (src.startsWith(AGRABAH_REPO) && (await isFileDirty(src))) {
+            dirtyAtStart.add(src);
+        }
+    }
+
     for (const action of sortedActions) {
         const noteContent = await readFile(action.noteAbsPath, 'utf-8');
         const noteMatter = matter(noteContent);
@@ -96,13 +107,25 @@ export async function runWriteback(
             continue;
         }
 
-        const isInRepo = action.sourceAbsPath.startsWith(AGRABAH_REPO);
-        if (isInRepo && (await isFileDirty(action.sourceAbsPath))) {
+        if (dirtyAtStart.has(action.sourceAbsPath)) {
             report.skipped.push({ note: action.noteAbsPath, reason: 'source file has uncommitted changes' });
             continue;
         }
 
         const sourceText = await readFile(action.sourceAbsPath, 'utf-8');
+
+        // Guard against a stale `source_line`: if it no longer points at a real
+        // rpc-method (`async methodXxx`) or service class declaration, the note
+        // would be merged into the wrong place — skip rather than corrupt.
+        const declLine = sourceText.split('\n')[action.declarationLine - 1] ?? '';
+        if (!declLine.includes('async method') && !/\bclass\b/.test(declLine)) {
+            report.skipped.push({
+                note: action.noteAbsPath,
+                reason: 'declaration line is not a recognized method/class (stale source_line)',
+            });
+            continue;
+        }
+
         const block = extractJsdocAbove(sourceText, action.declarationLine);
         if (!block) {
             report.skipped.push({ note: action.noteAbsPath, reason: 'no JSDoc block found above declaration' });
