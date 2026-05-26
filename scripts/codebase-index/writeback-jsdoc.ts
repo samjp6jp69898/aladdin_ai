@@ -112,7 +112,16 @@ export async function runWriteback(
             continue;
         }
 
-        const sourceText = await readFile(action.sourceAbsPath, 'utf-8');
+        let sourceText: string;
+        try {
+            sourceText = await readFile(action.sourceAbsPath, 'utf-8');
+        } catch (err: any) {
+            if (err?.code === 'ENOENT') {
+                report.skipped.push({ note: action.noteAbsPath, reason: 'source file not found (deleted/renamed)' });
+                continue;
+            }
+            throw err;
+        }
 
         // Guard against a stale `source_line`: if it no longer points at a real
         // rpc-method (`async methodXxx`) or service class declaration, the note
