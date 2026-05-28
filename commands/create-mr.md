@@ -1,9 +1,9 @@
 ---
-description: For 洋蔥 assigned tickets only. Analyzes, traces root cause (with mandatory method-call-graph evidence), fixes code + writes pure L0 unit tests in worktree (base = origin/dev), reviews via single solution-reviewer, then pushes branch and opens MR against dev. Skips ticket if not assigned to 洋蔥.
+description: For 洋蔥 assigned tickets only. V6 pipeline — pre-check fast-path (73% 命中) → tracer (with mandatory method-call-graph evidence) → fixer-with-tests → single solution-reviewer → drive-uploader-mr → mr-pusher. 不跑 spec-fetcher（V5/V6 已驗證可砍）。Skips ticket if not assigned to 洋蔥.
 argument-hint: "<NotionURL> [ticket_id]"
 ---
 
-# /create-mr Pipeline (Analyze + Fix + Tests + MR)
+# /create-mr Pipeline (V6 — pre-check + Analyze + Fix + Tests + MR)
 
 You are the pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch sub agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
 
@@ -24,6 +24,9 @@ You are the pipeline manager responsible for dispatching engineers. Your role is
 ticket_id = ""
 page_id = ""                  # UUID format (8-4-4-4-12), extracted from Notion URL
 assignee_check_passed = false
+pre_check_verdict = ""        # "ALREADY_FIXED_HIGH" | "ALREADY_FIXED_MEDIUM" | "PRESS_ON"
+pre_check_evidence = ""       # commit hash / repo / merge-base 結果 / 文字摘要
+fixed_commit = ""             # ALREADY_FIXED_HIGH 路徑下從 pre-check 取得的 commit hash（給 Step 7c 留言用）
 tracer_attempt_count = 0
 fixer_attempt_count = 0
 reviewer_attempt_count = 0
@@ -88,17 +91,112 @@ SCREENSHOT_STATUS: ...
 
 ---
 
-### Step 2: Spec Fetcher
+### Step 2: Pre-Check (V6 核心 — fast-path 命中率 73%)
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/spec-fetcher.md`:
+Dispatch a general-purpose sub-agent with the following inline prompt (no separate agent file needed):
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/spec-fetcher.md} as the prompt. Please find the business specification for the affected module.
-ticket_id: {ticket_id}
+你是 /create-mr V6 pipeline 的 pre-check sub-agent。判定 {ticket_id} 是否已在 origin/dev 修復、或需要 PRESS_ON 進入 fix 階段。
+
+## 你的任務
+
+對 5 個 repo（agrabah, abu, lago, rajah, genie）跑下列流程，最多 3 階段。
+
+### Step 2a: Ticket-id grep（所有 repo 並行）
+
+對每個 repo 在 /Users/user/aladdin/{repo}/ 下跑：
+```bash
+git -C /Users/user/aladdin/{repo} log --all --oneline -i -E \
+  --grep='FAQ[-_ ]?{ticket_num}' \
+  --grep='(^|[^0-9]){ticket_num}([^0-9]|$)'
+```
+({ticket_num} = ticket id 去掉 FAQ- 前綴，例如 "1702")
+
+### Step 2b: 對命中 commit 驗證
+
+對每個命中 commit：
+```bash
+git -C /Users/user/aladdin/{repo} show {commit} --stat
+git -C /Users/user/aladdin/{repo} merge-base --is-ancestor {commit} origin/dev; echo $?
+git -C /Users/user/aladdin/{repo} branch -r --contains {commit} | head -10
 ```
 
-**Wait for completion.** If spec.md was not created, continue (graceful degradation).
+判定（依嚴格度）：
+- **ALREADY_FIXED HIGH**：commit message 帶 ticket id + merge-base exit 0（IN DEV）+ 修改檔與 ticket 描述對應 + 落地分支含 origin/dev / origin/pro（非 mr/exp-*、landon/*、exp/*、mr/FAQ-*）
+- **ALREADY_FIXED MEDIUM**：commit 在 dev 但與 analytics.md 提案的 fix 路徑有語意差異（不同 enum / 不同檔等）
+- **ALREADY_FIXED LOW**：commit 帶 ticket id 但 merge-base exit 非 0（只在 experiment / MR branch）
+- **PRESS_ON**：5 repo 全部 0 命中，或所有命中都是 LOW
+
+### Step 2c: Commit-message-fallback（僅當 Step 2a 全 5 repo 0 命中時跑）
+
+實際 commit 可能不帶 ticket id（例如 `feat(agent): 換線規則調整`）。兜底策略：
+
+1. 讀 ticket 報案日（從 analytics.md 或 stage1 ticket info）
+2. 抓 ticket 報案日起 +30 天範圍內，5 個 repo 的版本 tag list：
+   ```bash
+   git -C /Users/user/aladdin/{repo} tag --sort=creatordate --merged origin/dev | awk -v from="{report_date}" '$0 >= from'
+   ```
+3. 從 analytics.md 抓 ticket 描述提到的關鍵檔案（例如 `inventory_manager.ts`、`Personal.vue`），對每個檔案跑：
+   ```bash
+   git -C /Users/user/aladdin/{repo} log --oneline {first_tag}..{last_tag} -- {path/to/file}
+   ```
+4. 對候選 commit 跑 `git show {commit} --stat` + diff inspection，驗證 diff 邏輯是否對應 ticket 描述的症狀
+5. 若有匹配 commit 且在 origin/dev → 升級為 **ALREADY_FIXED MEDIUM**（commit-message-fallback 命中信心一律 MEDIUM，不給 HIGH）
+6. 若找不到匹配 commit → 維持 **PRESS_ON**
+
+### Step 3: 寫產出
+
+寫到 /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-pre-check.md：
+
+```
+# Pre-check — {ticket_id}
+
+## VERDICT: ALREADY_FIXED HIGH / MEDIUM / LOW / PRESS_ON
+
+## 證據
+- Repo: ...
+- Commit hash: ...
+- Commit message: ...
+- merge-base check: IN DEV / NOT IN DEV
+- Refs containing: origin/dev / origin/pro / mr/exp-* ...
+- 修改檔: ...
+- 與 ticket 對應: YES / PARTIAL / NO
+
+## 與 analytics 提案的差異（MEDIUM only）
+...
+
+## Commit-message-fallback（如有跑 Step 2c）
+- 候選 tag range: ...
+- 掃過的關鍵檔案: ...
+- 命中候選 commit: ...
+```
+
+紀律：
+- **禁止**：建 worktree、commit、push、修改 source code、跑 lint/test/build
+- **允許**：read-only git（log / show / merge-base / branch -r / tag）+ Read + Bash + Write {ticket_id}-pre-check.md
+- 預算：~3-5 分鐘 / 10-20 次工具呼叫
+
+回最後三行：
+PRE_CHECK_VERDICT: ALREADY_FIXED_HIGH / ALREADY_FIXED_MEDIUM / PRESS_ON
+PRE_CHECK_COMMITS: {repo}:{hash} | {repo}:{hash}（命中 commit 清單，PRESS_ON 時為 NONE）
+PRE_CHECK_AFFECTED_REPOS: [list]（從命中 commit 改的檔提取的 repo list，PRESS_ON 時為 []）
+```
+
+**Wait for completion.** 解析三個輸出：
+- `pre_check_verdict`
+- `pre_check_evidence`（從 pre-check.md 讀）
+- `affected_repos`（若 pre-check 已抓到）
+
+ALREADY_FIXED_HIGH 路徑下從 `PRE_CHECK_COMMITS` 取第一個 commit hash 存為 `fixed_commit`（給 Step 7c Notion 留言用）。
+
+#### Pre-check Fast-Path 分流
+
+| pre_check_verdict | 下一步 |
+|---|---|
+| `ALREADY_FIXED_HIGH` | 設 `pipeline_status = already_fixed`，**跳過 Steps 3-6**，直接進 Step 7（**只跑 7a drive-uploader-mr，不跑 7b mr-pusher**，由 7c manager 寫 Notion already_fixed 留言） |
+| `ALREADY_FIXED_MEDIUM` | 進 Step 3 bug tracer；tracer 須再驗證 commit 是否真的對應 ticket（可能升級為 already_fixed 或回退 PRESS_ON） |
+| `PRESS_ON` | 進 Step 3 bug tracer |
 
 ---
 
@@ -114,8 +212,12 @@ Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-t
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer-with-callgraph.md} as the prompt. Please analyze the bug, trace the root cause through the codebase, and write a detailed analysis document.
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+pre-check document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-pre-check.md
 ticket_id: {ticket_id}
+pre_check_verdict: {pre_check_verdict}
+
+⚠️ V6 紀律：§A 候選表必須對所有命中 commit 跑 `git merge-base --is-ancestor {commit} origin/dev`，merge-base exit 非 0 的 commit 一律不得當成「已修復」根據。pre-check.md 已給出嚴格的 commit list 作為參考。
+⚠️ 若 pre_check_verdict = ALREADY_FIXED_MEDIUM：須對 pre-check 抓到的 commit 做 deep verification — 比對 commit diff 與 ticket 描述症狀，若實際修法（即使檔案/enum 不同）能消除症狀則確認「已修復紀錄」並標記 fixed_commit；否則標記 PRESS_ON 並提完整 fix 路徑。
 ```
 
 **Re-dispatch after reviewer rejection (tracer_attempt_count > 1):**
@@ -124,9 +226,12 @@ ticket_id: {ticket_id}
 prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer-with-callgraph.md} as the prompt. Your previous analysis was rejected. Please re-analyze.
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
-spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+pre-check document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-pre-check.md
 reviewer feedback: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report.md
 ticket_id: {ticket_id}
+pre_check_verdict: {pre_check_verdict}
+
+⚠️ V6 紀律：§A 候選表必須對所有命中 commit 跑 `git merge-base --is-ancestor {commit} origin/dev`，merge-base exit 非 0 的 commit 一律不得當成「已修復」根據。
 ```
 
 **Wait for completion.**
@@ -241,7 +346,7 @@ Store affected repos: `affected_repos`（必須傳遞給所有 sub-agent）
 
 **Increment fixer_attempt_count. Increment total_attempt_count.**
 
-**Check hard cap: if total_attempt_count > 5, go to Pipeline Failure.**
+**Check hard cap: if total_attempt_count > 3, go to Pipeline Failure.**（V6 紀律：critical 路徑硬上限 3 次嘗試）
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-fixer-with-tests.md`:
 
@@ -339,7 +444,7 @@ Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report
 | review_result | Action |
 |---|---|
 | PASSED | Set `pipeline_status = success`,proceed to Step 7 |
-| FAILED | If `fixer_attempt_count < 3` AND `total_attempt_count ≤ 5` → return to Step 5（re-dispatch bug-fixer-with-tests with reviewer feedback；Step 5 entry 會負責 increment counts,本表不重複加）. If `fixer_attempt_count ≥ 3` OR `total_attempt_count > 5` → Pipeline Failure. |
+| FAILED | If `fixer_attempt_count < 2` AND `total_attempt_count < 3` → return to Step 5（re-dispatch bug-fixer-with-tests with reviewer feedback；Step 5 entry 會負責 increment counts,本表不重複加）. If `fixer_attempt_count ≥ 2` OR `total_attempt_count ≥ 3` → Pipeline Failure. |
 
 ---
 
@@ -352,9 +457,10 @@ prompt:
 Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader-mr.md} as the prompt. Please compile the solution document, upload to Google Drive, and return the Drive link.
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
-worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
+worktree_path: {/Users/user/aladdin/worktrees/{ticket_id} 或 N/A（pre-check fast-path 命中時為 N/A）}
 affected_repos: {affected_repos}
 pipeline_status: {pipeline_status}
+pre_check_verdict: {pre_check_verdict}
 i18n_keys: {若 pipeline_status == i18n_manual_handoff,傳入 key 清單,否則 N/A}
 ```
 
@@ -464,9 +570,11 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 ### Step 8: Completion Report
 
 ```
-## {ticket_id} /create-mr Pipeline Complete
+## {ticket_id} /create-mr Pipeline Complete (V6)
 
 - Assignee check: PASSED (洋蔥 在當前指派)
+- Pre-check verdict: {pre_check_verdict}
+- Path taken: {fast-path | full}（ALREADY_FIXED_HIGH 為 fast-path，其他為 full）
 - Pipeline status: {pipeline_status}
 - Bug Tracer (with call-graph) attempts: {tracer_attempt_count}
 - Bug Fixer (with tests) attempts: {fixer_attempt_count}
@@ -477,7 +585,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 {對每個 affected_repo 列一行 "- {repo}: {mr_url}",若 pipeline_status != success 則整段顯示 "(N/A - {pipeline_status})"}
 - Notion comment: completed
 - Notion AI分析: {分析成功 / 分析失敗}
-- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (affected_repos: {affected_repos} 為 git worktree on mr/{ticket_id}，其餘為 symlink)
+- Worktree root: /Users/user/aladdin/worktrees/{ticket_id} 或 N/A（fast-path 命中時無 worktree）
 
 Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
@@ -496,11 +604,30 @@ Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 
 ```
 {ticket_id} pipeline 失敗,需要人工介入。
+- Pre-check verdict: {pre_check_verdict}
 - Bug Tracer 嘗試：{tracer_attempt_count} 次
 - Bug Fixer 嘗試：{fixer_attempt_count} 次
 - 總嘗試：{total_attempt_count} 次
 - Reviewer 結果：{review_result}
 - 失敗原因：{最後一次 reviewer / tracer / fixer 退回理由摘要}
-- Worktree 保留在：/Users/user/aladdin/worktrees/{ticket_id}
+- Worktree 保留在：/Users/user/aladdin/worktrees/{ticket_id} 或 N/A（fast-path 失敗無 worktree）
 - 文件位於：/Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
+
+---
+
+## V6 同步設計依據
+
+| 變更 | 設計依據 |
+|---|---|
+| 新增 pre-check fast-path | 與 /analyze-single-bug V6 對齊。V6-Light 100 張驗證：73% fast-path 命中率，省 tracer + fixer + reviewer + worktree 整段成本 |
+| ALREADY_FIXED_HIGH 不開 MR | fast-path 命中 = bug 已在 origin/dev 修復，重開 MR 屬冗餘；只跑 7a drive-uploader-mr + 7c manager 留 already_fixed 訊息 |
+| 砍 spec-fetcher | 與 /analyze-single-bug V6 對齊。spec 內容可由 tracer 階段直接讀,不需獨立 agent |
+| Hard cap 3 | 與 /analyze-single-bug V6 critical 路徑對齊。從 V5 的 5 降到 3,避免無限重試浪費 |
+| 保留 1× solution-reviewer | 不採用 V6 critical 的 2× parallel reviewer。solution-reviewer 已做 5 維度檢查,且 MR 流程下游 mr-pusher 還有 rebase 與 push 校驗,redundancy 已足夠 |
+| 不引入 complexity routing | /create-mr 的目的就是「自動產出 MR」,V6 simple 路徑（純文字 fix plan 不 commit）與此目的矛盾,因此所有非 ALREADY_FIXED 的 ticket 都走 critical-style 流程 |
+
+## 已知限制
+
+- **commit-message-fallback 仍可能漏判**：tag-range + diff inspection 是兜底,但仍依賴關鍵檔名能從 analytics 抽出
+- **ALREADY_FIXED_MEDIUM 需 tracer deep verification**：pre-check 信心 MEDIUM 時不直接跳 fast-path,而是進 tracer 重新驗證,避免誤判已修復而漏發 MR
