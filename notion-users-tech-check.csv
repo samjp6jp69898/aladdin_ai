@@ -1,0 +1,90 @@
+notion_user_name,notion_user_id,email,git_emails,is_technical,pushed_repos,match_method
+Ailesax,9a935d66-9398-466d-b767-ba1a25acacdf,pkh_ailesax@photons.com.tw,pkh_ailesax@photons.com.tw,Y,abu;agrabah;lago;rajah,email
+Anthone Hung KHH,0ffb8fb6-8161-4e3f-8025-fae8241c9235,pkh_anthone@photons.com.tw,pkh_anthone@photons.com.tw,Y,abu;agrabah;lago;rajah,email
+benson,99e924be-0366-459a-8ce7-37a46f07e417,pkh_benson@photons.com.tw,pkh_benson@photons.com.tw,Y,abu;agrabah;genie;lago;rajah,email
+Blast,ed581589-9b3e-4362-b91f-c7ae4140f6c3,pkh_blast@photons.com.tw,pkh_blast@photons.com.tw,Y,agrabah;rajah,email
+Chaosheng Wang KHH,35d53111-6270-4add-98ee-8d58f1af8cbe,pkh_chao@photons.com.tw,pkh_chao@photons.com;pkh_chao@photons.com.tw,Y,abu;agrabah;jafar;lago;rajah,email;email-localpart
+Eden Li KHH,562c1ebd-0bb8-4501-8fff-1e133eb66b95,pkh_eden@photons.com.tw,pkh_eden@photons.com.tw,Y,abu;lago;rajah,email
+Forrest Hsia KHH,21b3d1fa-2dbc-4abc-bd56-4fc59a8fe4e4,pkh_forresthsia@photons.com.tw,pkh_forresthsia@photons.com.tw,Y,agrabah;rajah,email
+Gerubana,aacd5807-9b3a-4d8b-bef7-549ea7ccc703,pkh_gerubana@photons.com.tw,pkh_gerubana@photons.com.tw,Y,abu;lago;rajah,email
+Gghotss Hsieh KHH,9fc632d0-dbf2-40f5-aa6e-6450fe53e4a8,pkh_gordon@photons.com.tw,pkh_gordon@photons.com.tw,Y,abu;agrabah;genie;lago;rajah,email
+Howard,196d872b-594c-8188-983e-00027a1d20e0,pkh_howard@photons.com.tw,pkh_howard@photons.com.tw,Y,abu;lago;rajah,email
+Jeff Kuo KHH,02fa9aaa-0b4e-495c-8953-394ce25f23c0,pkh_jeffrey@photons.com.tw,pkh_jeffrey@photons.com.tw,Y,abu;lago;rajah,email
+Joshlin Lin KHH,75670581-b697-47f2-9b04-9abdfedc0f49,pkh_chienhung@photons.com.tw,pkh_chienhung@photons.com.tw,Y,abu;jafar;lago;rajah,email
+Kevin KHH,11ad872b-594c-817d-b887-00024db1072c,pkh_kevin@photons.com.tw,kevin198@laptop-ut8m0ut1.;pkh_kevin@photons.com.tw,Y,abu;lago;rajah,email;name-as-email
+KHH Ash Liu,1d1d872b-594c-8131-a3bf-00026a67069c,pkh_twashliu@photons.com.tw,phk_twashliu@photons.com.tw,Y,agrabah;rajah,email-localpart
+KHH Ben Huang,319d872b-594c-81c2-a2c3-0002150774cd,pkh_ben@photons.com.tw,pkh_ben@photons.com.tw,Y,agrabah,email
+KHH Evelyn Lin,9208f5e1-d4ab-4a54-9ce6-80d62b174e93,pkh_evelyn@photons.com.tw,pkh_evelyn@photons.com.tw,Y,agrabah;lamp;rajah,email
+KHH Hiro Hsu,193d872b-594c-815d-959a-000283daad9b,pkh_hiro@photons.com.tw,pkh_hiro@photons.com.tw,Y,abu;agrabah;jasmine;rajah,email
+KHH Ian Lin,fe23c640-2341-427c-9342-7c0bf289ded0,pkh_ian.lin@photons.com.tw,pkh_ian.lin@photons.com.tw,Y,abu;lago;rajah,email
+KHH Jeffrey Hsieh,333d872b-594c-817c-9fcb-00021117107f,pkh_ian.h@photons.com.tw,pkh_ian.h@photons.com.tw,Y,abu;agrabah;lago;rajah,email
+KHH Jonathan Lee,1f8d872b-594c-8160-adef-00020433cc48,pkh_aceryue@photons.com.tw,pkh_aceryue@photons.com.tw,Y,agrabah;rajah,email
+KHH Kawa Lin,1f1d872b-594c-815f-891b-000250879bc1,pkh_renchuan@photons.com.tw,pkh_renchuan@photons.com.tw,Y,abu;agrabah;genie;rajah,email
+KHH Landon Lo,11ad872b-594c-8196-a694-0002759ea4f7,pkh_samjp6jp69898@photons.com.tw,85883294+samjp6jp69898@users.noreply.github.com;pkh_samjp6jp69898@photons.com.tw,Y,abu;agrabah;lago;lamp;obsidian;rajah,email;email-github-noreply
+KHH Tom Pan,118d872b-594c-81e7-9b42-0002a1bf4cda,pkh_tom@photons.com.tw,pkh_tom@photons.com.tw,Y,agrabah;rajah,email
+KHH Well,b402fe3a-5fa1-486c-ab50-143ced7d80fe,pkh_dabau975@photons.com.tw,pkh_dabau975@photons.com.tw,Y,abu;lago;rajah,email
+KHH Wenrong Wu,286d872b-594c-814e-95eb-000212cd7ddf,pkh_wenrong@photons.com.tw,pkh_wenrong@photons.com.tw,Y,abu;agrabah;rajah,email
+leon chen,8e75e43a-3a4d-43fe-a9cb-bef0b37211d3,pkh_leon.chen@photons.com.tw,pkh_leon.chen@photons.com.tw,Y,agrabah,email
+Mark,39991686-f4f2-4e6a-a061-88f7eb41c186,ippan@photons.com.tw,ippan@photons.com.tw,Y,Sally;abu;agrabah;cassim;genie;jafar;jasmine;lago;rajah,email
+Max Yeh KHH,7c5162d8-3ca6-4349-9aa3-04595c5d0d50,pkh_maxyeh666@photons.com.tw,pkh_maxeh666@photons.com.tw;pkh_maxyeh666@photons.com.tw,Y,abu;lago;rajah,email;name
+Ming,fc0650d0-babc-4d48-ae07-eb50b4fb57e7,pkh_ming0802@photons.com.tw,pkh_ming0802@photons.com.tw,Y,abu;agrabah;lago;rajah,email
+Nanami,223d872b-594c-81b2-89be-0002b418f214,pkh_nora0110@photons.com.tw,pkh_nora0110@photons.com.tw,Y,agrabah,email
+Naxa,34f1c3fc-85cb-40ab-bbe5-3e6491d6ed05,pkh_naxaliu724@photons.com.tw,pkh_naxaliu724@photons.com.tw,Y,abu;lago;rajah,email
+PandaWu,c4a1b688-3af4-4eed-af3d-bbe982c5ea6c,pkh_arthuras@photons.com.tw,pkh_arthuras@photons.com.tw,Y,agrabah;rajah,email
+Raye Pan KHH,4b6d4141-ada3-403a-9fac-83817a4ee43b,pkh_rayeee@photons.com.tw,pkh_rayeee@photons.com.tw,Y,abu;agrabah;cassim;genie;jafar;lago;lamp;rajah,email
+Saka Li KHH,f700aa2f-4e3e-4109-9eb9-ca997f0bd069,pkh_saka@photons.com.tw,saka@example.com,Y,abu;lago,name
+Shiro/Sheila Lo,317d872b-594c-81a3-82ea-0002768a2d32,pkh_sheila@photons.com.tw,pkh_sheila@photons.com.tw,Y,agrabah;rajah,email
+Ting-xuan TPE,84f9155e-7771-4aaf-af08-6a11265c1c06,ptp_ting-xuan@photons.com.tw,ptp_ting-xuan@photons.com.tw,Y,abu;genie;jafar;jasmine;lago;rajah,email
+Uber KHH,058e91f7-3e37-45c0-8cb2-61bc0cbe8278,pkh_enix@photons.com.tw,pkh_enix@photons.com.tw,Y,rajah,email
+Vic Tsai KHH,76c8e137-b24c-4fdb-acd9-1f2243d3f9da,pkh_vic1228@photons.com.tw,pkh_vic1228@photons.com.tw,Y,abu;jafar;lago;rajah,email
+yifong,279626aa-b4ef-44b8-8811-4ac4959300f5,pkh_chengyifong@photons.com.tw,pkh_chengyifong@photons.com.tw,Y,agrabah;rajah,email
+Yotsai Su KHH,bc94611a-b798-4f7b-b79c-3f2768b6ecc1,pkh_yotsai@photons.com.tw,pkh_yotsai@photons.com.tw;r8613266@gmail.com,Y,abu;agrabah;genie;jafar;lago;rajah,email;name
+洋蔥,541fdd40-1690-4483-a258-50d2949787da,pkh_farus@photons.com.tw,pkh_farus@photons.com.tw,Y,abu;agrabah;genie;lago;rajah,email
+Alu,67e81e57-069a-41d1-a9e0-e6be6e4c5c72,pkh_alu@photons.com.tw,,N,,
+Andy,850664ca-0355-4ba2-b12d-8096c6b758a0,pkh_andy@photons.com.tw,,N,,
+Ayre Lu KHH,220befc1-f075-4ff9-a38b-0018628361c5,pkh_enyi1201007@photons.com.tw,,N,,
+Baxiao Wu KHH,3ea009e9-36a1-4e84-94f1-e364f59d07cb,pkh_tigercar@photons.com.tw,,N,,
+Benro Lin KHH,9ab6d6a5-ad7c-4649-aa96-f39290066910,pkh_husky@photons.com.tw,,N,,
+Blue Yang KHH,576732c2-ef89-4689-b611-f082a58163c7,pkh_soblue497@photons.com.tw,,N,,
+Bobo Chen KHH,2ef7fcf1-31dc-46c9-bf49-9672d5bffe25,pkh_yq8213@photons.com.tw,,N,,
+Brian Chen KHH,2e8d872b-594c-81b2-ac30-00025b6d9efa,pkh_brian@photons.com.tw,,N,,
+Crimson,e41adae7-a02f-4521-a5ed-893319cab74a,pkh_crimson@photons.com.tw,,N,,
+Ct Huang KHH,95770f09-186d-473c-a5d1-c9890af1dacd,pkh_cthuang@photons.com.tw,,N,,
+door the,193d872b-594c-815a-84ae-00029f1bb733,pkh_thedoor@photons.com.tw,,N,,
+Ekko,1e4d872b-594c-8152-8366-00027b6bd673,pkh_ekko818@photons.com.tw,,N,,
+Elaine Chiang KHH,d890f34b-5f77-406c-880a-42950ae5a75b,pkh_elaine@photons.com.tw,,N,,
+eling,20ad872b-594c-810f-a6d5-00022eea9acc,pkh_eling@photons.com.tw,,N,,
+EMMA,5419ec4b-fc15-486a-9f00-a306ecbd20cf,pkh_playstaremma@photons.com.tw,,N,,
+Evil Evil,3ba5b230-097c-47c9-aa3e-b10987becb1d,evil@redfin.tech,,N,,
+Jacob Yang KHH,27fd872b-594c-817f-8fef-00025fb011b1,pkh_jacob@photons.com.tw,,N,,
+KHH Angelo Chen,20ed872b-594c-81c5-964e-00020ca32df0,pkh_angelo.chen@photons.com.tw,,N,,
+KHH Belinda Yeh,1ddd872b-594c-818c-81fa-0002652baa90,pkh_belinda@photons.com.tw,,N,,
+KHH Chun,196d872b-594c-815e-a46d-00025eb9e446,pkh_chun@photons.com.tw,,N,,
+KHH Conrad Lin,1ced872b-594c-8119-ab64-0002e1cebc59,pkh_conrad@photons.com.tw,,N,,
+KHH Ethan Hong,29bd872b-594c-8180-b607-00021e779820,pkh_ethan@photons.com.tw,,N,,
+KHH Hannah Hsu,222d872b-594c-8159-97e0-00025ff72784,pkh_hannah162@photons.com.tw,,N,,
+KHH Hugo Sun,22ad872b-594c-81a5-bb2c-00028d7861e0,pkh_hugo@photons.com.tw,,N,,
+KHH Kevin Liu,322d872b-594c-81a1-97d6-0002da60f745,pkh_kevinliu@photons.com.tw,,N,,
+KHH Kit Yiu,299d872b-594c-81e1-bf29-0002e1777849,pkh_kityiu@photons.com.tw,,N,,
+KHH Randolph Huang,1f8d872b-594c-81f4-8408-0002257b9755,pkh_randolph@photons.com.tw,,N,,
+KHH Sam Chien,22ad872b-594c-8174-813e-0002a0c42743,pkh_samchien@photons.com.tw,,N,,
+KHH Sunny Yang,322d872b-594c-8138-9600-0002db21d072,pkh_sun232308@photons.com.tw,,N,,
+KHH Wego Chen,2aed872b-594c-8112-85f1-0002ed3a654b,pkh_wego@photons.com.tw,,N,,
+Kuro Wu KHH,f8a237ae-ef07-4623-9c07-ae6d037e2228,pkh_kuro1244@photons.com.tw,,N,,
+Leo Tsai KHH,b2b26c74-fa20-4c96-81ae-423cf679f6bc,pkh_leotsai@photons.com.tw,,N,,
+Mavic KHH,ca4d66da-c71c-48de-9a43-08baafa60ed7,pkh_wuxiaosheng@photons.com.tw,,N,,
+Mibo Lo KHH,a92d3317-f048-4518-b8b7-65f3a9fea671,pkh_r7546446@photons.com.tw,,N,,
+Nora Huang KHH,f20c8973-7f60-40ab-857e-e83272d2ba19,pkh_nora753951@photons.com.tw,,N,,
+Owen Huang KHH,1c1d872b-594c-8158-9685-00026211bda3,pkh_vcr123rt@photons.com.tw,,N,,
+Photons,3415a2da-20d2-4c42-8804-f3097b37ac94,photonstw2@gmail.com,,N,,
+pkh_yuming@photons.com.tw,6a7719e9-908c-447a-8b51-d29153efda27,pkh_yuming@photons.com.tw,,N,,
+Rin Li KHH,267ee715-48e2-4bd1-9910-26adeab9a141,pkh_rinli@photons.com.tw,,N,,
+Ryan Chen KHH,8fce21a0-fe2d-49e3-8669-03ace674bf00,pkh_ryanchen@photons.com.tw,,N,,
+Shaman Ho KHH,a424c445-b820-4d95-97b8-2fef8342f113,pkh_shaman0926@photons.com.tw,,N,,
+Shin Lu KHH,1abd872b-594c-81aa-904a-000293cf75a2,pkh_shin@photons.com.tw,,N,,
+Tintin Liou KHH,ebddbb22-e054-414d-8ff8-2caaf5d1ba43,pkh_tintin@photons.com.tw,,N,,
+Vincent Chen KHH,886a273b-4db7-4b0d-b93c-b22a9a5c25e4,pkh_vincent@photons.com.tw,,N,,
+Wei Rong Chen KHH,05b7941f-6c91-4d82-9b16-9755c8c0e6da,pkh_jiang_wei_dragon@photons.com.tw,,N,,
+White Cheng KHH,5aaa2d82-9969-41d4-8d21-fd5c7fae7e1b,pkh_reko7379_office@photons.com.tw,,N,,
+Zoe,22ad872b-594c-819a-af34-00022fcfdee5,zoebao@photons.com.tw,,N,,
+王旻濬,152d872b-594c-8154-812f-00021178a409,pkh_jun@photons.com.tw,,N,,
