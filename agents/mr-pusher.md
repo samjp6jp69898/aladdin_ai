@@ -30,6 +30,7 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 **Drive link:** `{drive_link}`（由 manager 從 drive-uploader-mr 結果傳入,可能為 `N/A`）
 **Bug summary:** `{bug_summary}`（由 manager 從 analytics.md 抽取的一句話,< 60 字）
 **Solution md path:** `{solution_md_path}`（MR description 的來源）
+**Reviewer email:** `{reviewer_email}`（manager 從 /create-mr Step 0.5 比對 tech-users.csv 推導出的技術人員 git email,例如 `pkh_ailesax@photons.com.tw`；用於 `glab mr create --reviewer`。空字串 → 跳過 reviewer 指派）
 
 ## GitLab CLI 前置條件
 
@@ -39,7 +40,7 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 - `cd {worktree_path}/{repo} && git fetch origin dev && git rebase origin/dev`（Step 0.5 推前基準新鮮度校驗）
 - `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id}`
-- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch dev --title <...> --description <...> --yes`
+- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch dev --title <...> --description <...> --reviewer <username> --yes`
 - `cd {worktree_path}/{repo} && glab mr view mr/{ticket_id} --output json`
 - `curl` 對 Notion API（POST comment, PATCH page）
 - `Read` 任何 worktree 或 Debug 文件
@@ -141,12 +142,21 @@ echo "PUSHED: $repo"
 ```bash
 cd {worktree_path}/{repo}
 
+# 從 reviewer_email 推導 GitLab username（email localpart）
+# 例：pkh_ailesax@photons.com.tw → pkh_ailesax
+REVIEWER_FLAG=""
+if [ -n "{reviewer_email}" ]; then
+  REVIEWER_USERNAME="${reviewer_email%@*}"
+  REVIEWER_FLAG="--reviewer $REVIEWER_USERNAME"
+fi
+
 # 若該 ticket 在此 repo 已存在 MR（重跑 case）,glab mr create 會 fail
 MR_URL=$(glab mr create \
   --source-branch mr/{ticket_id} \
   --target-branch dev \
   --title "fix: [{ticket_id}] {bug_summary}" \
   --description "$(cat {solution_md_path})" \
+  $REVIEWER_FLAG \
   --yes 2>&1)
 
 # 若 fail 因 MR 已存在,改取現有 MR
@@ -154,12 +164,29 @@ if echo "$MR_URL" | grep -qi "already exists"; then
   MR_URL=$(glab mr view mr/{ticket_id} --output json | jq -r '.web_url')
 fi
 
-echo "$repo MR: $MR_URL"
+# 若 fail 因 reviewer 找不到（例如 username 對不上 GitLab user）,
+# 移除 --reviewer 後重試一次,不讓 reviewer 問題卡住整個 MR 建立
+if echo "$MR_URL" | grep -qiE "reviewer.*not.*found|invalid.*reviewer|user.*not.*exist"; then
+  echo "WARN: reviewer $REVIEWER_USERNAME 無法解析,改不指定 reviewer 重試"
+  MR_URL=$(glab mr create \
+    --source-branch mr/{ticket_id} \
+    --target-branch dev \
+    --title "fix: [{ticket_id}] {bug_summary}" \
+    --description "$(cat {solution_md_path})" \
+    --yes 2>&1)
+  if echo "$MR_URL" | grep -qi "already exists"; then
+    MR_URL=$(glab mr view mr/{ticket_id} --output json | jq -r '.web_url')
+  fi
+fi
+
+echo "$repo MR: $MR_URL (reviewer: ${REVIEWER_USERNAME:-none})"
 ```
 
 收集所有 MR url 到陣列。
 
 `--description "$(cat {solution_md_path})"`：solution.md 內含程式碼區塊（backtick）也安全 —— `$(cat ...)` 的展開結果不會被 shell 二次解析,整份內容會原樣當成單一參數傳入。
+
+**Reviewer 指派失敗的容錯**：reviewer 對 MR 是 nice-to-have,不應卡住整個 MR 建立。上方 retry-without-reviewer 邏輯確保即使 username 解析失敗（例如 CSV 中 email localpart 與 GitLab username 不符）仍能成功開出 MR;失敗的 reviewer 指派會在 Step 5 報告中標示需人工補指派。
 
 ### Step 3: 合併 Drive link + MR links 寫 Notion 留言
 
@@ -240,6 +267,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 ```
 MR_LINKS: [{"repo":"agrabah","url":"https://gitlab.the777.pro/.../-/merge_requests/123"},{"repo":"rajah","url":"https://gitlab.the777.pro/.../-/merge_requests/456"}]
 DRIVE_LINK: {drive_link}
+REVIEWER: {reviewer_username} | none (assigned: yes | no | partial)
 NOTION_COMMENT: ok | failed (HTTP <status>)
 NOTION_AI_FIELD: ok | failed (HTTP <status>)
 ```
