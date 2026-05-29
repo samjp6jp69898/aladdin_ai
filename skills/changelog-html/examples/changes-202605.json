@@ -1,0 +1,1741 @@
+{
+  "versions": [
+    {
+      "id": "518",
+      "label": "5/18 版（feature/20260518 vs pro）",
+      "cls": "v518"
+    },
+    {
+      "id": "522",
+      "label": "5/22 版（feature/20260522 vs 5/18）",
+      "cls": "v522"
+    },
+    {
+      "id": "526",
+      "label": "5/26 版（feature/20260526 vs 5/22）",
+      "cls": "v526"
+    }
+  ],
+  "lago": [
+    {
+      "name": "_lago.home",
+      "label": "首頁／啟動畫面",
+      "tags": [
+        "ny",
+        "n8",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.sport",
+      "label": "體育投注",
+      "tags": [
+        "ny",
+        "n8",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.cricket",
+      "label": "體育 — 板球 Cricket",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.game",
+      "label": "娛樂城／第三方遊戲",
+      "tags": [
+        "pk",
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.live",
+      "label": "PK 直播間",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.message-board",
+      "label": "大舞台／發文／聊天",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.vip",
+      "label": "VIP",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.deposit",
+      "label": "充值",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.withdraw",
+      "label": "提現",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.personal",
+      "label": "個人中心",
+      "tags": [
+        "n8",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.general-agent",
+      "label": "全民代理（玩家端）",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.about",
+      "label": "關於我們",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.darkmode",
+      "label": "暗黑模式（跨頁面）",
+      "tags": [
+        "ny"
+      ]
+    },
+    {
+      "name": "_lago.activity",
+      "label": "優惠活動",
+      "tags": [
+        "pk",
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.announcement",
+      "label": "公告／訊息中心",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.pref",
+      "label": "偏好設置／多語",
+      "tags": [
+        "pk",
+        "ny"
+      ]
+    }
+  ],
+  "other": [
+    {
+      "name": "_internal.frontend",
+      "label": "前端內部優化／版本更新"
+    },
+    {
+      "name": "_internal.backend",
+      "label": "後端服務內部優化"
+    },
+    {
+      "name": "_internal.rajah",
+      "label": "RPC 協議（rajah）結構整理"
+    }
+  ],
+  "changes": [
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "_lago.home"
+      ],
+      "title": "啟動畫面串接站台 logo",
+      "subs": [
+        "ny-gaming 啟動頁顯示站台 logo",
+        "n8-gaming 啟動頁顯示站台 logo"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "體育投注新手／專業版切換引導",
+      "subs": [
+        "首次進入時新增「專業版／新手版」切換引導（ny-gaming）"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "串關投注單顯示",
+      "subs": [
+        "失效時顯示錯誤",
+        "串關 Tab 樣式微調"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "_lago.live"
+      ],
+      "title": "PK 直播間優化",
+      "subs": [
+        "影像播放器、用戶列表、禮物排行、隨機房間等彈窗的資料流程重新調整，減少資源殘留",
+        "評論超長文字自動換行",
+        "直播多國語言更新"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "_lago.pref"
+      ],
+      "title": "偏好設置盤口賠率",
+      "subs": [
+        "儲存後不生效"
+      ],
+      "tags": [
+        "FAQ-636"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "user-behavior-log"
+      ],
+      "title": "會員行為日誌查詢（新功能）",
+      "subs": [
+        "後台新增「會員行為日誌查詢」頁，可依識別碼／會員 ID 等條件查詢",
+        "背後新增登入、登出、忘記密碼、手機綁定、OTP 等行為埋點",
+        "新增裝置 ID 管理"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "user-behavior-log"
+      ],
+      "title": "會員裝置查詢 API",
+      "subs": [
+        "補上 platformId 參數"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "character-list"
+      ],
+      "title": "新增「陪玩帳號」會員類型",
+      "subs": [
+        "身分管理新增「陪玩帳號」類型"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "title": "會員權限擴充 — 新增 5 項權限項",
+      "subs": [
+        "禁止關閉陪玩帳號",
+        "禁止儲值",
+        "禁止提款",
+        "禁產返水",
+        "禁止參與活動"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "user-list"
+      ],
+      "title": "用戶詳細頁 — 遊戲概覽",
+      "subs": [
+        "輸贏金額以對照顏色顯示，正負更易識別"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "activity-review"
+      ],
+      "title": "活動審核新增獎勵狀態",
+      "subs": [
+        "新增「暫停審核（黑名單）」狀態",
+        "新增「待申請」狀態"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "activity-review"
+      ],
+      "title": "活動黑名單同步",
+      "subs": [
+        "訂單狀態調整為「暫停審核」並同步生效"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "activity-review"
+      ],
+      "title": "搜尋過濾",
+      "subs": [
+        "隱藏 unknown 狀態的搜尋選項"
+      ],
+      "tags": [
+        "FAQ-3052"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "betting-record"
+      ],
+      "title": "投注紀錄新增「依比賽 ID 查投注」",
+      "subs": [
+        "曬單用，依 gameId + matchId"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "r-player-report",
+        "game-report",
+        "deposit-channel-statistics"
+      ],
+      "title": "報表選單／權限調整",
+      "subs": [
+        "報表管理新增二級選單",
+        "充值報表權限拆分為「充值日報」「提現日報」兩個獨立節點",
+        "搜尋日期改為非必填，貨幣選項預設隱藏"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "deposit-daily-report"
+      ],
+      "title": "充值報表（每日）",
+      "subs": [
+        "依後續回報需求調整顯示欄位與篩選"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "deposit-daily-report"
+      ],
+      "title": "充值報表搜尋日期型別修正",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "adjustment-request"
+      ],
+      "title": "資金調整 — 新增匯入幣別",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "user-transaction-list"
+      ],
+      "title": "帳變紀錄匯出新增「備註」欄位",
+      "subs": [],
+      "tags": [
+        "FAQ-3088"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "access-management"
+      ],
+      "title": "訪問管理頁排序改為新到舊",
+      "subs": [],
+      "tags": [
+        "FAQ-1750"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-promotion-register-bonus"
+      ],
+      "title": "批量註冊預設值調整",
+      "subs": [],
+      "tags": [
+        "FAQ-3095"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-list"
+      ],
+      "title": "代理列表顯示優化",
+      "subs": [
+        "加入會員資料與佣金詳情顯示優化"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "turnover-rebate-invoice-list"
+      ],
+      "title": "合營代理流水返佣 — 匯出 CSV",
+      "subs": [
+        "流水返佣提成匯總可匯出 CSV",
+        "匯出補上幣別欄位"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-reports"
+      ],
+      "title": "合營代理數據報表 — 新增「會員加入時間」",
+      "subs": [
+        "搜尋與顯示均支援"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-deposit-method-list"
+      ],
+      "title": "代理 App — 代充設置入口",
+      "subs": [
+        "新增「獲取代理代充設置」入口，會員端可查看代充規則"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-deposit-method-list"
+      ],
+      "title": "代理充值通道",
+      "subs": [
+        "新增／編輯彈窗加大，操作更舒適",
+        "新增「匯入幣別」功能"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "title": "佣金詳情調整",
+      "subs": [
+        "僅顯示「充值佣金」",
+        "文案同步調整"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "commission-settings"
+      ],
+      "title": "合營佣金設置",
+      "subs": [
+        "費用來源新增選項",
+        "過濾清單只顯示已開啟項目"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "title": "佣金帳單操作",
+      "subs": [
+        "搜尋月份方式調整",
+        "新增「只能操作當期帳單」錯誤提示"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "joint-venture-referral-provide-support"
+      ],
+      "title": "代理扶持紅利下分修正",
+      "subs": [
+        "應為扣除非加上，方向錯誤已修正"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "title": "代理帳變紀錄備註",
+      "subs": [
+        "未依類型顯示"
+      ],
+      "tags": [
+        "FAQ-3088"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "會員操作紀錄結構性重整",
+      "subs": [
+        "EventCategory / EventActionId / EventStatusCode 結構性重整"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "AgentProxyDepositSettings 搬移",
+      "subs": [
+        "搬移到 agent_common 共用"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "首儲檢查邏輯重構",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "replication lag 檢查",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "日誌強化",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "串接 event back office 後端服務",
+      "subs": []
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "abu 多語表更新",
+      "subs": [
+        "platform 1.5.32"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.general-agent"
+      ],
+      "title": "n8 全民代理主頁全新改版",
+      "subs": [
+        "新增邀請頁面",
+        "新增團隊統計頁面",
+        "新增領取記錄頁面"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.about"
+      ],
+      "title": "n8「關於我們」頁面群（6 頁）",
+      "subs": [
+        "公司介紹",
+        "創新",
+        "即時動態",
+        "隱私政策",
+        "責任博彩",
+        "穩定與安全"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.darkmode"
+      ],
+      "title": "ny 暗黑模式（Dark Mode）大規模上線",
+      "subs": [
+        "首頁、登入註冊、我的、個人資料",
+        "優惠活動、公告、客服中心、訊息中心",
+        "充值、提現",
+        "體育、娛樂城、第三方遊戲",
+        "搜尋、收藏、APP 下載、聊天室"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.deposit"
+      ],
+      "title": "充值頁「可獲得」金額（PK）",
+      "subs": [
+        "改為計入手續費與優惠後的實得金額"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.announcement"
+      ],
+      "title": "公告分類前台分頁顯示邏輯",
+      "subs": [],
+      "tags": [
+        "FAQ-1240"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "三方體育投注紀錄詳情",
+      "subs": [
+        "文案調整",
+        "分數顯示規則更新"
+      ],
+      "tags": [
+        "FAQ-2537",
+        "FAQ-2739",
+        "FAQ-2746",
+        "FAQ-2762"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "投注單角球比分顯示格式",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.home"
+      ],
+      "title": "應用啟動預先載入",
+      "subs": [
+        "預先載入公告",
+        "預先載入站內信"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.vip"
+      ],
+      "title": "VIP 頁面無法顯示（PK）",
+      "subs": [],
+      "tags": [
+        "FAQ-3118"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.activity"
+      ],
+      "title": "點擊活動內頁無法跳轉",
+      "subs": [],
+      "tags": [
+        "FAQ-2324"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.general-agent"
+      ],
+      "title": "代理公告紅點同步",
+      "subs": [
+        "新訊息未同步合營入口紅點"
+      ],
+      "tags": [
+        "FAQ-2622"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "投注購物車「全部餘額」金額帶入錯誤",
+      "subs": [],
+      "tags": [
+        "FAQ-1955"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.pref"
+      ],
+      "title": "多國語言關鍵字使用錯誤",
+      "subs": [],
+      "tags": [
+        "FAQ-2564"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.game"
+      ],
+      "title": "重新進入遊戲時停留在前一局資料",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "general-agent-short-link"
+      ],
+      "title": "全民代理 — 推廣域名（短連結）端到端新功能",
+      "subs": [
+        "會員前台：申請短連結、查詢申請狀態",
+        "後台：批次匯入、審核、編輯短連結",
+        "後台：設定申請條件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-ranking"
+      ],
+      "title": "排行榜 — 新增「固定排行榜」",
+      "subs": [
+        "新增「流水榜／盈利榜／等級榜」三類",
+        "可設定週期、最大名次、是否顯示玩家自身",
+        "前後台功能皆完備並支援匯出"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-review",
+        "activity-detail",
+        "activity-participation",
+        "activity-statistic"
+      ],
+      "title": "活動數據選單擴充為四子頁",
+      "subs": [
+        "活動審核",
+        "活動明細",
+        "活動參與",
+        "活動統計"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-detail"
+      ],
+      "title": "活動明細新增多項欄位",
+      "subs": [
+        "稽核倍數",
+        "首存金額",
+        "申請 IP／地區／端別／設備",
+        "帳變備註"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-participation"
+      ],
+      "title": "活動參與統計",
+      "subs": [
+        "新增「會員維度」統計頁",
+        "新增「活動維度」統計頁",
+        "支援會員詳情下鑽"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-level-setting"
+      ],
+      "title": "大舞台 — 等級名稱多語",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-post-list"
+      ],
+      "title": "大舞台 — 後台發文管理支援置頂排序",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-level-contribute-settings"
+      ],
+      "title": "大舞台貢獻值",
+      "subs": [
+        "開放給排行榜計分使用"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-withdraw-daily-report"
+      ],
+      "title": "充提報表（獨立頁）— 新增",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-data-statistics"
+      ],
+      "title": "充值數據統計（獨立頁）— 新增",
+      "subs": [
+        "顯示成功率",
+        "顯示成功金額",
+        "顯示人工扣款累計"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list"
+      ],
+      "title": "充值列表 — 取消／拒絕原因",
+      "subs": [
+        "新增取消／拒絕類型（會員自取消／系統逾時／後台人工拒絕）"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list",
+        "withdraw-order-list",
+        "activity-detail"
+      ],
+      "title": "充值／提現列表跳轉",
+      "subs": [
+        "可帶會員帳號從充值／提現列表跳轉至活動明細直接搜尋"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-review-short-link"
+      ],
+      "title": "短連結審核批量按鈕",
+      "subs": [
+        "改為「批量拒絕」並補提示語"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list",
+        "withdraw-order-list"
+      ],
+      "title": "充值／提現匯出對齊",
+      "subs": [
+        "匯出欄位與頁面顯示對齊"
+      ],
+      "tags": [
+        "FAQ-3030",
+        "FAQ-3044"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "withdraw-order-list"
+      ],
+      "title": "提現審核帳戶資料顯示修正",
+      "subs": [],
+      "tags": [
+        "FAQ-930",
+        "FAQ-3076"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "record-center"
+      ],
+      "title": "開獎紀錄補賽果／退單",
+      "subs": [
+        "限制為僅鎖單操作者可執行",
+        "新增「檢視鎖單人」按鈕"
+      ],
+      "tags": [
+        "FAQ-2996"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "fund-adjustment-preset"
+      ],
+      "title": "資金調整 — 預設快捷（新增）",
+      "subs": [
+        "新增「預設快捷」功能",
+        "新增選用彈窗，可預先設定常用金額／類別"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "fund-adjustment-preset"
+      ],
+      "title": "資金快捷建立流程錯誤",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "title": "會員操作日誌（會員詳細頁分頁）",
+      "subs": [
+        "會員詳細頁加入「會員操作日誌」分頁"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-list"
+      ],
+      "title": "會員操作紀錄查詢時間",
+      "subs": [
+        "改為日期區間（原本被 Hide）"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "user-behavior-log"
+      ],
+      "title": "會員日誌無法以 ID 搜尋",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "title": "會員狀態權限新增",
+      "subs": [
+        "禁止 VIP 升降",
+        "禁止參與活動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "agent-list"
+      ],
+      "title": "代理列表 — 新增「設定代理密碼」",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-promotion-tiered-deposit-rewards"
+      ],
+      "title": "充值滿額獎勵",
+      "subs": [
+        "新增「週期內新註冊會員才列入統計」選項"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "title": "合營上下分",
+      "subs": [
+        "新增遊戲前端備注欄位"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "withdrawal-tag"
+      ],
+      "title": "風控新增獨立伺服器",
+      "subs": [
+        "新增風控後台伺服器（risk_back_office）",
+        "機器人投注設定骨架：帳號池、人數、頻率、時段機率、最大張數等",
+        "IP／地區黑白名單骨架"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-discount-list",
+        "withdraw-discount-list"
+      ],
+      "title": "充值／提款優惠 — 會員狀態檢查",
+      "subs": [
+        "新增「禁止參加活動」檢查"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "rebate-records"
+      ],
+      "title": "手動返水下分",
+      "subs": [
+        "佣金紀錄不再轉正"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "title": "撤銷佣金",
+      "subs": [
+        "新增兩種帳變類別"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-deposit-order-list",
+        "agent-withdraw-order-list"
+      ],
+      "title": "代理入款／扣款",
+      "subs": [
+        "新增「會員備註」欄位"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "general-agent-commission-list"
+      ],
+      "title": "全民代理報表詳細",
+      "subs": [
+        "新增「彙總列」"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "turnover-rebate-invoice-list"
+      ],
+      "title": "合營代理 CSV 撤銷類佣金顯示",
+      "subs": [],
+      "tags": [
+        "FAQ-3122"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "title": "合營代理帳變改用 wallet_type 排除會員側帳變",
+      "subs": [],
+      "tags": [
+        "FAQ-3127"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "store-items"
+      ],
+      "title": "商城道具狀態欄誤判可點擊",
+      "subs": [],
+      "tags": [
+        "FAQ-3099"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-transaction-list"
+      ],
+      "title": "帳變紀錄補會員標籤備注",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "fixed-level"
+      ],
+      "title": "固定層級策略描述補幣別解析",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "activity-management"
+      ],
+      "title": "隱藏世界杯類型過濾",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "message-board-information-review"
+      ],
+      "title": "官方動態失效修正",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "message-board-tip-audit-list"
+      ],
+      "title": "打賞審核導出多語修正",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "充值通道統計權限節點調整命名",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "活動審核 excludeRewardStatus 改為多值",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "推廣域名 service 重構",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "操作紀錄打點補齊",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "訂單列表搜尋優化",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "代理 config value 改 TEXT",
+      "subs": [
+        "傭金 18 層以上超字數"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "lago 活動任務邏輯改前端 composable",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "lago 用戶資訊改用 API 直取餘額",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "密碼重置錯誤通知精簡",
+      "subs": []
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "abu 多語表更新",
+      "subs": [
+        "platform 1.5.33／admin 1.5.11"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "_lago.cricket"
+      ],
+      "title": "n8 板球（Cricket）功能擴充",
+      "subs": [
+        "新版賽事列表",
+        "賽事收藏功能",
+        "購物車加入與錯誤處理",
+        "賠率變動提示",
+        "板球詳情頁收藏"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "_lago.darkmode"
+      ],
+      "title": "ny 暗黑模式補完",
+      "subs": [
+        "福利、體育、我的",
+        "優惠活動、充值、密碼欄位"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "n8 賠率與賽事呈現",
+      "subs": [
+        "賠率顯示組件視覺優化",
+        "OddsButton 視覺優化",
+        "賽事列表呈現調整"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "title": "三方體育串關注單金額顯示錯誤",
+      "subs": [],
+      "tags": [
+        "FAQ-3154"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.game"
+      ],
+      "title": "個人資訊「近期在玩的遊戲」",
+      "subs": [
+        "顯示超過 3 款並出現空白項目"
+      ],
+      "tags": [
+        "FAQ-3156"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.personal"
+      ],
+      "title": "個人行事曆超長文字溢出處理",
+      "subs": [],
+      "tags": [
+        "FAQ-3149"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.personal"
+      ],
+      "title": "n8 部分 fixed 樣式問題修正",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "game-report"
+      ],
+      "title": "報表分析新增「遊戲報表」",
+      "subs": [
+        "新增「遊戲報表」主頁與詳情彈窗",
+        "依「遊戲分類」維度的列表與卡片統計",
+        "依「品牌」維度的列表與卡片統計",
+        "遊戲報表詳情新增權限節點"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "game-report"
+      ],
+      "title": "遊戲報表查詢 gameDisplayTag",
+      "subs": [
+        "移除 Required 驗證，修正 0 值被誤判"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "betting-record"
+      ],
+      "title": "投注記錄版型切換",
+      "subs": [
+        "新增版型切換篩選，列表展示模式更彈性"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "agent-list"
+      ],
+      "title": "代理列表 — 新增「修改代理密碼」",
+      "subs": [
+        "除既有重設外可手動指定"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "commission-settings"
+      ],
+      "title": "佣金等級設置門檻",
+      "subs": [
+        "新增「需多少有效直屬會員」門檻設定"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "title": "合營佣金帳單匯出新增多欄",
+      "subs": [
+        "有效會員人數",
+        "投注用戶人數",
+        "帳戶調整",
+        "補單輸贏",
+        "佣金調整",
+        "最終佣金",
+        "其他費用"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "title": "佣金帳單明細新增欄位",
+      "subs": [
+        "新增有效會員數",
+        "有效直屬會員人數",
+        "投注會員數"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "vip-upgrade-log"
+      ],
+      "title": "VIP 等級紀錄新增「鎖級」類型",
+      "subs": [
+        "會員開啟「禁止 VIP 升降」時觸發紀錄"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "vip-upgrade-log"
+      ],
+      "title": "VIP 帳變紀錄操作人顯示為系統",
+      "subs": [],
+      "tags": [
+        "FAQ-3068"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "deposit-data-statistics",
+        "deposit-withdraw-daily-report",
+        "deposit-daily-report"
+      ],
+      "title": "報表 tooltip 與權限",
+      "subs": [
+        "充值數據統計、充提報表為各欄位標題加上 tooltip",
+        "充值報表、充提報表、充值數據統計依使用者權限控制是否顯示"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report",
+        "deposit-data-statistics"
+      ],
+      "title": "三表「結束時間」送出結果錯誤修正",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "fund-adjustment-preset"
+      ],
+      "title": "資金預設快捷",
+      "subs": [
+        "預設排版改為三欄",
+        "列表回傳所有幣別金額"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "activity-review"
+      ],
+      "title": "活動審核搜尋「狀態」多語與參數調整",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "activity-management"
+      ],
+      "title": "活動取得遊戲清單 tag=0",
+      "subs": [],
+      "tags": [
+        "FAQ-3138"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "turnover-rebate-invoice-list"
+      ],
+      "title": "合營代理傭金發票匯出",
+      "subs": [
+        "欄位對齊規格"
+      ],
+      "tags": [
+        "FAQ-3153"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "record-center"
+      ],
+      "title": "開獎紀錄開盤時間搜尋包含隔日資料",
+      "subs": [],
+      "tags": [
+        "FAQ-3155"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "corner-label-management"
+      ],
+      "title": "角標管理圖片類型圖示重疊",
+      "subs": [],
+      "tags": [
+        "FAQ-2972"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "login-history"
+      ],
+      "title": "登入紀錄 SQL 修正",
+      "subs": [
+        "appType 搜尋 SQL 修正",
+        "會員 IP 搜尋 SQL 修正"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "admin:bet-records"
+      ],
+      "title": "二八遊戲注單匯出",
+      "subs": [
+        "新增至匯出類型清單"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "admin:game-lottery-results"
+      ],
+      "title": "自研遊戲開獎改分頁撈取",
+      "subs": [
+        "避免區間過大遺漏",
+        "加分頁上限保護"
+      ],
+      "tags": [
+        "FAQ-3113"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "admin:bet-records"
+      ],
+      "title": "自研遊戲注單已結算狀態未正確更新",
+      "subs": [],
+      "tags": [
+        "FAQ-3115"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "admin:game-vendor-list"
+      ],
+      "title": "遊戲廠商 BG",
+      "subs": [
+        "移除 bizId fallback 改 fail-fast",
+        "修正轉帳失敗狀態未更新"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "admin:game-vendor-list"
+      ],
+      "title": "遊戲廠商 FB",
+      "subs": [
+        "修正注單時間戳問題",
+        "修正簽名問題"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "後台通知 service／job 建立空檔案骨架",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "title": "撤回 5/22 新增的 payment 訂單 identifier 欄位",
+      "subs": [
+        "避免 PII"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "統計報表邏輯抽出至 reports 子資料夾",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "title": "export 格式化函式快取化",
+      "subs": []
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "n8 板球購物車移除不必要的輪詢",
+      "subs": [
+        "圖示旋轉效果優化",
+        "賠率邏輯類型定義調整"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "title": "abu 多語表更新",
+      "subs": [
+        "platform 1.5.41／admin 1.5.17"
+      ]
+    }
+  ]
+}

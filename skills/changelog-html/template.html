@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Aladdin 平台變更摘要 — 2026 年 5 月三版 v3</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; color: #1f2937; background: #f8fafc; }
+  body { display: flex; flex-direction: column; height: 100vh; }
+
+  .topbar { background: #1e293b; color: #f1f5f9; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 3px solid #0ea5e9; }
+  .topbar h1 { margin: 0; font-size: 17px; font-weight: 600; }
+  .topbar .subtitle { font-size: 12.5px; color: #94a3b8; }
+  .filters { display: flex; gap: 6px; margin-left: auto; align-items: center; }
+  .ver-btn { padding: 5px 13px; border-radius: 14px; border: 1px solid #475569; background: #334155; color: #e2e8f0; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .ver-btn.active.v518 { background: #6366f1; border-color: #6366f1; color:white; font-weight: 600; }
+  .ver-btn.active.v522 { background: #10b981; border-color: #10b981; color:white; font-weight: 600; }
+  .ver-btn.active.v526 { background: #f59e0b; border-color: #f59e0b; color:white; font-weight: 600; }
+  .app-btn { padding: 5px 11px; border-radius: 14px; border: 1px solid #475569; background: #334155; color: #cbd5e1; font-size: 11.5px; cursor: pointer; font-family: inherit; }
+  .app-btn.active.app-platform { background: #6366f1; border-color: #6366f1; color: white; font-weight: 600; }
+  .app-btn.active.app-admin    { background: #8b5cf6; border-color: #8b5cf6; color: white; font-weight: 600; }
+  .app-btn.active.app-n8       { background: #f59e0b; border-color: #f59e0b; color: white; font-weight: 600; }
+  .app-btn.active.app-ny       { background: #ec4899; border-color: #ec4899; color: white; font-weight: 600; }
+  .app-btn.active.app-pk       { background: #10b981; border-color: #10b981; color: white; font-weight: 600; }
+  .filter-sep { width: 1px; height: 18px; background: #475569; margin: 0 3px; }
+  .filter-label { font-size: 11px; color: #94a3b8; margin-right: 2px; user-select: none; }
+  .search-box { padding: 5px 10px; border-radius: 14px; border: 1px solid #475569; background: #334155; color: #e2e8f0; font-size: 12.5px; width: 180px; font-family: inherit; }
+  .search-box::placeholder { color: #94a3b8; }
+  .toggle-empty { font-size: 12px; color: #cbd5e1; display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+  .toggle-empty input { margin: 0; }
+
+  .layout { display: flex; flex: 1; min-height: 0; }
+  .sidebar { width: 340px; background: white; border-right: 1px solid #e2e8f0; overflow-y: auto; padding: 8px 0 30px; flex-shrink: 0; }
+  .main { flex: 1; overflow-y: auto; padding: 20px 28px; }
+
+  .tree-root { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+  .tree-root ul { list-style: none; padding-left: 0; margin: 0; }
+  .tree-node { padding: 3px 8px 3px 0; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 4px; line-height: 1.4; }
+  .tree-node:hover { background: #f1f5f9; }
+  .tree-node.selected { background: #0ea5e9; color: white; font-weight: 600; }
+  .tree-node.selected:hover { background: #0284c7; }
+  .tree-node .caret { font-size: 9px; width: 14px; text-align: center; color: #94a3b8; flex-shrink: 0; }
+  .tree-node.collapsed .caret { transform: rotate(-90deg); transition: transform 0.12s; }
+  .tree-node .label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tree-node .count { font-size: 10.5px; padding: 1px 6px; border-radius: 10px; background: #e2e8f0; color: #475569; min-width: 18px; text-align: center; flex-shrink: 0; font-weight: 600; }
+  .tree-node.selected .count { background: rgba(255,255,255,0.25); color: white; }
+  .tree-node.depth-0 { font-weight: 700; color: #0f172a; font-size: 13.5px; padding-top: 5px; padding-bottom: 5px; }
+  .tree-node.depth-1 { color: #334155; font-weight: 500; }
+  .tree-node.section-header { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.7px; color: #0ea5e9; padding: 14px 12px 4px; cursor: default; font-weight: 700; border-top: 1px solid #f1f5f9; margin-top: 4px; }
+  .tree-node.section-header:hover { background: transparent; }
+  .tree-node.section-header:first-of-type { border-top: none; margin-top: 0; }
+  .tree-node.empty { opacity: 0.45; }
+  .hidden { display: none !important; }
+  .app-tag { font-size: 9.5px; padding: 1px 5px; border-radius: 3px; background: #f1f5f9; color: #64748b; margin-left: 4px; flex-shrink: 0; }
+  .tree-node.selected .app-tag { background: rgba(255,255,255,0.25); color: white; }
+
+  .breadcrumb { font-size: 12.5px; color: #64748b; margin-bottom: 4px; }
+  .breadcrumb .sep { margin: 0 5px; color: #cbd5e1; }
+  .page-title { font-size: 21px; font-weight: 700; margin: 0 0 4px; color: #0f172a; }
+  .page-title-meta { font-size: 12px; color: #94a3b8; margin-bottom: 18px; font-family: ui-monospace, monospace; }
+
+  .version-block { background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .version-header { padding: 10px 16px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f5f9; }
+  .version-header.v518 { background: linear-gradient(90deg, #eef2ff, white); color: #4338ca; }
+  .version-header.v522 { background: linear-gradient(90deg, #ecfdf5, white); color: #047857; }
+  .version-header.v526 { background: linear-gradient(90deg, #fffbeb, white); color: #b45309; }
+  .version-pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; color: white; }
+  .version-pill.v518 { background: #6366f1; }
+  .version-pill.v522 { background: #10b981; }
+  .version-pill.v526 { background: #f59e0b; }
+  .version-body { padding: 4px 0; }
+
+  .change-group { padding: 11px 16px; border-bottom: 1px dashed #f1f5f9; }
+  .change-group:last-child { border-bottom: none; }
+  .change-type { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 7px; vertical-align: 1px; }
+  .change-type.add { background: #dbeafe; color: #1e40af; }
+  .change-type.adj { background: #fef3c7; color: #92400e; }
+  .change-type.fix { background: #fee2e2; color: #991b1b; }
+  .change-type.internal { background: #f1f5f9; color: #475569; }
+  .change-title { font-weight: 600; color: #0f172a; font-size: 14px; }
+  .change-sub { margin: 5px 0 0 22px; padding-left: 14px; }
+  .change-sub li { font-size: 13px; color: #334155; margin: 2px 0; line-height: 1.6; }
+  .change-tags { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: #f1f5f9; color: #64748b; }
+  .tag.faq { background: #fef2f2; color: #b91c1c; }
+  .change-apps { display: inline-flex; gap: 3px; margin-left: 7px; vertical-align: 1px; }
+  .app-pill { font-size: 9.5px; padding: 1px 6px; border-radius: 9px; font-weight: 600; color: white; line-height: 1.4; }
+  .app-pill.app-pill-platform { background: #6366f1; }
+  .app-pill.app-pill-admin    { background: #8b5cf6; }
+  .app-pill.app-pill-n8       { background: #f59e0b; }
+  .app-pill.app-pill-ny       { background: #ec4899; }
+  .app-pill.app-pill-pk       { background: #10b981; }
+  .change-cross-ref { margin-top: 5px; font-size: 11.5px; color: #64748b; font-style: italic; }
+  .change-cross-ref a { color: #0ea5e9; text-decoration: none; cursor: pointer; }
+  .change-cross-ref a:hover { text-decoration: underline; }
+
+  details.change-impact { margin: 6px 0 0 22px; }
+  details.change-impact summary { cursor: pointer; font-size: 11.5px; color: #475569; padding: 3px 8px; background: #f1f5f9; border-radius: 4px; display: inline-block; user-select: none; list-style: none; border: 1px solid transparent; }
+  details.change-impact summary::-webkit-details-marker { display: none; }
+  details.change-impact summary:hover { background: #e2e8f0; border-color: #cbd5e1; }
+  details.change-impact summary::before { content: '▶'; display: inline-block; margin-right: 5px; font-size: 9px; transition: transform 0.15s; }
+  details.change-impact[open] summary::before { transform: rotate(90deg); }
+  details.change-impact[open] summary { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+  details.change-impact.na summary { color: #94a3b8; font-style: italic; }
+  details.change-impact.na[open] summary { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+  details.change-impact .impact-list { margin: 6px 0 4px; padding: 8px 12px 8px 28px; background: #f8fafc; border-left: 3px solid #0ea5e9; border-radius: 0 4px 4px 0; }
+  details.change-impact.na .impact-list { border-left-color: #cbd5e1; background: #fafafa; }
+  details.change-impact .impact-list li { font-size: 12.5px; line-height: 1.6; color: #334155; margin: 3px 0; }
+  details.change-impact .impact-list li.impact-na { color: #94a3b8; font-style: italic; }
+  .impact-repo-tag { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 3px; margin-right: 6px; vertical-align: 1px; }
+  .impact-repo-tag.repo-backend { background: #fef3c7; color: #92400e; }
+  .impact-repo-tag.repo-api     { background: #ede9fe; color: #5b21b6; }
+  .impact-repo-tag.repo-admin   { background: #dbeafe; color: #1e40af; }
+  .impact-repo-tag.repo-app     { background: #dcfce7; color: #14532d; }
+  .impact-repo-tag.repo-agrabah { background: #fef3c7; color: #92400e; }
+  .impact-repo-tag.repo-rajah   { background: #ede9fe; color: #5b21b6; }
+  .impact-repo-tag.repo-abu     { background: #dbeafe; color: #1e40af; }
+  .impact-repo-tag.repo-lago    { background: #dcfce7; color: #14532d; }
+
+  .empty-content { padding: 50px 20px; text-align: center; color: #94a3b8; font-size: 13px; }
+  .empty-content h3 { color: #64748b; margin-bottom: 6px; font-weight: 500; }
+
+  .overview { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+  .overview h2 { margin: 0 0 8px; font-size: 16px; color: #0f172a; }
+  .overview p { margin: 4px 0; color: #475569; font-size: 13.5px; line-height: 1.7; }
+  .theme-cards { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .theme-card { flex: 1; min-width: 230px; padding: 12px 14px; border-radius: 6px; }
+  .theme-card.v518 { background: #eef2ff; border-left: 3px solid #6366f1; }
+  .theme-card.v522 { background: #ecfdf5; border-left: 3px solid #10b981; }
+  .theme-card.v526 { background: #fffbeb; border-left: 3px solid #f59e0b; }
+  .theme-card h4 { margin: 0 0 4px; font-size: 13px; }
+  .theme-card p { margin: 0; font-size: 12.5px; color: #475569; }
+  .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+  .meta-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; }
+  .meta-card .n { font-size: 22px; font-weight: 700; color: #0f172a; }
+  .meta-card .l { font-size: 11.5px; color: #64748b; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Aladdin 平台變更摘要</h1>
+  <div class="filters">
+    <input type="text" class="search-box" id="search" placeholder="搜尋菜單...">
+    <label class="toggle-empty"><input type="checkbox" id="show-empty"> 顯示無變更項目</label>
+    <span class="filter-sep"></span>
+    <span class="filter-label">版本</span>
+    <button class="ver-btn v518 active" data-ver="518">5/18</button>
+    <button class="ver-btn v522 active" data-ver="522">5/22</button>
+    <button class="ver-btn v526 active" data-ver="526">5/26</button>
+    <span class="filter-sep"></span>
+    <span class="filter-label">前端</span>
+    <button class="app-btn app-platform active" data-app="platform">platform</button>
+    <button class="app-btn app-admin active" data-app="admin">admin</button>
+    <button class="app-btn app-n8 active" data-app="n8">n8</button>
+    <button class="app-btn app-ny active" data-app="ny">ny</button>
+    <button class="app-btn app-pk active" data-app="pk">pk</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <ul class="tree-root" id="tree"></ul>
+  </aside>
+  <main class="main" id="content"></main>
+</div>
+
+<script>
+/*__DATA__*/
+
+const TYPE_META = {
+  add:      { label: '新增', cls: 'add' },
+  adj:      { label: '調整', cls: 'adj' },
+  fix:      { label: '修正', cls: 'fix' },
+  internal: { label: '內部', cls: 'internal' },
+};
+const VER_META = {
+  '518': { short: '5/18', full: '5/18 版（feature/20260518 — 該分支獨有新增）', cls: 'v518' },
+  '522': { short: '5/22', full: '5/22 版（feature/20260522 — 該分支獨有新增）', cls: 'v522' },
+  '526': { short: '5/26', full: '5/26 版（feature/20260526 — 該分支獨有新增）', cls: 'v526' },
+};
+const ALL_APPS = ['platform', 'admin', 'n8', 'ny', 'pk'];
+
+const state = {
+  activeVers: new Set(['518','522','526']),
+  activeApps: new Set(ALL_APPS),
+  selected: 'overview',
+  collapsed: new Set(),
+  showEmpty: false,
+  search: '',
+};
+
+function leafToApps(id) {
+  if (!id) return ALL_APPS.slice();
+  if (id.startsWith('admin:')) return ['admin'];
+  if (id.startsWith('_lago.')) {
+    const node = (window.__DATA__.lago || []).find(x => x.name === id);
+    return (node && Array.isArray(node.tags) && node.tags.length > 0) ? node.tags.slice() : ['n8','ny','pk'];
+  }
+  if (id.startsWith('_internal.')) return ALL_APPS.slice();
+  return ['platform'];
+}
+
+function changeVisible(c) {
+  if (!state.activeVers.has(c.ver)) return false;
+  const apps = Array.isArray(c.apps) && c.apps.length > 0 ? c.apps : ALL_APPS;
+  return apps.some(a => state.activeApps.has(a));
+}
+
+function leafAppVisible(id) {
+  const apps = leafToApps(id);
+  return apps.some(a => state.activeApps.has(a));
+}
+
+// Build a unified tree with sections
+function buildSections() {
+  return [
+    { kind: 'section', id: 'sec-lago',    label: '玩家端 (lago)',     nodes: window.__DATA__.lago },
+    { kind: 'section', id: 'sec-platform',label: '平台後台 (abu/platform)', nodes: window.__DATA__.platform, prefix: '' },
+    { kind: 'section', id: 'sec-admin',   label: '系統後台 (abu/admin)',    nodes: window.__DATA__.admin,    prefix: 'admin:' },
+    { kind: 'section', id: 'sec-other',   label: '內部優化',          nodes: window.__DATA__.other },
+  ];
+}
+
+// Pre-index: leaf id -> array of changes
+const changesByLeaf = new Map();
+for (const c of window.__DATA__.changes) {
+  for (const l of c.leaves) {
+    if (!changesByLeaf.has(l)) changesByLeaf.set(l, []);
+    changesByLeaf.get(l).push(c);
+  }
+}
+
+function leafId(node, prefix) {
+  // For lago/other nodes the name is already prefixed; for platform/admin use prefix + name
+  if (node.name && (node.name.startsWith('_lago.') || node.name.startsWith('_internal.'))) return node.name;
+  return (prefix || '') + node.name;
+}
+
+function countActiveAt(id) {
+  const list = changesByLeaf.get(id) || [];
+  return list.filter(c => changeVisible(c)).length;
+}
+
+function countSubtree(node, prefix) {
+  if (!node.children || node.children.length === 0) {
+    return countActiveAt(leafId(node, prefix));
+  }
+  let sum = 0;
+  for (const c of node.children) sum += countSubtree(c, prefix);
+  return sum;
+}
+
+function matchesSearch(label) {
+  if (!state.search) return true;
+  return label.toLowerCase().includes(state.search.toLowerCase());
+}
+
+function findFirstMatching(nodes, prefix) {
+  for (const n of nodes) {
+    if (matchesSearch(n.label)) return true;
+    if (n.children && findFirstMatching(n.children, prefix)) return true;
+  }
+  return false;
+}
+
+function renderTree() {
+  const tree = document.getElementById('tree');
+  tree.innerHTML = '';
+
+  // Overview pseudo-leaf at top
+  const ovDiv = document.createElement('div');
+  ovDiv.className = 'tree-node' + (state.selected === 'overview' ? ' selected' : '');
+  ovDiv.style.padding = '8px 12px';
+  ovDiv.style.fontWeight = '700';
+  ovDiv.innerHTML = '<span class="caret">★</span><span class="label">版本總覽</span>';
+  ovDiv.addEventListener('click', () => { state.selected = 'overview'; renderTree(); renderContent(); });
+  tree.appendChild(ovDiv);
+
+  for (const sec of buildSections()) {
+    // Skip whole abu sections when their app filter is off
+    if (sec.id === 'sec-platform' && !state.activeApps.has('platform')) continue;
+    if (sec.id === 'sec-admin'    && !state.activeApps.has('admin'))    continue;
+    // Section header
+    const hdr = document.createElement('div');
+    hdr.className = 'tree-node section-header';
+    hdr.textContent = sec.label;
+    tree.appendChild(hdr);
+
+    for (const n of sec.nodes) {
+      tree.appendChild(makeNode(n, 0, sec.prefix));
+    }
+  }
+}
+
+function makeNode(node, depth, prefix) {
+  const id = leafId(node, prefix);
+  const isGroup = node.children && node.children.length > 0;
+  const isSelected = state.selected === id;
+  const isCollapsed = state.collapsed.has(id);
+  const count = isGroup ? countSubtree(node, prefix) : countActiveAt(id);
+
+  const wrap = document.createElement('div');
+
+  // App filter for lago leaves: if its tags ∩ activeApps == ∅, hide whole leaf
+  if (id.startsWith('_lago.') && !leafAppVisible(id)) return wrap;
+
+  // Filter by search: if search active, only render if node label matches OR any descendant matches
+  if (state.search) {
+    const selfMatch = matchesSearch(node.label);
+    const descMatch = isGroup && findFirstMatching(node.children, prefix);
+    if (!selfMatch && !descMatch) return wrap;
+  }
+
+  // Filter empty
+  if (!state.showEmpty && count === 0 && !state.search) return wrap;
+
+  const div = document.createElement('div');
+  div.className = 'tree-node depth-' + Math.min(depth, 2)
+    + (isSelected ? ' selected' : '')
+    + (isCollapsed ? ' collapsed' : '')
+    + (count === 0 ? ' empty' : '');
+  div.style.paddingLeft = (8 + depth * 14) + 'px';
+  div.dataset.id = id;
+
+  const caret = document.createElement('span');
+  caret.className = 'caret';
+  caret.textContent = isGroup ? '▼' : '·';
+  div.appendChild(caret);
+
+  const label = document.createElement('span');
+  label.className = 'label';
+  label.textContent = node.label;
+  div.appendChild(label);
+
+  // app tags for lago (only show tags currently selected in the app filter)
+  if (node.tags) {
+    for (const t of node.tags) {
+      if (!state.activeApps.has(t)) continue;
+      const tg = document.createElement('span');
+      tg.className = 'app-tag';
+      tg.textContent = t;
+      div.appendChild(tg);
+    }
+  }
+
+  const cnt = document.createElement('span');
+  cnt.className = 'count';
+  cnt.textContent = count;
+  div.appendChild(cnt);
+
+  div.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isGroup) {
+      // Group: toggle collapse, AND also allow selection if it has changes mapped directly (rare)
+      if (state.collapsed.has(id)) state.collapsed.delete(id);
+      else state.collapsed.add(id);
+      renderTree();
+    } else {
+      state.selected = id;
+      renderTree();
+      renderContent();
+    }
+  });
+
+  wrap.appendChild(div);
+
+  if (isGroup) {
+    const ul = document.createElement('div');
+    if (isCollapsed) ul.className = 'hidden';
+    for (const c of node.children) {
+      ul.appendChild(makeNode(c, depth + 1, prefix));
+    }
+    wrap.appendChild(ul);
+  }
+
+  return wrap;
+}
+
+// Breadcrumb resolution
+function findPath(id, nodes, prefix, trail) {
+  for (const n of nodes) {
+    const myId = leafId(n, prefix);
+    const t = [...trail, { id: myId, label: n.label, isGroup: (n.children && n.children.length > 0) }];
+    if (myId === id) return t;
+    if (n.children && n.children.length > 0) {
+      const r = findPath(id, n.children, prefix, t);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+function resolveBreadcrumb(id) {
+  for (const sec of buildSections()) {
+    const r = findPath(id, sec.nodes, sec.prefix || '', [{ id: sec.id, label: sec.label, isSection: true }]);
+    if (r) return r;
+  }
+  return null;
+}
+
+function renderContent() {
+  const main = document.getElementById('content');
+  main.innerHTML = '';
+
+  if (state.selected === 'overview') {
+    renderOverview(main);
+    return;
+  }
+
+  const trail = resolveBreadcrumb(state.selected);
+  if (trail) {
+    const bc = document.createElement('div');
+    bc.className = 'breadcrumb';
+    bc.innerHTML = trail.map((t, i) => i === trail.length - 1
+      ? '<strong style="color:#0f172a;">' + escapeHtml(t.label) + '</strong>'
+      : escapeHtml(t.label)
+    ).join('<span class="sep">›</span>');
+    main.appendChild(bc);
+  }
+
+  const leafLabel = trail ? trail[trail.length - 1].label : state.selected;
+
+  const title = document.createElement('h2');
+  title.className = 'page-title';
+  title.textContent = leafLabel;
+  main.appendChild(title);
+
+  // Show menu meta (route / perm) if available from the source tree
+  const meta = lookupMeta(state.selected);
+  if (meta && (meta.route || meta.perm)) {
+    const m = document.createElement('div');
+    m.className = 'page-title-meta';
+    const parts = [];
+    if (meta.route) parts.push('route: ' + meta.route);
+    if (meta.perm) parts.push('perm: ' + meta.perm);
+    m.textContent = parts.join('  |  ');
+    main.appendChild(m);
+  }
+
+  const changes = (changesByLeaf.get(state.selected) || []).filter(c => changeVisible(c));
+
+  if (changes.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-content';
+    empty.innerHTML = '<h3>此分頁目前無對應的變更</h3><p>請調整上方版本篩選，或從左側選擇其他菜單。</p>';
+    main.appendChild(empty);
+    return;
+  }
+
+  // Group by version
+  const byVer = { '518': [], '522': [], '526': [] };
+  for (const c of changes) byVer[c.ver].push(c);
+
+  for (const ver of ['518','522','526']) {
+    if (byVer[ver].length === 0) continue;
+    const meta = VER_META[ver];
+    const block = document.createElement('div');
+    block.className = 'version-block';
+    const hdr = document.createElement('div');
+    hdr.className = 'version-header ' + meta.cls;
+    hdr.innerHTML = '<span class="version-pill ' + meta.cls + '">' + meta.short + '</span>' + escapeHtml(meta.full);
+    block.appendChild(hdr);
+
+    const body = document.createElement('div');
+    body.className = 'version-body';
+
+    const byType = { add: [], adj: [], fix: [], internal: [] };
+    for (const c of byVer[ver]) byType[c.type].push(c);
+
+    for (const type of ['add','adj','fix','internal']) {
+      for (const c of byType[type]) {
+        const cg = document.createElement('div');
+        cg.className = 'change-group';
+        const tmeta = TYPE_META[type];
+        let html = '<span class="change-type ' + tmeta.cls + '">' + tmeta.label + '</span>';
+        html += '<span class="change-title">' + escapeHtml(c.title) + '</span>';
+        // app pills (only show the ones currently selected in the filter; hide when full set or empty)
+        if (Array.isArray(c.apps) && c.apps.length > 0) {
+          const visibleApps = c.apps.filter(a => state.activeApps.has(a));
+          if (visibleApps.length > 0 && visibleApps.length < ALL_APPS.length) {
+            html += '<span class="change-apps">';
+            for (const a of visibleApps) html += '<span class="app-pill app-pill-' + a + '">' + escapeHtml(a) + '</span>';
+            html += '</span>';
+          }
+        }
+        if (c.subs && c.subs.length > 0) {
+          html += '<ol class="change-sub">';
+          for (const s of c.subs) html += '<li>' + escapeHtml(s) + '</li>';
+          html += '</ol>';
+        }
+        if (c.tags && c.tags.length > 0) {
+          html += '<div class="change-tags">';
+          for (const t of c.tags) html += '<span class="tag faq">' + escapeHtml(t) + '</span>';
+          html += '</div>';
+        }
+        // Cross-ref to other leaves this change is mapped to
+        if (c.leaves && c.leaves.length > 1) {
+          const others = c.leaves.filter(l => l !== state.selected);
+          const refs = others.map(l => {
+            const tp = resolveBreadcrumb(l);
+            const lab = tp ? tp[tp.length - 1].label : l;
+            return '<a data-jump="' + escapeHtml(l) + '">' + escapeHtml(lab) + '</a>';
+          });
+          html += '<div class="change-cross-ref">同步影響：' + refs.join('、') + '</div>';
+        }
+        if (c.impact && c.impact.length > 0) {
+          html += renderImpact(c.impact);
+        }
+        cg.innerHTML = html;
+        body.appendChild(cg);
+      }
+    }
+    block.appendChild(body);
+    main.appendChild(block);
+  }
+
+  // Wire jump links
+  main.querySelectorAll('a[data-jump]').forEach(a => {
+    a.addEventListener('click', () => {
+      state.selected = a.getAttribute('data-jump');
+      renderTree();
+      renderContent();
+    });
+  });
+}
+
+function lookupMeta(id) {
+  function walk(nodes, prefix) {
+    for (const n of nodes) {
+      const myId = leafId(n, prefix);
+      if (myId === id) return { route: n.route, perm: n.perm };
+      if (n.children && n.children.length > 0) {
+        const r = walk(n.children, prefix);
+        if (r) return r;
+      }
+    }
+    return null;
+  }
+  return walk(window.__DATA__.platform, '') || walk(window.__DATA__.admin, 'admin:');
+}
+
+function renderOverview(main) {
+  const totals = { '518': 0, '522': 0, '526': 0 };
+  let impactReal = 0, impactNa = 0;
+  for (const c of window.__DATA__.changes) {
+    totals[c.ver]++;
+    if (Array.isArray(c.impact) && c.impact.length > 0) {
+      const allNa = c.impact.every(s => /^N\/?A\b/i.test(s.trim()) || s.startsWith('（'));
+      if (allNa) impactNa++; else impactReal++;
+    }
+  }
+
+  const platformCount = countSection(window.__DATA__.platform, '');
+  const adminCount = countSection(window.__DATA__.admin, 'admin:');
+  const lagoCount = window.__DATA__.lago.reduce((s, n) => s + countActiveAt(n.name), 0);
+  const otherCount = window.__DATA__.other.reduce((s, n) => s + countActiveAt(n.name), 0);
+
+  const overview = document.createElement('div');
+  overview.className = 'overview';
+  overview.innerHTML = `
+    <h2>2026 年 5 月三版變更摘要 <span style="font-size:12px;color:#0ea5e9;font-weight:600;vertical-align:3px;">v2 · 含影響範圍分析</span></h2>
+    <p>本文件按 <strong>abu/platform、abu/admin、lago</strong> 真實菜單階層整理 5/18、5/22、5/26 三個 feature 分支的變更，每段呈現相對於上一版的新增。</p>
+    <p>左側為完整菜單樹（abu 嚴格三級對齊 menu.ts），右側顯示該分頁的變更條目。可勾選「顯示無變更項目」查看完整菜單。</p>
+    <p style="background:#f0f9ff;border-left:3px solid #0ea5e9;padding:8px 12px;border-radius:0 4px 4px 0;font-size:13px;">
+      <strong>v2 新增：</strong>每條變更下方加上「影響範圍」摺疊區塊，點開可看這次改動會連帶影響到的其他功能區域。
+      共 ${impactReal} 條有跨功能影響、${impactNa} 條僅單一頁面或顯示調整。
+    </p>
+    <div class="theme-cards">
+      <div class="theme-card v518"><h4>5/18 版（${totals['518']} 條）</h4><p>風控／會員行為日誌全鏈路埋點、陪玩帳號權限體系、體育新手版／專業版切換引導。</p></div>
+      <div class="theme-card v522"><h4>5/22 版（${totals['522']} 條）</h4><p>全民代理推廣短連結端到端、ny 暗黑模式全站、固定排行榜、活動數據四子頁、n8 全民代理改版。</p></div>
+      <div class="theme-card v526"><h4>5/26 版（${totals['526']} 條）</h4><p>遊戲報表新維度、n8 板球擴充、暗黑模式補完、廠商 adapter 修正。</p></div>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-card"><div class="n">${lagoCount}</div><div class="l">玩家端 (lago) 條目</div></div>
+      <div class="meta-card"><div class="n">${platformCount}</div><div class="l">平台後台條目</div></div>
+      <div class="meta-card"><div class="n">${adminCount}</div><div class="l">系統後台條目</div></div>
+      <div class="meta-card"><div class="n">${otherCount}</div><div class="l">內部優化條目</div></div>
+    </div>
+    <div class="meta-grid" style="margin-top:6px;">
+      <div class="meta-card" style="background:#f0f9ff;border-color:#bae6fd;"><div class="n" style="color:#0369a1;">${impactReal}</div><div class="l">有真實影響範圍</div></div>
+      <div class="meta-card"><div class="n" style="color:#94a3b8;">${impactNa}</div><div class="l">影響範圍 N/A</div></div>
+      <div class="meta-card"><div class="n" style="color:#0f172a;">${impactReal + impactNa}</div><div class="l">總分析變更</div></div>
+      <div class="meta-card"><div class="n" style="color:#0f172a;">12</div><div class="l">派工分析 agent</div></div>
+    </div>
+  `;
+  main.appendChild(overview);
+
+  const note = document.createElement('div');
+  note.className = 'overview';
+  note.innerHTML = `
+    <h2>使用說明</h2>
+    <p>每條變更分四類：<span class="change-type add">新增</span> 全新功能；<span class="change-type adj">調整</span> 既有功能改動；<span class="change-type fix">修正</span> 問題修復；<span class="change-type internal">內部</span> 客戶無感的技術優化。</p>
+    <p>條目下方若顯示「同步影響：xxx」，表示同一個改動也影響其他分頁，點擊可跳轉。</p>
+    <p>每條變更下方有「影響範圍 ▶」摺疊區塊，點開可看這次改動會連帶影響到的功能區域。影響範圍依四種來源分類：
+      <span class="impact-repo-tag repo-backend">後端服務</span> 後端業務邏輯與資料層；
+      <span class="impact-repo-tag repo-api">後端介面</span> 後端對外契約（影響前後端介接）；
+      <span class="impact-repo-tag repo-admin">後台介面</span> 後台共用元件與設定；
+      <span class="impact-repo-tag repo-app">玩家端 App</span> 玩家端跨頁共用模組。
+    </p>
+    <p style="margin-top:8px; font-size:12px; color:#94a3b8;">註：cassim、jafar、genie、jasmine、lamp 在此區間內無實質變更。</p>
+  `;
+  main.appendChild(note);
+}
+
+function countSection(nodes, prefix) {
+  let s = 0;
+  function walk(n) {
+    if (!n.children || n.children.length === 0) {
+      s += countActiveAt(leafId(n, prefix));
+    } else {
+      for (const c of n.children) walk(c);
+    }
+  }
+  for (const n of nodes) walk(n);
+  return s;
+}
+
+function escapeHtml(x) {
+  return String(x).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// Parse "**[xxx]** 受影響的 ..." → tag + rest
+const REPO_TAG_MAP = {
+  '後端服務': 'backend',
+  '後端介面': 'api',
+  '後台介面': 'admin',
+  '玩家端 App': 'app',
+  '後端 agrabah': 'agrabah',
+  'RPC 契約 rajah': 'rajah',
+  '後台前端 abu': 'abu',
+  '玩家端 lago': 'lago',
+};
+function renderImpactLine(line) {
+  const m = line.match(/^\*\*\[([^\]]+)\]\*\*\s*(.*)$/);
+  if (m) {
+    const tagKey = REPO_TAG_MAP[m[1]] || '';
+    const tagCls = tagKey ? ('impact-repo-tag repo-' + tagKey) : 'impact-repo-tag';
+    return '<li><span class="' + tagCls + '">' + escapeHtml(m[1]) + '</span>' + escapeHtml(m[2]) + '</li>';
+  }
+  if (/^N\/?A\b/i.test(line.trim())) {
+    return '<li class="impact-na">' + escapeHtml(line) + '</li>';
+  }
+  return '<li class="impact-na">' + escapeHtml(line) + '</li>';
+}
+function renderImpact(impact) {
+  const isNa = impact.length === 1 && (/^N\/?A\b/i.test(impact[0].trim()) || impact[0].startsWith('（'));
+  const realCount = impact.filter(s => !/^N\/?A\b/i.test(s.trim()) && !s.startsWith('（')).length;
+  const summary = isNa
+    ? '影響範圍：N/A'
+    : ('影響範圍（' + realCount + ' 條）');
+  let h = '<details class="change-impact' + (isNa ? ' na' : '') + '"><summary>' + summary + '</summary>';
+  h += '<ul class="impact-list">';
+  for (const s of impact) h += renderImpactLine(s);
+  h += '</ul></details>';
+  return h;
+}
+
+// Version buttons
+document.querySelectorAll('.ver-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    const v = b.dataset.ver;
+    if (state.activeVers.has(v)) {
+      if (state.activeVers.size === 1) return;
+      state.activeVers.delete(v); b.classList.remove('active');
+    } else { state.activeVers.add(v); b.classList.add('active'); }
+    renderTree(); renderContent();
+  });
+});
+
+// App buttons (platform / admin / n8 / ny / pk)
+document.querySelectorAll('.app-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    const a = b.dataset.app;
+    if (state.activeApps.has(a)) {
+      if (state.activeApps.size === 1) return;
+      state.activeApps.delete(a); b.classList.remove('active');
+    } else { state.activeApps.add(a); b.classList.add('active'); }
+    // If currently selected leaf becomes hidden due to app filter, fall back to overview
+    if (state.selected !== 'overview') {
+      const sid = state.selected;
+      if ((sid.startsWith('_lago.') && !leafAppVisible(sid)) ||
+          (sid.startsWith('admin:') && !state.activeApps.has('admin')) ||
+          (!sid.startsWith('_lago.') && !sid.startsWith('admin:') && !sid.startsWith('_internal.') && !state.activeApps.has('platform'))) {
+        state.selected = 'overview';
+      }
+    }
+    renderTree(); renderContent();
+  });
+});
+
+// Show-empty toggle
+document.getElementById('show-empty').addEventListener('change', e => {
+  state.showEmpty = e.target.checked;
+  renderTree();
+});
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+  state.search = e.target.value.trim();
+  renderTree();
+});
+
+renderTree();
+renderContent();
+</script>
+</body>
+</html>

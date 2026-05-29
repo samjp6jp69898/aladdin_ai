@@ -1,0 +1,4067 @@
+{
+  "versions": [
+    {
+      "id": "518",
+      "label": "5/18 版（feature/20260518）",
+      "cls": "v518"
+    },
+    {
+      "id": "522",
+      "label": "5/22 版（feature/20260522）",
+      "cls": "v522"
+    },
+    {
+      "id": "526",
+      "label": "5/26 版（feature/20260526）",
+      "cls": "v526"
+    }
+  ],
+  "lago": [
+    {
+      "name": "_lago.home",
+      "label": "首頁／啟動畫面",
+      "tags": [
+        "n8",
+        "ny",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.sport",
+      "label": "體育投注",
+      "tags": [
+        "n8",
+        "ny",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.cricket",
+      "label": "體育 — 板球 Cricket",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.game",
+      "label": "娛樂城／第三方遊戲",
+      "tags": [
+        "pk",
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.live",
+      "label": "PK 直播間",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.message-board",
+      "label": "大舞台／發文／聊天",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.vip",
+      "label": "VIP",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.deposit",
+      "label": "充值",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.withdraw",
+      "label": "提現",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.personal",
+      "label": "個人中心",
+      "tags": [
+        "n8",
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.general-agent",
+      "label": "全民代理（玩家端）",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.about",
+      "label": "關於我們",
+      "tags": [
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.darkmode",
+      "label": "暗黑模式（跨頁面）",
+      "tags": [
+        "ny"
+      ]
+    },
+    {
+      "name": "_lago.activity",
+      "label": "優惠活動",
+      "tags": [
+        "pk",
+        "n8"
+      ]
+    },
+    {
+      "name": "_lago.announcement",
+      "label": "公告／訊息中心",
+      "tags": [
+        "pk"
+      ]
+    },
+    {
+      "name": "_lago.pref",
+      "label": "偏好設置／多語",
+      "tags": [
+        "pk",
+        "ny",
+        "n8"
+      ]
+    }
+  ],
+  "other": [
+    {
+      "name": "_internal.frontend",
+      "label": "前端內部優化／版本更新"
+    },
+    {
+      "name": "_internal.backend",
+      "label": "後端服務內部優化"
+    },
+    {
+      "name": "_internal.rajah",
+      "label": "RPC 協議（rajah）結構整理"
+    }
+  ],
+  "changes": [
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "_lago.home"
+      ],
+      "apps": [
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "啟動畫面動態 LOGO",
+      "subs": [
+        "三個玩家端 App 啟動畫面接上動態 LOGO，未設定時 fallback 為內建 LOGO"
+      ],
+      "idx": 0,
+      "impact": [
+        "N/A — 純 玩家端啟動畫面前端調整，不涉及 後端；三個 App 的 App 啟動畫面 已於本次改動各自直接修改、動態 LOGO 設定 與 主題靜態資源 只在這三個檔內使用，沒有其他非本次改動的下游會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "ny"
+      ],
+      "title": "體育投注新手／專業版切換引導",
+      "subs": [
+        "ny-gaming 體育投注頁首次進入提供「新手版／專業版」切換引導浮窗，玩家可挑選慣用介面後立即套用"
+      ],
+      "idx": 1,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "_lago.live"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "直播間進房資料流程改寫",
+      "subs": [
+        "以伺服器回傳的房間資訊覆寫快取，避免閃過舊房主資訊",
+        "若進入的是自己的房間會自動切到主播端"
+      ],
+      "idx": 2,
+      "impact": [
+        "**[玩家端 App]** 連帶影響 pk App 未在本次改動 修改的 直播 子頁（、、直播 等）：透過共用 mapper. 取回的 直播間Info 在 == null 時 host 改為 undefined（先前固定⋯",
+        "**[玩家端 App]** 連帶影響 pk App 與 SportDetail / RoomSwitchPopup 等讀取 直播間 / 的卡片元件：在 伺服器 真的回傳新欄位後才會顯示具名主播"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "_lago.message-board",
+        "_lago.live"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "直播間評論顯示自動換行",
+      "subs": [
+        "評論顯示支援自動換行與保留原始換行格式，超長文字不再被截斷"
+      ],
+      "idx": 3,
+      "impact": [
+        "N/A — 純 玩家端直播間評論前端樣式調整（自動換行），不涉及 後端"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "_lago.withdraw"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "n8 提款頁面文案微調",
+      "subs": [
+        "提款頁顯示文案微調"
+      ],
+      "idx": 4,
+      "impact": [
+        "N/A — 純 玩家端提款頁面前端文案微調，不涉及 後端；純 n8 App/src/pages/withdraw/components/步驟區段 單檔 TODO 註解空白格式調整，沒有任何邏輯變更也不涉及共用模組"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "user-behavior-log",
+        "character-list",
+        "user-list"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "會員操作紀錄基礎建設端到端",
+      "subs": [
+        "後端建立會員操作紀錄基礎（登入、登出、忘記密碼、裝置 ID 記錄、操作 enum）",
+        "VIP 領獎成功事件補上埋點，可追蹤會員 VIP 獎勵領取行為",
+        "後台風控管理新增「會員操作日誌查詢」分頁，可依識別碼或會員 ID 查閱會員行為紀錄",
+        "新增 event back office 連線設定，預留活動後台對接",
+        "rajah 重新編碼會員行為操作紀錄事件種類／動作／狀態三大列舉（保留 vip / game / user 三大類）",
+        "事件值（value）資料型別由 32 位整數放大為 64 位整數，避免大金額被截斷"
+      ],
+      "idx": 5,
+      "impact": [
+        "**[後端服務]** 連帶影響 金流 / 大舞台 兩個非本次改動的 伺服器：deposit / withdraw / 代理金流內部服務 / 全民代理 App / 大舞台 等 service 透過 會員行為日誌共用埋點 的⋯",
+        "**[後端服務]** 連帶影響 統計 報表 / 風控規則 / 外部下游 資料倉同步：會員行為日誌資料表 value 欄位由32 位整數放大為 64 位整數 改名為 action_id",
+        "**[後端服務]** 連帶影響 會員登入紀錄排程：與 會員行為日誌寫入排程 共用 會員裝置資訊快取 Redis 快取，本次調整裝置 ID 快取 TTL 與 平台Id 寫入結構",
+        "**[後端服務]** 連帶影響 522 / 526 後續版次的 事件大分類：本次砍掉的 profile=4 / security=5 / bet=6 / deposit=7 / withdraw=8 / promotio⋯",
+        "**[後端服務]** 行為日誌金額欄位 由 32 位整數放大為 64 位整數 連帶影響任何非本次改動的下游打點消費者：所有將 EventLog 資料負載 序列化到外部 資料倉同步 / 數據倉 / 報表系統的整合"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "character-list",
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "陪玩帳號身分類型與四項保護權限",
+      "subs": [
+        "新增「禁止關閉陪玩帳號、禁止儲值、禁止提款、禁產返水、禁止參與活動」四類會員身分權限",
+        "rajah 補上陪玩帳號禁止調整四項權限的錯誤碼",
+        "rajah 新增「當前帳號已綁定過提現姓名」錯誤碼"
+      ],
+      "idx": 6,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "新增「禁止 VIP 升降」「禁止參加活動」兩個會員權限旗標",
+      "subs": [
+        "後端會員權限旗標新增兩個項目，作為後續活動排除與 VIP 經驗統計排除的依據"
+      ],
+      "idx": 7,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "betting-record"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "體育投注依比賽 ID 查詢會員投注紀錄",
+      "subs": [
+        "新增 GetSportShowBetList API，後台可依場次調閱會員注單明細",
+        "場館服務新增「依遊戲ID＋賽事ID查詢曬單投注紀錄」契約"
+      ],
+      "idx": 8,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "activity-review",
+        "activity-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動審核新增「彩金統計」能力",
+      "subs": [
+        "活動後台審核列表回傳當前條件下的「申請人數／領取人數／依幣別累計彩金、道具、旗標、進度」彙總",
+        "支援按彩金金額／申請時間／領取時間排序、依排除狀態過濾",
+        "前端可同時取得列表與統計卡片資料"
+      ],
+      "idx": 9,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "activity-review"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動審核新增「暫停審核 / 待申請」獎勵狀態",
+      "subs": [
+        "活動黑名單會同步將命中訂單的狀態切換為「暫停審核」",
+        "避免被列入黑名單的會員獎勵仍被誤發"
+      ],
+      "idx": 10,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "activity-management",
+        "activity-review",
+        "activity-detail"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動模組依會員識別碼查 userId API",
+      "subs": [
+        "活動後台新增依會員帳號／手機／姓名等識別碼精準查 userId 契約，供活動相關搜尋頁以帳號定位會員"
+      ],
+      "idx": 11,
+      "impact": [
+        "**[後端服務]** ActivityPlatform service 被 11 個後台 伺服器（代理 App / 會員後台 / 後台匯出服務 / 資金調整後台 / 遊戲 / 遊戲後台 / 遊戲背景處理 / 金流後台 /⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-deposit-method-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "代理 App「獲取代理代充設置」接口",
+      "subs": [
+        "代理端可查看自身代充設定",
+        "rajah 將 AgentProxyDepositSettings 移到 agent_common 共用模組，前後台同步引用同一份契約"
+      ],
+      "idx": 12,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理後台 後台代充設定（與本次改動共用同一個 ）： / 兩個非本次改動的 manager 已長期讀取相同 的 system 級代充設定",
+        "**[後端服務]** AgentProxyDepositSettings 同時為 11 個 伺服器 共用 資料模型（agent / 代理 App / 代理後台 / 會員前台 / 會員後台 / 後台匯出服務 / 閘道 / ⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理流水返佣提成匯總匯出",
+      "subs": [
+        "後台可直接下載匯總 CSV",
+        "rajah 回傳結構補上幣別欄位以對應多幣別匯總"
+      ],
+      "idx": 13,
+      "impact": [
+        "**[後端服務]** GetAgentCommissionTurnoverRebateSummaryResponse 新增 並重排 / / / 返水Amount 欄位編號"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理數據報表詳細表新增「會員加入時間」",
+      "subs": [
+        "報表詳細搜尋條件新增「會員加入時間」區間",
+        "回傳資料同步多出「加入時間」與「幣別」欄位"
+      ],
+      "idx": 14,
+      "impact": [
+        "**[後端服務]** VentureAgentReportDetail 共 27 個欄位 reindex（5→6、6→7 ... 30→31）並新增 =5 / =31"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "adjustment-request",
+        "adjustment-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "fund_adjustment_back_office 匯入 Currency 支援",
+      "subs": [
+        "資金預設 / 調整流程支援帶入 Currency 參數，後續多幣別資金調整能正確處理"
+      ],
+      "idx": 15,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "add",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "報表管理菜單與權限節點重整",
+      "subs": [
+        "新增「報表管理」二級菜單與「充值報表-充值日報」「充值報表-充提日報」三級權限節點",
+        "原 Finance.DepositReport 拆分為兩支獨立 API 權限"
+      ],
+      "idx": 16,
+      "impact": [
+        "**[後端服務]** ListDepositDailyReport / 充提日報 的 @Permission 由 \"Finance.DepositReport\" 拆為 \"Finance.DepositReport.Dep⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "referral-commission-invoice-list",
+        "turnover-rebate-invoice-list",
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理佣金帳單搜索改變月份方式",
+      "subs": [
+        "佣金帳單搜尋條件邏輯更精確"
+      ],
+      "idx": 17,
+      "impact": [
+        "**[後端服務]** 連帶影響 venture 結算 job 與既有月結模式： 的 month 條件在 daily settlement cycle 改用 invoice_month 區間比對（月初 ~ 次月初）"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "代理「扶持紅利下分」帳變方向修正",
+      "subs": [
+        "「扶持紅利下分」帳變方向修正為「扣除」而非加值，符合業務定義"
+      ],
+      "idx": 18,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "customer_ticket",
+        "issue_complaint"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "客服模組 doTransaction 與 replication lag 檢查調整",
+      "subs": [
+        "customer_info doTransaction 流程調整",
+        "客服 replication lag 檢查失效修正"
+      ],
+      "idx": 19,
+      "impact": [
+        "**[後端服務]** 連帶影響三方客服 komi 回調與 NotifyTicketCreated 通知（非本 commit 直接改）： 拿掉外層 （只 insert 單表） 把 update + insert 合進同一 ⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-deposit-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "代理充值通道彈窗放大",
+      "subs": [
+        "代理充值通道新增/編輯彈窗版面放大為大尺寸，欄位更易閱讀"
+      ],
+      "idx": 20,
+      "impact": [
+        "N/A — 純 後台代理充值通道彈窗的版面尺寸調整，不涉及 後端"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "代理開關初始化改用 disable 顯示",
+      "subs": [
+        "代理開關初始化改用 disable 顯示",
+        "變更後自動刷新，避免狀態顯示與實際不一致"
+      ],
+      "idx": 21,
+      "impact": [
+        "N/A — 純 後台代理開關初始化顯示／自動刷新 UI 行為，不涉及 後端"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "用戶詳細「遊戲概覽」輸贏金額紅綠色區分",
+      "subs": [
+        "輸贏金額依正負以紅／綠色區分顯示"
+      ],
+      "idx": 22,
+      "impact": [
+        "N/A — 純 後台會員詳情頁遊戲概覽輸贏金額紅綠顏色顯示，不涉及 後端"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "deposit-daily-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值報表後續回報需求調整",
+      "subs": [
+        "帳務管理 - 充值報表後續回報需求調整",
+        "rajah 充值報表搜尋的日期類型由「日期+時間」改為純「日期」，並改為非必填；幣別欄位隱藏"
+      ],
+      "idx": 23,
+      "impact": [
+        "**[後端服務]** ListDepositDailyReportSearch 的 / 由 DateTimeRange 改為 DateRange 並移除 Required 加 @Hide"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "commission-settings"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營佣金設置費用來源邏輯調整",
+      "subs": [
+        "費用來源邏輯調整，過濾清單只顯示已開啟項目"
+      ],
+      "idx": 24,
+      "impact": [
+        "**[後台介面]** 連帶影響所有透過 取得通道下拉的非本次修改頁面（彩金中心折扣設定 簽到任務設定 簽到任務列表、合營代理佣金設定 佣金會員詳情 佣金成員詳情彈窗、代理帳變紀錄 代理帳變紀錄 等）： 為這兩個 sele⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "general-agent-commission-details-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "佣金詳情只顯示充值佣金",
+      "subs": [
+        "佣金詳情只顯示充值佣金並調整對應文案"
+      ],
+      "idx": 25,
+      "impact": [
+        "N/A — 純 後台佣金詳情顯示調整與文案，不涉及 後端；改動限於合營代理佣金詳情列表（全民代理佣金詳情列表）與 佣金成員詳情彈窗 兩個檔案間的內部互動，僅多帶 參數與依該值隱藏「查看明細」按鈕，未動到共用元件或 type"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "agent-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "隱藏代理 unknown 狀態搜尋選項",
+      "subs": [
+        "避免代理列表搜尋出現無意義的選項"
+      ],
+      "idx": 26,
+      "impact": [
+        "N/A — 純 後台代理列表搜尋下拉選項隱藏 unknown，不涉及 後端"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "adj",
+      "leaves": [
+        "user-list",
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員裝置查詢 API 改用 platformId + userId",
+      "subs": [
+        "避免跨平台撞號問題"
+      ],
+      "idx": 27,
+      "impact": [
+        "**[後端服務]** 連帶影響 user_login_details 資料表查詢的跨平台隔離行為：會員裝置資訊查詢 的 SQL where 由 改為 跨平台同 的會員裝置 ID 原本可能互相覆寫 / 洩漏",
+        "**[後端服務]** 連帶影響 event 伺服器 以外的 上游呼叫端 解析路徑： 把 上游呼叫端 group key 從 AppUserBackOffice 改為 AppUser",
+        "**[後端服務]** AppUserInternal service 被 22+ 伺服器 透過 上游呼叫端 引用，所有 伺服器 重生 .gen 後 protobuf wire format 變動（新增 平台Id 為 fi⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理帳變紀錄備註欄位顯示修正",
+      "subs": [
+        "帳變紀錄頁面「備註」欄位現在會依照帳變類型正確顯示",
+        "匯出 CSV 補上缺漏的「備註」欄位"
+      ],
+      "tags": [
+        "FAQ-3088"
+      ],
+      "idx": 28,
+      "impact": [
+        "**[後端服務]** 連帶影響後台匯出設定頁與 GetExportFields 通用流程：venture_agent_transaction_list_export 新增的 F.remark 欄位走 / 標準路徑"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理團隊統計口徑修正",
+      "subs": [
+        "活躍會員數、下注會員數、活動彩金口徑偏離問題修正",
+        "改以 user_relation 真正的團隊定義為準"
+      ],
+      "idx": 29,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "user-transaction-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "帳變統計傳遞時間資料型態錯誤修正",
+      "subs": [
+        "避免錯誤資料寫入統計表"
+      ],
+      "idx": 30,
+      "impact": [
+        "**[後端服務]** 連帶影響 統計 伺服器 的 錢包帳變排程 消費端（src/servers/統計/jobs/錢包，非本 commit 直接改）：消費端 依靠 job. 算 時區換算工具(...) 寫入 hourly ⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "activity-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動模組條件判斷錯誤修正",
+      "subs": [
+        "活動條件判斷錯誤修正"
+      ],
+      "tags": [
+        "FAQ-2271"
+      ],
+      "idx": 31,
+      "impact": [
+        "**[後端服務]** 連帶影響所有走 活動 / / / 的玩家端領獎與活動條件流程（活動 等多檔，非本 commit 直接改）：_checkPartType 將 .GetAgentId 回傳 視為「非代理」而不再 war⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "record-center",
+        "betting-record"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "三方遊戲注單 details 欄位確保回傳陣列",
+      "subs": [
+        "避免前端解析錯誤"
+      ],
+      "idx": 32,
+      "impact": [
+        "N/A — 此改動為自閉迴圈，details 陣列防護僅作用在本版次同 commit 新增的 內部組裝迴圈，下游消費者尚未接入該 method"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "fix",
+      "leaves": [
+        "role-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "權限文案與顯示錯誤修正",
+      "subs": [
+        "修正部分權限文案與顯示錯誤"
+      ],
+      "idx": 33,
+      "impact": [
+        "N/A — 後台兩支 commit 僅新增 稽核流水設定 的 TurnoverMultiplierSetting 權限旗標檢查，以及在 localizations 三語 JSON 補上權限樹節點文案（這些文案僅由 role-list 權限編⋯"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "pk",
+        "n8",
+        "ny"
+      ],
+      "title": "lago 直播禮物與多語更新",
+      "subs": [
+        "直播禮物跑馬燈與播放器資源釋放邏輯強化，降低長時間停留直播間的資源占用",
+        "PK 多國語言文案更新"
+      ],
+      "idx": 34,
+      "impact": [
+        "N/A — 純 玩家端直播禮物跑馬燈、播放器資源釋放、PK 多國語言文案前端調整"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "platform",
+        "admin"
+      ],
+      "title": "abu 多語表與版本號更新",
+      "subs": [
+        "平台後台多語表與版本號更新（v1.5.32）"
+      ],
+      "idx": 35,
+      "impact": [
+        "**[後台介面]** 連帶影響合營代理推廣域名匯入結果彈窗（，本次未修改）：本次補上 agent-general-referral-domain-操作紀錄-* 系列 key"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "agrabah 代理／支付模組內部清理",
+      "subs": [
+        "代理模組多項 lint／命名／字串清理",
+        "review 建議修正",
+        "payment 模組 withdraw method statistics unique index 重排"
+      ],
+      "idx": 36,
+      "impact": [
+        "**[後端服務]** 連帶影響重試 / 併發訂單終態統計： / 加上 .data > 0 守衛後，同筆訂單併發或 retry 觸發兩次更新時"
+      ]
+    },
+    {
+      "ver": "518",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "rajah 5/18 結構整理",
+      "subs": [
+        "agent_common 模組擴充：報表詳情新增「上級帳號」欄位整理、欄位編號重排",
+        "補上「逾期帳單結算方式」列舉與「代理代充設置」欄位定義集中化"
+      ],
+      "idx": 37,
+      "impact": [
+        "**[後端服務]** 欄位編號由 29 重排為 13 屬於 線上格式 breaking change：任何序列化 protobuf 並儲存到外部（快取 / persistent log / 重放佇列）的非本次改動下游"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "general-agent-short-link",
+        "_lago.general-agent"
+      ],
+      "apps": [
+        "platform",
+        "n8"
+      ],
+      "title": "全民代理推廣短連結端到端",
+      "subs": [
+        "後台完整功能：列表 / 新增 / 編輯 / 啟用 / 取消 / 移除 / 審核列表 / 批量批准 / 批量拒絕",
+        "含資料庫 schema、審核狀態流程與 Redis 並發鎖",
+        "前台 App：會員可查詢自身推廣域名狀態並提出申請",
+        "申請條件驗證：手機綁定／真實姓名綁定／提現帳號綁定",
+        "審核列表匯出功能",
+        "rajah 新增匯出類型「全民代理推廣域名審核列表」、錯誤碼「推廣域名已存在」"
+      ],
+      "idx": 38,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員後台.PlatformAppUserInternal：本次新建的 SearchAppUserByIdsOrIdentifiers 是審核列表展示會員帳號 / 下級資訊的依賴",
+        "**[後端服務]** 連帶影響合營代理 App 端的會員資料 / 真實姓名 / 提現帳戶綁定流程：申請推廣域名時呼叫 ConfigNameGeneralMemberDomainApplication 配置",
+        "**[後端服務]** 連帶影響非本次直接改動的 後台匯出服務 host： 在 ExportTypeEnum 新增 = 74，下游 後台匯出服務 既有匯出處理 dispatcher 的「依 ExportType 分流」邏輯⋯",
+        "**[後端服務]** 連帶影響非本次直接改動的合營代理菜單與權限管理頁：新增 4 個 AgentGeneral.Referral.Domain.* 權限節點後，後台「角色權限樹」會自動長出新節點"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-ranking",
+        "_lago.activity"
+      ],
+      "apps": [
+        "platform",
+        "pk",
+        "n8"
+      ],
+      "title": "固定排行榜系統",
+      "subs": [
+        "後端：流水榜／盈利榜／等級榜（大舞台貢獻值）三類榜單完整功能",
+        "後台設置週期 / 名次 / 計分策略，支援多語名稱、最大展示名次（100/300）、是否顯示自身名次、啟用狀態",
+        "新增 score / state / settings / periods 四張資料表",
+        "前台 App：會員可查看排行榜並追蹤其他會員",
+        "支援以會員ID/帳號精確搜尋；同步新增五分鐘重算 Job、設定變更廣播訊息",
+        "新增匯出功能"
+      ],
+      "idx": 39,
+      "impact": [
+        "**[後端服務]** 連帶影響 排行榜 伺服器 設定變更廣播訊息：fixed_排行榜 設定變更的 Pub/Sub message 由 排行榜後台 發出、排行榜 / 統計 收聽",
+        "**[後端服務]** 連帶影響非本次直接改動的 大舞台 伺服器： 在 MessageBoardInternal 新增 BatchCheckFollowStatus / GetTopUserPointsForRanking⋯",
+        "**[後端服務]** 連帶影響非本次直接改動的 會員後台 host：在 PlatformAppUserInternal 新增 GetAppUserProfilesForRanking 與 AppUserRankingPr⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-post-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "大舞台後台發文管理「置頂排序」",
+      "subs": [
+        "後台發文管理新增置頂排序功能"
+      ],
+      "idx": 40,
+      "impact": [
+        "**[後端服務]** 連帶影響玩家端官方動態頁 大舞台.玩家端官方動態查詢：與後台共用 大舞台兩段式分頁邏輯 兩段式分頁邏輯，本次後台改成兩段式後玩家端跨頁 分頁游標 計算規則同步變動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-level-setting",
+        "message-board-level-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "大舞台等級名稱多語系支援",
+      "subs": [
+        "等級名稱由單一字串擴充為多語字串",
+        "新增大舞台與排行榜協作的內部 API：批次查關注狀態、取等級榜 top-N 貢獻值、查單一使用者貢獻值"
+      ],
+      "idx": 41,
+      "impact": [
+        "**[後端服務]** 連帶影響 levels 資料表的既有讀取點：level_name 由 string 改為 LocalizationString 後",
+        "**[後端服務]** 連帶影響非本次直接改動的 service_共用介面 多語服務 ID 對照表：新增 = 2003 後，整個多語管理後台「服務 ID 下拉」會多一個值"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "message-board-user-information-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "大舞台會員行為對應操作狀態欄位",
+      "subs": [
+        "新增會員行為對應操作狀態欄位"
+      ],
+      "idx": 42,
+      "impact": [
+        "**[後端服務]** 連帶影響大舞台會員行為查詢的下游消費：新增「會員行為對應操作狀態欄位」後，後台會員行為日誌頁、會員詳情頁日誌彈窗會多出該欄位；其他讀 會員行為日誌資料表展示分類的稽核 / 風控報表也會看到該新欄位"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-participation",
+        "activity-statistic"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動參與統計／活動統計報表",
+      "subs": [
+        "依活動名稱+時間範圍／活動ID取得會員彩金/道具/旗標/進度/領取次數/充提總額/待提現總額",
+        "活動列表可依參與人數、領取次數、彩金總金額排序",
+        "後台新增「活動審核」三級菜單初始版本，與後端 API 串接"
+      ],
+      "idx": 43,
+      "impact": [
+        "**[後端服務]** 連帶影響活動黑名單 / 排除名單查詢：本次新增的內部批次 介面（idx 57）SearchAppUserByIdsOrIdentifiers 是統計查詢解析會員資訊的依賴",
+        "**[後端服務]** 連帶影響活動審核三級菜單：本次「活動審核」初始版本與後端 活動_平台.list*Review / 對接，後續審核狀態改變（，idx 59）會同步影響此菜單的搜尋結果",
+        "**[後端服務]** 連帶影響非本次直接改動的活動詳情頁與會員管理頁：新增 ActivityGetActivityStatisticSearch / ActivityStatistic / 後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-detail"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動明細新增多項欄位",
+      "subs": [
+        "新增「稽核倍數」與「登錄資訊」欄位",
+        "新增「帳變備註」欄位，後台可看到該筆活動獎勵實際入帳的備註內容",
+        "首存金額欄位",
+        "rajah 新增申請IP、申請地區、申請端別、申請設備號欄位供大廳前端展示與審計"
+      ],
+      "idx": 44,
+      "impact": [
+        "**[後端服務]** 連帶影響 活動_internal.、quests/base_quest 等 5 處活動獎勵發放路徑：新增 transaction_remark 欄位後",
+        "**[後端服務]** 連帶影響 會員任務獎勵紀錄 表的下游消費者：後台匯出服務 的 會員任務獎勵紀錄_export 匯出、活動審核列表、會員資料 - 活動明細彈窗都會看到新的稽核倍數 / 登錄資訊 / 帳變備註 / 首存⋯",
+        "**[後端服務]** 連帶影響 會員後台.UserData：本次 user_data 服務拆出共用 金流 方法後（idx 79），活動模組查 user 與 金流 模組查 user 走相同分離方法",
+        "**[後端服務]** 連帶影響非本次直接改動的 活動後台 reflection 消費者：// 在 ActivityUserQuestRewardRecord 等 資料模型 新增 操作紀錄Multiplier / / / ⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report",
+        "deposit-data-statistics"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值報表手動扣減與重新計算歷史資料",
+      "subs": [
+        "充值報表（每日存提匯總）新增手動扣減欄位，並重新計算歷史資料"
+      ],
+      "idx": 45,
+      "impact": [
+        "**[後端服務]** 連帶影響 存提日報 表的所有讀取點：本次新增 manual_deduct 欄位後，錢包 伺服器、金流統計內部服務、代理後台.代理彙總 等 6 處讀此表的 service 都要重新對齊新欄位"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值列表「取消理由」與「類型判斷」欄位",
+      "subs": [
+        "新增「取消理由」與「類型判斷」欄位",
+        "rajah 後台充值列表/訂單詳情回傳新增「取消/拒絕類型（會員自取/系統逾時/後台人工）」欄位",
+        "前端依此加多語前綴顯示"
+      ],
+      "idx": 46,
+      "impact": [
+        "**[後端服務]** 連帶影響 金流後台.deposit_平台. 與既有訂單詳情下游：充值列表與訂單詳情共用同一個 資料模型 回傳，新增「取消/拒絕類型」欄位後",
+        "**[後端服務]** 連帶影響合營代理充值頁（idx 81）：取消／拒絕原因依拒絕類型顯示前綴邏輯，需 deposit_orders 表新增的取消理由欄位才能正確分流，兩個 commit 必須同時上線",
+        "**[後端服務]** 連帶影響非本次直接改動的 DepositOrderEssential 既有消費者： 新增 DepositRejectTypeEnum 65 與 DepositRejectTypeEnum 新 enu⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-list",
+        "deposit-method-list",
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值列表 / 充值方式操作日誌",
+      "subs": [
+        "充值列表 / 充值方式操作改寫入會員操作紀錄",
+        "後台支付相關操作改寫入會員操作紀錄"
+      ],
+      "idx": 47,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員行為日誌資料表的下游消費者：本次充值列表 / 充值方式新增寫入會員操作紀錄後，event_back_office.event_平台.（會員行為日誌頁）、會員詳情 - 行為日誌彈窗、風控⋯",
+        "**[後端服務]** 連帶影響支付埋點補齊（idx 56）的相依關係：本 commit 與 OTP / 註冊 / 登入 / 忘密 / 充值回調埋點同屬一個事件分類擴充計畫",
+        "**[後端服務]** 連帶影響非本次直接改動的 共用介面 事件大分類 跨 伺服器 共用點： 在 事件大分類 新增條目（與 idx 56 一同擴張）",
+        "**[後端服務]** 連帶影響非本次直接改動的「會員行為日誌」搜尋頁 (會員操作日誌查詢)：事件大分類 / 事件動作識別 新增條目後，原本的「行為大類 / 小類」下拉選單會自動多出三大類（金流 / agent / mes⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "agent-promotion-tiered-deposit-rewards"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值滿額獎勵設置「週期內新註冊會員才列入統計」",
+      "subs": [
+        "代理後台「充值滿額獎勵設置」新增「週期內新註冊會員才列入統計」開關",
+        "控制獎勵發放對象"
+      ],
+      "idx": 48,
+      "impact": [
+        "**[後端服務]** 連帶影響合營代理 tiered_deposit_rewards_settings 表的執行器 tiered_deposit_rewards processor：本次新增「週期內新註冊會員才列入統計」⋯",
+        "**[後端服務]** 連帶影響 agent_promotions_平台 後台設定頁的既有充值滿額獎勵：新欄位上線後既存設定的預設值處理（false/null）需在 processor 端容錯，未升級的歷史設定按舊行為運作"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-discount-list",
+        "withdraw-discount-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充提優惠檢查「禁止參加活動」狀態",
+      "subs": [
+        "充值／提款優惠檢查會員是否處於「禁止參加活動」狀態",
+        "狀態被禁則無法套用優惠"
+      ],
+      "idx": 49,
+      "impact": [
+        "**[後端服務]** 連帶影響 金流_manager.（共用方法）：本次 deposit / withdraw 兩個 service 同步加入「禁止參加活動」狀態檢查",
+        "**[後端服務]** 連帶影響 會員前台.活動Restricted 狀態欄位讀取點：會員後台、活動管理（活動黑名單）、VIP 月禮設置等讀此欄位的 service 沒改但都會影響流程"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理數據報表詳細匯出與匯總增強",
+      "subs": [
+        "詳細匯出支援匯總資訊",
+        "新增「加總欄位」",
+        "rajah 報表詳細回傳改為同時帶 summary 彙總列（注單量、投注金額、有效投注、中獎、會員投注盈虧、充值、提現、返水、優惠、推薦佣金、流水返佣、淨利潤等 16 項）"
+      ],
+      "idx": 50,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理報表（共用 manager）：本次新增 彙總 16 項彙總欄位後，內部 合營代理數據報表詳細匯出 匯出（合營匯出檔）、代理後台.agent_平台 報表查詢、代理彙總 模型都共用 代理報⋯",
+        "**[後端服務]** 連帶影響 後台匯出服務.合營代理數據報表詳細匯出 匯出類型：本次 manager 多 彙總 列後，匯出檔案 CSV 第一行 / 表尾邏輯需配合 idx 71「彙總 只在第一頁傳回」一起調整",
+        "**[後端服務]** 連帶影響非本次直接改動的 代理共用介面 跨 伺服器 模型：合營代理報表詳情彙總 新增 string 17 後，所有 import 代理共用介面 的後端 伺服器（agent / 代理後台 / 代理 A⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "agent-deposit-order-list",
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理上下分操作新增「會員端備註」",
+      "subs": [
+        "代理上下分操作可填寫獨立的「遊戲前端備註」",
+        "會員可於前端看到該筆代理操作的備註",
+        "rajah 後台與會員端可看到不同備註"
+      ],
+      "idx": 51,
+      "impact": [
+        "**[後端服務]** 連帶影響 agent_transactions 表的所有讀取點：本次新增 user_remark 欄位後，agent_金流（合營代理 App 端會員可見備註）、代理金流內部服務（內部呼叫）、合營代理⋯",
+        "**[後端服務]** 連帶影響合營代理帳變紀錄匯出 CSV（idx 105）：匯出檔案會多出 user_remark 欄位，匯出格式設定、欄位對齊規格必須跟著調整"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理帳變紀錄搜索強化",
+      "subs": [
+        "帳變紀錄搜索條件強化正確性",
+        "rajah 帳變紀錄交易類型新增「撤銷佣金會員轉入到合營佣金」「撤銷合營代理紅利返佣」兩個分類"
+      ],
+      "idx": 52,
+      "impact": [
+        "**[後端服務]** 連帶影響 agent_transactions 表 錢包_type 欄位的所有讀取點： 改用 錢包_type 過濾（idx 70）與本次「強化搜索正確性」屬同一支 service 的兩段修補",
+        "**[後端服務]** 連帶影響 TransactionCategoryTypeEnum 既有讀取點：新增「撤銷佣金會員轉入到合營佣金」「撤銷合營代理紅利返佣」兩個分類後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "referral-commission-invoice-list",
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理佣金帳單「月份」欄位生成代碼統一",
+      "subs": [
+        "月份欄位生成代碼統一"
+      ],
+      "idx": 53,
+      "impact": [
+        "**[後端服務]** 連帶影響 commission_invoice 與 referral_commission_invoice 兩張表的 month 欄位產出路徑：本次共用月份生成代碼後，未來月份格式變動只需改一處"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "tag-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "新增 risk_back_office server",
+      "subs": [
+        "含 IP 區域風控基礎設置",
+        "rajah 新增 risk_back_office.rajah 雛形：限制遊戲 IP/地區的列表 API、限制項目（遊戲黑/白名單）、限制方式（IP / 國碼）列舉",
+        "後台風控管理對接 risk_back_office IP/區域服務"
+      ],
+      "idx": 54,
+      "impact": [
+        "**[後端服務]** 連帶影響 與 設定檔：新增 後台風控 伺服器 後，平台_閘道 增加 後台風控 route，現有 風控 伺服器 與 平台 服務發現需重新啟動才能識別新 伺服器",
+        "**[後端服務]** 連帶影響 tag_log（風控管理）相關下游：後台風控 IP/區域限制服務上線後，遊戲廠商管理頁、會員管理頁中既有的 IP 區域顯示需與 後台風控 對齊",
+        "**[後端服務]** 連帶影響非本次直接改動的 伺服器 註冊機制： 新增 services/後台風控 整檔（RiskPlatformIpRegion service、RiskIpRegionSearch / RiskIp⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "admin:in-house-game-vendor",
+        "admin:in-house-game-list",
+        "admin:bet-records"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "自研遊戲機器人功能（後台與設定）",
+      "subs": [
+        "新增 robot 相關設定表、後台 service 與下注設定模板",
+        "rajah 新增「機器人投注管理」整套契約：機器人列表（Profile，可設多語暱稱、頭像、性別、VIP等級、大舞台等級）",
+        "機器人行為設定（綁定自研遊戲、最大/最小機器人數、波動週期、投注金額範圍、最多張數、同局參與率、進場頻率、前/中/後段機率與時間、封盤緩衝時間、玩法上限）"
+      ],
+      "idx": 55,
+      "impact": [
+        "**[後端服務]** 連帶影響 自研遊戲後台 既有自研遊戲管理頁：本次新增 in_house_遊戲_robot_back_office service 與既有自研遊戲列表共用同一個 伺服器",
+        "**[後端服務]** 連帶影響 in_house_遊戲 自研遊戲投注流程：機器人投注設定（最大/最小數、波動週期、進場頻率等）會在自研遊戲下注 service 內被讀取",
+        "**[後端服務]** 連帶影響大舞台等級系統與 VIP 系統：機器人 Profile 可設定大舞台等級、VIP 等級，read 大舞台 / VIP 等級資料的下游需相容機器人帳號",
+        "**[後端服務]** 連帶影響非本次直接改動的「VIP 等級設定」與「大舞台等級設定」既有後台頁：被機器人配置 reference 為 Select 後，這兩個既有設定頁的下拉資料源被新模組共用"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "註冊／登入／OTP／充值回調埋點補齊",
+      "subs": [
+        "註冊、登入、OTP、手機綁定、忘記密碼、充值回調事件補上會員操作埋點",
+        "rajah 會員行為小分類大幅擴充：新增支付（充值、取消充值、申請提現、綁定提現帳戶）、代理（代理充值、代理取消充值）、大舞台（發文、評論、打賞、改頭像、改背景、改暱稱、改個性簽名）共 13 項",
+        "行為大類新增 payment / agent / messageboard 三項",
+        "行為狀態碼新增 8 項（電話格式錯誤、提現次數超限、充值建單成功、充值上分成功、綁定帳戶超量、綁定銀行卡成功、發文次數已用盡等）"
+      ],
+      "idx": 56,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員行為日誌共用埋點 與 會員行為日誌資料表的全部下游消費者：本次行為大類新增 金流 / agent / messageboard 三項、小分類擴充 13 項、狀態碼新增 8 項後",
+        "**[後端服務]** 連帶影響 大舞台 / agent / 金流 既有 service 的埋點點位：新分類上線後，原本未埋點的支付申請提現 / 綁定提現帳戶 / 發文 / 評論 / 打賞 / 改頭像等 13 個操作會開始⋯",
+        "**[後端服務]** 連帶影響非本次直接改動的「會員行為日誌列表」(會員操作日誌查詢) 與「會員詳情 - 行為日誌」分頁：事件大分類 從 3 大類擴成 6 大類，事件動作識別 從 11 小類擴成 24 小類",
+        "**[後端服務]** 連帶影響非本次直接改動的 風控 / 風控報表 daily 彙總：事件狀態碼 新增 =8 / =10 / =11 / =12 / =13 / =14 / =15 七個狀態碼後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台批次查詢會員內部 API",
+      "subs": [
+        "可批次依 ids 或識別碼查詢會員",
+        "rajah 新增 SearchAppUserByIdsOrIdentifiers 與「給活動列表用、含首存金額」「給活動黑名單列表用、含真實姓名」兩個內部批次 API"
+      ],
+      "idx": 57,
+      "impact": [
+        "**[後端服務]** 連帶影響活動參與統計與活動黑名單（idx 43）：「給活動列表用、含首存金額」「給活動黑名單列表用、含真實姓名」兩個內部批次 介面 屬於本次的補強",
+        "**[後端服務]** 連帶影響非本次直接改動的 PlatformAppUserInternal 既有 13 個 伺服器 消費端： 在 新增 method SearchAppUserByIdsOrIdentifiers",
+        "**[後端服務]** 連帶影響非本次直接改動的 UserSearchItem 資料模型 共用：新 method 沿用既有 UserSearchItem"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "referral-commission-invoice-list",
+        "commission-invoice-list",
+        "turnover-rebate-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "日結／週結／推薦人佣金處理日誌加強",
+      "subs": [
+        "加強日結／週結／推薦人佣金處理日誌"
+      ],
+      "idx": 58,
+      "impact": [
+        "**[後端服務]** 連帶影響 agent_referral_report processor 與 venture/daily_turnover_reward / weekly_turnover_reward / ven⋯",
+        "**[後端服務]** 連帶影響 agent_commission_manage_平台：本次補強的日誌包含 cross-db query 修正（idx 109）與 會員前台_id 替代 agent_id 修正"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "activity-review"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動排除特定獎勵狀態查詢",
+      "subs": [
+        "新增 excludeRewardStatuses 查詢支援",
+        "rajah 將「排除審核狀態」欄位由單值改為陣列，預設排除「待申請、待領取、已過期」三狀態"
+      ],
+      "idx": 59,
+      "impact": [
+        "**[後端服務]** 連帶影響活動審核 三級菜單（idx 43）：本次將「排除審核狀態」由單值改為陣列（預設排除待申請、待領取、已過期）後，活動審核列表預設查詢結果筆數會增加；既有書籤、儲存的搜尋條件若依賴單值會失效",
+        "**[後端服務]** 連帶影響非本次直接改動的「活動審核」「活動明細」共用 介面 介面：兩頁共用 ActivityPlatform 同一支 method（comment 中明文寫共用）"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-data-statistics"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值數據統計報表頁面",
+      "subs": [
+        "充值管理新增「充值數據統計」頁面",
+        "集中呈現充值成功筆數、金額與人工增減等指標",
+        "支援標題 tooltip 說明",
+        "rajah 新增「充值數據統計」API：依日期範圍回傳「卡片彙總（充值總筆數、成功筆數、成功金額、人工扣款筆數/金額）」與「分頁列表（每日成功率）」",
+        "與「充提日報」共用統計表確保口徑一致",
+        "「充值通道統計」權限節點由 PaymentDeposit.DepositStatistics 重命名為 PaymentDeposit.Statistics，並新增「充值數據統計」三級權限節點"
+      ],
+      "idx": 60,
+      "impact": [
+        "**[後端服務]** 連帶影響 充值統計權限 權限節點重命名為 充值統計權限：所有原本綁定 DepositStatistics 權限的角色 / 後台帳號配置需重新對應",
+        "**[後端服務]** 連帶影響 存提日報 表的口徑一致性：本頁新增的「充值數據統計」介面 與「充提日報」共用同一張統計表，本次（idx 45）manual_deduct 欄位新增後兩個頁面口徑會同步",
+        "**[後端服務]** 連帶影響後台「充值通道統計」既有頁面：與本頁同屬 充值權限 權限樹下，權限重命名影響到此既有頁的存取權",
+        "**[後端服務]** 連帶影響非本次直接改動的權限樹節點重命名： 把 充值通道統計 權限從 '充值統計權限' 改成 '充值統計權限'，把 充值數據統計 從 '充值統計權限.DepositDataStatistics' 改⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-withdraw-daily-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "帳務管理 - 報表管理新增「充提報表」頁面",
+      "subs": [
+        "整合充值與提現的每日數據",
+        "rajah 充提報表搜尋條件改為非必填、隱藏幣別欄位"
+      ],
+      "idx": 61,
+      "impact": [
+        "**[後端服務]** 連帶影響充值報表（idx 45）：充值報表與本頁共用 存提日報 表，搜尋條件由必填改為非必填、隱藏幣別欄位後兩頁面搜尋體驗會出現差異",
+        "**[後端服務]** 連帶影響 後台匯出服務 充值與提現匯出（idx 104）：充提報表整合後匯出檔案的欄位排列順序可能影響到既有匯出檔案 CSV 解析的下游 資料倉同步",
+        "**[後端服務]** 連帶影響非本次直接改動的 統計服務介面 同檔搜尋條件 資料模型：// 把 充值數據統計Search 的 / 從 @Rules Required 改非必填 加 @Hide",
+        "**[後端服務]** 連帶影響非本次直接改動的「充值數據統計」頁面：與「充提報表」共用 充值數據統計Search 資料模型，幣別欄位 @Hide 後既有「充值數據統計」頁的幣別下拉會一起消失，需確認那頁是否需另開幣別欄位"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "fund-adjustment-preset"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "資金預設快捷功能",
+      "subs": [
+        "資金調整新增「快捷預設」分頁",
+        "可預先建立預設選單，提交調整時直接套用",
+        "rajah 新增「狀態切換」獨立權限節點"
+      ],
+      "idx": 62,
+      "impact": [
+        "**[後端服務]** 連帶影響 id_currency_amount_links 表的下游：本次資金預設快捷 資金調整後台 新增 preset 後",
+        "**[後端服務]** 連帶影響資金調整既有頁面：新增「狀態切換」獨立權限節點會引發 角色權限 角色設定變更，現有負責資金調整的後台帳號需重新指派該節點才能啟用 / 停用快捷",
+        "**[後端服務]** 連帶影響非本次直接改動的「角色權限樹」： 把 Set資金調整預設Status 的 @Permission 從 '資金調整權限.Preset.Ops.Status' 改成 '資金調整預設狀態權限.Sw⋯",
+        "**[後台介面]** 連帶影響後台會員資金列表與會員資金調整列表（會員資金紀錄 / 會員資金調整紀錄，本次未直接修改）：兩頁透過 UserFundEditPopup 開啟資金編輯彈窗"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "user-list",
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員資料 - 詳細頁新增「會員操作日誌」分頁",
+      "subs": [
+        "固定使用該會員 ID 查詢",
+        "rajah 會員操作紀錄日誌搜尋的「操作時間」欄位由隱藏改為純日期區間，正式對前台開放搜尋條件"
+      ],
+      "idx": 63,
+      "impact": [
+        "**[後端服務]** 連帶影響 event_back_office.event_平台. 既有會員行為日誌頁：本次「操作時間」欄位由隱藏改為純日期區間後，原本依預設時間範圍查詢的客戶端會看到新的搜尋 UI",
+        "**[後端服務]** 連帶影響非本次直接改動的會員行為日誌風控頁： 把 Risk會員操作日誌Search / Member會員操作日誌Search 的 / 從 @Hide 改為 @Type 'DateRange:Star⋯",
+        "**[後台介面]** 連帶影響後台會員列表（會員列表）與商城兌換紀錄頁：兩頁本次未直接修改，但都透過 UserDetailDialog 開啟會員詳情抽屜，本次新增『會員操作日誌』分頁後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.about"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "n8 公司資訊頁面",
+      "subs": [
+        "新增「關於我們、創新理念、即時遊戲、隱私政策、穩定與安全、責任博彩」等公司資訊頁面",
+        "於登入頁可進入"
+      ],
+      "idx": 64,
+      "impact": [
+        "N/A — 純 玩家端單頁前端新增（n8 公司資訊頁），不涉及後端或跨頁共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.general-agent"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "n8 全民代理頁全新改版",
+      "subs": [
+        "邀請、戰績、團隊統計頁面結構與互動全面更新"
+      ],
+      "idx": 65,
+      "impact": [
+        "N/A — 純 玩家端單頁前端改版（n8 全民代理頁），未動共用功能模組 / 共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "_lago.announcement"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "公告中心依類別分流到對應分頁",
+      "subs": [
+        "公告中心依公告類別自動分流至對應前台分頁顯示"
+      ],
+      "idx": 66,
+      "impact": [
+        "N/A — 純 玩家端依公告類別分流的本地路由邏輯調整，未動共用功能模組 / 共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "betting-record",
+        "record-center"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "場館後台依廠商 ID 取得 game_vendor_game IDs 內部 API",
+      "subs": [
+        "供 statistic server 跨 DB 查詢改用 RPC",
+        "rajah 新增 game_back_office 內部 API"
+      ],
+      "idx": 67,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接改動的 統計 伺服器： 在 遊戲後台 的 GameBackOfficeInternal 新增 GetGameVendorGameIdsByVendorIds 內部 method"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "withdraw-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "提現報表「批次取得會員未完成出款金額」內部 API",
+      "subs": [
+        "避免單筆呼叫造成 N+1"
+      ],
+      "idx": 68,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "add",
+      "leaves": [
+        "deposit-list",
+        "deposit-method-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值訂單回傳新增「會員帳號」欄位",
+      "subs": [
+        "payment 後端服務充值訂單回傳新增 identifier 欄位"
+      ],
+      "idx": 69,
+      "impact": [
+        "**[後端服務]** 連帶影響充值列表（idx 47）與充值方式列表共用的訂單回傳結構：本次 金流 服務新增 identifier 欄位後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理帳變紀錄改用 wallet_type 過濾",
+      "subs": [
+        "僅顯示代理錢包 / 佣金錢包帳變",
+        "正確排除會員側帳變"
+      ],
+      "tags": [
+        "FAQ-3127"
+      ],
+      "idx": 70,
+      "impact": [
+        "**[後端服務]** 連帶影響活動審核（idx 59）與合營代理數據報表（idx 50）：兩者讀帳變類型時與本次 錢包 過濾邏輯獨立，若依賴撤銷類佣金的條目展示需特別對齊"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理數據報表詳細匯總資訊只在第一頁",
+      "subs": [
+        "匯總資訊只在第一頁傳回有效值，避免多頁重複顯示誤導"
+      ],
+      "idx": 71,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理報表 共用 manager：彙總 只在第一頁回傳的變動，會影響既有的合營代理數據報表（idx 50）以及匯出檔案（合營代理數據報表詳細匯出），匯出檔需在第一頁讀 彙總 後再產生表尾"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "referral-commission-invoice-list",
+        "turnover-rebate-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理「手動返水下分」佣金紀錄不再轉正",
+      "subs": [
+        "在佣金紀錄中不再轉正計算"
+      ],
+      "idx": 72,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理報表 既有佣金計算路徑：合營代理流水返佣處理器（venture/turnover_返水_invoice、weekly_turnover_reward）依此 manager 計算佣金"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-proxy-deposit-records-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理代存改以 TransactionCategoryTypeEnum 判斷首儲",
+      "subs": [
+        "改以 TransactionCategoryTypeEnum.deposit 判斷是否觸發首儲檢查",
+        "移除多餘的 agentMemberVentureDeposit 類別"
+      ],
+      "idx": 73,
+      "impact": [
+        "**[後端服務]** 連帶影響 transaction_category_manager 與 TransactionCategoryTypeEnum 既有 6 處讀取點：活動後台、代理後台.錢包、代理金流後台、depos⋯",
+        "**[後端服務]** 連帶影響活動 deposit_duration_condition_provider / deposit_duration_first_condition_provider：充值時長條件、首次充值條⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "general-agent-short-link"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "短鏈接申請審核批量改為批量拒絕",
+      "subs": [
+        "批量審核按鈕改為批量拒絕按鈕",
+        "搭配只可選「已拒絕」狀態的篩選邏輯",
+        "移除批量審核按鈕後清除多餘 tooltip 提示語",
+        "後端批次操作主鍵改為 userId、批次審核改為單筆"
+      ],
+      "idx": 74,
+      "impact": [
+        "**[後端服務]** 連帶影響推廣域名審核流程的 reject 邏輯：批次審核改為單筆後，原本同時審核多筆的後台 UI 動作會被視為多筆獨立 操作紀錄，event log 紀錄筆數會階梯式上升"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理可調整設定獨立到 sys_options.ts",
+      "subs": [
+        "便於後續維運微調"
+      ],
+      "idx": 75,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理後台.sys_options 共用模組：可調整設定獨立後，代理彙總、agent_user、會員前台_id、commission_invoice、代理後台_internal、agent_⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台批次註冊預設欄位檢查調整",
+      "subs": [
+        "批次註冊預設欄位檢查方式調整"
+      ],
+      "idx": 76,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員後台.平台_會員前台 既有批量註冊邏輯：欄位檢查調整影響合營代理批量 import、後台批次註冊兩個入口，缺欄位的 CSV 匯入會看到不同錯誤碼"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "access-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台安全管理「訪問管理」頁面排序",
+      "subs": [
+        "資料順序改為「添加時間新到舊」"
+      ],
+      "tags": [
+        "FAQ-1750"
+      ],
+      "idx": 77,
+      "impact": [
+        "**[後端服務]** 連帶影響 核心後台.app_ip_management 既有訪問紀錄查詢：排序由舊到新改為新到舊後，所有讀此頁的後台帳號預設看到的條目會不同"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "message-board-post-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台官方動態查詢邏輯重整",
+      "subs": [
+        "修正 Get 失效問題"
+      ],
+      "idx": 78,
+      "impact": [
+        "**[後端服務]** 連帶影響玩家端公開動態查詢 大舞台.玩家端官方動態查詢：本次官方動態查詢邏輯重整與後台發文管理（idx 40）共用 大舞台管理 兩段分頁邏輯，玩家端取官方動態的查詢結果跟著變動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list",
+        "agent-deposit-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "訂單列表搜尋優化",
+      "subs": [
+        "訂單列表搜尋優化與日誌排查"
+      ],
+      "idx": 79,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員後台.UserData：本 commit 拆出 金流 共用方法後，活動 user 查詢與 金流 訂單列表搜尋共用同一個 user_data helper",
+        "**[後端服務]** 連帶影響合營代理充值頁的訂單列表搜尋（idx 47）：訂單列表搜尋優化會降低查詢時延、改變 SQL plan，影響合營代理列表頁的捲動載入速度"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值取消失敗時不再寫入操作紀錄",
+      "subs": [
+        "避免無效紀錄干擾"
+      ],
+      "idx": 80,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員行為日誌資料表寫入頻率：原本失敗時也寫入操作紀錄，現在改為失敗不寫入；會員行為日誌（idx 47）總紀錄筆數會下降，下游報表的「取消訂單」事件統計筆數會相應減少"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list",
+        "agent-deposit-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值列表取消／拒絕原因依拒絕類型顯示前綴",
+      "subs": [
+        "取消／拒絕原因依拒絕類型（使用者取消、系統逾時、人工拒絕）顯示對應前綴文案"
+      ],
+      "idx": 81,
+      "impact": [
+        "**[後端服務]** 連帶影響合營代理充值頁與訂單詳情：拒絕類型（會員自取 / 系統逾時 / 後台人工）三類前綴顯示，前端依賴後端 idx 46 的取消類型欄位，兩個 commit 必須同時上線"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "withdraw-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "提現列表審核帳戶資料顯示",
+      "subs": [
+        "審核帳戶資料顯示有誤調整"
+      ],
+      "idx": 82,
+      "impact": [
+        "N/A — 純後台 提現列表審核帳戶顯示調整，後端 介面 未動，未涉及共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-list",
+        "user-transaction-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員資料 - 帳變紀錄分頁標籤與備註顯示",
+      "subs": [
+        "新增會員標籤與備註顯示",
+        "可開啟詳情彈窗"
+      ],
+      "idx": 83,
+      "impact": [
+        "N/A — 純後台 會員資料帳變紀錄分頁標籤與備註彈窗，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-transaction-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "用戶交易類別設置調整",
+      "subs": [
+        "隱藏世界杯相關交易類型選項",
+        "彈窗錯誤處理優化"
+      ],
+      "idx": 84,
+      "impact": [
+        "**[後台介面]** 連帶影響後台會員交易類別列表（，本次未直接修改）：本頁透過 UserTransactionCategorySettingPopup 與 UserTransactionClassificationSe⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "fixed-level"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "固定層級策略描述補上幣別解析",
+      "subs": [
+        "金額顯示依當前幣別呈現"
+      ],
+      "idx": 85,
+      "impact": [
+        "N/A — 純後台 固定層級策略描述補幣別解析，未涉及後端介面"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-list",
+        "withdraw-order-list",
+        "admin:payment-deposit-adapters",
+        "admin:payment-withdraw-adapters"
+      ],
+      "apps": [
+        "platform",
+        "admin"
+      ],
+      "title": "充值／提現列表自動帶入會員帳號搜尋",
+      "subs": [
+        "他頁跳轉到此頁時自動帶入會員帳號進行搜尋",
+        "新增可自定義時間範圍快選"
+      ],
+      "idx": 86,
+      "impact": [
+        "**[後台介面]** 連帶影響後台所有使用快速時間選擇的非本次改動頁面（首頁統計 廳主報表 玩家報表 設備報表 域名報表 VIP 報表 VIP 報表、共用元件 等 6+ 個頁面）：本次 (n)` 方法"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "user-list",
+        "deposit-list",
+        "withdraw-order-list",
+        "admin:platform-management-list",
+        "admin:bet-records"
+      ],
+      "apps": [
+        "platform",
+        "admin"
+      ],
+      "title": "DataTable 操作欄預設標題",
+      "subs": [
+        "操作欄未指定標題時自動顯示「操作」預設標籤"
+      ],
+      "idx": 87,
+      "impact": [
+        "**[後台介面]** 連帶影響後台幾乎所有列表頁的操作欄預設文字： 是超共用元件，被全後台 300+ 頁面引用（會員列表、訂單列表、提現列表、平台管理、注單記錄、活動數據等等）"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值報表與充提報表交易日期顯示",
+      "subs": [
+        "交易日期顯示錯誤調整"
+      ],
+      "idx": 88,
+      "impact": [
+        "N/A — 純後台 報表交易日期顯示修正，未涉及後端介面；後台僅在 `財務管理頁 與 兩頁各自實作日期顯示，未抽共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "message-board-post-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "大舞台官方發文「顯示/隱藏」狀態開關暫時隱藏",
+      "subs": [
+        "相關搜尋與欄位一併隱藏（已於後續 revert）"
+      ],
+      "tags": [
+        "FAQ-534"
+      ],
+      "idx": 89,
+      "impact": [
+        "N/A — 純後台 官方發文顯示/隱藏開關暫時隱藏，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "admin:game-lottery-results"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "開獎紀錄操作按鈕顯示邏輯",
+      "subs": [
+        "補賽果／退單按鈕僅鎖單操作者本人可見",
+        "新增非操作者可看的「檢視鎖單人」按鈕"
+      ],
+      "idx": 90,
+      "impact": [
+        "N/A — 純後台 開獎紀錄操作按鈕顯示邏輯，未涉及後端介面；後台僅 單頁的操作欄按鈕顯示邏輯，未抽共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "admin:platform-management-list"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "好友邀請換線功能開關多語名稱",
+      "subs": [
+        "顯示為「換線是否需要具備合營代理身份」"
+      ],
+      "idx": 91,
+      "impact": [
+        "N/A — 純後台 開關多語名稱顯示，未涉及後端介面；後台僅 多語檔調整，純多語文案無 UI 結構變動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "agent-promotion-description"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "全民代理佣金設置「稽核倍數」改用比率顯示",
+      "subs": [
+        "rajah 改用 @Type 'Rate:10000' 顯示為比率"
+      ],
+      "idx": 92,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.general-agent"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "代理 App 三支契約加上強制登入校驗",
+      "subs": [
+        "取代理域名+推廣碼、取全民代理域名+邀請碼、取代理代充設置三支契約加上 @LoginRequired"
+      ],
+      "idx": 93,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接改動的 代理 App 玩家端啟動點： 在 代理 的 GetAgentDomainWithReferralCode / GetGeneralAgentDomainWithFriend⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk",
+        "ny"
+      ],
+      "title": "體育投注紀錄詳情比分顯示規則",
+      "subs": [
+        "三方注單的比分顯示規則與文字格式調整（含足球角球比分）"
+      ],
+      "idx": 94,
+      "impact": [
+        "**[玩家端 App]** 連帶影響 ny App 賽事詳情頁（ny ）：雖然本次改動 只標記為 PK 三方注單調整，但同步修改的 common/components/體育投注/賽事詳情 是 ny 賽事詳情頁也引用的盤口⋯",
+        "**[玩家端 App]** 連帶影響 ny App 投注成功彈窗（ny App/src/App 主介面 引入的 common 投注成功彈窗）：彈窗 entry 行多加一段 s核心Text 文字節點"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.deposit"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "充值頁「預估可獲得金額」",
+      "subs": [
+        "改為扣除手續費並計入優惠後的實際入帳金額"
+      ],
+      "idx": 95,
+      "impact": [
+        "N/A — 純玩家端 充值頁「預估可獲得金額」前端計算調整，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.withdraw"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "提款頁餘額直接呼叫 API",
+      "subs": [
+        "避免快取造成的金額不同步"
+      ],
+      "idx": 96,
+      "impact": [
+        "N/A — 純玩家端 提款頁前端取餘額流程調整，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "體育投注三方注單查詢條件",
+      "subs": [
+        "紀錄列表更貼合實際資料"
+      ],
+      "idx": 97,
+      "impact": [
+        "N/A — 純玩家端 體育投注紀錄列表查詢條件調整，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.home",
+        "_lago.personal"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "n8 介面細節調整",
+      "subs": [
+        "首頁、設定頁、側邊選單與標題列等多處 n8 介面細節調整"
+      ],
+      "idx": 98,
+      "impact": [
+        "N/A — 純玩家端 n8 介面多頁細節調整，未動 玩家端共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.announcement",
+        "_lago.personal"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "n8 啟動時預載公告與站內信",
+      "subs": [
+        "App 啟動時即預載公告與站內信",
+        "使用者登入後立即取回個人資訊",
+        "密碼重置流程提示訊息精簡"
+      ],
+      "idx": 99,
+      "impact": [
+        "N/A — 純玩家端 n8 啟動流程調整，僅在 n8 子專案範圍內"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.pref"
+      ],
+      "apps": [
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "偏好設定「盤口賠率」儲存後正確套用",
+      "subs": [
+        "偏好設定中的「盤口賠率」儲存後可正確套用至盤口顯示"
+      ],
+      "idx": 100,
+      "impact": [
+        "N/A — 純玩家端 偏好設定本地儲存與展示同步修正，未動共用功能模組"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "adj",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "投注單串關失效顯示與頁籤樣式",
+      "subs": [
+        "串關失效時顯示文字修正",
+        "投注單頁籤樣式微調"
+      ],
+      "idx": 101,
+      "impact": [
+        "N/A — 純玩家端 體育投注單失效顯示與頁籤樣式調整，未動共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "vip-config",
+        "vip-level-config"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "VIP 模組修正",
+      "subs": [
+        "VIP 模組修正"
+      ],
+      "tags": [
+        "FAQ-3118"
+      ],
+      "idx": 102,
+      "impact": [
+        "**[後端服務]** 連帶影響 user_VIP_level_manager 共用 manager：VIP 等級變更與活動明細獎勵發放（idx 44）共用 路徑"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台批量註冊預設值補齊",
+      "subs": [
+        "批量註冊修正預設值補齊"
+      ],
+      "tags": [
+        "FAQ-3095"
+      ],
+      "idx": 103,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員後台.平台_會員前台 既有批量註冊邏輯（與 idx 76 同檔）：本次補預設值與欄位檢查調整屬同一波後台批次註冊修補"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "deposit-list",
+        "withdraw-order-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值列表 / 提現列表匯出欄位修正",
+      "subs": [
+        "匯出檔案部分欄位與頁面顯示不一致"
+      ],
+      "tags": [
+        "FAQ-3030",
+        "FAQ-3044"
+      ],
+      "idx": 104,
+      "impact": [
+        "**[後端服務]** 連帶影響 後台匯出服務 既有充值 / 提現匯出 CSV 結構：本次 deposit_orders_list_export / withdraw_orders_list_export 修正後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "agent-transaction"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理帳變紀錄匯出 CSV 撤銷類佣金顯示",
+      "subs": [
+        "撤銷類佣金的交易類別仍顯示為數字代碼修正"
+      ],
+      "tags": [
+        "FAQ-3122"
+      ],
+      "idx": 105,
+      "impact": [
+        "**[後端服務]** 連帶影響 後台匯出服務.transaction_category_formatter 共用 utility：本次撤銷類佣金顯示修正後",
+        "**[後端服務]** 連帶影響合營代理帳變紀錄頁（idx 51 / 70）：頁面顯示與匯出 CSV 共用 formatter，顯示與匯出口徑同步"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "message-board-tip-audit-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "打賞審核匯出多語系修正",
+      "subs": [
+        "打賞審核匯出多語系修正"
+      ],
+      "idx": 106,
+      "impact": [
+        "**[後端服務]** 連帶影響 後台匯出服務.大舞台_tip_操作紀錄_list_export 共用打賞審核匯出邏輯：多語 key 補齊後，匯出檔的繁簡英三語會由原本的 fallback 文字變成正確多語"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "deposit-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值回調取不到會員登入資訊修正",
+      "subs": [
+        "充值回調取不到會員登入資訊問題修正"
+      ],
+      "idx": 107,
+      "impact": [
+        "**[後端服務]** 連帶影響 common_services/會員前台 與 會員行為日誌共用埋點 共用模組：充值回調的會員資料解析修正"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "adjustment-request",
+        "adjustment-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "建立資金預設快捷錯誤修正",
+      "subs": [
+        "補上對應 id_currency_amount_links 表"
+      ],
+      "idx": 108,
+      "impact": [
+        "**[後端服務]** 連帶影響 currency_link_manager 共用 manager：本次補上 id_currency_amount_links 表後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "agent-reports"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營代理推廣報表 cross-db query 修正",
+      "subs": [
+        "修正 cross-db query 與日期區間判斷錯誤"
+      ],
+      "idx": 109,
+      "impact": [
+        "**[後端服務]** 連帶影響合營代理推廣報表 detail export（venture_agent_referral_report_detail_export）：日期區間判斷與 會員前台_id 替代 agent_id⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "activity-management",
+        "activity-detail"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動模組拼字錯誤修正",
+      "subs": [
+        "修正活動模組拼字錯誤",
+        "rajah 活動審核統計欄位 calim* 修正為 claim* 拼字",
+        "活動審核搜尋的「審核時間／領取時間」與「申請時間」順序與註解整理"
+      ],
+      "idx": 110,
+      "impact": [
+        "**[後端服務]** 連帶影響活動審核統計欄位名 calim* → claim*：所有讀此欄位的後台前端 / 匯出 CSV 自動化腳本需重新對齊欄位名；舊欄位名 calim* 的歷史 介面產出的程式碼會失效",
+        "**[後端服務]** 連帶影響活動審核搜尋（idx 43 / 59）：「審核時間／領取時間」與「申請時間」順序與註解整理，會影響前端搜尋表單元件的欄位順序"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "message-board-level-setting"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "大舞台等級名稱 i18n 修正",
+      "subs": [
+        "rajah 列表項目與設定模型的 levelName 由 string 改為 LocalizationString"
+      ],
+      "idx": 111,
+      "impact": [
+        "**[後端服務]** 連帶影響大舞台等級列表與設定模型 由 string 改為 LocalizationString（idx 41）：所有讀 的下游（活動獎勵發放、會員等級升等通知、合營報表）都要切到 才能正確顯示",
+        "**[後端服務]** 連帶影響非本次直接改動的 service_共用介面 多語服務 ID 表：新增 = 2003 後，所有 import service_共用介面 的後端 伺服器 重新 建置 會觸發全量 generate⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員操作日誌查詢無法透過 ID 搜尋",
+      "subs": [
+        "修正會員操作日誌查詢搜尋無法透過 ID 搜尋的問題"
+      ],
+      "idx": 112,
+      "impact": [
+        "**[後端服務]** 連帶影響 event_back_office.event_平台. 既有會員行為日誌頁：本次修正會員操作日誌透過 ID 搜尋的問題，搜尋條件 search by id 上線後"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "store-items"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "商城道具總表 toggle 無權限仍可變更",
+      "subs": [
+        "無權限時 toggle hover 出現「無法更動」提示卻仍可點擊變更狀態的問題修正"
+      ],
+      "tags": [
+        "FAQ-3099"
+      ],
+      "idx": 113,
+      "impact": [
+        "N/A — 純後台 商城道具 toggle 權限校驗修正，未涉及後端介面"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "role-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "權限長度顯示問題修正",
+      "subs": [
+        "修正權限長度顯示問題"
+      ],
+      "idx": 114,
+      "impact": [
+        "N/A — 純後台 權限長度顯示修正，未涉及後端介面；後台僅 多語表權限長度文案調整，純多語修正無 UI 結構變動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "customer_ticket"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "錯誤碼相關多語文案修正",
+      "subs": [
+        "修正錯誤碼相關多語文案",
+        "如「未綁定手機號碼」「客服工單」相關提示"
+      ],
+      "idx": 115,
+      "impact": [
+        "N/A — 純前端 多語 多語文案修正，AI 不得編輯 localizations/*.json，影響範圍由開發者匯入 Google Sheets 後管控"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.vip"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "VIP 頁面無法開啟修正",
+      "subs": [
+        "VIP 頁面無法開啟的問題已修正"
+      ],
+      "idx": 116,
+      "impact": [
+        "N/A — 純玩家端 VIP 頁無法開啟修正，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.activity"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "活動列表跳轉「前端頁面」類活動內頁失敗",
+      "subs": [
+        "活動列表點擊跳轉「前端頁面」類活動內頁失敗問題修正"
+      ],
+      "tags": [
+        "FAQ-2324"
+      ],
+      "idx": 117,
+      "impact": [
+        "N/A — 純玩家端 活動列表跳轉前端頁面修正，後端 介面 未動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.announcement"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "代理公告新訊息同步合營入口紅點",
+      "subs": [
+        "代理公告新訊息現在會同步更新合營入口的紅點提示"
+      ],
+      "tags": [
+        "FAQ-2622"
+      ],
+      "idx": 118,
+      "impact": [
+        "N/A — 純玩家端 公告紅點同步修正，未動共用功能模組；雖修改 common/api/消息 新增 AGENT_ANNOUNCEMENT 快取鍵 與 方法"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "體育購物車「全部餘額」金額帶入修正",
+      "subs": [
+        "體育購物車點擊「全部餘額」後金額正確帶入注單"
+      ],
+      "tags": [
+        "FAQ-1955"
+      ],
+      "idx": 119,
+      "impact": [
+        "N/A — 純玩家端 體育購物車金額帶入修正，未動共用元件；pk App 單一 App 內購物車數字鍵盤調整（pk App/src/pages/體育投注/components/注單 與 ），這兩個檔案非 common/ 共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "體育注單多語 key 錯誤修正",
+      "subs": [
+        "體育注單因多語 key 錯誤導致文字顯示為英文／key 名的問題修正"
+      ],
+      "tags": [
+        "FAQ-2564"
+      ],
+      "idx": 120,
+      "impact": [
+        "N/A — 純前端 多語 key 補齊，AI 不得編輯 localizations/*.json"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "fix",
+      "leaves": [
+        "_lago.game"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "遊戲重新進入舊資料殘留修正",
+      "subs": [
+        "遊戲重新進入時前一局舊資料殘留的問題修正",
+        "遊戲頁 console warning 一併清理"
+      ],
+      "idx": 121,
+      "impact": [
+        "N/A — 純玩家端 遊戲重新進入舊資料清理修正，未動共用功能模組"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_lago.darkmode"
+      ],
+      "apps": [
+        "ny"
+      ],
+      "title": "ny 暗黑模式覆蓋率大幅擴張",
+      "subs": [
+        "登入／註冊、忘記密碼、客服中心、會員中心（含個人資料、地址、密碼欄位）",
+        "娛樂城（含遊戲廠商、遊戲群組、收藏、最近瀏覽、搜尋）",
+        "體育（投注單、注單摘要、成功彈窗）",
+        "活動（活動列表、活動詳情、商城規則、VIP 等級資訊）",
+        "優惠／公告、訊息中心、App 下載、提款、入金、訂單紀錄、跑馬燈、直播聊天列等頁面的深色配色與圖示資產"
+      ],
+      "idx": 122,
+      "impact": [
+        "**[玩家端 App]** 連帶影響 pk App 體育下注流程的版面渲染：「[ny]dark 體育投注 / bet」commit 同步調整了 體育注單共用元件/{注單元件,注單項目,注單元件Summary,投注成功彈窗⋯"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "pk",
+        "n8",
+        "ny"
+      ],
+      "title": "lago 5/22 其餘前端內部優化",
+      "subs": [
+        "活動任務邏輯重構為 composable",
+        "探索頁媒體切換刪除邏輯性能優化",
+        "PK 多國語言文案與 n8／ny 多語同步",
+        "依賴解析錯誤修正"
+      ],
+      "idx": 123,
+      "impact": [
+        "**[玩家端 App]** 連帶影響 pk App 投注成功彈窗版面：「[ny]dark 補圖」順手改了 體育注單共用元件/components/投注成功彈窗 的 第二參數為 true（理論上載入 dark 變體）",
+        "**[玩家端 App]** 連帶影響 n8 / ny / pk 全部 App 的依賴解析行為： 三支「修正 dependencies are imported but could not be resolved」comm⋯",
+        "**[玩家端 App]** 連帶影響 pk App 探索頁媒體查看器（ 與 ）： 改用 filter 取代 splice，pk 被多處媒體預覽組件透過 取用",
+        "**[玩家端 App]** PK 與 n8 / ny 的 localizations/*.json 同步更新（純多語文字）由開發者直接從 Google Sheets 匯入，不會自動回饋至程式碼"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "abu 5/22 活動數據 UI 微調與重構",
+      "subs": [
+        "活動數據／活動審核 UI 微調、refactor",
+        "移除誤改變動",
+        "補充未完成程式碼註解"
+      ],
+      "idx": 124,
+      "impact": [
+        "N/A — 後台內部活動數據與審核 UI 微調，未動 後台共用元件"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "agrabah 5/22 代碼整理與優化",
+      "subs": [
+        "代理推廣域名 service 委派至 manager",
+        "imports 重排、agent_report_manager 抽共用",
+        "payment debug log 移除"
+      ],
+      "idx": 125,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理報表 共用 manager：本次抽共用後 代理後台 報表多處讀取點切過去，imports 重排不影響功能但 git blame 變動"
+      ]
+    },
+    {
+      "ver": "522",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "rajah 5/22 結構整理",
+      "subs": [
+        "欄位順序整理、@hide → @Hide 大小寫統一、註解補強",
+        "推廣域名 service 委派至 manager",
+        "審核流程以 userId 為主鍵重構",
+        "平台行為紀錄新增「充值方式推薦切換」「充值方式顯示通道切換」「固定排行榜設定更新」「固定排行榜啟用切換」四項",
+        "多語服務識別 ID 新增「大舞台等級名稱」「固定排行榜設定名稱」"
+      ],
+      "idx": 126,
+      "impact": [
+        "**[後端服務]** 連帶影響 會員行為日誌資料表的下游消費者：平台行為紀錄新增「充值方式推薦切換」「充值方式顯示通道切換」「固定排行榜設定更新」「固定排行榜啟用切換」四項後"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "character-list",
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "陪玩帳號保護強制四項權限",
+      "subs": [
+        "身分類型為「陪玩帳號」時，後台必須勾選四項受限權限（禁止儲值／禁止提款／禁產返水／禁止參與活動），缺一不予保存",
+        "角色管理：陪玩帳號類型強制鎖定「禁止充值／提現／返水／參加活動」四項固定禁止項，並更新多語顯示"
+      ],
+      "idx": 127,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "user-list",
+        "vip-upgrade-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "「禁止 VIP 升降」與「禁止參與活動」權限上線",
+      "subs": [
+        "勾選後 VIP 經驗統計與活動參與會跳過該會員",
+        "會員狀態新增「VIP 等級變更」與「參加活動」兩個權限控管欄位",
+        "rajah 新增權限切換 API 節點與批次取會員權限 API BatchGetAppUserPrivileges",
+        "VIP 升降紀錄新增「Locked（鎖級）」類型，記錄會員開啟「禁止 VIP 升降」時觸發但不變更等級的事件"
+      ],
+      "idx": 128,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 5 個下游：轉盤/services/app_轉盤（抽獎黑名單）、金流 與 （充提優惠列表 / 今日已用統計）、managers/金流 多筆建單分支 — 這些先前已串接 的入⋯",
+        "**[後端服務]** 連帶影響 VIP 升降紀錄查詢（後台 VIP_upgrade_log 列表 / 玩家端 VIP 個人頁的升降紀錄）：DbUserVipLevelChangeLog 寫入會多出新增的 紀錄",
+        "**[後端服務]** 連帶影響 /970/1311/1353（非本次改動的呼叫點）：BatchGetAppUserPrivileges 為新增 method",
+        "**[後端服務]** 連帶影響 23 個既有 GetAppUserPrivileges 呼叫點（金流_manager / deposit / withdraw / 直播間_manager / app_轉盤 / custo⋯",
+        "**[後端服務]** 連帶影響 PlatformAppUser service 新增的 PlaceholderDetailToggleForbidVipLevelChange / PlaceholderDetailTog⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "agent-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "後台「設定代理密碼」",
+      "subs": [
+        "與「重設密碼」分流的後台手動指定密碼能力"
+      ],
+      "idx": 129,
+      "impact": [
+        "**[後端服務]** 連帶影響代理前台改密入口 ：底層 回傳型別由 改為 所有原本拿 result.data 為 boolean 判斷的呼叫端必須改為以 failed / 判斷 的 . 等用法需驗證仍可用",
+        "**[後端服務]** 連帶影響 servers/代理後台/services/agent_list_平台 ：與本次新增的 SetAgentPassword 共用同一個 方法回傳型態改變後該流程的錯誤紀錄格式（.）跟著切換到⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "activity-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動「展示週期」設定",
+      "subs": [
+        "後台可獨立設定活動明細顯示期間",
+        "可設「展示週期-每週特定時段（多時段）」",
+        "與原本「活動展示期間」並存",
+        "活動審核搜尋的「申請時間」改為必填"
+      ],
+      "idx": 130,
+      "impact": [
+        "**[後端服務]** 連帶影響活動前台 servers/活動/services/活動 的 GetDetail / GetList 等讀取活動設定的入口：因 活動設定管理._rowsHandler 多帶 欄位",
+        "**[後端服務]** 連帶影響 操作紀錄 紀錄與活動審核搜尋查詢：活動審核「申請時間」改為必填會影響非本次改動但呼叫該搜尋 介面 的儀表板 / 排程，先前空白搜尋的請求會被回退",
+        "**[後台介面]** 連帶影響獎勵中心 17 個 quest 相關頁面（QuestList / QuestPopupEdit / QuestCheckInList / QuestStepConditionList / Q⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "general-agent-referral-commission"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "推薦佣金設置「有效場館設置」",
+      "subs": [
+        "可控制哪些遊戲廠商計入推薦佣金",
+        "未設置代表全體有效",
+        "後台佣金方案推薦佣金設置新增「有效投注遊戲」選擇器，可指定統計範圍的廠商"
+      ],
+      "idx": 131,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的代理結算流程 daily_稽核流水_commission_report / tiered_deposit_rewards / wager / referral 等 proce⋯",
+        "**[後端服務]** 連帶影響後台合營代理推薦佣金列表 ReferralCommissionInvoiceList：原本 raw_data 中 等欄位的人數計算規則改變",
+        "**[後端服務]** 連帶影響 與 levels 欄位 tag 從 4/5 重排為 5/6：舊版本（5/22 之前）的 上游呼叫端 若用舊 .gen 對此 資料模型 做 protobuf decode"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "commission-settings"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "佣金等級設置「直屬有效人數門檻」",
+      "subs": [
+        "作為晉級條件之一",
+        "rajah 新增「需多少有效直屬會員才有佣金層級」門檻欄位"
+      ],
+      "idx": 132,
+      "impact": [
+        "**[後端服務]** 連帶影響代理結算 commission processor中各等級門檻判斷流程：佣金等級設置多了「直屬有效人數門檻」後",
+        "**[後端服務]** 連帶影響後台代理佣金結算結果頁與佣金等級設置頁讀取 commission settings 的下游：合營後台 / 代理後台讀取 CommissionConfig 時會看到 新欄位",
+        "**[後端服務]** 連帶影響 VentureCommissionLevelSettings 欄位 tag 重排（levels 5→6 6→7）：所有讀寫 venture_commission_level_setting⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "佣金帳單詳細欄位擴充",
+      "subs": [
+        "新增「總存款費」與「總提款費」欄位",
+        "rajah 帳單搜尋回傳與匯出新增「新增有效會員人數、投注用戶人數、帳戶調整、補單輸贏、佣金調整、最終佣金額、其他費用 JSON」共 7 個欄位"
+      ],
+      "idx": 133,
+      "impact": [
+        "**[後端服務]** 連帶影響 後台匯出服務 佣金帳單匯出：新增 7 個欄位（新增有效會員人數、投注用戶人數、帳戶調整、補單輸贏、佣金調整、最終佣金額、其他費用 JSON）會被同步寫進 CSV",
+        "**[後端服務]** 連帶影響非本次直接修改的 代理後台 月結算 commission processor ：CommissionInvoiceRawData 模型多了 / processor 寫入新欄位後既有讀取點如 ⋯",
+        "**[後端服務]** 連帶影響 getter（非本次改動）：VentureCommissionInvoiceOriginalData 新增 7 欄並重排 tag（如 9→10/12 10→11/13 11→12/14）",
+        "**[後端服務]** 連帶影響 代理後台/job/合營代理結算排程 .create（非本次改動）：建構 時若沿用舊欄位集合（沒填 / / / ），生成的紀錄會缺值，後續匯出報表會出現空欄"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "third-party-bet-report",
+        "game-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "三方注單統計報表",
+      "subs": [
+        "後台新增列表，依會員聚合的注額／有效注額／派彩 / 公司毛利統計卡片",
+        "匯出 CSV；支援動態排序",
+        "依 userId / userIdentifier / agentId / agentIdentifier / brandId 過濾",
+        "可依「注單數／投注金額／有效投注」排序",
+        "提供「統計卡片彙總」與「列表」兩支 API",
+        "匯出服務新增「三方注單統計報表」匯出類型"
+      ],
+      "idx": 134,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 daily_user_遊戲_brand_bet_統計s 既有讀取點（如 遊戲_report_by_display_tag ）：本次新增的 對同一張表新增 GROUP BY ⋯",
+        "**[後端服務]** 連帶影響 後台匯出服務 ExportTypeEnum 新增 = 76：匯出系統 後台匯出服務 與 export 統計查詢都需要新增對應的 ExportTypeConfig",
+        "**[後端服務]** 連帶影響 ListThirdPartyBetReportSearch 新增 / 欄位 tag 9 / 10：與既有 tag 8 互不衝突（採往後新增策略）"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "game-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "遊戲報表（依品牌／依顯示分類）",
+      "subs": [
+        "依時間範圍+遊戲分類列出每日「投注人數、注單數、投注金額、有效投注、派彩」",
+        "可下鑽到品牌維度",
+        "新增 ReportAnalysis.GameReport 與其 Ops.View 子權限",
+        "後台新增頁面與詳情彈窗，按權限決定是否顯示「詳情」操作"
+      ],
+      "idx": 135,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 平台統計 共用 helper：時間區間條件由 改為 （半開區間），與本檔案內未動過的舊路徑語意不一致，若有從同一 衍生的查詢（如其他報表）需確認都已切換到半開區間",
+        "**[後端服務]** 連帶影響 daily_user_遊戲_tag_bet_統計s 表的舊有查詢點：新增 GROUP BY (started_at_timestamp 遊戲_display_tag) 與 COUNT(DI⋯",
+        "**[後端服務]** 連帶影響後台 PermissionTree：新增 ReportAnalysis.GameReport 與 Ops.View 子權限後"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "betting-statistics",
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "統計模組「依條件取得有效會員 IDs」能力",
+      "subs": [
+        "可加入有效場館等過濾條件",
+        "rajah 新增此契約（與原本只取數量的 CountValidMembersByIds 並列）",
+        "CountValidMembersByIds 多帶 validBrandIds 條件"
+      ],
+      "idx": 136,
+      "impact": [
+        "**[後端服務]** 連帶影響 代理後台/job/合營代理結算排程/processor/venture/{tiered_deposit_rewards,referral,wager}/370/138（非本次改動的 Cou⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "admin:bet-records"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "二八遊戲注單匯出（自研遊戲）",
+      "subs": [
+        "後台新增二八遊戲注單匯出",
+        "匯出服務新增「自研品牌遊戲注單紀錄」匯出類型"
+      ],
+      "idx": 137,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "admin:in-house-game-vendor",
+        "admin:in-house-game-list"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "自研遊戲機器人設計修正",
+      "subs": [
+        "betting_settings 修正欄位預設值",
+        "in_house_game_robot_back_office 邏輯精修"
+      ],
+      "idx": 138,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 in_house_遊戲 機器人讀取點：betting_settings 欄位預設值修正會影響歷史已建立的機器人設定遷移後行為",
+        "**[後端服務]** 連帶影響 in_house_遊戲_robot_back_office service：邏輯精修後該 service 的呼叫方（後台機器人管理頁、機器人模擬注單流程）讀取結果欄位與舊版不一致"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "deposit-list",
+        "deposit-monitor",
+        "deposit-channel",
+        "payment-exchange-rate",
+        "agent-deposit-order-list",
+        "agent-transaction",
+        "withdraw-order-list",
+        "user-behavior-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值／提現操作日誌完整化",
+      "subs": [
+        "充值監控、匯率、代理上下分、提現異動全部寫入會員操作紀錄",
+        "rajah 平台行為紀錄新增 18 項與支付/提現審核流相關紀錄碼",
+        "涵蓋充值方式 Tab 建立/更新、提現訂單風控鎖定/解鎖/通過/拒絕/掛起、財務鎖定/解鎖/付款/拒絕/修正、再提現、提現實例建立/更新、匯率更新"
+      ],
+      "idx": 139,
+      "impact": [
+        "**[後端服務]** 連帶影響後台會員操作紀錄查詢頁（event_back_office..List會員操作日誌 / event_log 系列 介面 的下游消費者）：新增 18 項 PlatformActionId 涵蓋⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "admin:in-house-game-vendor",
+        "admin:in-house-game-list",
+        "admin:bet-records"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "BG 自研遊戲廠商存款／提款狀態查詢",
+      "subs": [
+        "BG 廠商新增存款／提款狀態查詢能力"
+      ],
+      "idx": 140,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 遊戲/services/遊戲 與後台 in_house_遊戲_vendor 列表：BGBase 新增 / 後，原本只取轉帳結果的後台轉帳 / 自研廠商列表頁可查詢三方狀態"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "_internal.backend",
+        "_internal.rajah"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "後台通知設定（BackOfficeNotification）系統建立",
+      "subs": [
+        "以平台為單位設定「財務（會員充值審核、會員提現-風控審核、會員提現-財務審核）、風控（風控日誌）、合營（代理審核、短鏈審核）、全民（短鏈審核）、客服（投訴建議、風控/財務/人工客服三類工單）、活動（活動審核）、大舞台（評論審核、打賞審核、資訊審核）」共 16 個項目的通知/提醒開關",
+        "定義 system id (backOfficeNotification=41)、平台行為紀錄碼、權限樹（設置/通知雙向四層）",
+        "後台通知設定 service 模組以權限樹形式建立佔位 API"
+      ],
+      "idx": 141,
+      "impact": [
+        "**[後端服務]** 連帶影響 service_共用介面 系統識別 新增 = 41 與 平台動作識別 新增 = 4100：所有依 系統識別 做業務分發的下游（操作紀錄、operation log、permission t⋯",
+        "**[後端服務]** 連帶影響 新增 BackOfficeNotificationSettingItemTypeEnum 16 個項目：對應的 BackOfficeNotificationSettingItem @Uni⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "general-agent-user-list",
+        "general-agent-commission-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "全民代理「好友數據報表」",
+      "subs": [
+        "可依代理帳號/UID/上級帳號/上級UID/統計時間/註冊時間搜尋",
+        "回傳每位下級代理 25 欄位（註冊/活躍/新增有效會員/首充人數+金額/複充/總充/總提/充提差額/總投注/有效投注/派彩/盈虧/返水/邀請好友優惠/推薦佣金/打碼佣金）",
+        "彙總卡片（本月首充人數、本月新增有效會員、本月新增推薦人數）",
+        "支援匯出"
+      ],
+      "idx": 142,
+      "impact": [
+        "**[後端服務]** 連帶影響 AgentGeneralPlatform service 新增 GetFriendReport 與 PlaceholderGetFriendReport 兩支 method（非本次改動 h⋯",
+        "**[後端服務]** 連帶影響 GeneralAgentFriendReport 新 資料模型 25 個欄位（ / / / / / / / / / / / /Amount / / / / / / / / / payout⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "使用者批次編輯狀態失敗結果彈窗",
+      "subs": [
+        "列出失敗的會員識別碼與原因"
+      ],
+      "idx": 143,
+      "impact": [
+        "N/A — 此改動為自閉迴圈，使用者批次編輯狀態失敗結果彈窗為 後台單頁 UX，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "activity-detail",
+        "activity-participation",
+        "activity-statistic"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動數據跨頁跳轉與彈窗",
+      "subs": [
+        "活動明細支援他頁跳轉帶入活動代號與名稱",
+        "活動參與統計新增使用者統計詳情彈窗並可跳轉活動明細",
+        "活動統計新增列表、排序與活動詳情彈窗"
+      ],
+      "idx": 144,
+      "impact": [
+        "**[後端服務]** 連帶影響 活動會員統計 / 活動會員統計詳情 加大量 @ 註解但不影響 線上格式：純文件改動，下游無實質影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "betting-record"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "投注記錄版型切換",
+      "subs": [
+        "新增版型切換篩選（全部／一般／體育）",
+        "切換後自動隱藏對應欄位",
+        "rajah 注單紀錄頁面新增「投注紀錄/版面切換」權限節點"
+      ],
+      "idx": 145,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "add",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "體育冠軍盤顯示",
+      "subs": [
+        "體育冠軍盤（冠軍賽）顯示介面新增",
+        "補上對應多國語言文案"
+      ],
+      "idx": 146,
+      "impact": [
+        "N/A — 純 玩家端體育冠軍盤頁面新增，不涉及後端介面或跨頁共用元件"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "referral-commission-invoice-list",
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "歷史未發放佣金帳單必須為正值",
+      "subs": [
+        "負值不予發放，避免異常帳單"
+      ],
+      "idx": 147,
+      "impact": [
+        "**[後端服務]** 連帶影響 referral_commission_invoice 同類流程：與 commission_invoice 共用相同 資料模型 結構，referral 流程沒在本次直接動"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "activity-ranking"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "固定排行榜效能優化",
+      "subs": [
+        "用戶資料 / 追蹤狀態並行查詢",
+        "不同幣別並行計算",
+        "UPSERT 改為 updateOrInsert 避免 lock 衝突",
+        "集中清除 kind 相關 cache",
+        "加入 page / pageSize 防呆",
+        "幣別取得邏輯修正為使用平台預設貨幣"
+      ],
+      "idx": 148,
+      "impact": [
+        "**[後端服務]** 連帶影響 統計/jobs/fixed_排行榜：UPSERT 改為 並使用平台預設貨幣後，非本次修改的 排行榜 平台級資料寫入會繞過 ON DUPLICATE KEY 路徑"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "game-report",
+        "third-party-bet-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "遊戲報表統一使用平台預設貨幣",
+      "subs": [
+        "移除使用者傳入的 currencyCode，統一改用平台預設貨幣"
+      ],
+      "idx": 149,
+      "impact": [
+        "**[後端服務]** 連帶影響後台「遊戲報表」/「三方注單統計報表」全部查詢入口： 改為從 context. 取貨幣後，舊版前端若仍在 search 物件中送 將被忽略",
+        "**[後端服務]** 連帶影響 後台匯出服務 對應匯出（third_party_bet_report_list_export）：以平台預設貨幣 後匯出檔案的金額幣別固定，下游 BI / 對帳工具需修改幣別欄位的解析邏輯",
+        "**[後端服務]** 連帶影響 GameReportByBrandSummary / Row 與 GameReportByDisplayTagSummary / Row 金額欄位（bet / / win）：加上 @Typ⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "fund-adjustment-preset"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "資金預設快捷列表回傳所有幣別",
+      "subs": [
+        "改為回傳所有幣別的金額，避免單幣別漏列",
+        "rajah 「狀態切換」獨立權限節點移除（5/22 加入後本版本移除），使用統一的 Preset.Status.Switch"
+      ],
+      "idx": 150,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 資金調整預設 模型消費者（如資金預設下發 / 後台批次調整）：amounts 結構由「指定幣別陣列」變為「所有幣別陣列」",
+        "**[後端服務]** 連帶影響 資金調整預設編輯 資料模型：name 與 amounts 加 @Columns 2、remark 加 @Columns 1，僅影響前端排版，下游無實質 線上格式 變動"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "commission-settings",
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "agent config value 欄位型態改為 TEXT",
+      "subs": [
+        "由 VARCHAR 改為 TEXT，支援佣金設定超過 18 層"
+      ],
+      "idx": 151,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 configs 表所有消費者（代理後台 中的 / 等）：value 欄位由 VARCHAR(4000) 改為 TEXT 後，下游消費者讀取上限放寬",
+        "**[後端服務]** 連帶影響非本次修改的 代理 App / 代理後台 服務多個 setting 讀取點（代理 代理 全民代理後台、agent_list_平台、agent_commission_manage_平台、age⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "general-agent-commission-details-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "代理佣金詳情彈窗重構",
+      "subs": [
+        "充提費用 tooltip 改顯示實際充值費／提現費",
+        "簡化原始佣金詳情結構",
+        "佣金詳情彈窗補上估算佣金、充提費用等 info 提示與排版調整"
+      ],
+      "idx": 152,
+      "impact": [
+        "N/A — 後台代理佣金詳情彈窗重構為純前端 UI 改動，沒有後端介面變更，對應系統 沒有對應修改"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "佣金帳單列表隱藏不顯示的欄位",
+      "subs": [
+        "隱藏前端不顯示的欄位（新有效會員數、投注人數、額度調整、補單淨額等）",
+        "rajah 合營代理佣金帳單欄位重排：將帳單產生時間、新增有效會員數、有效會員人數、有效直屬會員人數、投注會員數往前",
+        "rajah 佣金帳單原始資料模型「有效投注會員數」改名為「投注會員數」；補上「總充值費用、總提現費用」獨立欄位"
+      ],
+      "idx": 153,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 CommissionInvoice raw_data 欄位語意：「有效投注會員數」改名為「投注會員數」並補上「總充值費用、總提現費用」獨立欄位後",
+        "**[後端服務]** 連帶影響 getter 與 代理後台/job/合營代理結算排程 .create（非本次改動）：VentureCommissionInvoiceDetail 大量欄位排序與 @Columns 重排（ ⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "corner-label-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "角標管理欄位顯示重疊修正",
+      "subs": [
+        "圖片類型角標欄位顯示重疊修正",
+        "圖片類型不再顯示文字並調整最小尺寸"
+      ],
+      "idx": 154,
+      "impact": [
+        "N/A — 後台角標管理 ImageEditor / TextEditor 元件樣式微調，僅單頁 UI 修正"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report",
+        "deposit-data-statistics"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值報表權限細分與標題 tooltip",
+      "subs": [
+        "充值報表、充提報表、充值數據統計：依權限節點細分顯示／隱藏",
+        "充值數據統計、充提報表新增標題 tooltip 說明"
+      ],
+      "idx": 155,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "activity-review"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動審核狀態篩選簡化",
+      "subs": [
+        "移除多餘狀態",
+        "調整審核狀態多語顯示"
+      ],
+      "idx": 156,
+      "impact": [
+        "N/A — 後台活動審核狀態篩選下拉收斂為純單頁 UI 與 多語 文案調整"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "general-agent-short-link"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "拒絕推廣域名審核新增 remark 必填",
+      "subs": [
+        "rajah 「拒絕推廣域名審核（批次）」API 新增 remark 必填參數"
+      ],
+      "idx": 157,
+      "impact": [
+        "**[後端服務]** 連帶影響 函式：簽名新增 remark 選項參數，雖向下相容但所有呼叫端（全民代理後台 拒絕推廣域名審核入口 批次審核）建議補上 remark 才能透明顯示審核原因"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.cricket"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "板球賽事列表與聯賽分組顯示優化",
+      "subs": [
+        "賽事資訊密度與切換流暢度提升"
+      ],
+      "idx": 158,
+      "impact": [
+        "N/A — 純 玩家端板球頁面列表 UX 優化，不涉及後端；板球聯賽分組與賽事列表顯示密度調整僅在 n8 App/src/pages/cricket 子目錄內生效（板球賽事 / / / ） 只被 板球元件 引用"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.cricket"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "板球購物車選項邏輯與輪詢機制重整",
+      "subs": [
+        "避免重複下注",
+        "無關聯賽輪詢自動停用",
+        "詳情頁輪詢機制優化，切離頁面後自動暫停輪詢以節省資源"
+      ],
+      "idx": 159,
+      "impact": [
+        "N/A — 純 玩家端板球購物車邏輯與輪詢機制重整，屬前端單頁優化"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.cricket",
+        "_lago.sport"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "賠率按鈕共用組件",
+      "subs": [
+        "OddsButton 統一抽為共用組件",
+        "賠率變化高亮動畫一致"
+      ],
+      "idx": 160,
+      "impact": [
+        "N/A — OddsButton 共用元件僅在 n8 App 內部從兩處重複定義（板球元件 與 板球詳情元件）合併為 n8 單一檔案"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.cricket"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "板球詳情頁細節調整",
+      "subs": [
+        "收藏按鈕互動與分數面板顯示調整",
+        "市場卡 fixed 樣式吸頂顯示修正"
+      ],
+      "idx": 161,
+      "impact": [
+        "N/A — 純 玩家端板球詳情頁互動細節調整；板球詳情頁互動微調僅在 n8 App/src/pages/cricket_detail 子目錄內生效，板球賽事詳情 與 改動沒有外部消費者"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.personal"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "個人中心月曆項目超長文字溢出",
+      "subs": [
+        "超長文字溢出隱藏，避免破版"
+      ],
+      "idx": 162,
+      "impact": [
+        "N/A — 純 玩家端個人中心月曆樣式修正；個人中心月曆超長文字溢出修正僅改 pk 一個檔案（加 text-overflow / line-clamp 屬性），無下游消費者會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "adj",
+      "leaves": [
+        "_lago.pref"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "錯誤代碼提示訊息格式統一",
+      "subs": [
+        "錯誤代碼提示訊息格式統一"
+      ],
+      "tags": [
+        "FAQ-2886"
+      ],
+      "idx": 163,
+      "impact": [
+        "**[玩家端 App]** 連帶影響 pk App 全 App 所有發起 介面 呼叫的頁面：pk 的 是 全域錯誤攔截器（ ui.）的回呼"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "user-transaction-list",
+        "vip-upgrade-log"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "VIP 帳變紀錄操作人顯示為實際來源",
+      "subs": [
+        "VIP 帳變紀錄操作人原本顯示為「系統」修正為實際操作來源"
+      ],
+      "tags": [
+        "FAQ-3068"
+      ],
+      "idx": 164,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 user-transaction-list 後台查詢與會員「VIP 帳變紀錄」下游報表： 兩處 ChangeUserBalance 的 參數從 context. 改為 0"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "vip-config",
+        "vip-upgrade-config"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "VIP 保級流水計算修正",
+      "subs": [
+        "VIP 保級流水計算修正"
+      ],
+      "idx": 165,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 VIP_level realtime 計算消費者（後台 VIP 設定的「保級流水即時值」、玩家端 VIP 個人頁顯示）：. 計算原本未包含 .，補上後即時保級流水數字會升高"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "activity-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動 GetGameIdsForActivity tag=0 修正",
+      "subs": [
+        "當 tag=0 時改為取所有遊戲"
+      ],
+      "tags": [
+        "FAQ-3138"
+      ],
+      "idx": 166,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 GetGameIdsForActivity 5 個呼叫端：、、活動 — 當活動配置 tag=0 時將從「全平台遊戲」拿 id，活動條件比對範圍跟著放大"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "activity-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "活動複數週期判斷錯誤修正",
+      "subs": [
+        "活動複數週期判斷錯誤修正"
+      ],
+      "tags": [
+        "FAQ-3048"
+      ],
+      "idx": 167,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "login-information"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員登入紀錄 appType 欄位修正",
+      "subs": [
+        "會員登入紀錄 appType 欄位修正"
+      ],
+      "idx": 168,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的後台 與 user_login_history 表的下游消費者（風控 / 安全分析）：會員登入紀錄排程. 中補上 context. = job. 後"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "user-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "會員 IP 搜尋 SQL 修正",
+      "subs": [
+        "會員 IP 搜尋 SQL 修正"
+      ],
+      "idx": 169,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的會員列表 search 邏輯： / 從 改為 原本以 MySQL INET6_ATON 處理的 IPv6 / 雙堆疊 IP 解析將改走應用層轉換"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "佣金帳單批量導入下載模板 CSV 欄數",
+      "subs": [
+        "批量導入下載模板 CSV 欄數不對稱修正"
+      ],
+      "tags": [
+        "FAQ-3152"
+      ],
+      "idx": 170,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的後台佣金帳單批量導入流程（代理後台..BatchImportCommissionAdjustment 與其衍生 csv 解析路徑）： 補上「備註」欄並修正 example 欄⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "commission-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "合營佣金帳單匯出欄位與規格對齊",
+      "subs": [
+        "匯出欄位與規格對齊",
+        "補單元測試",
+        "rajah 合營代理佣金帳單匯出補上漏掉的欄位定義"
+      ],
+      "tags": [
+        "FAQ-3153"
+      ],
+      "idx": 171,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 venture_agent_commission_invoice_export. 等測試斷言（補單元測試後既有 CI 通過點增加），不影響執行行為",
+        "**[後端服務]** 連帶影響 VentureCommissionInvoiceSearchResponse 新增 7 個 資料模型 欄位（ 32 位整數 21 / 32 位整數 22 / 64 位整數 23 / 64 ⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "turnover-rebate-invoice-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "每日有效投注佣金報表欄位",
+      "subs": [
+        "每日有效投注佣金報表欄位與規格對齊"
+      ],
+      "idx": 172,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的後台每日有效投注佣金報表匯出（venture_daily_稽核流水_commission_report_export / member_export）：欄位與規格對齊後"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "admin:in-house-game-vendor",
+        "admin:in-house-game-list",
+        "admin:bet-records"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "BG 廠商 bizId 型別與轉帳狀態修正",
+      "subs": [
+        "bizId 型別錯誤與轉帳失敗時狀態未更新修正",
+        "hashBizId fallback 移除改為 fail-fast，避免 bizId 碰撞"
+      ],
+      "idx": 173,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 遊戲_transactions 表消費者： 改為「先查 遊戲_transactions.id 當 查無則直接回 遊戲TransactionNotExists（fail-fa⋯",
+        "**[後端服務]** 連帶影響非本次修改的 呼叫端：fallback 參數預設為 遊戲VendorUnknownError，post 內部對 open.balance.transfer 改為傳入 遊戲Transactio⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "record-center",
+        "betting-record"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "FB 廠商注單時間戳與簽名修正",
+      "subs": [
+        "FB 廠商注單時間戳改為 number 解析，避免寫入 DB 後產生零日期",
+        "簽名前過濾 null/undefined/NaN 避免簽名不一致"
+      ],
+      "idx": 174,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 FB 廠商歷史注單同步流程： / 改為以 Number 轉換、簽名前過濾 null/undefined/NaN 後"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "admin:bet-records",
+        "admin:game-lottery-results"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "自研遊戲注單同步至 game_records 修正",
+      "subs": [
+        "已結算注單狀態未正確更新修正"
+      ],
+      "tags": [
+        "FAQ-3115"
+      ],
+      "idx": 175,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次直接修改的 遊戲_records 表消費者： 對 Settled / Cancelled 狀態補上 =settle 後，下游 排程能正確觸發 流程"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "admin:game-lottery-results"
+      ],
+      "apps": [
+        "admin"
+      ],
+      "title": "LoktarResultFetcher 分頁撈取與 MAX_PAGES 保護",
+      "subs": [
+        "改為分頁撈取，避免區間過大時遺漏開獎資料",
+        "加 MAX_PAGES 上限保護避免異常時無限迴圈"
+      ],
+      "tags": [
+        "FAQ-3113"
+      ],
+      "idx": 176,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "user-transaction-list"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "帳變類型送出值與後端編碼不一致",
+      "subs": [
+        "改用 enum value 儲存並相容舊 label 格式"
+      ],
+      "tags": [
+        "FAQ-3160"
+      ],
+      "idx": 177,
+      "impact": [
+        "N/A — 後台 user-transaction-list 帳變類型送出值修正屬前端參數值處理，對應系統 沒有對應修改"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "deposit-daily-report",
+        "deposit-withdraw-daily-report",
+        "deposit-data-statistics"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "充值報表結束時間含隔日資料",
+      "subs": [
+        "結束時間送出結果包含隔日資料的問題修正"
+      ],
+      "idx": 178,
+      "impact": [
+        "N/A — 後台充值報表 / 充提報表的時間區間 end 處理屬前端參數送出修正，後端 後端沒有對應改動"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "betting-record",
+        "admin:game-lottery-results"
+      ],
+      "apps": [
+        "platform",
+        "admin"
+      ],
+      "title": "時間區間搜尋包含隔日資料修正",
+      "subs": [
+        "開獎記錄等使用時間區間搜尋會包含隔日資料的問題修正",
+        "end 改為「該分鐘最後一毫秒」相容後端的 < / <= 行為"
+      ],
+      "tags": [
+        "FAQ-3155"
+      ],
+      "idx": 179,
+      "impact": [
+        "**[後台介面]** 連帶影響全平台 80+ 個「使用時間區間搜尋」的後台列表頁： 的 / 把 從『下一分鐘 00.000』改為『該分鐘最後一毫秒 (xx:xx.999)』",
+        "**[後台介面]** 連帶影響所有透過 PropertyFieldEdit + DateTimeRange 模式做查詢字串持久化的頁面：URL query string / 收藏的搜尋條件中的 end 時戳預期會從 xx⋯"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "corner-label-management"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "角標管理圖片類型圖示欄位顯示重疊",
+      "subs": [
+        "角標管理圖片類型圖示欄位顯示重疊修正"
+      ],
+      "tags": [
+        "FAQ-2972"
+      ],
+      "idx": 180,
+      "impact": [
+        "N/A — 後台角標管理圖片類型圖示樣式重疊修正屬單頁 UI 顯示問題"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "game-report"
+      ],
+      "apps": [
+        "platform"
+      ],
+      "title": "遊戲報表 gameDisplayTag 不再 Required",
+      "subs": [
+        "rajah 遊戲報表（依品牌）搜尋的 gameDisplayTag 移除 @Rules 'Required'",
+        "避免分類值 0 被誤判為未填寫"
+      ],
+      "idx": 181,
+      "impact": [
+        "N/A — 此改動為自閉迴圈或無可識別連帶影響，沒有其他功能會被連帶影響"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.personal"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "個人中心「最近在玩的遊戲」",
+      "subs": [
+        "顯示超過 3 款並出現空白項目的問題修正"
+      ],
+      "tags": [
+        "FAQ-3156"
+      ],
+      "idx": 182,
+      "impact": [
+        "N/A — 玩家端個人中心「最近在玩的遊戲」屬玩家端單頁 UI 修正"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.sport"
+      ],
+      "apps": [
+        "pk"
+      ],
+      "title": "三方體育串關注單金額顯示錯誤",
+      "subs": [
+        "三方體育串關注單金額顯示錯誤修正"
+      ],
+      "tags": [
+        "FAQ-3154"
+      ],
+      "idx": 183,
+      "impact": [
+        "N/A — 玩家端三方體育串關注單金額顯示錯誤屬玩家端單頁顯示修正"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "fix",
+      "leaves": [
+        "_lago.cricket"
+      ],
+      "apps": [
+        "n8"
+      ],
+      "title": "板球賽事收藏切換同步",
+      "subs": [
+        "在某些情境下無法即時同步的問題修正"
+      ],
+      "idx": 184,
+      "impact": [
+        "N/A — 玩家端板球賽事收藏切換同步屬玩家端單頁同步邏輯修正"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_lago.darkmode"
+      ],
+      "apps": [
+        "ny"
+      ],
+      "title": "ny 暗黑模式收尾補圖與配色完善",
+      "subs": [
+        "個人中心 Header、商務拓展、卡片清單、入金頭部、福利項目、密碼欄位",
+        "體育投注（注單、注單項、成功彈窗）",
+        "活動／入金（cherry-pick 補齊）"
+      ],
+      "idx": 185,
+      "impact": [
+        "N/A — ny 暗黑模式收尾屬玩家端各頁面樣式與配色完善，不涉及後端介面或跨頁共用元件"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "pk",
+        "n8",
+        "ny"
+      ],
+      "title": "lago 5/26 多語與 landing-page 版號",
+      "subs": [
+        "PK 多國語言更新",
+        "landing-page 版號更新"
+      ],
+      "idx": 186,
+      "impact": [
+        "N/A — pk 多國語言更新與 landing-page 版號屬 localizations / 版號維護，依規範不分析"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.frontend"
+      ],
+      "apps": [
+        "platform",
+        "admin"
+      ],
+      "title": "abu 5/26 多語表更新",
+      "subs": [
+        "多語表更新、版本號更新",
+        "權限稽核參考文件補充"
+      ],
+      "idx": 187,
+      "impact": [
+        "N/A — 後台多語表更新與權限稽核文件補充屬 localizations / 文檔維護，依規範不分析"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.backend"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "agrabah 5/26 內部優化",
+      "subs": [
+        "三方注單統計 / 遊戲報表邏輯抽到 reports 子資料夾",
+        "佣金 invoice model 微優化",
+        "export_back_office enum 改從 remote.gen 匯入",
+        "createAmountFormatter 移至 prepareBatchCache 快取",
+        "推廣域名 code review 優化",
+        "semaphore 新增 ABORT symbol"
+      ],
+      "idx": 188,
+      "impact": [
+        "**[後端服務]** 連帶影響非本次修改的 統計 / 後台匯出服務 報表呼叫端（如 daily_稽核流水_commission_report、其他 平台統計 報表）：報表邏輯抽到 reports 子資料夾後 平台統計 改⋯",
+        "**[後端服務]** 連帶影響非本次修改的 後台匯出服務 in_house_遊戲 共用流程： 移至 快取後，所有匯出時建立 的次數從「每筆 row」降為「每批 快取」，大數據量匯出時間下降；其他從 取 的匯出類型行為一致",
+        "**[後端服務]** 連帶影響非本次直接修改的 消費者：新增 ABORT symbol 後現有 iterate 方法多出「提早終止迴圈」能力，未升級的呼叫端行為不變，新功能可被未來呼叫端採用"
+      ]
+    },
+    {
+      "ver": "526",
+      "type": "internal",
+      "leaves": [
+        "_internal.rajah"
+      ],
+      "apps": [
+        "platform",
+        "admin",
+        "n8",
+        "ny",
+        "pk"
+      ],
+      "title": "rajah 5/26 結構整理",
+      "subs": [
+        "欄位順序整理、註解補強、@hide → @Hide 統一",
+        "後台通知設定 SPECIAL_MAPPERS 對應規則文件化",
+        "通用列舉新增 SortOrderEnum（desc/asc）",
+        "多時長服務 ID 新增「活動展示週期-每週特定時段」"
+      ],
+      "idx": 189,
+      "impact": [
+        "**[後端服務]** 連帶影響 service_共用介面 時段連結服務識別 新增 活動BaseConfigDisplayPeriodWeekDaysTimeRanges = 1603：時段連結 子系統的下游 消費端（ag⋯",
+        "**[後端服務]** 連帶影響 純註解 / Placeholder rename：placeholder method 名稱由 PlaceholderN 改為 PlaceholderSetting/Placeholder⋯"
+      ]
+    }
+  ]
+}
