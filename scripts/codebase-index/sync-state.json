@@ -2,7 +2,7 @@
   "schema_version": 2,
   "agrabah_last_sync_commit": null,
   "rajah_last_sync_commit": null,
-  "last_sync_date": "2026-05-29T02:35:03.875Z",
+  "last_sync_date": "2026-06-01T06:59:59.496Z",
   "processed_commits": {
     "agrabah": {
       "5012d3b1fd00400bb951b19520e5952d242c2006": "2026-05-20",
@@ -2769,7 +2769,21 @@
       "5b1442f1788a6e543af539d22a1b23cfc0ecd388": "2026-05-29",
       "04c65fbd41d1610baf5bea13557ae88f74485115": "2026-05-29",
       "9588053dd98470298d9306137591a234c47572a6": "2026-05-29",
-      "5b8ccd25c3ac6fb078955e6e5088b1fbc8767058": "2026-05-29"
+      "5b8ccd25c3ac6fb078955e6e5088b1fbc8767058": "2026-05-29",
+      "39415420ce2456393a33f58ff8f10cbe3e918036": "2026-06-01",
+      "4282b376dc143d5191f909038590b2578f17c038": "2026-06-01",
+      "e643b21ebc709b482320ff9b8b85a3bf2737c111": "2026-06-01",
+      "c2665378c43b9b4083f756d2b518ab1cd7f5d28e": "2026-06-01",
+      "026928c86f1f9db867f4a65c498198e1f8aae1e2": "2026-06-01",
+      "52e1df4dce98eb31b352e3168a87d0db6c24dc3d": "2026-06-01",
+      "fbf5ae86c4278d598a7bcf74021e97f226be0229": "2026-06-01",
+      "30611154ef076ecd4398b248a85c93bf08b5a87a": "2026-06-01",
+      "07f2c1608955a831d0f80ed4ddd9172365ea41d2": "2026-06-01",
+      "55e0fd5841f46554b9ae370fbd99353490ab227c": "2026-06-01",
+      "f7b75de47f81709a940b1ed75b9e6e97daba9f0a": "2026-06-01",
+      "629b535e76e25505c39f29e4b1969a35518beea9": "2026-06-01",
+      "c0b7d35238e9c47f5fdf5f47789a68fccdbb201b": "2026-06-01",
+      "10dcd577d409ea8ebcc11e2ce1494fb223ba54d2": "2026-06-01"
     },
     "rajah": {
       "47357636d7ae27b3f8e1f71d26e5dcc2babf7a44": "2026-05-20",
@@ -3776,7 +3790,13 @@
       "b8e9a4d9502fd61e562d98fdc75966bb4ffe679f": "2026-05-29",
       "d6f1de895814f6165fa091a3f6ce186ca0930d57": "2026-05-29",
       "03630de0435ffe3377b045181b4dc2a3cbc437ca": "2026-05-29",
-      "d3cb63dbc51eaf4aace1424fd4a06faa5ca65938": "2026-05-29"
+      "d3cb63dbc51eaf4aace1424fd4a06faa5ca65938": "2026-05-29",
+      "43f84774858e17494556b8f88d20d61394bb98a2": "2026-06-01",
+      "0c7e86b973a82291fbef3326fa3c9981776ab2f2": "2026-06-01",
+      "7a8088b6a49fff7c03dc4aabf7c4f44e58c49a33": "2026-06-01",
+      "00d6962cf8fed27c79c3bfdbdafb47291741dff4": "2026-06-01",
+      "ace57fbcf02a6167cf222f8351c43e53cc125214": "2026-06-01",
+      "8db5ed420adc96a05f1fa7168c21c48c6f7883fa": "2026-06-01"
     }
   },
   "sync_history": [
@@ -3940,6 +3960,13 @@
       "rajah_commits": 66,
       "actions": 143,
       "report": "/Users/user/aladdin/obsidian/Codebase/_index/daily-sync-reports/2026-05-29.md"
+    },
+    {
+      "date": "2026-06-01",
+      "agrabah_commits": 14,
+      "rajah_commits": 6,
+      "actions": 5,
+      "report": "/Users/user/aladdin/obsidian/Codebase/_index/daily-sync-reports/2026-06-01.md"
     }
   ]
 }

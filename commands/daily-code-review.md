@@ -6,14 +6,14 @@ user-invocable: true
 
 # Daily Code Review v2 Workflow
 
-You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's **`origin/dev` and `feature/*` branches for commits not yet merged into `origin/pro` whose commit date falls within the requested date window**, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
+You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's **`origin/dev` branch for commits not yet merged into `origin/pro` whose commit date falls within the requested date window**, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
 
 ## Review Scope
 
-- **Branches reviewed:** `origin/dev` **and** all `origin/feature/*` of `agrabah` / `abu` / `lago` / `rajah`. `origin/pro` is used only as the exclusion baseline.
-- **Commits reviewed:** every commit reachable from `origin/dev` or a `feature/*` branch but not from `origin/pro`, **whose commit date falls within the requested date window** (a single day or an inclusive range), **after patch-id de-duplication** (the same change cherry-picked from `dev` onto a `feature/*` build branch is reviewed once — see Step 2). Re-running a date window re-reviews it — there is no cross-run dedup.
+- **Branches reviewed:** `origin/dev` of `agrabah` / `abu` / `lago` / `rajah` **only**. `origin/pro` is used only as the exclusion baseline. `origin/feature/*` branches are **not** scanned.
+- **Commits reviewed:** every commit reachable from `origin/dev` but not from `origin/pro`, **whose commit date falls within the requested date window** (a single day or an inclusive range). `git log` emits each SHA once, so no extra de-duplication is needed. Re-running a date window re-reviews it — there is no cross-run dedup.
 
-> ⚠️ **掃描範圍守則 — 請勿移除 `origin/dev`**：2026-05-21 曾有一次改版把 `origin/dev` 移出掃描、只留 `origin/feature/*`，結果是**產出停在 `origin/dev` / MR 分支、尚未被 cherry-pick 進當期 `feature/*` 建置分支的開發者，連續多日完全未被 review，且過程無任何錯誤訊息**（直到有人發現某 author 長期缺報告才被察覺）。`feature/*` 是從 `dev` cherry-pick 組出來的，唯有 **`dev` 與 `feature/*` 並存掃描**才能涵蓋所有人；也正因兩者並存，Step 2 的 **patch-id 去重**才是必要的（避免同一 change 的 dev / feature 兩個 SHA 被審兩次）。請勿在未充分評估下移除 `origin/dev` 或關閉 patch-id 去重。
+> ⚠️ **掃描範圍守則 — 請勿移除 `origin/dev`**：`origin/dev` 是本流程**唯一**的掃描來源（`origin/pro` 僅作排除基準），移除它等同整個流程掃不到任何 commit、所有開發者連續多日完全無報告且無錯誤訊息（2026-05-21 曾因把 `origin/dev` 移出掃描、只留 `origin/feature/*` 而踩過此坑）。本流程已於 2026-06-01 起改為**只掃 `origin/dev`、不再掃 `origin/feature/*`**：`feature/*` 是從 `dev` cherry-pick 組出來的，原始 authored commit 都在 `dev` 上，因此只掃 `dev` 不會漏人，也不再需要 patch-id 去重。代價是**只存在於 `feature/*`、從未進過 `dev` 的 commit 不在審查範圍內**（依分支策略本不應發生）。請勿在未充分評估下移除 `origin/dev`。
 
 ## Parameters
 
@@ -39,7 +39,19 @@ Examples:
 
 ## Execution Flow
 
-### Step 0: Parse Parameters
+### Step 0: Run Bootstrap, then Parse Parameters
+
+**0.0 — Run the daily bootstrap (每次執行都必跑，無條件):**
+
+Before anything else, run the bootstrap script from the repo root. This is unconditional — it runs on **every** invocation, with no flag-based skip.
+
+```bash
+cd /Users/user/aladdin && sh daily_bootstrap.sh
+```
+
+Wait for it to finish before continuing. The script refreshes rajah (`update.sh` + `bootstrap.sh`) and writes the day's `review/.${TODAY}.bootstrap_ready` flag; any failure inside it is logged to `review/bootstrap.log` but does **not** abort the review.
+
+**0.1 — Parse parameters:**
 
 1. Classify each whitespace-separated token in `$ARGUMENTS`:
    - an 8-digit number → a **date**
@@ -54,27 +66,13 @@ Examples:
    - `DATE_START_FMT = fmt(DATE_START)` and `DATE_END_FMT = fmt(DATE_END)` — `YYYY-MM-DD`, used for git date filtering and the report header
    - `REVIEW_LABEL` = `DATE_START` for a single-day window, otherwise `${DATE_START}-${DATE_END}` (e.g. `20260520` or `20260515-20260520`)
 
-> **`REVIEW_LABEL` only names the outputs** — the report folder `review/{REVIEW_LABEL}/`, the report filenames, and the CSV filename. The **date window `[DATE_START, DATE_END]`** decides which commits are reviewed: commit scope = "`origin/dev` + `origin/feature/*` not yet merged into `origin/pro`, with commit date inside the window, patch-id de-duplicated" (see Step 2).
+> **`REVIEW_LABEL` only names the outputs** — the report folder `review/{REVIEW_LABEL}/`, the report filenames, and the CSV filename. The **date window `[DATE_START, DATE_END]`** decides which commits are reviewed: commit scope = "`origin/dev` not yet merged into `origin/pro`, with commit date inside the window" (see Step 2).
 
 ---
 
-### Step 1: Confirm Bootstrap Flag
+### Step 1: Fetch All Repos (Remote Refs)
 
-```bash
-TODAY=$(TZ=Asia/Taipei date +%Y%m%d)
-FLAG_FILE="/Users/user/aladdin/review/.$TODAY.bootstrap_ready"
-```
-
-| Situation | Action |
-|-----------|--------|
-| Flag exists | Continue |
-| Flag missing | Run `sh daily_bootstrap.sh` and wait |
-
----
-
-### Step 1.5: Fetch All Repos (Remote Refs)
-
-The scan in Step 2 reads the `origin/pro`, `origin/dev` and `origin/feature/*` **remote-tracking refs** directly — it never touches the local working tree or local branches. The only freshness requirement is therefore that each repo's remote-tracking refs are up to date, which a plain `git fetch` guarantees (it is unaffected by `git-lfs` smudge / checkout failures, which only hit the working tree).
+The scan in Step 2 reads the `origin/pro` and `origin/dev` **remote-tracking refs** directly — it never touches the local working tree or local branches. The only freshness requirement is therefore that each repo's remote-tracking refs are up to date, which a plain `git fetch` guarantees (it is unaffected by `git-lfs` smudge / checkout failures, which only hit the working tree).
 
 For each repo in `agrabah`, `abu`, `lago`, `rajah`:
 
@@ -83,7 +81,7 @@ REPO_DIR=/Users/user/aladdin/<repo>
 git -C "$REPO_DIR" fetch --quiet --prune origin
 ```
 
-`--prune` removes stale `refs/remotes/origin/feature/*` for branches deleted after merge, so they are not scanned.
+`--prune` keeps the local remote-tracking refs tidy by dropping branches deleted on the remote; it is not required for correctness now that only `origin/dev` is scanned.
 
 | Situation | Action |
 |-----------|--------|
@@ -96,24 +94,17 @@ After all 4 repos are fetched, proceed to Step 2.
 
 ### Step 2: Scan All Repos — Collect Unmerged Commits + Author Workload
 
-For each of the 4 repos, list every commit reachable from `origin/dev` or an `origin/feature/*` branch but **not** reachable from `origin/pro` **whose commit date is inside the date window**, with `--numstat` for line counts. `git log` walks the commit graph and emits each unique SHA only once across the supplied refs (automatic SHA-level dedup); a branch already fully merged into `pro` contributes zero commits automatically. SHA-level dedup is **not** enough here — `feature/*` build branches are cherry-picked off `dev`, so the same change can appear under two different SHAs; these are collapsed by patch-id at the end of this step.
+For each of the 4 repos, list every commit reachable from `origin/dev` but **not** reachable from `origin/pro` **whose commit date is inside the date window**, with `--numstat` for line counts. `git log` walks the commit graph and emits each unique SHA only once; a branch already fully merged into `pro` contributes zero commits automatically. Because only `origin/dev` is scanned, there is no `dev` / `feature/*` overlap and **no patch-id de-duplication is needed**.
 
 ```bash
 # Run on each repo: agrabah, abu, lago, rajah
-# Refs are expanded inline via command substitution (`$(...)`) so word
-# splitting works in both bash and zsh. Do NOT assign for-each-ref output
-# to an intermediate variable and then expand `$REFS` — zsh does not
-# word-split parameter expansion by default, which would pass the whole
-# list as one arg and silently yield zero commits.
 git -C /Users/user/aladdin/<repo> log --format="COMMIT_START|%an|%ae|%H|%s" --numstat \
   --after="${DATE_START_FMT} 00:00:00" --before="${DATE_END_FMT} 23:59:59" \
-  $(git -C /Users/user/aladdin/<repo> for-each-ref --format='%(refname)' \
-    'refs/remotes/origin/dev' 'refs/remotes/origin/feature/*' 2>/dev/null) \
-  --not origin/pro
+  origin/dev --not origin/pro
 ```
 
 - **Date filter** — `--after` / `--before` keep only commits whose **commit date** falls within `[DATE_START, DATE_END]`. For a single-day window `DATE_START_FMT` and `DATE_END_FMT` are the same date.
-- `for-each-ref` silently skips a ref that is absent. If a repo has neither `origin/dev` nor any `origin/feature/*` ref, the command has no positive ref → skip that repo (it contributes no commits).
+- If a repo has no `origin/dev` ref, the command has no positive ref → skip that repo (it contributes no commits).
 - If the scan yields zero commits across all 4 repos, print `[DONE] {REVIEW_LABEL} no commits in the date window to review.` and terminate.
 
 Parse the output to build a workload table per author:
@@ -126,21 +117,7 @@ Parse the output to build a workload table per author:
 - Subsequent lines with `<added>\t<deleted>\t<filepath>` are numstat → sum added+deleted per author
 - **Deduplicate by `%ae` (email), NOT by `%an`**. The canonical display name is the most recent `%an` observed for that email.
 - When collecting an author's commits in later steps, always filter by `%ae`, never by `%an`.
-- **Record the full SHA list per author per repo** — these drive each Review Agent's commit list (Step 5), **after the patch-id de-duplication below**.
-
-**Patch-id de-duplication (MANDATORY — `dev` and `feature/*` overlap):**
-
-Because `feature/YYYYMMDD` build branches are assembled by **cherry-picking** commits off `origin/dev`, the SAME change routinely exists as two different SHAs — one on `dev`, one on a `feature/*` branch. `git log` dedups by SHA only, so both copies survive Step 2 and would be reviewed twice. Collapse them by patch-id so each change is reviewed once:
-
-```bash
-# stable patch-id of one commit; empty output for merge / no-diff commits
-git -C /Users/user/aladdin/<repo> show --format= <sha> | git patch-id --stable   # → "<patch-id> <sha>"
-```
-
-- Compute the patch-id of every scanned SHA **per repo**, then group by patch-id. For any patch-id with >1 SHA, keep ONE representative — **prefer the `origin/dev` SHA** (the original authored commit) — and drop the cherry-picked copies.
-- Commits whose patch-id is **empty** (merge commits; pure version-bump commits such as `v1.5.253` with no file delta) cannot be collapsed — keep each as-is.
-- Dedup is **per repo** — an identical patch-id appearing in two different repos is coincidental; never merge across repos.
-- Build the author workload table and the per-author SHA lists (Step 5) from the **post-dedup** commit set. Typical overlap in this codebase is ~15–20% of a day's commits.
+- **Record the full SHA list per author per repo** — these drive each Review Agent's commit list (Step 5).
 
 ---
 
@@ -422,5 +399,5 @@ If file already exists, read current content, append new rows only (do not re-wr
 2. **Author deduplication**: Same author across multiple repos = one author, reviewed by one agent across all repos
 3. **Report naming**: Keep original author name from git `%an` even if it contains spaces/special chars
 4. **Agent independence**: Each sub agent reviews independently
-5. **Bootstrap flag**: Flag date = today (script execution date), independent of the review window. The `date1` / `date2` arguments select which commits are reviewed (commit date inside the window); `REVIEW_LABEL` only names the output folder / files
+5. **Bootstrap runs every time**: Step 0 runs `sh daily_bootstrap.sh` from the repo root unconditionally on every invocation (no flag-based skip). The `date1` / `date2` arguments select which commits are reviewed (commit date inside the window); `REVIEW_LABEL` only names the output folder / files
 6. **QA is mandatory**: Every batch must go through QA before the next batch starts (but QA and the next batch's Review Agents can run in parallel if there are remaining batches)
