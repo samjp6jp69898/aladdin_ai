@@ -6,12 +6,18 @@
 //
 // changes.json schema:
 //   {
+//     "versions": [{ "id": "518", "short": "5/18", "full": "5/18 版（…）", "cls": "v518",
+//                    "color": "#6366f1", "bg": "#eef2ff", "fg": "#4338ca", "desc"?: "主題一句話" }, ...],
+//                  // JSON-driven: template.html renders the version chips / colors / headers / theme-cards
+//                  // entirely from this array — adding a new release = append one object here (no template edits).
 //     "lago":     [{ "name": "_lago.<area>", "label": "...", "tags"?: ["n8"|"ny"|"pk"] }, ...],
 //     "other":    [{ "name": "_internal.<slug>", "label": "..." }, ...],
 //     "changes":  [{ "ver": "518"|..., "type": "add"|"adj"|"fix"|"internal",
 //                    "leaves": ["<leafName>", "admin:<leafName>", "_lago.*", "_internal.*"],
 //                    "apps"?: ["platform"|"admin"|"n8"|"ny"|"pk"],  // v3: drives the front-end app filter (multi-select chip)
-//                    "title": "...", "subs"?: [...], "tags"?: [...] }, ...]
+//                    "title": "...", "subs"?: [...], "tags"?: ["FAQ-XXXX"],
+//                    "commits"?: ["<repo>:<short-sha>"],                    // v4: source commit traceability
+//                    "ticketUrls"?: { "FAQ-XXXX": "<notion bug ticket url>" } }, ...]  // v4: FAQ → Notion link (FAQ tag renders as <a>)
 //   }
 
 const fs = require('fs');
@@ -73,6 +79,7 @@ const data = {
   lago: lagoTree,
   other: otherTree,
   changes: CHANGES,
+  versions: changesData.versions || [],
 };
 
 const tpl = fs.readFileSync(path.join(__dirname, 'template.html'), 'utf8');

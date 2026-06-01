@@ -13,9 +13,7 @@
   .topbar .subtitle { font-size: 12.5px; color: #94a3b8; }
   .filters { display: flex; gap: 6px; margin-left: auto; align-items: center; }
   .ver-btn { padding: 5px 13px; border-radius: 14px; border: 1px solid #475569; background: #334155; color: #e2e8f0; font-size: 12.5px; cursor: pointer; font-family: inherit; }
-  .ver-btn.active.v518 { background: #6366f1; border-color: #6366f1; color:white; font-weight: 600; }
-  .ver-btn.active.v522 { background: #10b981; border-color: #10b981; color:white; font-weight: 600; }
-  .ver-btn.active.v526 { background: #f59e0b; border-color: #f59e0b; color:white; font-weight: 600; }
+  /* .ver-btn.active.v<id> colors injected at runtime by injectVersionStyles() from window.__DATA__.versions */
   .app-btn { padding: 5px 11px; border-radius: 14px; border: 1px solid #475569; background: #334155; color: #cbd5e1; font-size: 11.5px; cursor: pointer; font-family: inherit; }
   .app-btn.active.app-platform { background: #6366f1; border-color: #6366f1; color: white; font-weight: 600; }
   .app-btn.active.app-admin    { background: #8b5cf6; border-color: #8b5cf6; color: white; font-weight: 600; }
@@ -61,13 +59,8 @@
 
   .version-block { background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
   .version-header { padding: 10px 16px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f5f9; }
-  .version-header.v518 { background: linear-gradient(90deg, #eef2ff, white); color: #4338ca; }
-  .version-header.v522 { background: linear-gradient(90deg, #ecfdf5, white); color: #047857; }
-  .version-header.v526 { background: linear-gradient(90deg, #fffbeb, white); color: #b45309; }
   .version-pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; color: white; }
-  .version-pill.v518 { background: #6366f1; }
-  .version-pill.v522 { background: #10b981; }
-  .version-pill.v526 { background: #f59e0b; }
+  /* .version-header.v<id> / .version-pill.v<id> colors injected at runtime by injectVersionStyles() */
   .version-body { padding: 4px 0; }
 
   .change-group { padding: 11px 16px; border-bottom: 1px dashed #f1f5f9; }
@@ -83,6 +76,8 @@
   .change-tags { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
   .tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: #f1f5f9; color: #64748b; }
   .tag.faq { background: #fef2f2; color: #b91c1c; }
+  a.tag.faq { text-decoration: none; cursor: pointer; }
+  a.tag.faq:hover { background: #fee2e2; text-decoration: underline; }
   .change-apps { display: inline-flex; gap: 3px; margin-left: 7px; vertical-align: 1px; }
   .app-pill { font-size: 9.5px; padding: 1px 6px; border-radius: 9px; font-weight: 600; color: white; line-height: 1.4; }
   .app-pill.app-pill-platform { background: #6366f1; }
@@ -125,9 +120,7 @@
   .overview p { margin: 4px 0; color: #475569; font-size: 13.5px; line-height: 1.7; }
   .theme-cards { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
   .theme-card { flex: 1; min-width: 230px; padding: 12px 14px; border-radius: 6px; }
-  .theme-card.v518 { background: #eef2ff; border-left: 3px solid #6366f1; }
-  .theme-card.v522 { background: #ecfdf5; border-left: 3px solid #10b981; }
-  .theme-card.v526 { background: #fffbeb; border-left: 3px solid #f59e0b; }
+  /* .theme-card.v<id> colors injected at runtime by injectVersionStyles() */
   .theme-card h4 { margin: 0 0 4px; font-size: 13px; }
   .theme-card p { margin: 0; font-size: 12.5px; color: #475569; }
   .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
@@ -145,9 +138,7 @@
     <label class="toggle-empty"><input type="checkbox" id="show-empty"> 顯示無變更項目</label>
     <span class="filter-sep"></span>
     <span class="filter-label">版本</span>
-    <button class="ver-btn v518 active" data-ver="518">5/18</button>
-    <button class="ver-btn v522 active" data-ver="522">5/22</button>
-    <button class="ver-btn v526 active" data-ver="526">5/26</button>
+    <span id="ver-btns"></span>
     <span class="filter-sep"></span>
     <span class="filter-label">前端</span>
     <button class="app-btn app-platform active" data-app="platform">platform</button>
@@ -174,21 +165,50 @@ const TYPE_META = {
   fix:      { label: '修正', cls: 'fix' },
   internal: { label: '內部', cls: 'internal' },
 };
-const VER_META = {
-  '518': { short: '5/18', full: '5/18 版（feature/20260518 — 該分支獨有新增）', cls: 'v518' },
-  '522': { short: '5/22', full: '5/22 版（feature/20260522 — 該分支獨有新增）', cls: 'v522' },
-  '526': { short: '5/26', full: '5/26 版（feature/20260526 — 該分支獨有新增）', cls: 'v526' },
-};
+// Versions are JSON-driven: every version object lives in window.__DATA__.versions
+// ({ id, short, full, cls, color, bg, fg, desc? }). Adding a new release = append to the JSON only.
+const VERSIONS = (window.__DATA__.versions || []);
+const VER_IDS = VERSIONS.map(v => v.id);
+const VER_META = {};
+for (const v of VERSIONS) VER_META[v.id] = { short: v.short, full: v.full, cls: v.cls, desc: v.desc || '' };
 const ALL_APPS = ['platform', 'admin', 'n8', 'ny', 'pk'];
 
 const state = {
-  activeVers: new Set(['518','522','526']),
+  activeVers: new Set(VER_IDS),
   activeApps: new Set(ALL_APPS),
   selected: 'overview',
   collapsed: new Set(),
   showEmpty: false,
   search: '',
 };
+
+// Inject per-version colors at runtime (replaces the old hard-coded .v518/.v522/.v526 CSS rules).
+function injectVersionStyles() {
+  const css = VERSIONS.map(v => {
+    const cls = v.cls, color = v.color || '#64748b', bg = v.bg || '#f1f5f9', fg = v.fg || '#0f172a';
+    return [
+      '.ver-btn.active.' + cls + ' { background:' + color + '; border-color:' + color + '; color:#fff; font-weight:600; }',
+      '.version-header.' + cls + ' { background: linear-gradient(90deg, ' + bg + ', white); color:' + fg + '; }',
+      '.version-pill.' + cls + ' { background:' + color + '; }',
+      '.theme-card.' + cls + ' { background:' + bg + '; border-left: 3px solid ' + color + '; }',
+    ].join('\n');
+  }).join('\n');
+  const el = document.createElement('style');
+  el.textContent = css;
+  document.head.appendChild(el);
+}
+
+// Render version filter buttons from VERSIONS (replaces the old hard-coded <button> markup).
+function renderVerButtons() {
+  const box = document.getElementById('ver-btns');
+  if (!box) return;
+  box.innerHTML = VERSIONS.map(v =>
+    '<button class="ver-btn ' + v.cls + ' active" data-ver="' + v.id + '">' + escapeHtml(v.short) + '</button>'
+  ).join('');
+}
+
+injectVersionStyles();
+renderVerButtons();
 
 function leafToApps(id) {
   if (!id) return ALL_APPS.slice();
@@ -449,10 +469,11 @@ function renderContent() {
   }
 
   // Group by version
-  const byVer = { '518': [], '522': [], '526': [] };
-  for (const c of changes) byVer[c.ver].push(c);
+  const byVer = {};
+  for (const v of VER_IDS) byVer[v] = [];
+  for (const c of changes) { if (byVer[c.ver]) byVer[c.ver].push(c); }
 
-  for (const ver of ['518','522','526']) {
+  for (const ver of VER_IDS) {
     if (byVer[ver].length === 0) continue;
     const meta = VER_META[ver];
     const block = document.createElement('div');
@@ -491,7 +512,11 @@ function renderContent() {
         }
         if (c.tags && c.tags.length > 0) {
           html += '<div class="change-tags">';
-          for (const t of c.tags) html += '<span class="tag faq">' + escapeHtml(t) + '</span>';
+          for (const t of c.tags) {
+            const turl = c.ticketUrls && c.ticketUrls[t];
+            if (turl) html += '<a class="tag faq" href="' + escapeHtml(turl) + '" target="_blank" rel="noopener">' + escapeHtml(t) + ' ↗</a>';
+            else html += '<span class="tag faq">' + escapeHtml(t) + '</span>';
+          }
           html += '</div>';
         }
         // Cross-ref to other leaves this change is mapped to
@@ -541,10 +566,11 @@ function lookupMeta(id) {
 }
 
 function renderOverview(main) {
-  const totals = { '518': 0, '522': 0, '526': 0 };
+  const totals = {};
+  for (const v of VER_IDS) totals[v] = 0;
   let impactReal = 0, impactNa = 0;
   for (const c of window.__DATA__.changes) {
-    totals[c.ver]++;
+    if (totals[c.ver] !== undefined) totals[c.ver]++;
     if (Array.isArray(c.impact) && c.impact.length > 0) {
       const allNa = c.impact.every(s => /^N\/?A\b/i.test(s.trim()) || s.startsWith('（'));
       if (allNa) impactNa++; else impactReal++;
@@ -556,21 +582,21 @@ function renderOverview(main) {
   const lagoCount = window.__DATA__.lago.reduce((s, n) => s + countActiveAt(n.name), 0);
   const otherCount = window.__DATA__.other.reduce((s, n) => s + countActiveAt(n.name), 0);
 
+  const verShorts = VER_IDS.map(v => VER_META[v].short).join('、');
+  const themeCards = VERSIONS.map(v =>
+    '<div class="theme-card ' + v.cls + '"><h4>' + escapeHtml(v.short) + ' 版（' + (totals[v.id] || 0) + ' 條）</h4><p>' + escapeHtml(v.desc || '') + '</p></div>'
+  ).join('');
   const overview = document.createElement('div');
   overview.className = 'overview';
   overview.innerHTML = `
-    <h2>2026 年 5 月三版變更摘要 <span style="font-size:12px;color:#0ea5e9;font-weight:600;vertical-align:3px;">v2 · 含影響範圍分析</span></h2>
-    <p>本文件按 <strong>abu/platform、abu/admin、lago</strong> 真實菜單階層整理 5/18、5/22、5/26 三個 feature 分支的變更，每段呈現相對於上一版的新增。</p>
-    <p>左側為完整菜單樹（abu 嚴格三級對齊 menu.ts），右側顯示該分頁的變更條目。可勾選「顯示無變更項目」查看完整菜單。</p>
+    <h2>2026 年 5 月版本變更摘要 <span style="font-size:12px;color:#0ea5e9;font-weight:600;vertical-align:3px;">含影響範圍 + 前端篩選</span></h2>
+    <p>本文件按 <strong>abu/platform、abu/admin、lago</strong> 真實菜單階層整理 ${verShorts} 共 ${VER_IDS.length} 個 feature 分支的變更，每段呈現相對於上一版的新增。</p>
+    <p>左側為完整菜單樹（abu 嚴格三級對齊 menu.ts），右側顯示該分頁的變更條目。可勾選「顯示無變更項目」查看完整菜單，並用上方「前端」chip 篩選只看特定 app 的變更。</p>
     <p style="background:#f0f9ff;border-left:3px solid #0ea5e9;padding:8px 12px;border-radius:0 4px 4px 0;font-size:13px;">
-      <strong>v2 新增：</strong>每條變更下方加上「影響範圍」摺疊區塊，點開可看這次改動會連帶影響到的其他功能區域。
+      <strong>影響範圍：</strong>每條變更下方加上「影響範圍」摺疊區塊，點開可看這次改動會連帶影響到的其他功能區域。
       共 ${impactReal} 條有跨功能影響、${impactNa} 條僅單一頁面或顯示調整。
     </p>
-    <div class="theme-cards">
-      <div class="theme-card v518"><h4>5/18 版（${totals['518']} 條）</h4><p>風控／會員行為日誌全鏈路埋點、陪玩帳號權限體系、體育新手版／專業版切換引導。</p></div>
-      <div class="theme-card v522"><h4>5/22 版（${totals['522']} 條）</h4><p>全民代理推廣短連結端到端、ny 暗黑模式全站、固定排行榜、活動數據四子頁、n8 全民代理改版。</p></div>
-      <div class="theme-card v526"><h4>5/26 版（${totals['526']} 條）</h4><p>遊戲報表新維度、n8 板球擴充、暗黑模式補完、廠商 adapter 修正。</p></div>
-    </div>
+    <div class="theme-cards">${themeCards}</div>
     <div class="meta-grid">
       <div class="meta-card"><div class="n">${lagoCount}</div><div class="l">玩家端 (lago) 條目</div></div>
       <div class="meta-card"><div class="n">${platformCount}</div><div class="l">平台後台條目</div></div>
@@ -581,7 +607,7 @@ function renderOverview(main) {
       <div class="meta-card" style="background:#f0f9ff;border-color:#bae6fd;"><div class="n" style="color:#0369a1;">${impactReal}</div><div class="l">有真實影響範圍</div></div>
       <div class="meta-card"><div class="n" style="color:#94a3b8;">${impactNa}</div><div class="l">影響範圍 N/A</div></div>
       <div class="meta-card"><div class="n" style="color:#0f172a;">${impactReal + impactNa}</div><div class="l">總分析變更</div></div>
-      <div class="meta-card"><div class="n" style="color:#0f172a;">12</div><div class="l">派工分析 agent</div></div>
+      <div class="meta-card"><div class="n" style="color:#0f172a;">${VER_IDS.length}</div><div class="l">版本區段</div></div>
     </div>
   `;
   main.appendChild(overview);

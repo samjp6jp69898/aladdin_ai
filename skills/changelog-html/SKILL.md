@@ -33,6 +33,50 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 
 ---
 
+## JSON-first 增量更新（最高優先：能不重跑就不重跑）
+
+> **核心原則**：每一版整理好的 changes 是持久化資產，不是用過即丟的中間檔。新版只「append」，舊版永不重跑 git diff。
+
+**歷史資料位置**：`obsidian/Projects/changelog/data/changes-<YYYY-MM>.json`（一個月一檔，single source of truth）。這份檔含完整 `versions` + `lago` + `other` + `changes`，可直接餵給 build-html.js 產出 HTML，**無需任何 git / menu 重算**。
+
+**`versions` 欄位（JSON 驅動版本渲染）**：每個版本物件為 `{ id, short, full, cls, color, bg, fg, desc? }`。build-html.js 會把整個 `versions` array 注入 `window.__DATA__.versions`，template.html 在執行期由它動態生成版本 chip、注入版本配色（`injectVersionStyles()`）、渲染版本標題與 overview theme-card。**加一個新版本 = 在 JSON 的 `versions` append 一個物件 + 在 `changes` append 該版條目，完全不需要改 template.html / build-html.js**（這是相對舊版「版本顏色/按鈕/標題硬編 7 處」的根本改進）。
+
+| 欄位 | 套用處 |
+|---|---|
+| `color`（主色） | 版本 chip 背景、version-pill、theme-card 左邊框 |
+| `bg`（淺背景） | version-header 漸層、theme-card 背景 |
+| `fg`（深字） | version-header 文字 |
+
+**增量加一個新版本（如已有 518/522/526，要加 529）的標準流程**：
+
+1. 只跑新版的階段 3（重新解析 menu，因新版可能有新菜單頁）、階段 2（4 agent 提取 `<上一版>..<新版>` 增量）、階段 4（mapper）、階段 5/6（影響範圍 + 業務語言）；**舊版完全不動**（影響 worker 因此只需 4 個 = repo 數，而非 v3 範例的 12 個）。
+2. 把新版 changes（`ver:"<新版>"`）append 進 `data/changes-<YYYY-MM>.json` 的 `changes`，並在 `versions` append 新版定義（挑一組未用的 color/bg/fg，例 529 用 rose `#ec4899`/`#fdf2f8`/`#be185d`）。
+3. **菜單改名校驗（必做）**：新版 menu 重新解析後，舊版 leaf 可能因改名或從 item 降級成 group 而失效（實例：5/29 把 `activity-management` 從 item 變 group，原葉功能移到 `activity-settings`，route/perm 不變）。跑一次 build-html.js，依其 `Unknown leaf` 訊息，用 route/perm 比對找出承接葉，把舊資料的失效 leaf 對齊過去。
+4. 重跑階段 7 build-html.js 產出含全部版本的 HTML。
+
+**只是要重出某個已整理月份的 HTML（零新變更）**：直接 `node build-html.js <menu-tree.json> data/changes-<YYYY-MM>.json <out.html>`，秒出，不派任何 agent。
+
+### commit 可追溯性 + FAQ Notion 連結（強制）
+
+每條 change 應帶 `commits` 欄位（對應的 source commit，格式 `["<repo>:<short-sha>", ...]`），讓「某個 commit 有沒有被列入 changelog」可**精確比對**。建立方式：
+
+1. 每版提取後，對 `<上一版>..<新版>` 各 repo 的全部 non-merge commit，派 4 個 agent（每 repo 一個）把每個 commit 對應到 change 的全域 idx（FAQ 編號最強信號、關鍵字比對 title/subs；純技術歸 internal change；merge/squash commit 標排除）。
+2. 合併出每條 change 的 `commits`，並產出**覆蓋率審計** `data/commit-audit-<YYYY-MM>.md`：逐一列出每個 commit 對應到哪條 change（或排除理由）。**若有實質 commit 對應不到任何 change（idx:null），多半是 mapper 遺漏 → 必須補回該條 change**（實例：5/29 審計抓到漏掉「撤銷返水」，已補回 idx 69）。
+3. 覆蓋率目標：實質 commit 100% 對應；只有 merge / 單親 squash commit 可列排除。
+
+**FAQ-[XXXX] → Notion bug ticket 連結（強制）**：當 commit / change 帶 `FAQ-[XXXX]` 工單號時，**必須**附上對應的 Notion bug ticket 連結。Notion bug 資料庫的「單號」屬性（`unique_id`）即 FAQ 編號，用 data_sources query 查 url：
+
+```bash
+curl -s -X POST "https://api.notion.com/v1/data_sources/21c87d78-618a-817f-ae71-000baa9ab11b/query" \
+  -H "Authorization: Bearer <NOTION_TOKEN，見 scripts/notion.sh>" \
+  -H "Notion-Version: 2025-09-03" -H "Content-Type: application/json" \
+  -d '{"filter":{"property":"單號","unique_id":{"equals":<編號數字>}}}'
+```
+
+取回的 `results[0].url` 填入 change 的 `ticketUrls` map（`{"FAQ-XXXX":"https://www.notion.so/..."}`）；tags 統一正規化為 `FAQ-XXXX`（純數字補前綴）。template.html 的 FAQ tag 會自動渲染為可點連結（開新分頁 ↗）。
+
+---
+
 ## 階段 1：確認 branch
 
 用 `AskUserQuestion` 確認：
@@ -395,10 +439,11 @@ node /Users/user/aladdin/.claude/skills/changelog-html/build-html.js \
   - **左側 lago leaf 旁的 app-tag chip**：只顯示「leaf 自己有 ∩ 當前選中」的 app（例如 `_lago.home` 有 `[n8,ny,pk]` tag，只選 pk 時只顯示 `[pk]`）
   - **右側 change 卡片**：依 `change.apps ∩ activeApps` 過濾顯示；同時卡片標題旁的 app-pill 也只顯示「change.apps ∩ activeApps」的子集；當交集為空或交集等於完整 5 個時 pill 整個不渲染（避免噪音）
   - 至少要保留一個 chip 啟用（不允許全關）；若當前選取的 leaf 因 app filter 被隱藏，會自動 fallback 回「版本總覽」
+- **v4 新增（版本 JSON 驅動）**：版本的 chip 按鈕、配色、version-header、theme-card 全部由 `changes.json` 的 `versions` array 在執行期生成（`injectVersionStyles()` + `renderVerButtons()`），不再硬編於 template.html。加新版本只需在 JSON append `versions` 物件（帶 `color/bg/fg`），無需改 template/build-html（詳見開頭「JSON-first 增量更新」章節）。
 
 ---
 
-## 完整範例（2026 年 5 月三版）
+## 完整範例（2026 年 5 月四版）
 
 來源檔已保留：
 
@@ -407,6 +452,8 @@ node /Users/user/aladdin/.claude/skills/changelog-html/build-html.js \
 - `examples/changes-202605-v3.json`：v3 含 `apps` 欄位（190 條 change，每條都標 apps）
 - 輸出 HTML（v2）：`obsidian/Projects/changelog/Release Changelog 2026-05 v2.html`
 - 輸出 HTML（v3）：`obsidian/Projects/changelog/Release Changelog 2026-05 v3.html`
+- 輸出 HTML（v4）：`obsidian/Projects/changelog/Release Changelog 2026-05 v4.html`（四版 259 條，版本 JSON 驅動）
+- **持久化資料（JSON-first SSOT）**：`obsidian/Projects/changelog/data/changes-2026-05.json`（四版完整資料，重出 HTML 或加新版的唯一來源）
 
 v2 階段統計：
 
@@ -425,6 +472,18 @@ v3 階段統計（5/18 / 5/22 / 5/26 三段都 vs origin/pro，每版列該分�
 - type 分佈：add 66、adj 62、fix 48、internal 14
 - apps 分佈：platform 143、admin 23、n8 28、ny 19、pk 34（後端常為保守全 5）
 - 業務標籤：後端服務 217、後台介面 70、玩家端 App 30、N/A 34
+
+v4 階段統計（**JSON-first 增量**：沿用 v3 三版資料不重跑 git，只新增 5/29 一版 vs 5/26）：
+
+- 歷史資料持久化於 `data/changes-2026-05.json`（四版 259 條），舊三版零重算
+- stage 2 並行 4 sub-agent 提取 125 條原始 changes（abu 30 / lago 26 / agrabah 38 / rajah 31）
+- stage 4 mapper 跨 repo 去重合併為 69 條（去重 ~45%；FAQ-2917 評論撤銷、扶持紅利備註等多 repo 同源條目合併）
+- stage 5 **只需 4 worker**（4 repo × 單版 529，非 v3 的 12 個），全程無 stall
+- stage 6 rewriter 把 97 句 impact 翻為業務語言（TECH 驗證 `total bad: 0`）
+- 529 type 分佈：add 22、adj 19、fix 26、internal 2
+- 529 apps 分佈：platform 50、admin 6、n8 4、ny 4、pk 22
+- 529 業務標籤：後端服務 51、後台介面 10、玩家端 App 14
+- **菜單改名校驗實例**：5/29 把 `activity-management` 從 item 改為 group，舊三版資料的該 leaf 已用 route/perm 比對對齊到承接葉 `activity-settings`，否則舊版 HTML 會生成失敗
 
 ## 限制與注意事項
 
