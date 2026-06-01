@@ -307,6 +307,11 @@ for repo in {affected_repos}; do
   cd /Users/user/aladdin/$repo && git fetch origin dev --quiet
   git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b landon/{ticket_id} origin/dev 2>/dev/null \
     || git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo landon/{ticket_id}
+  # 實體 worktree 沒有 node_modules（gitignored）；symlink 主 repo 的，讓 bun 能解析 genie/* 等 workspace 依賴
+  ln -sfn /Users/user/aladdin/$repo/node_modules /Users/user/aladdin/worktrees/{ticket_id}/$repo/node_modules
+  # .gitignore 用 node_modules/（只比對目錄），symlink 不會被忽略；用 local exclude 讓它對 git 隱形
+  grep -qxF 'node_modules' /Users/user/aladdin/$repo/.git/info/exclude 2>/dev/null \
+    || echo 'node_modules' >> /Users/user/aladdin/$repo/.git/info/exclude
 done
 
 # 驗證 affected_repos 全部在 landon/{ticket_id}
@@ -327,7 +332,19 @@ for shared in jasmine genie jafar; do
   ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
 done
 
+# bootstrap：刷新主 repo 的 generated code（rajah 為 shared symlink；generate-all.sh 以物理路徑寫進主 repo，不是 worktree）
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
+
+# bootstrap 後，把 worktree 缺的 gitignored 衍生產物（主要是 src/generated）從剛刷新的主 repo 補進 worktree（只補缺的）
+for repo in {affected_repos}; do
+  cd /Users/user/aladdin/$repo
+  git status --ignored --porcelain 2>/dev/null | grep '^!!' \
+    | grep -vE 'node_modules|\.DS_Store|\.env|\.vscode' | sed 's/^!! //' | while read f; do
+    f="${f%/}"
+    dst="/Users/user/aladdin/worktrees/{ticket_id}/$repo/$f"
+    [ -e "$dst" ] || { mkdir -p "$(dirname "$dst")"; cp -R "/Users/user/aladdin/$repo/$f" "$dst"; }
+  done
+done
 ```
 
 若 worktree 建立失敗：清殘留 → 重試 1 次 → 仍失敗 → Pipeline Failure。
@@ -354,9 +371,11 @@ ticket_id: {ticket_id}
 
 **Wait for completion.**
 
+> **單一 turn 自足原則：** 本環境沒有 SendMessage，無法喚醒已讓出的 sub agent。fixer 端已改為「只 lint 改動檔、前景跑完」；若 fixer 仍中途讓出（把長指令丟背景等通知、沒有正常完成），manager 不要枯等，視為該次嘗試未完成、重派接手 worktree 既有變更（計入 total_attempt_count cap）。
+
 #### BRANCH_ERROR Handling
 
-若 Bug Fixer 返回 `BRANCH_ERROR`：清除殘留 worktree → 重建 → Re-dispatch（最多 1 次）。仍失敗 → Pipeline Failure。
+若 Bug Fixer 返回 `BRANCH_ERROR`（含 worktree 環境未備妥）：清除殘留 worktree → **重建（重跑 Step 5a 全段，含 node_modules / generated 準備）** → Re-dispatch（最多 1 次）。仍失敗 → Pipeline Failure。
 
 ---
 

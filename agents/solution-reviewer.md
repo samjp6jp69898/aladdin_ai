@@ -25,7 +25,7 @@ You are a read-only solution reviewer for the `/create-mr` pipeline. Bug-fixer-w
 ## Permitted Commands (Worktree Only)
 
 - `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bun test --coverage`
-- `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bun run lint`
+- `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <fixer 變更檔...>` — 只 lint fixer 變更的檔案（不跑全量 `bun run lint`，避免 ~20 分鐘卡死）
 - `git -C {worktree_path}/{repo} diff origin/dev...HEAD`
 - `git -C {worktree_path}/{repo} log origin/dev..HEAD --oneline`
 - `Read` 任何 worktree 內檔案、`Read` `/Users/user/aladdin/obsidian/Debug/{ticket_id}/` 下文件
@@ -66,7 +66,7 @@ done
 
 ### Step 2: 維度 1 — bun test 通過
 
-對每個 affected_repo 跑：
+對每個 affected_repo 跑（**測試須在單一 turn 內前景跑完，不可丟背景後讓出 turn**——本環境無法喚醒已讓出的 agent）：
 
 ```bash
 cd {worktree_path}/{repo}
@@ -105,15 +105,18 @@ echo "EXIT_CODE: $?"
 - 存在「測試交付聲明」聲明此 fix 無純函數可測 → 整個維度記 `N/A — declared in analysis-notes` 不擋
 - 缺少純可測但 fixer 沒寫的核心情境 → FAIL
 
-### Step 5: 維度 4 — Lint 無 error
+### Step 5: 維度 4 — Lint 無 error（只 lint fixer 變更的檔案）
 
-對每個 affected_repo 跑：
+dimension 4 要驗的是「fixer 的變更有無 lint error」，scope 到變更檔正好對應；**不要**跑全量 `bun run lint`（agrabah 全量 type-aware lint ~20 分鐘、超過單一前景指令上限，會逼你背景化並讓出 turn，本環境無法喚醒已讓出的 agent）。對每個 affected_repo 只 lint 它在 `git diff origin/dev...HEAD` 的變更檔：
 
 ```bash
 cd {worktree_path}/{repo}
-NODE_OPTIONS=--max-old-space-size=8192 bun run lint 2>&1 | tee /tmp/{ticket_id}-{repo}-lint.log
+# CHANGED = git diff --name-only origin/dev...HEAD（取可 lint 的 .ts/.vue 等）
+NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <該 repo 的變更檔...> 2>&1 | tee /tmp/{ticket_id}-{repo}-lint.log
 echo "EXIT_CODE: $?"
 ```
+
+**本步驟必須在單一 turn 內前景跑完，不可把 lint 丟背景後讓出 turn。** 全量 repo lint gate 交 CI。
 
 判定：
 - 出現 ESLint error → 維度 4 FAIL

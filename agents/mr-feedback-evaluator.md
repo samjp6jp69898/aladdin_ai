@@ -59,7 +59,7 @@ git log origin/mr/{ticket_id}..HEAD --oneline
 
 ### Step 3: 執行相關測試
 
-只跑相關測試，不跑全 repo：
+只跑相關測試，不跑全 repo。**測試必須在本 turn 內前景跑完並取得結果——嚴禁把測試丟背景後結束 turn 等通知**（本環境無法喚醒已讓出的 agent）；相關測試通常很快，若跑不完多半是範圍選太大，請收斂測試清單而不是背景化：
 
 ```bash
 cd {worktree_path}/{repo}

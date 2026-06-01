@@ -31,27 +31,34 @@ The project knowledge base is at `/Users/user/aladdin/obsidian`.
 
 - `glab api ...` — 讀取 MR discussions（唯讀）
 - `cd {worktree_path}/rajah && sh bootstrap.sh`、`bun run generate-*` — 若改動 rajah 需重生
-- `NODE_OPTIONS=--max-old-space-size=8192 bun run lint` — ESLint
+- `NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <改動檔...>` — 只 lint 你改過的檔案（全量 gate 交 CI；**嚴禁**把全量 `bun run lint` 丟背景後結束 turn 等通知）
 - `git add` / `git commit` — 在 `mr/{ticket_id}` 上 commit
 - **FORBIDDEN：** `git push`（一律禁止，由 mr-feedback-pusher 負責）、`glab mr create`、修改 `localizations/*.json`
 
 ## Execution Steps
 
-### Step 0: Worktree Branch Validation（必須先做）
+### Step 0: Worktree Branch + Env Validation（必須先做）
 
 ```bash
 if [ ! -d "{worktree_path}/{repo}" ]; then
   echo "MISSING:{repo}"
 else
   git -C {worktree_path}/{repo} branch --show-current
+  # env sanity：實體 worktree 需有 node_modules（由 /refine-mr Step 2 備妥）；agrabah 另需 generated code
+  [ -e "{worktree_path}/{repo}/node_modules" ] || echo "ENV_MISSING: node_modules"
+  if [ "{repo}" = "agrabah" ]; then
+    [ -f "{worktree_path}/{repo}/src/generated/services.gen.ts" ] || echo "ENV_MISSING: src/generated"
+  fi
 fi
 ```
 
-目錄不存在，或分支不是 `mr/{ticket_id}` → 立即停止，最後一行輸出：
+目錄不存在、分支不是 `mr/{ticket_id}`、或出現任何 `ENV_MISSING`（worktree 環境未備妥）→ 立即停止，最後一行輸出：
 
 ```
 FIXER_RESULT: BRANCH_ERROR
 ```
+
+（manager 收到 `BRANCH_ERROR` 會重建 worktree 並重新備妥 node_modules / generated 後重派。）
 
 通過才進 Step 1。
 
@@ -108,17 +115,20 @@ FIXER_RESULT: NO_ACTIONABLE_COMMENTS
 
 若改動了 rajah `.rajah` 檔，執行 `cd {worktree_path}/rajah && sh bootstrap.sh` 重生程式碼。
 
-### Step 4: Lint
+### Step 4: Lint（只 lint 你改過的檔案，必須在本 turn 內完成）
 
-對你實際改過的 repo 跑：
+只對你「實際用 Edit 改過的檔案」跑 ESLint，**不要**跑全 repo 的 `bun run lint`。原因：agrabah 全量 type-aware lint 約需 ~20 分鐘、超過單一前景指令上限，會逼你把它丟背景並結束 turn 等通知——而本環境無法喚醒已讓出的 agent，你會卡死、變成未完成續派。改動檔的 eslint 是秒級、可在本 turn 內跑完：
 
 ```bash
 cd {worktree_path}/{repo}
-NODE_OPTIONS=--max-old-space-size=8192 bun run lint 2>&1 | tail -40
+# 逐一列出你改過的檔案，不要用 git add -A 的範圍
+NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <你改過的檔案路徑...> 2>&1 | tail -40
 echo "LINT_EXIT: $?"
 ```
 
-修掉自己改動造成的 ESLint error（warning 可不處理）。lint 因 OOM 而 crash（`Killed` / exit 137 / `JavaScript heap out of memory`）→ 加大 `--max-old-space-size` 到 12288 重跑。
+- 只需確保你改動造成的 ESLint error 為 0（warning 可不處理）。全 repo 的全量 lint gate 交由 CI 把關。
+- lint 因 OOM crash（`Killed` / exit 137 / `JavaScript heap out of memory`）→ 加大 `--max-old-space-size` 到 12288 重跑。
+- **lint → commit → 寫報告必須全部在這一個 turn 內完成**；不可把任何長指令丟背景後讓出 turn。
 
 ### Step 5: Commit
 

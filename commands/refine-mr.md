@@ -32,6 +32,7 @@ worktree_path = ""            # /Users/user/aladdin/worktrees/{ticket_id}
 # 每個 repo 各自一組
 per_repo[repo] = {
   fixer_attempt_count = 0,
+  continuation_count = 0,     # fixer 未吐出 result token 時的「未完成續派」次數（上限 2）
   refine_status = "",         # committed / no_actionable / fixer_failed / eval_failed / push_failed / pushed
   commit_hashes = [],
   evaluator_result = "",      # PASSED / FAILED
@@ -106,6 +107,11 @@ for repo in {mr_target_repos}; do
   git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
   git branch -D "mr/{ticket_id}" 2>/dev/null
   git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b "mr/{ticket_id}" "origin/mr/{ticket_id}"
+  # 實體 worktree 沒有 node_modules（gitignored，不在 checkout 內）；symlink 主 repo 的，讓 bun 能解析 genie/* 等 workspace 依賴
+  ln -sfn /Users/user/aladdin/$repo/node_modules /Users/user/aladdin/worktrees/{ticket_id}/$repo/node_modules
+  # .gitignore 用 node_modules/（只比對目錄），symlink 不會被忽略；用 local exclude 讓它對 git 隱形，避免 fixer 誤 commit
+  grep -qxF 'node_modules' /Users/user/aladdin/$repo/.git/info/exclude 2>/dev/null \
+    || echo 'node_modules' >> /Users/user/aladdin/$repo/.git/info/exclude
 done
 
 # 驗證：mr_targets 中的 sub-worktree 都必須在 mr/{ticket_id}
@@ -131,8 +137,25 @@ for shared in jasmine genie jafar; do
   ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
 done
 
-# 從 rajah 跑 bootstrap，確保 generated code 一致
+# 從 rajah 跑 bootstrap：rajah 為 shared symlink，generated 與分支無關。
+# 注意：bootstrap 中 rajah 驅動的 generate-all.sh 會以「物理路徑」把 src/generated 寫進主 repo，不是 worktree；
+# 故 bootstrap 在此的作用是「刷新主 repo 的 generated code」，worktree 再由下面的 sync 迴圈鏡像。
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
+
+# bootstrap 後，把 worktree 缺的 gitignored 衍生產物（主要是 src/generated）從剛刷新的主 repo 補進 worktree。
+# 已由 worktree 內 generate 步驟產生者（configurations、entries 等）會被 [ ! -e ] 跳過，只補真正缺的。
+for repo in {mr_target_repos}; do
+  cd /Users/user/aladdin/$repo
+  git status --ignored --porcelain 2>/dev/null | grep '^!!' \
+    | grep -vE 'node_modules|\.DS_Store|\.env|\.vscode' | sed 's/^!! //' | while read f; do
+    f="${f%/}"
+    dst="/Users/user/aladdin/worktrees/{ticket_id}/$repo/$f"
+    if [ ! -e "$dst" ]; then
+      mkdir -p "$(dirname "$dst")"
+      cp -R "/Users/user/aladdin/$repo/$f" "$dst"
+    fi
+  done
+done
 ```
 
 Store: `worktree_path = /Users/user/aladdin/worktrees/{ticket_id}`
@@ -141,11 +164,15 @@ Store: `worktree_path = /Users/user/aladdin/worktrees/{ticket_id}`
 
 bootstrap.sh 失敗（例如 sync-all 連不到 DB）只記錄、不中止；只有 worktree 沒全部建成才算硬性失敗。
 
+> generated code 一致性由「bootstrap 刷新主 repo + 上面的 sync 迴圈鏡像到 worktree」共同保證；即使 bootstrap 的 migrate / sync-all 因 DB 失敗，只要主 repo 既有 generated code，worktree 仍能補齊。node_modules 與 generated 皆 gitignored，不會污染 fixer 的 commit。
+
 ---
 
 ### Step 3-5: 逐 repo 處理（對 `mr_targets` 中每個 repo 依序執行）
 
 對 `mr_targets` 中的每一個 `{repo, iid, web_url}`，依序跑 Step 3 → 4 → 5。各 repo 互相獨立。
+
+> **派工韌性原則（重要）：本執行環境沒有 SendMessage，無法喚醒已讓出（suspended）的 sub agent。** 因此每個 agent 必須在「單一 turn 內」自足完成其工作。若 agent 沒有在最後一行吐出約定的 result token（`FIXER_RESULT` / `EVAL_RESULT` / `PUSH_RESULT`）——常見於 agent 把長指令（如全量 lint / 全量測試）丟背景後結束 turn 等通知——manager **不要枯等原 agent，一律「重派一個新 agent 接手 worktree 內既有的未提交變更與既有 commit」續作**。交接點固定是 worktree 的檔案狀態。
 
 #### Step 3: Dispatch mr-feedback-fixer
 
@@ -175,6 +202,14 @@ evaluator feedback: /Users/user/aladdin/worktrees/{ticket_id}/{repo}-eval-report
 Read the evaluator feedback, fix the failing tests / issues on the same branch, and commit again.
 ```
 
+**未完成續派（前一個 fixer 沒吐出 FIXER_RESULT）：** 在 prompt 末尾追加：
+
+```
+This is a continuation re-dispatch. The previous fixer did NOT finish — it yielded/timed out without producing a FIXER_RESULT (e.g. it backgrounded a long command to wait for a notification, which loses control in this environment).
+The worktree may already contain uncommitted changes from that attempt — run `git status` first and inspect them.
+Re-read the MR review comments, verify and complete the existing uncommitted changes (adjust if wrong/incomplete), lint ONLY the changed files, commit on the same branch, write the report, and end with the FIXER_RESULT line — ALL within this single turn. Do NOT background any long command and yield.
+```
+
 **Wait for completion.** 從輸出最後一行抽 `FIXER_RESULT`：
 
 | FIXER_RESULT | 處理 |
@@ -183,6 +218,7 @@ Read the evaluator feedback, fix the failing tests / issues on the same branch, 
 | `NO_ACTIONABLE_COMMENTS` | 設 `refine_status = no_actionable`，**跳過 Step 4、5**，此 repo 完成（不 push、不發 MR 訊息） |
 | `BRANCH_ERROR` | 依下方 BRANCH_ERROR Handling 重建 worktree 後重派一次；仍失敗 → `refine_status = fixer_failed` |
 | `FIXER_FAILED` | 設 `refine_status = fixer_failed`，跳過 Step 4、5 |
+| **最後一行非任何上述 token**（agent 中途讓出 / 逾時未完成） | `continuation_count += 1`；若 `continuation_count <= 2` → 依上方「未完成續派」重派新 fixer 接手既有未提交變更；若 `continuation_count > 2` → 設 `refine_status = fixer_failed`，跳過 Step 4、5 |
 
 #### Step 4: Dispatch mr-feedback-evaluator（僅 refine_status == committed）
 
@@ -276,9 +312,21 @@ cd /Users/user/aladdin/{repo} && git fetch origin "mr/{ticket_id}" --quiet
 git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/{repo} --force 2>/dev/null
 git branch -D "mr/{ticket_id}" 2>/dev/null
 git worktree add /Users/user/aladdin/worktrees/{ticket_id}/{repo} -b "mr/{ticket_id}" "origin/mr/{ticket_id}"
+# 重建後同樣要備妥環境（比照 Step 2）：node_modules symlink + git 隱形 + 從主 repo 補 generated
+ln -sfn /Users/user/aladdin/{repo}/node_modules /Users/user/aladdin/worktrees/{ticket_id}/{repo}/node_modules
+grep -qxF 'node_modules' /Users/user/aladdin/{repo}/.git/info/exclude 2>/dev/null \
+  || echo 'node_modules' >> /Users/user/aladdin/{repo}/.git/info/exclude
+cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
+cd /Users/user/aladdin/{repo}
+git status --ignored --porcelain 2>/dev/null | grep '^!!' \
+  | grep -vE 'node_modules|\.DS_Store|\.env|\.vscode' | sed 's/^!! //' | while read f; do
+  f="${f%/}"
+  dst="/Users/user/aladdin/worktrees/{ticket_id}/{repo}/$f"
+  [ -e "$dst" ] || { mkdir -p "$(dirname "$dst")"; cp -R "/Users/user/aladdin/{repo}/$f" "$dst"; }
+done
 ```
 
-驗證 branch 為 `mr/{ticket_id}` 後重派一次。仍失敗 → 該 repo 標記 `fixer_failed`。
+驗證 branch 為 `mr/{ticket_id}` 且環境備妥（node_modules、generated）後重派一次。仍失敗 → 該 repo 標記 `fixer_failed`。
 
 ---
 
