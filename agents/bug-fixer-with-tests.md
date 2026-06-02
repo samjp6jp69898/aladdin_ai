@@ -33,7 +33,7 @@ The project knowledge base is located at: `/Users/user/aladdin/obsidian`
 
 - `cd {worktree_path}/rajah && sh bootstrap.sh` — regenerate code after rajah changes
 - `bun run generate-configuration-files` / `bun run generate-standalone-settings` / `bun run generate-entries`
-- `bun run lint` — ESLint fix
+- `NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <改動檔...>` — 只 lint 你改過的檔案（全量 gate 交 CI；**嚴禁**把全量 `bun run lint` 丟背景後讓出 turn）
 - `git add` / `git commit` — commit fixes
 - **FORBIDDEN:** `git push` — never push to remote
 
@@ -66,6 +66,14 @@ for repo in agrabah abu lago rajah; do
     echo "SYMLINK_MISSING:$repo"
   fi
 done
+
+# env sanity：實體 worktree 需有 node_modules（由 pipeline 建 worktree 時備妥）；agrabah 另需 generated code
+for repo in {affected_repos}; do
+  [ -e "{worktree_path}/$repo/node_modules" ] || echo "ENV_MISSING:node_modules:$repo"
+  if [ "$repo" = "agrabah" ]; then
+    [ -f "{worktree_path}/$repo/src/generated/services.gen.ts" ] || echo "ENV_MISSING:src/generated:$repo"
+  fi
+done
 ```
 
 **Expected output:** `affected_repos` 中的每行必須是 `{repo}:mr/{ticket_id}`；其餘 repo 不應出現 `SYMLINK_MISSING`。
@@ -77,6 +85,10 @@ done
 - **If any symlinked repo is `SYMLINK_MISSING:`**: immediately stop and return:
   ```
   BRANCH_ERROR: symlink 缺漏 — {worktree_path}/{repo}
+  ```
+- **If any `ENV_MISSING:` line appears**（worktree 環境未備妥，node_modules / generated 缺，須由 pipeline 重建）: immediately stop and return:
+  ```
+  BRANCH_ERROR: worktree 環境未備妥（node_modules / generated）— {worktree_path}/{repo}
   ```
 - **If all checks passed**: proceed to Step 1.
 
@@ -112,7 +124,12 @@ If the code doesn't match the Tracer's description:
 Execute the repair following the Tracer's 修復策略:
 1. Use Edit tool to modify the relevant source code files **inside the matching sub-worktree** — agrabah 改 `{worktree_path}/agrabah/...`，abu 改 `{worktree_path}/abu/...`，lago 改 `{worktree_path}/lago/...`，rajah 改 `{worktree_path}/rajah/...`。**禁止編輯主 checkout `/Users/user/aladdin/{repo}/...`**。
 2. If rajah `.rajah` files were modified, run `cd {worktree_path}/rajah && sh bootstrap.sh`（從 sub-worktree 跑 bootstrap，相對路徑 `../agrabah` 會解到 `{worktree_path}/agrabah` 兄弟 worktree，產生的程式碼會留在 worktree 內）。對於只動 agrabah 設定的情境，可改用 `cd {worktree_path}/agrabah && bun run generate-configuration-files`。
-3. Run `cd {worktree_path}/{repo} && bun run lint` for each sub-worktree you actually modified.
+3. Lint **only the files you changed** in each modified sub-worktree（不要跑全量 `bun run lint`——agrabah 全量 type-aware lint 約 ~20 分鐘、超過單一前景指令上限，會逼你把它丟背景並結束 turn 等通知，而本環境無法喚醒已讓出的 agent，你會卡死）：
+   ```bash
+   cd {worktree_path}/{repo}
+   NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <你改過的檔案路徑...> 2>&1 | tail -40
+   ```
+   修掉自己改動造成的 ESLint error（warning 可不處理）；全量 repo lint gate 交 CI。**lint → 寫 L0 測試 → commit 必須全部在這一個 turn 內完成，不可把任何長指令丟背景後讓出 turn。**
 
 **Important for monetary calculations:** All amounts use **bigint** for DB storage. Calculations must use bigint operations, never floating-point Number arithmetic.
 

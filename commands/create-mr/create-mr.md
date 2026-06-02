@@ -275,6 +275,11 @@ for repo in {affected_repos}; do
   git worktree remove /Users/user/aladdin/worktrees/{ticket_id}/$repo --force 2>/dev/null
   git branch -D mr/{ticket_id} 2>/dev/null
   git worktree add /Users/user/aladdin/worktrees/{ticket_id}/$repo -b mr/{ticket_id} origin/dev
+  # 實體 worktree 沒有 node_modules（gitignored，不在 checkout 內）；symlink 主 repo 的，讓 bun 能解析 genie/* 等 workspace 依賴
+  ln -sfn /Users/user/aladdin/$repo/node_modules /Users/user/aladdin/worktrees/{ticket_id}/$repo/node_modules
+  # .gitignore 用 node_modules/（只比對目錄），symlink 不會被忽略；用 local exclude 讓它對 git 隱形，避免誤 commit
+  grep -qxF 'node_modules' /Users/user/aladdin/$repo/.git/info/exclude 2>/dev/null \
+    || echo 'node_modules' >> /Users/user/aladdin/$repo/.git/info/exclude
 done
 
 # 驗證
@@ -300,13 +305,32 @@ for shared in jasmine genie jafar; do
   ln -sfn /Users/user/aladdin/$shared /Users/user/aladdin/worktrees/{ticket_id}/$shared
 done
 
-# bootstrap
+# bootstrap：rajah 為 shared symlink，generated 與分支無關。
+# 注意：bootstrap 中 rajah 驅動的 generate-all.sh 會以「物理路徑」把 src/generated 寫進主 repo，不是 worktree；
+# 故 bootstrap 在此的作用是「刷新主 repo 的 generated code」，worktree 再由下面的 sync 迴圈鏡像。
 cd /Users/user/aladdin/worktrees/{ticket_id}/rajah && sh bootstrap.sh
+
+# bootstrap 後，把 worktree 缺的 gitignored 衍生產物（主要是 src/generated）從剛刷新的主 repo 補進 worktree。
+# 已由 worktree 內 generate 步驟產生者（configurations、entries 等）會被 [ ! -e ] 跳過，只補真正缺的。
+for repo in {affected_repos}; do
+  cd /Users/user/aladdin/$repo
+  git status --ignored --porcelain 2>/dev/null | grep '^!!' \
+    | grep -vE 'node_modules|\.DS_Store|\.env|\.vscode' | sed 's/^!! //' | while read f; do
+    f="${f%/}"
+    dst="/Users/user/aladdin/worktrees/{ticket_id}/$repo/$f"
+    if [ ! -e "$dst" ]; then
+      mkdir -p "$(dirname "$dst")"
+      cp -R "/Users/user/aladdin/$repo/$f" "$dst"
+    fi
+  done
+done
 ```
 
 Store: `worktree_path = /Users/user/aladdin/worktrees/{ticket_id}`, `affected_repos`。
 
 **任一 sub-worktree 建立或驗證失敗** → 清掉殘留後重試一次,仍失敗則進入 Pipeline Failure。
+
+> node_modules 與 generated 皆 gitignored，不會污染後續 commit；generated 一致性由「bootstrap 刷新主 repo + 上面的 sync 迴圈鏡像到 worktree（只補 worktree 缺的、已生成者不動）」共同保證。
 
 ---
 
@@ -346,6 +370,8 @@ Read the reviewer feedback carefully, modify the code on the same branch, and co
 ```
 
 **Wait for completion.**
+
+> **單一 turn 自足原則：** 本環境沒有 SendMessage，無法喚醒已讓出的 sub agent。bug-fixer-with-tests 與 solution-reviewer 端已改為「只 lint 改動檔、前景跑完」；若任一 agent 仍中途讓出（把長指令丟背景等通知、沒有正常完成），manager 不要枯等，視為該次嘗試未完成、重派接手 worktree 既有變更（計入 total_attempt_count cap）。
 
 #### BRANCH_ERROR Handling
 
