@@ -133,6 +133,7 @@ If you catch yourself thinking any of these, STOP:
    - 「名稱不一致 / 不符 / 與…不同」型 ticket:不得自行裁定以衝突哪方為準;目標值列為「待業務裁定的候選」,並標明 spec 總表可能是歷史快照而非實時決策。
 8. **Spec 完整性 Check**:讀 `spec.md` 開頭的「規格完整性」section。若 `SPEC_INCOMPLETE`,**禁止照抄「待補」結論** — 必須從 analytics 截圖 + Step 1.3 的 git log commit message 反向補規格資訊
 9. **Related FAQ IDs Check**:讀 `analytics.md` 的「Related FAQ IDs in Recent Commits」section。若有命中,Step 1.3 git log 必須涵蓋這些 FAQ id 對應的 commit,並在 Step 4 Already-Fixed Verification 時納入考慮(這些 commit 可能與本 ticket 在同 PR 處理)
+10. **Read grounding.md（若存在）**:`obsidian/Debug/{ticket_id}/{ticket_id}-grounding.md`(從主目錄讀)。**列為最高優先實證** —— 其 CQA DB 真實值與「ticket↔實況」比對表凌駕 analytics 的文字描述(與「輸入去偏」一致:實證 > 二手描述)。若 grounding 判定有未解出入,納入 Step 0.5 問題性質判定。
 
 ### Step 0.5: 問題性質前置閘
 
@@ -256,6 +257,7 @@ If you catch yourself thinking any of these, STOP:
 - 是否有新欄位 / migration 未部署?
 - ORM field 名稱是否與 DB 欄位對齊?(例如 `taskType` → `task_type`)
 - stored value 是否被誤當成 display value 使用?
+- **CQA 真實數據佐證(授權)**:對「stored value vs display value」「某欄位實際值」「migration 是否已套用」這類資料層疑點,可執行 `bash /Users/user/aladdin/tmp-sql/cqa-query.sh <db> "SELECT ..."` 撈 CQA 真實值,貼回本 angle 作為與 file:line 同級的實證(取代純靠 ORM/migration 推測)。連線靠 cqa-query.sh,禁止寫死。
 
 #### Angle 5:框架(Framework / Library)
 
@@ -661,6 +663,13 @@ alternative_paths:
 3. **承認:你之前的根因被推翻。必須重做,不能局部 patch**
 4. 重跑 Phase 1-2-3 + 五角度,可參考但不可複製先前已被推翻的結論
 5. 產生新 analysis-notes.md(覆蓋舊版,但保留「### 上次分析被推翻的原因」section)
+
+### 不可調和出入 → NEEDS_QA_CLARIFICATION 出口
+
+若走完五角度後,source/DB 證據與 ticket 症狀**不可調和**,且任何根因結論都需要「猜企劃意圖 / 猜業務正解」才能下(對應「反證線索閉環」中『需與企劃確認』升級版):
+- **不硬猜**。在 analysis-notes.md 開頭標 `[NEEDS-QA-CLARIFICATION]`,寫一段具體、可回答、附 file:line/DB 證據的 `qa_question`(詳細描述待確認問題)。
+- 最後一行額外輸出:`TRACER_RESULT: NEEDS_QA_CLARIFICATION`(正常完成則輸出 `TRACER_RESULT: ROOT_CAUSE_FOUND`)。
+- 僅用於「真的只能靠業務裁定」的情況;能用 spec/Rules/source 自行裁定者不得走此出口(避免濫用逃避分析)。
 
 ## Important Restrictions
 

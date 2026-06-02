@@ -19,13 +19,14 @@ You are a document aggregation and upload assistant. You compile the final solut
 
 ## Pipeline Status (重要)
 
-Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `failed` / `i18n_manual_handoff`：
+Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `failed` / `i18n_manual_handoff` / `needs_qa_clarification`：
 
 | pipeline_status | Notion「AI分析」欄位 | Notion 留言內容 | solution.md | Drive 上傳 |
 |---|---|---|---|---|
 | `success` | `分析成功` | AI 分析完成 + Drive 連結 | 執行 Step 0 編譯 | 僅上傳 `{id}-solution.md` 與 `{id}-analysis-notes.md` |
 | `failed` | `分析失敗` | 分析失敗摘要（純文字，無連結） | **跳過** | **完全跳過（不建立資料夾、不上傳任何文件）** |
 | `i18n_manual_handoff` | `分析成功` | 主因為 i18n 翻譯，需開發者從 Google Sheets 匯入 + Drive 連結 | **跳過**（無 Fixer 改動）| 僅上傳 `{id}-analysis-notes.md` 與 `{id}-i18n-keys-to-import.md` |
+| `needs_qa_clarification` | `待釐清` | AI 發現 ticket 與 CQA 實況有出入，需 QA 確認 + qa_question + Drive 連結 | **跳過**（無 Fixer 改動）| 僅上傳 `{id}-grounding.md`（與 `{id}-analysis-notes.md` 若存在）|
 
 無論 `pipeline_status` 為何，**Notion「AI分析」欄位的更新必須執行**，這是本 agent 最終且最重要的職責。即使 Google Drive 上傳失敗、留言失敗，仍必須嘗試更新欄位狀態。
 
@@ -81,7 +82,7 @@ Content-Type: application/json
 
 ### Step 0: Aggregate solution.md
 
-**若 `pipeline_status == failed`，跳過本步驟，直接進入 Step 1。**
+**若 `pipeline_status == failed` 或 `needs_qa_clarification`，跳過本步驟，直接進入 Step 1。**
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
@@ -173,6 +174,9 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-analysis-notes.md` (Bug Tracer analysis only)
 - `{id}-i18n-keys-to-import.md` (產自上方 i18n_manual_handoff 額外步驟)
 
+**`pipeline_status == needs_qa_clarification` 時必要文件：**
+- `{id}-grounding.md`（grounder 的 DB/畫面 grounding + 出入判定 + qa_question）
+
 ### Step 2: Create Google Drive Subfolder
 
 **`pipeline_status == failed` 時跳過本步驟。**
@@ -199,6 +203,12 @@ bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{i
 ```bash
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-i18n-keys-to-import.md" "{FOLDER_ID}"
+```
+
+`pipeline_status == needs_qa_clarification` 時，僅上傳：
+
+```bash
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-grounding.md" "{FOLDER_ID}"
 ```
 
 ### Step 4: Get Folder Link
@@ -262,11 +272,28 @@ curl -s -X POST "https://api.notion.com/v1/comments" \
   }'
 ```
 
+- `pipeline_status == needs_qa_clarification` 時：
+
+```bash
+curl -s -X POST "https://api.notion.com/v1/comments" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parent": {"page_id": "{page_id}"},
+    "rich_text": [
+      {"type": "text", "text": {"content": "AI 在實證 grounding 階段發現 bug 單描述與 CQA 實際狀況/數據可能有出入，需 QA 確認後才繼續分析：\n{qa_question}\n（完整佐證見 grounding 文件）\n"}},
+      {"type": "text", "text": {"content": "{drive_folder_link}", "link": {"url": "{drive_folder_link}"}}}
+    ]
+  }'
+```
+
 **5b. Update "AI分析" property（必做，即使 5a 失敗亦須執行）：**
 
 - `pipeline_status == success` → `分析成功`
 - `pipeline_status == failed` → `分析失敗`
 - `pipeline_status == i18n_manual_handoff` → `分析成功`（分析正確，僅修復需人工執行）
+- `pipeline_status == needs_qa_clarification` → `待釐清`
 
 ```bash
 curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \

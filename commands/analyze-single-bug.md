@@ -28,7 +28,9 @@ pre_check_verdict = ""        # "ALREADY_FIXED_HIGH" | "ALREADY_FIXED_MEDIUM" | 
 pre_check_evidence = ""       # commit hash / repo / merge-base 結果 / 文字摘要
 complexity = ""               # "simple" | "critical"
 affected_repos = []           # parsed from analyst / fix-planner / tracer 輸出
-pipeline_status = ""          # success | already_fixed | failed | i18n_manual_handoff
+pipeline_status = ""          # success | already_fixed | failed | i18n_manual_handoff | needs_qa_clarification
+grounding_result = ""         # CONSISTENT | NEEDS_QA_CLARIFICATION
+qa_question = ""              # grounder 或 tracer 給 QA 的詳細待確認問題
 tracer_attempt_count = 0      # 僅 critical 路徑用
 fixer_attempt_count = 0       # 僅 critical 路徑用
 total_attempt_count = 0
@@ -169,6 +171,28 @@ PRE_CHECK_AFFECTED_REPOS: [list]（從命中 commit 改的檔提取的 repo list
 
 ---
 
+### Step 2.5: CQA Grounder（實證 grounding + 早停）
+
+**僅當 `pre_check_verdict != ALREADY_FIXED_HIGH` 時執行**（已修復的單不需 grounding）。
+
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/cqa-grounder.md`:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/cqa-grounder.md} as the prompt. Please ground the bug against CQA real data and judge ticket-vs-reality discrepancy.
+ticket_id: {ticket_id}
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+```
+
+**Wait for completion.** 從 grounder 回傳輸出的最後兩行抽 `GROUNDING_RESULT` 與 `QA_QUESTION`（亦附在 `{ticket_id}-grounding.md` 檔末），存入 `grounding_result` / `qa_question`。
+
+- 若 `grounding_result == NEEDS_QA_CLARIFICATION` → 設 `pipeline_status = needs_qa_clarification`，**跳過 Steps 3–6**，直接進 Step 7 Drive Uploader（傳 `pipeline_status = needs_qa_clarification` + `qa_question`），上傳 grounding 文件 + Notion 留言問 QA + AI分析=待釐清。
+- 否則續跑 Step 3；Step 4a fix-planner 與 Step 4b tracer 的 dispatch prompt 各加一行：`grounding document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-grounding.md`。
+- grounder 整個失敗 / 未產出 grounding.md → graceful degradation：當作 CONSISTENT，續跑 Step 3。
+
+---
+
 ### Step 3: Complexity Routing
 
 判定 `complexity`：
@@ -280,6 +304,7 @@ ticket_id: {ticket_id}
 Read analysis-notes.md：
 - 若 tracer 標記「已修復」且 merge-base 已驗 → 跳 Step 7，`pipeline_status = already_fixed`
 - 若 tracer 標記「已修復」但無 merge-base 驗證 → 視同 PRESS_ON，繼續 Step 5
+- **若 tracer 最後一行輸出 `TRACER_RESULT: NEEDS_QA_CLARIFICATION`** → 設 `pipeline_status = needs_qa_clarification`，從 analysis-notes 的 `qa_question` 段抽出存入 `qa_question`，**跳過 Steps 5–6**，直接進 Step 7（傳 `pipeline_status = needs_qa_clarification` + `qa_question`）
 - 其他情況 → 繼續 Step 5
 
 #### Extract affected_repos & i18n Detection
@@ -438,15 +463,18 @@ ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: {worktree_path or N/A if no worktree built}
 affected_repos: {affected_repos}
-pipeline_status: success / already_fixed / i18n_manual_handoff
+pipeline_status: success / already_fixed / i18n_manual_handoff / needs_qa_clarification
 pre_check_verdict: {pre_check_verdict}
 complexity: {complexity}
+qa_question: {qa_question；非 needs_qa_clarification 時填 N/A}
+grounding_doc: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-grounding.md
 ```
 
 **pipeline_status 對應**：
 - `success` — critical 路徑跑完且 reviewer PASS / WEAK_PASS，已有 commit + L0 tests
 - `already_fixed` — pre-check HIGH fast-path 命中、或 fix-planner / tracer 標 ALREADY_FIXED_EQUIVALENT
 - `i18n_manual_handoff` — tracer 標 primary_fix_paths 全為 i18n JSON（critical 路徑 only；simple 路徑由 fix-planner 處理）
+- `needs_qa_clarification` — grounder 或 tracer 發現 ticket 與 CQA 實況有不可裁定的出入，暫停問 QA（drive-uploader 設 AI分析=待釐清 + 留言 qa_question + 上傳 grounding 文件）
 
 對 `i18n_manual_handoff` 額外傳入 `i18n_keys` 清單（從 analysis-notes.md 解析）。
 
@@ -482,6 +510,8 @@ complexity: {complexity}
 ### Pipeline Failure
 
 無論失敗發生在哪個步驟，都必須透過 drive-uploader 統一同步狀態至 Notion（留下失敗留言、並更新「AI分析」欄位為「分析失敗」）。**失敗路徑不上傳任何文件、不建立 Drive 資料夾。**
+
+**needs_qa_clarification 不是 failed**：它是「等 QA 釐清」的正常暫停，走 Step 7（drive-uploader 設 AI分析=待釐清 + 留言 qa_question + 上傳 grounding 文件），不留失敗留言、不標分析失敗。
 
 Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
 

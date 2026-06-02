@@ -50,7 +50,9 @@ fixer_attempt_count = 0
 reviewer_attempt_count = 0
 total_attempt_count = 0
 review_result = ""            # PASSED / FAILED
-pipeline_status = ""          # success / already_fixed / i18n_manual_handoff / failed
+pipeline_status = ""          # success / already_fixed / i18n_manual_handoff / needs_qa_clarification / failed
+grounding_result = ""         # CONSISTENT / NEEDS_QA_CLARIFICATION
+qa_question = ""              # grounder 或 tracer 給 QA 的詳細待確認問題
 drive_link = ""
 mr_links = []
 affected_repos = []
@@ -162,6 +164,26 @@ ticket_id: {ticket_id}
 
 ---
 
+### Step 2.5: CQA Grounder（實證 grounding + 早停）
+
+Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/cqa-grounder.md`:
+
+```
+prompt:
+Use all text in {/Users/user/aladdin/.claude/agents/cqa-grounder.md} as the prompt. Please ground the bug against CQA real data and judge ticket-vs-reality discrepancy.
+ticket_id: {ticket_id}
+analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
+```
+
+**Wait for completion.** 從 grounder 回傳輸出的最後兩行抽 `GROUNDING_RESULT` 與 `QA_QUESTION`（grounder 亦會把這兩行附在 `{ticket_id}-grounding.md` 檔末作備援），存入 `grounding_result` / `qa_question`;`grounding.md` 為詳細佐證文件。
+
+- 若 `grounding_result == NEEDS_QA_CLARIFICATION` → 設 `pipeline_status = needs_qa_clarification`,**跳過 Steps 3–7b**,直接進 Step 7c（manager Notion 寫回），再走 Step 7a 上傳 grounding 文件、Step 8 收尾。
+- 否則續跑 Step 3,並在 tracer dispatch prompt 加一行:`grounding document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-grounding.md`。
+- grounder 整個失敗 / 未產出 grounding.md → graceful degradation:當作 CONSISTENT,續跑 Step 3（不擋 pipeline）。
+
+---
+
 ### Step 3: Bug Tracer (with method-call-graph)
 
 **Increment tracer_attempt_count. Increment total_attempt_count.**
@@ -194,6 +216,12 @@ ticket_id: {ticket_id}
 Read analysis-notes.md：
 
 - 若 bug 確認已修復（有「已修復紀錄」section + commit hash） → 設 `pipeline_status = already_fixed`,從 analysis-notes.md「已修復紀錄」段抽取 commit hash 存為 `fixed_commit`（給 Step 7c Notion 留言用）,跳過 Steps 4-6,直接進 Step 7（**只跑 7a drive-uploader-mr,不跑 7b mr-pusher**)
+
+#### Check TRACER_RESULT — NEEDS_QA_CLARIFICATION
+
+若 tracer 最後一行輸出 `TRACER_RESULT: NEEDS_QA_CLARIFICATION`:
+- 設 `pipeline_status = needs_qa_clarification`,從 analysis-notes 的 `qa_question` 段抽出存入 `qa_question`
+- 跳過 Steps 4–7b,直接進 Step 7c → Step 7a → Step 8
 
 #### Check primary_fix_paths — i18n Manual Handoff Detection
 
@@ -378,6 +406,8 @@ i18n_keys: {若 pipeline_status == i18n_manual_handoff,傳入 key 清單,否則 
 
 failed 路徑 → drive-uploader-mr 會回傳 `DRIVE_LINK: N/A`。
 
+needs_qa_clarification 路徑:比照 already_fixed / i18n —— 只跑本步驟（7a）上傳 grounding/analysis 文件,**不跑 7b mr-pusher**。
+
 ### Step 7b: MR Pusher（僅 pipeline_status == success）
 
 **只有 `pipeline_status == success` 才執行本步驟。** already_fixed / i18n_manual_handoff / failed 路徑：完成 Step 7a 後**跳過本步驟**,直接進 Step 7c 由 manager 自處 Notion。
@@ -472,6 +502,28 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
   -d '{"properties": {"AI分析": {"select": {"name": "分析失敗"}}}}'
 ```
 
+#### needs_qa_clarification
+
+```bash
+curl -s -X POST "https://api.notion.com/v1/comments" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"parent\": {\"page_id\": \"{page_id}\"},
+    \"rich_text\": [
+      {\"type\": \"text\", \"text\": {\"content\": \"AI 在實證 grounding 階段發現 bug 單描述與 CQA 實際狀況/數據可能有出入,需 QA 確認後才繼續分析:\\n{qa_question}\\n(完整佐證見分析文件)\\n\"}},
+      {\"type\": \"text\", \"text\": {\"content\": \"{drive_link}\", \"link\": {\"url\": \"{drive_link}\"}}}
+    ]
+  }"
+
+curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
+  -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{"properties": {"AI分析": {"select": {"name": "待釐清"}}}}'
+```
+
 ---
 
 ### Step 8: Release Lock & Update Tracker
@@ -485,6 +537,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 2. Edit tracker row for `{ticket_id}`:
    - `pipeline_status ∈ {success, already_fixed, i18n_manual_handoff}` → `狀態` = `done`, 完成時間 = `YYYY-MM-DD HHMM`
    - `pipeline_status == failed` 或 Step 0.5 SKIPPED → `狀態` = `failed`, 完成時間 = now
+   - `pipeline_status == needs_qa_clarification` → `狀態` = `needs_qa`, 完成時間 = now
 
 ---
 
@@ -517,3 +570,5 @@ Documents at: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 任何步驟失敗（tracer / fixer / reviewer / drive-uploader-mr）超過重試上限,設定 `pipeline_status = failed`,跳過 Step 7b（mr-pusher）,進 Step 7c 由 manager 直接 curl Notion 留失敗訊息 + 「AI分析」=「分析失敗」,然後**仍要執行 Step 8 釋放鎖並把 tracker 標為 `failed`**。
 
 **失敗路徑不上傳 Drive 文件、不開 PR、不留成功留言。**
+
+**needs_qa_clarification 不是 failed**:不留失敗留言、不標分析失敗;它是「等 QA 釐清」的正常暫停,走 Step 7c 的 needs_qa_clarification 分支（`AI分析` = `待釐清` + 留言詳述待確認問題）+ Step 7a 上傳 grounding 文件 + tracker 標 `needs_qa`。
