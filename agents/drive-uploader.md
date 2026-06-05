@@ -309,6 +309,44 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 
 **必做原則：** 5b 的 PATCH 是本 agent 最核心任務，即便 Google Drive 相關步驟（Step 2–4）或 5a 留言失敗，仍必須嘗試執行 5b。
 
+### Step 5c: TG 通知技術（僅 `pipeline_status ∈ {success, needs_qa_clarification}`）
+
+`already_fixed` / `i18n_manual_handoff` / `failed` 不發。永不阻斷流程，僅記 log。
+
+1. 取「當前指派」people ids：
+
+```bash
+ASSIGNEE_IDS=$(curl -s -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
+  -H "Notion-Version: 2022-06-28" \
+  "https://api.notion.com/v1/pages/{page_id}" \
+  | jq -r '.properties["當前指派"].people[].id' | tr '\n' ' ')
+```
+
+> **無指派守門：** 若上面 `ASSIGNEE_IDS` 去空白後為空（ticket 當前無指派），**略過**下面的 tg-notify 呼叫，並把「TG 通知結果」記為 `TG_SKIP_NO_ASSIGNEE`（乾淨略過，不是 FAIL）。
+
+2. 依 `pipeline_status` 組訊息並呼叫腳本：
+
+`success` 時：
+```bash
+TG_MSG="✅ [分析完成] {ticket_id}
+AI 已完成分析與修復（含 L0 單元測試，未開 MR）。
+分析文件：{drive_folder_link}
+Notion：{Notion URL}"
+bash /Users/user/aladdin/scripts/tg-notify.sh --notion-user-ids "$ASSIGNEE_IDS" --text "$TG_MSG"
+```
+
+`needs_qa_clarification` 時：
+```bash
+TG_MSG="🟡 [待釐清] {ticket_id}
+AI 在實證 grounding 階段發現 bug 單與 CQA 實況可能有出入，需你確認：
+{qa_question}
+分析文件：{drive_folder_link}
+Notion：{Notion URL}"
+bash /Users/user/aladdin/scripts/tg-notify.sh --notion-user-ids "$ASSIGNEE_IDS" --text "$TG_MSG"
+```
+
+把腳本輸出（`TG_SENT` / `TG_SKIP_NOT_TECH` / `TG_SKIP_NO_CHATID` / `TG_FAIL`）記入 Step 6 報告。
+
 ### Step 6: Report Results
 
 Report:
@@ -317,6 +355,7 @@ Report:
 - uploaded file list
 - Notion comment status（completed / failed）
 - Notion「AI分析」欄位更新結果（成功 / 失敗 + HTTP 狀態碼）
+- TG 通知結果（success / needs_qa_clarification 才送，其餘 N/A）：{tg-notify.sh 輸出那一行}
 
 ## Error Handling
 

@@ -56,6 +56,7 @@ qa_question = ""              # grounder 或 tracer 給 QA 的詳細待確認問
 drive_link = ""
 mr_links = []
 affected_repos = []
+tg_notify_result = ""         # tg-notify.sh 回傳的一行狀態（TG_SENT / TG_SKIP_* / TG_FAIL）
 worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id} after Step 4
 ```
 
@@ -107,7 +108,7 @@ ASSIGNEE_IDS=$(curl -s -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" \
 
 # 與 tech-users.csv 的 notion_user_id 欄位比對
 MATCHED_EMAIL=""
-while IFS=, read -r name nid email repos; do
+while IFS=, read -r name nid email repos tgid; do
   for aid in $ASSIGNEE_IDS; do
     if [ "$aid" = "$nid" ]; then
       MATCHED_EMAIL="$email"
@@ -457,6 +458,21 @@ reviewer_email: {reviewer_email}
 
 **Wait for completion.** 抽 `MR_LINKS: [...]` 存到 `mr_links`,並從報告確認 `NOTION_AI_FIELD: ok`。
 
+#### Step 7b.1: TG 通知技術（success）
+
+成功開出 MR 後，向該技術發私訊（永不阻斷流程，僅記 log）：
+
+```bash
+TG_MSG="✅ [已開 MR] {ticket_id}
+AI 已完成修復並開出 MR，待你 review：
+{對每個 affected repo 一行：'{repo}: {mr_url}'}
+分析文件：{drive_link}
+Notion：{notion_url}"
+bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "$TG_MSG"
+```
+
+把輸出（`TG_SENT` / `TG_SKIP_NOT_TECH` / `TG_SKIP_NO_CHATID` / `TG_FAIL`）存入 `tg_notify_result`。
+
 ### Step 7c: Manager Notion Writeback（非 success 路徑）
 
 僅在 `pipeline_status ∈ {already_fixed, i18n_manual_handoff, failed}` 執行。
@@ -550,6 +566,19 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
   -d '{"properties": {"AI分析": {"select": {"name": "待釐清"}}}}'
 ```
 
+TG 通知該技術（待釐清）：
+
+```bash
+TG_MSG="🟡 [待釐清] {ticket_id}
+AI 在實證 grounding 階段發現 bug 單與 CQA 實況可能有出入，需你確認：
+{qa_question}
+分析文件：{drive_link}
+Notion：{notion_url}"
+bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "$TG_MSG"
+```
+
+把輸出存入 `tg_notify_result`。（`already_fixed` / `i18n_manual_handoff` / `failed` 分支不發 TG。）
+
 ---
 
 ### Step 8: Release Lock & Update Tracker
@@ -583,6 +612,7 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 {對每個 affected_repo 列一行 "- {repo}: {mr_url}",若 pipeline_status != success 則整段顯示 "(N/A - {pipeline_status})"}
 - Notion comment: completed
 - Notion AI分析: {分析成功 / 分析失敗}
+- TG 通知: {tg_notify_result}（success / 待釐清 才會送，其餘為 N/A）
 - Reviewer: {reviewer_email}
 - Worktree root: /Users/user/aladdin/worktrees/{ticket_id}
 

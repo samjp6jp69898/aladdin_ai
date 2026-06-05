@@ -499,6 +499,8 @@ grounding_doc: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-ground
 
 **Wait for completion.** drive-uploader 會根據 pipeline_status 更新 Notion「AI分析」欄位為「分析成功」。
 
+> drive-uploader 另會在 `pipeline_status ∈ {success, needs_qa_clarification}` 時，查當前指派並對技術人員發 Telegram 私訊（透過 `scripts/tg-notify.sh`；非技術 / 無 chat_id 則略過並記 log）。
+
 ---
 
 ### Step 8: Completion Report
@@ -516,6 +518,7 @@ grounding_doc: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-ground
 - Pipeline status: {pipeline_status}
 - Google Drive: {share link}
 - Notion comment: completed / failed
+- TG 通知: drive-uploader 回報的 tg-notify 結果（success / 待釐清 才送）
 - Worktree root: /Users/user/aladdin/worktrees/{ticket_id} (critical only) or N/A
 - Documents: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
