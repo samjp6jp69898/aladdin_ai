@@ -3,7 +3,7 @@
  *
  * 篩選條件：
  *   狀態     = 仍有問題 OR 待處理
- *   AI分析   = 待分析
+ *   AI分析   = 待分析 OR 需要重跑
  *   當前指派 = 至少一人在 tech-users.csv 名單中（程式端後篩）
  *
  * 寫入 tracker file：
@@ -94,7 +94,12 @@ function buildFilter(): object {
                     { property: '狀態', select: { equals: '待處理' } },
                 ],
             },
-            { property: 'AI分析', select: { equals: '待分析' } },
+            {
+                or: [
+                    { property: 'AI分析', select: { equals: '待分析' } },
+                    { property: 'AI分析', select: { equals: '需要重跑' } },
+                ],
+            },
         ],
     };
 }
@@ -306,7 +311,7 @@ function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=仍有問題,待處理 | AI分析=待分析 | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=仍有問題,待處理 | AI分析=待分析,需要重跑 | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
 
     const techUsers = loadTechUsers();
     console.log(`  Tech 名單載入: ${techUsers.length} 人`);
