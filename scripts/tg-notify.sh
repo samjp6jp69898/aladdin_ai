@@ -8,7 +8,7 @@
 set -uo pipefail
 
 CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv}"
-ENV_FILE="${TG_ENV_FILE:-/Users/user/.claude/channels/telegram/.env}"
+ENV_FILE="${TG_ENV_FILE:-/Users/user/aladdin/.env}"
 API_BASE="${TG_API_BASE:-https://api.telegram.org}"
 
 EMAIL=""; IDS=""; TEXT=""; DRY=0; CHAT_DIRECT=""
