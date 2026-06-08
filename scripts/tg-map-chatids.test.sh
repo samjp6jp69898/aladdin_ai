@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# tg-map-chatids.test.sh — 全離線測試（不打 Telegram API、不碰真實 access.json / CSV）
+# tg-map-chatids.test.sh — 全離線測試（不打 Telegram API、不碰真實 CSV）
 # 跑法：bash scripts/tg-map-chatids.test.sh
-# 紀律：用 TG_GETCHAT_CMD stub 掉 getChat、用 TG_ACCESS_JSON / TG_NOTIFY_CSV 餵 fixture。
+# 紀律：用 TG_GETUPDATES_CMD stub 掉 getUpdates、用 TG_NOTIFY_CSV 餵 fixture。
 set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -63,29 +63,23 @@ assert_has "set unknown email prints SET_ERR_NO_EMAIL" "$out" "SET_ERR_NO_EMAIL"
 # ───────────────────────── --list ─────────────────────────
 echo "## --list"
 
-cat > "$TMP/access.json" <<'JSONEOF'
-{
-  "dmPolicy": "pairing",
-  "allowFrom": ["111", "777", "333"],
-  "groups": {},
-  "pending": { "tok": { "chatId": "222", "senderId": "222" } }
-}
-JSONEOF
-
-cat > "$TMP/stub.sh" <<'STUBEOF'
+# getUpdates stub：模擬 4 個私聊 DM（含一個已對映 777、一個非私聊應被忽略）
+cat > "$TMP/upd.sh" <<'STUBEOF'
 #!/usr/bin/env bash
-case "$1" in
-  111) echo '{"ok":true,"result":{"first_name":"洋蔥","username":"farus422"}}';;
-  222) echo '{"ok":true,"result":{"first_name":"Dup","username":"dupuser"}}';;
-  333) echo '{"ok":true,"result":{"first_name":"Zzz","username":"zzz999"}}';;
-  777) echo '{"ok":true,"result":{"first_name":"Mapped","username":"mapped"}}';;
-  *)   echo '{"ok":false,"description":"chat not found"}';;
-esac
+cat <<'JSON'
+{"ok":true,"result":[
+ {"update_id":1,"message":{"chat":{"id":111,"type":"private","first_name":"洋蔥","username":"farus422"}}},
+ {"update_id":2,"message":{"chat":{"id":222,"type":"private","first_name":"Dup","username":"dupuser"}}},
+ {"update_id":3,"message":{"chat":{"id":333,"type":"private","first_name":"Zzz","username":"zzz999"}}},
+ {"update_id":4,"message":{"chat":{"id":777,"type":"private","first_name":"Mapped","username":"mapped"}}},
+ {"update_id":5,"message":{"chat":{"id":-1009,"type":"group","title":"some group"}}}
+]}
+JSON
 STUBEOF
-chmod +x "$TMP/stub.sh"
+chmod +x "$TMP/upd.sh"
 
 mkcsv
-OUT="$(TG_NOTIFY_CSV="$CSV" TG_ACCESS_JSON="$TMP/access.json" TG_GETCHAT_CMD="$TMP/stub.sh" bash "$SCRIPT" --list)"
+OUT="$(TG_NOTIFY_CSV="$CSV" TG_GETUPDATES_CMD="$TMP/upd.sh" bash "$SCRIPT" --list)"
 
 line_of(){ printf '%s\n' "$OUT" | awk -F'\t' -v id="$1" '$1==id'; }
 field(){ printf '%s' "$1" | awk -F'\t' -v n="$2" '{print $n}'; }
@@ -98,8 +92,8 @@ assert_eq "111 candidate_email"      "$(field "$L111" 6)" "pkh_farus@photons.com
 # 對到兩列 → ASK
 L222="$(line_of 222)"
 assert_eq "222 confidence ASK"       "$(field "$L222" 5)" "ASK"
-# pending 來源的 chat_id 有被納入
-assert_eq "222 source pending"       "$(field "$L222" 2)" "pending"
+# 來源一律標記 getUpdates
+assert_eq "222 source getUpdates"    "$(field "$L222" 2)" "getUpdates"
 
 # 對不到 → ASK
 L333="$(line_of 333)"
@@ -107,6 +101,9 @@ assert_eq "333 confidence ASK"       "$(field "$L333" 5)" "ASK"
 
 # 已對映 chat_id（777）→ 不出現在輸出（被跳過）
 assert_no "mapped 777 skipped"       "$OUT" "777"
+
+# 非私聊（group -1009）→ 被忽略，不出現在輸出
+assert_no "group chat ignored"       "$OUT" "1009"
 
 # ───────────────────────── summary ─────────────────────────
 echo "-----"

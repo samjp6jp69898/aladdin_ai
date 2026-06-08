@@ -57,6 +57,7 @@ drive_link = ""
 mr_links = []
 affected_repos = []
 tg_notify_result = ""         # tg-notify.sh 回傳的一行狀態（TG_SENT / TG_SKIP_* / TG_FAIL）
+tg_chatid_sync_result = ""    # Step 0 tg-chatid-sync 彙總（自動對映 N / ASK 待處理 M / 確認訊息結果）
 worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id} after Step 4
 ```
 
@@ -64,7 +65,31 @@ worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id}
 
 ## Execution Flow
 
-### Step 0: Claim Ticket From Tracker
+### Step 0: Telegram chat_id 回填（pipeline 前置，best-effort 非阻斷）
+
+在 claim 任何 ticket 之前，先用 `tg-chatid-sync` 流程把「有 DM 過 bot 但 CSV 缺 chat_id」的技術自動回填，讓 Step 7b.1 的 TG 通知不會因缺 chat_id 而 `TG_SKIP_NO_CHATID`。**本步驟一律 best-effort：任何錯誤只記 log、絕不中斷 pipeline；不 claim、不改 tracker。** 由 manager 自跑，**不派 sub agent**。
+
+紀律承襲 `tg-chatid-sync` skill：發現來源為新 bot 自己的 `getUpdates`（誰 DM 過新 bot），與 telegram channel / `access.json` 完全無關；只讀不確認 offset、冪等（`--list` 跳過已對映）、不覆蓋既有不同 chat_id。注意 getUpdates 只看近 ~24h 未確認更新，超時者需重發 DM 才會被發現。
+
+1. **唯讀發現**：
+   ```bash
+   bash /Users/user/aladdin/scripts/tg-map-chatids.sh --list
+   ```
+   輸出 TSV（無表頭，tab 分隔）：`chat_id  source  tg_first_name  tg_username  confidence(HIGH|ASK)  candidate_email  candidate_name  alt_candidates`。指令失敗或無輸出 → 設 `tg_chatid_sync_result = "SKIPPED (--list 無輸出或失敗)"`，直接進 Step 0.1。
+
+2. **逐行處理（不使用 AskUserQuestion）**：
+   - `confidence == HIGH` → 自動寫入，再對 `SET_OK` 者發確認訊息（`first_name` 取自該行）：
+     ```bash
+     bash /Users/user/aladdin/scripts/tg-map-chatids.sh --set <candidate_email> <chat_id>
+     bash /Users/user/aladdin/scripts/tg-notify.sh --email <candidate_email> --text "<tg_first_name> 連結成功"
+     ```
+   - `confidence == ASK`（候選 0 或 ≥2）→ **不問、不寫**，只記 log（`chat_id` / `tg_first_name` / `alt_candidates`），留待人工另跑 `/tg-chatid-sync`。
+
+3. 彙總寫入 `tg_chatid_sync_result`，格式：`自動對映 N / ASK 待處理 M / 確認訊息 X SENT, Y FAIL`，於 Step 9 完成報告輸出。
+
+無論結果如何，繼續 **Step 0.1**。
+
+### Step 0.1: Claim Ticket From Tracker
 
 1. **Read tracker file**:
    ```bash
@@ -613,6 +638,7 @@ bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text 
 - Notion comment: completed
 - Notion AI分析: {分析成功 / 分析失敗}
 - TG 通知: {tg_notify_result}（success / 待釐清 才會送，其餘為 N/A）
+- TG chat_id 同步 (Step 0): {tg_chatid_sync_result}
 - Reviewer: {reviewer_email}
 - Worktree root: /Users/user/aladdin/worktrees/{ticket_id}
 
