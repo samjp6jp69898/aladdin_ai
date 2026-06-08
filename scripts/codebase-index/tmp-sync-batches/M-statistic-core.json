@@ -1,0 +1,469 @@
+[
+  {
+    "index": 4,
+    "type": "update_existing",
+    "filePath": "src/servers/statistic/services/statistic.ts",
+    "commitMessage": "fix(agent_report): currencyCode='' 跳過幣別過濾，修復代理報表充值/提現欄位顯示 0 [FAQ-3075]",
+    "commitHash": "27b834bfa13f50cc0c33e1220af2d86f7345e4f5",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "statistic.statistic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "statistic.statistic.PopularGames",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.PopularGames.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetDailyUserGameBetStatisticsSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetDailyUserGameBetStatisticsSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetDepositHighNetWorthUsersByAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetDepositHighNetWorthUsersByAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGameTagBetWinByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGameTagBetWinByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchUserRecentPlayed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchUserRecentPlayed.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.RecentPlayed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.RecentPlayed.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetActiveDays",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetActiveDays.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUsersGameBetWinByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUsersGameBetWinByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.CountBettingUsersByIdsFromGameBets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.CountBettingUsersByIdsFromGameBets.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGameBrandBetStatisticsByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGameBrandBetStatisticsByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetActiveDepositDays",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetActiveDepositDays.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGameBetSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGameBetSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetPaymentStatisticsByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetPaymentStatisticsByUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGameBetSummaryByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGameBetSummaryByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserPaymentStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserPaymentStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchGetDailyPaymentStatisticsByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchGetDailyPaymentStatisticsByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.CountBettingUsersByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.CountBettingUsersByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserTotalBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserTotalBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTotalValidBetByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTotalValidBetByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchGetStatisticsInfoByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchGetStatisticsInfoByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchUserPaymentStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchUserPaymentStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTimespanUserGameBetStatisticsSumGroupByUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTimespanUserGameBetStatisticsSumGroupByUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchGetDailyPaymentStatisticsByUserIdsAndTime",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchGetDailyPaymentStatisticsByUserIdsAndTime.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserRankingActivityRanking",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserRankingActivityRanking.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.CountValidMembersByIdsFromGameBets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.CountValidMembersByIdsFromGameBets.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTwoEightRoundBetStatisticsSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTwoEightRoundBetStatisticsSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGameVendorGameRanking",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGameVendorGameRanking.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUsersPaymentStatisticsByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUsersPaymentStatisticsByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTotalValidBetByGameVendorIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTotalValidBetByGameVendorIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.SearchUserPaymentStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.SearchUserPaymentStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetOnlineUserCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetOnlineUserCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserGameTagBetStatisticsByStartedAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserGameTagBetStatisticsByStartedAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.CountValidMembersByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.CountValidMembersByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserValidBetStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserValidBetStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserTotalGameBetStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserTotalGameBetStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.ExportDailyUserGameVendorTagBetDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.ExportDailyUserGameVendorTagBetDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTotalBetWinByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTotalBetWinByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.BatchGetTimespanUserGameBetUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.BatchGetTimespanUserGameBetUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetNonFirstDepositSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetNonFirstDepositSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTimespanUserGameBetStatisticsSumGroupByTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTimespanUserGameBetStatisticsSumGroupByTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTimespanUserGameBetStatisticsSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTimespanUserGameBetStatisticsSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetActivityRankings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetActivityRankings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetDailyGameVendorFeeCategoryBetStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetDailyGameVendorFeeCategoryBetStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetGamesBetWinByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetGamesBetWinByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetTimespanUserBonusSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetTimespanUserBonusSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetPlatformStatistic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetPlatformStatistic.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.SearchReferralSupportValidMembersCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.SearchReferralSupportValidMembersCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetUserGameRanking",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetUserGameRanking.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statistic.GetDepositHighNetWorthUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/Statistic/methods/statistic.statistic.GetDepositHighNetWorthUsers.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 45,
+    "type": "update_existing",
+    "filePath": "src/servers/statistic/services/statistic_platform.ts",
+    "commitMessage": "feat(statistic): GetDailyUserGameVendorTagBetUserSummary 新增 gameVendorTagSearchList 篩選",
+    "commitHash": "91103df8c5473f93d9590757952b67cc5f840c2e",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "statistic.statisticPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetDailyPaymentHighNetWorthStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetDailyPaymentHighNetWorthStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.ListGameReportByDisplayTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.ListGameReportByDisplayTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.ListDepositWithdrawDailyReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.ListDepositWithdrawDailyReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetGameReportByDisplayTagSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetGameReportByDisplayTagSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetDailyUserGameVendorTagBetSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetDailyUserGameVendorTagBetSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetYesterdayPlatformStatistic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetYesterdayPlatformStatistic.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.ListGameReportByBrand",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.ListGameReportByBrand.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetTodayPlatformStatistic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetTodayPlatformStatistic.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetDailyUserGameVendorTagBetUsersSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetDailyUserGameVendorTagBetUsersSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetDailyUserGameVendorTagBetUserSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetDailyUserGameVendorTagBetUserSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.ListUserThirdPartyBetReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.ListUserThirdPartyBetReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetDailyPaymentHighNetWorthUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetDailyPaymentHighNetWorthUsers.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetUserThirdPartyBetReportSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetUserThirdPartyBetReportSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "statistic.statisticPlatform.GetGameReportByBrandSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Statistic/services/StatisticPlatform/methods/statistic.statisticPlatform.GetGameReportByBrandSummary.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 19,
+    "type": "update_existing",
+    "filePath": "src/servers/platform/services/dashboard.ts",
+    "commitMessage": "perf(dashboard): 將dashboard一些由\"充/提紀錄表\"取得的數據改從\"每日用戶支付統計表\"取得",
+    "commitHash": "c1f497e182562d5267efcbd0e44ab0ba00cbf2af",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "platform.dashboard",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "platform.dashboard.GetMemberData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetMemberData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "platform.dashboard.GetFirstPaymentData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetFirstPaymentData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "platform.dashboard.GetDepositAndWithdrawData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetDepositAndWithdrawData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "platform.dashboard.GetPaymentRequestData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetPaymentRequestData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "platform.dashboard.GetGameRecordData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetGameRecordData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "platform.dashboard.GetTodayMemberData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Platform/services/Dashboard/methods/platform.dashboard.GetTodayMemberData.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 69,
+    "type": "update_existing",
+    "filePath": "src/servers/core/services/core.ts",
+    "commitMessage": "feat: 統計各 server API 次數",
+    "commitHash": "6b4232144d72a3b52d6d2f49f7e31a98febcfcde",
+    "newMethodHints": [
+      "methodReportRequestStatistic"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "Core.CoreService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "core.core.GetProxyGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetProxyGroups.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetPlatformSupportedLanguages",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetPlatformSupportedLanguages.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetAppDomains",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetAppDomains.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetPlatformDetailById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetPlatformDetailById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetDomains",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetDomains.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetWhiteListedIps",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetWhiteListedIps.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetBlackListedIpsByPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetBlackListedIpsByPlatform.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetPlatforms",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetPlatforms.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetRoutes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetRoutes.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetBlackListedIps",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetBlackListedIps.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetPlatformDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetPlatformDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "core.core.GetWhiteListedIpsByPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Core/services/Core/methods/core.core.GetWhiteListedIpsByPlatform.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

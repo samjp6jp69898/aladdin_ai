@@ -1,0 +1,212 @@
+[
+  {
+    "index": 59,
+    "type": "update_existing",
+    "filePath": "src/servers/activity/services/activity_internal.ts",
+    "commitMessage": "feat(activity): 後台領獎後，同樣清除app端快取",
+    "commitHash": "820106cf7f414de6e7f2651018c2aff4500f4997",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Activity.ActivityInternalService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "activity.activityInternal.CreateUserActivityManualGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/methods/activity.activityInternal.CreateUserActivityManualGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activityInternal.RevokeActivityBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/methods/activity.activityInternal.RevokeActivityBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activityInternal.CheckDisplay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/methods/activity.activityInternal.CheckDisplay.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activityInternal.GetUserClaimCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/methods/activity.activityInternal.GetUserClaimCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activityInternal.ApproveAndClaimRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/ActivityInternal/methods/activity.activityInternal.ApproveAndClaimRewards.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 37,
+    "type": "update_existing",
+    "filePath": "src/servers/activity/services/activity.ts",
+    "commitMessage": "fix(activity): FAQ-3265",
+    "commitHash": "1e6ba01a69115120548ad8389fbb35e50f9be97e",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Activity.ActivityService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "activity.activity.ClaimRewardByQuestId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.ClaimRewardByQuestId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetCheckInDetailByStepId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetCheckInDetailByStepId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.JoinActivityById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.JoinActivityById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetActivityTabs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetActivityTabs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.CatchUpByQuestId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.CatchUpByQuestId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetDetailById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetDetailById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetBonusLobbyList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetBonusLobbyList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetRewardCenterList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetRewardCenterList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.CheckInByQuestId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.CheckInByQuestId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.ClaimRewardByUserQuestRewardRecordId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.ClaimRewardByUserQuestRewardRecordId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activity.activity.GetList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/services/Activity/methods/activity.activity.GetList.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 42,
+    "type": "update_existing",
+    "filePath": "src/servers/activity/services/quests/base_quest.ts",
+    "commitMessage": "feat(activity): 新增 flag 確認是否點擊申請/領取",
+    "commitHash": "7d2ae24768904bab0076572191f8c186996e1614",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Activity.Model.BaseQuest",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Activity/models/Activity.Model.BaseQuest.md",
+        "type": "model"
+      }
+    ]
+  },
+  {
+    "index": 28,
+    "type": "update_existing",
+    "filePath": "src/servers/activity_back_office/services/activity_platform.ts",
+    "commitMessage": "feat(activity): 活動審核/明細排序，活動審核暫停審核排除已完成",
+    "commitHash": "1d0e9f3087c473583321ad6afe73fdf08566aef6",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "activityBackOffice.activityPlatform.ToggleActivityConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.ToggleActivityConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.CreateOrUpdateActivityConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.CreateOrUpdateActivityConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.ToggleBonusLobbyItemStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.ToggleBonusLobbyItemStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetBonusLobbyList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetBonusLobbyList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.CreateOrUpdateBonusLobbyItem",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.CreateOrUpdateBonusLobbyItem.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.DeleteActivityConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.DeleteActivityConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform._getBlackUserSqlConditions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform._getBlackUserSqlConditions.md",
+        "type": "service-internal-helper"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetBonusCenterEnabledItems",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetBonusCenterEnabledItems.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetUserQuestRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetUserQuestRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetActivityTabs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetActivityTabs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.ToggleActivityTab",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.ToggleActivityTab.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.CreateOrUpdateActivityTabs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.CreateOrUpdateActivityTabs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.ApproveUserQuestRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.ApproveUserQuestRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetActivityConfigs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetActivityConfigs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "activityBackOffice.activityPlatform.GetUploadActivityConfigImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/ActivityBackOffice/services/ActivityPlatform/methods/activityBackOffice.activityPlatform.GetUploadActivityConfigImageToken.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

@@ -1,0 +1,855 @@
+[
+  {
+    "index": 8,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_back_office/services/agent_general_platform.ts",
+    "commitMessage": "feat(agent): 新增佣金會員充值明細與手動充值明細分頁 API",
+    "commitHash": "b12ccbd593da781d0dfbb843559e1820c84d1142",
+    "newMethodHints": [
+      "methodCommissionMemberRecharges",
+      "methodCommissionMemberManualRecharges"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "AgentBackOffice.AgentGeneralPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.VerifyDepositSupportRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.VerifyDepositSupportRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetPromotionReferralAdBanners",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetPromotionReferralAdBanners.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionAuditImplement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionAuditImplement.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetFriendDetailReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetFriendDetailReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.EditReferralDomainAuditRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.EditReferralDomainAuditRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionAudit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetAgentDetailsInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetAgentDetailsInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetDepositSupportRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetDepositSupportRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionDetailsAuditList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionDetailsAuditList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetPromotionReferralBannerUploadToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetPromotionReferralBannerUploadToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetUserReferralDomainAuditInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetUserReferralDomainAuditInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.DeletePromotionReferralAdBanner",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.DeletePromotionReferralAdBanner.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetReferralSupportConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetReferralSupportConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CreateOrUpdatePromotionReferralAdBanner",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CreateOrUpdatePromotionReferralAdBanner.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.UpdateDepositSupportConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.UpdateDepositSupportConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionMemberDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionMemberDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetCommissionSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetCommissionFlag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetCommissionFlag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetWeeklyDepositRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetWeeklyDepositRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetFriendStatisticReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetFriendStatisticReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.UpdateActiveMemberSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.UpdateActiveMemberSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetWeeklyDepositRewardInvoices",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetWeeklyDepositRewardInvoices.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetCommissionListAutoReviewSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetCommissionListAutoReviewSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CreateOrUpdatePromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CreateOrUpdatePromotionReferralIntro.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionDetailsAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionDetailsAudit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.ApproveWeeklyDepositRewardInvoices",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.ApproveWeeklyDepositRewardInvoices.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetCommissionSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.UserList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.UserList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.UpdateReferralSupportConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.UpdateReferralSupportConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetBatchAgentGeneralCommissionSettingByAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetBatchAgentGeneralCommissionSettingByAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetDepositSupportConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetDepositSupportConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionDetailsList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionDetailsList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetActiveMemberSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetActiveMemberSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.CommissionList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.CommissionList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetPromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetPromotionReferralIntro.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetCommissionListAutoReviewSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetCommissionListAutoReviewSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.ImportReferralDomain",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.ImportReferralDomain.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetFriendReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetFriendReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.RejectWeeklyDepositRewardInvoices",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.RejectWeeklyDepositRewardInvoices.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.GetWeeklyDepositRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.GetWeeklyDepositRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.UpdatePromotionReferralAdBannerOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.UpdatePromotionReferralAdBannerOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentGeneralPlatform.SetBatchAgentGeneralCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentGeneralPlatform/methods/agentBackOffice.agentGeneralPlatform.SetBatchAgentGeneralCommissionSetting.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 26,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_back_office/services/agent_payment_platform.ts",
+    "commitMessage": "feat(agent): 修正代理佣金上分未產生稽核問題，並統一帳變與稽核類型的對應關係",
+    "commitHash": "e0c9465147a2b922ac4143e3d4548b0a648a11dd",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AgentBackOffice.AgentPaymentsPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.GetTransactions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.GetTransactions.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.GetBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.GetBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.DeductFunds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.DeductFunds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.Deposit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.Deposit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.GetWalletTransactions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.GetWalletTransactions.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.GetBalanceByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.GetBalanceByUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPaymentsPlatform.GetProxyDepositRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPaymentsPlatform/methods/agentBackOffice.agentPaymentsPlatform.GetProxyDepositRecords.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 27,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_back_office/services/agent_promotions_platform.ts",
+    "commitMessage": "feat(agent): 修正代理佣金上分未產生稽核問題，並統一帳變與稽核類型的對應關係",
+    "commitHash": "e0c9465147a2b922ac4143e3d4548b0a648a11dd",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AgentBackOffice.AgentPromotionsPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetTieredDepositRewardsRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetTieredDepositRewardsRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetVenueWeeklyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetVenueWeeklyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetVenueWeeklyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetVenueWeeklyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetDailyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetDailyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.EditRegisterBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.EditRegisterBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetTieredDepositRewardsSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetTieredDepositRewardsSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.RejectTieredDepositRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.RejectTieredDepositRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.RejectWeeklyTurnoverRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.RejectWeeklyTurnoverRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetRegisterBonusCommonSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetRegisterBonusCommonSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetWeeklyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetWeeklyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.RejectVenueWeeklyTurnoverRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.RejectVenueWeeklyTurnoverRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetRegisterBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetRegisterBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.RejectDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.RejectDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.ApproveAgentGameVendorDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.ApproveAgentGameVendorDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.RejectAgentGameVendorDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.RejectAgentGameVendorDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetAgentBackOfficeDomain",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetAgentBackOfficeDomain.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetWeeklyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetWeeklyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.UpdatePromotionDescriptionSort",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.UpdatePromotionDescriptionSort.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetPromotionRulesDescription",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetPromotionRulesDescription.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.EnableRegisterBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.EnableRegisterBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetTieredDepositRewardsSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetTieredDepositRewardsSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetRegisterBonusCommonSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetRegisterBonusCommonSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.EditPromotionDescription",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.EditPromotionDescription.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetWeeklyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetWeeklyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetDailyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetDailyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.ApproveWeeklyTurnoverRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.ApproveWeeklyTurnoverRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.ApproveDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.ApproveDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.ApproveVenueWeeklyTurnoverRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.ApproveVenueWeeklyTurnoverRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetVenueWeeklyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetVenueWeeklyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetAgentGameVendorDailyTurnoverRewardRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetAgentGameVendorDailyTurnoverRewardRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.ApproveTieredDepositRewards",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.ApproveTieredDepositRewards.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.DisableRegisterBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.DisableRegisterBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.DeletePromotionDescription",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.DeletePromotionDescription.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetAgentGameVendorDailyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetAgentGameVendorDailyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.NewPromotionDescription",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.NewPromotionDescription.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SearchPromotionDescription",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SearchPromotionDescription.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.SetAgentGameVendorDailyTurnoverRewardSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.SetAgentGameVendorDailyTurnoverRewardSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentPromotionsPlatform.GetUploadPromotionsIconToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentPromotionsPlatform/methods/agentBackOffice.agentPromotionsPlatform.GetUploadPromotionsIconToken.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 22,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_back_office/services/agent_commission_manage_platform.ts",
+    "commitMessage": "fix(agent_back_office): 修正推薦佣金逾期處理程序未正常運行問題",
+    "commitHash": "67ee05ef92c6811a80343bba6f7a90826ad021d6",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AgentBackOffice.AgentCommissionManagePlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.BatchApproveCommissionInvoices",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.BatchApproveCommissionInvoices.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetCommissionPlansDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetCommissionPlansDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SetCommissionPlanStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SetCommissionPlanStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateAgentUserReferralCommissionInvoiceStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateAgentUserReferralCommissionInvoiceStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateAgentReferralCommissionInvoiceStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateAgentReferralCommissionInvoiceStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceOriginalData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceOriginalData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentReferralReportDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentReferralReportDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentReferralReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentReferralReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchCommissionInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchCommissionInvoice.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.DeleteOtherFeeSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.DeleteOtherFeeSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentDailySalaryDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentDailySalaryDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentDailySalarySummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentDailySalarySummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateCommissionPlan",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateCommissionPlan.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoiceOverdueSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoiceOverdueSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateAgentCommissionTurnoverRebateInvoiceStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateAgentCommissionTurnoverRebateInvoiceStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoice.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.AddCommissionPlan",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.AddCommissionPlan.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetAgentCommissionTurnoverRebateInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetAgentCommissionTurnoverRebateInvoice.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateOtherFeeSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateOtherFeeSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.UpdateCommissionInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.UpdateCommissionInvoice.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetAvailableCommissionPlans",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetAvailableCommissionPlans.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureDailyWageringCommissionReportMember",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureDailyWageringCommissionReportMember.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SetDefaultCommissionPlan",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SetDefaultCommissionPlan.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoiceDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetAgentReferralCommissionInvoiceDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetUploadCsvToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetUploadCsvToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentLegendaryTeaReward",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureAgentLegendaryTeaReward.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.ImportCommissionInvoices",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.ImportCommissionInvoices.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetImportCommissionInvoiceTemplate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetImportCommissionInvoiceTemplate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SetAgentReferralCommissionInvoiceOverdueSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SetAgentReferralCommissionInvoiceOverdueSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SetWageringMultiplierSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SetWageringMultiplierSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetWageringMultiplierSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetWageringMultiplierSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.ListHistoricalUnpaidCommission",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.ListHistoricalUnpaidCommission.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetCommissionPlans",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetCommissionPlans.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetOtherFeeSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetOtherFeeSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.SearchVentureDailyWageringCommissionReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.SearchVentureDailyWageringCommissionReport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.AddOtherFeeSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.AddOtherFeeSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceVenueFeeDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentBackOffice/services/AgentCommissionManagePlatform/methods/agentBackOffice.agentCommissionManagePlatform.GetCommissionInvoiceVenueFeeDetail.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 54,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_app/services/agent_applications_app.ts",
+    "commitMessage": "[Add] tracing for agent related events for BackOfficeNotification",
+    "commitHash": "3123228583e682877ebc99188c841859b01f5bc1",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AgentApp.ApplicationsAppService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/ApplicationsApp/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentApp.applicationsApp.SubmitAgentApplication",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/ApplicationsApp/methods/agentApp.applicationsApp.SubmitAgentApplication.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.applicationsApp.ApplyForAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/ApplicationsApp/methods/agentApp.applicationsApp.ApplyForAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.applicationsApp.GetMyApplicationStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/ApplicationsApp/methods/agentApp.applicationsApp.GetMyApplicationStatus.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 31,
+    "type": "update_existing",
+    "filePath": "src/servers/agent_app/services/agent_general_app.ts",
+    "commitMessage": "fixed:撤銷返水帳變",
+    "commitHash": "68f63ca39295fd0c4beb968e07aa99bfffee642d",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AgentApp.AgentGeneralAppService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetGeneralReferralDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetGeneralReferralDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetGeneralBonusRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetGeneralBonusRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.TeamRechargeDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.TeamRechargeDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.InviteDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.InviteDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetSupportQuota",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetSupportQuota.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.DistributeRechargeSupport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.DistributeRechargeSupport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.ValidBetsDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.ValidBetsDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetDepositSupportConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetDepositSupportConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetPromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetPromotionReferralIntro.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetTeamProgress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetTeamProgress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.CollectCommission",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.CollectCommission.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.RechargeSupportUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.RechargeSupportUsers.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.CommissionSchemeSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.CommissionSchemeSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.NumberOfInvites",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.NumberOfInvites.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetTeamBasicInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetTeamBasicInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.RechargeAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.RechargeAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.RechargeSupportRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.RechargeSupportRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.CollectionRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.CollectionRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetPromotionReferralAdBanners",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetPromotionReferralAdBanners.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.TeamBets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.TeamBets.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.CheckPromotionReferralActivityEligibility",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.CheckPromotionReferralActivityEligibility.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "agentApp.agentGeneralApp.GetGeneralMemberOverview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AgentApp/services/AgentGeneralApp/methods/agentApp.agentGeneralApp.GetGeneralMemberOverview.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1571 @@
+[
+  {
+    "index": 40,
+    "type": "new_file",
+    "filePath": "src/servers/app_user_back_office/services/app_user_ip_quota_platform.ts",
+    "commitMessage": "新增註冊 IP 配額後台管理 service 與 manager",
+    "commitHash": "dec59ef233b94d841400c5d916de3ff053ab2c06",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 5,
+    "type": "update_existing",
+    "filePath": "src/servers/app_user_back_office/services/common/query_builder.ts",
+    "commitMessage": "fix(app_user_back_office):修改搜尋表join",
+    "commitHash": "f83b07bec7e66399bb1c187ba3fb27cf45e5f0b1",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AppUserBackOffice._helpers.QueryBuilder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/_helpers/AppUserBackOffice._helpers.QueryBuilder.md",
+        "type": "helper-module"
+      }
+    ]
+  },
+  {
+    "index": 6,
+    "type": "update_existing",
+    "filePath": "src/servers/app_user_back_office/services/platform_app_user.ts",
+    "commitMessage": "fix(app_user_back_office):修改搜尋表join",
+    "commitHash": "f83b07bec7e66399bb1c187ba3fb27cf45e5f0b1",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AppUserBackOffice.PlatformAppUserService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailLoginLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailLoginLog.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportDepositStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportDepositStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportLastLoginIp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportLastLoginIp.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportMobileVerified",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportMobileVerified.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewAgentLine",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewAgentLine.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRebateLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRebateLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.AppUserEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.AppUserEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportTotalValidBetAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportTotalValidBetAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditMobileRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditMobileRegion.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserMustResetPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserMustResetPassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewWechat",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewWechat.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserImport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserImport.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetRevokeBonusCategories",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetRevokeBonusCategories.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserUserLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CallMobileLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CallMobileLog.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportCurrencyCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportCurrencyCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportDepositCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportDepositCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserVipLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportMessageBoardLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportMessageBoardLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmailUnmask",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmailUnmask.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetDepositDiscounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetDepositDiscounts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailVenueBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailVenueBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditDelivery",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditDelivery.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRecentPlayedGameTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRecentPlayedGameTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditUserLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditVipLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ToggleCharacters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ToggleCharacters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobileVerified",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobileVerified.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRegisterAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRegisterAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditRegisterName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditRegisterName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserCharacters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserCharacters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleVipBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleVipBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserGameOverview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserGameOverview.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderListFundStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderListFundStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderFundStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderFundStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserRealName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserDepositAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserDepositAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserRegisterIp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserRegisterIp.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserRecycleBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserRecycleBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SetAppUserTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SetAppUserTradePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportEmailVerifiedAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportEmailVerifiedAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportEmailVerified",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportEmailVerified.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportFirstDepositAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportFirstDepositAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchDeleteMemberTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchDeleteMemberTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportWalletBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportWalletBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleRoomTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleRoomTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SearchRevokeBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SearchRevokeBonusRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ChangeParent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ChangeParent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserKickGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserKickGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SearchAppUserBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SearchAppUserBonusRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetFreezeRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetFreezeRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserCallPhone",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserCallPhone.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailResetRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailResetRealName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserLoginHistories",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserLoginHistories.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchCreateMemberTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchCreateMemberTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.DeleteAppUserRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.DeleteAppUserRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserNickname",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserNickname.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastLoginIp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastLoginIp.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportTotalBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportTotalBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditAccountPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditAccountPassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserRebateLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserRebateLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditEmail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditEmail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobileVerifiedAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobileVerifiedAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateOrUpdateAppUserDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateOrUpdateAppUserDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateOrUpdateCharacters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateOrUpdateCharacters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailBonusQuery",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailBonusQuery.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentMode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentMode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportEmail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportEmail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SetAppUserPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SetAppUserPassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailPromoInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailPromoInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastDepositAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastDepositAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailDisableWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailDisableWithdrawAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportLastOrigin",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportLastOrigin.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleDepositPromo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleDepositPromo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportWechat",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportWechat.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateAppUserStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateAppUserStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserMobile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailBetStats",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailBetStats.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ListFundStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ListFundStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ResetAppUserRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ResetAppUserRealName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserLoginSameDeviceIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserLoginSameDeviceIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchRegister",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchRegister.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidDeposit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidDeposit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportAgentId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportAgentId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ExportAppUserBonusRecordPermission",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ExportAppUserBonusRecordPermission.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.BindUserTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.BindUserTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleThirdBet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleThirdBet.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailCasinoTransfer",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailCasinoTransfer.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailExportPointDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailExportPointDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateAppUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateAppUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserFirstDepositAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserFirstDepositAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportDepositBonusRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportDepositBonusRate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailWithdrawAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditGender",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditGender.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.DeductRebate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.DeductRebate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailGameOverview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailGameOverview.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleGuardian",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleGuardian.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportFirstDepositAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportFirstDepositAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailDeleteWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailDeleteWithdrawAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SearchAppUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SearchAppUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserTagIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserTagIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewLoginInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewLoginInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewMobileUnmask",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewMobileUnmask.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailDepositWithdraw",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailDepositWithdraw.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleDanmaku",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleDanmaku.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserPhoneUnmask",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserPhoneUnmask.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateDifferentNameDepositStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateDifferentNameDepositStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportWithdrawAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportWithdrawAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserTagsByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserTagsByUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailAccountChange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailAccountChange.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportQQ",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportQQ.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewRealName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportHasBoundBankCard",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportHasBoundBankCard.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ChangeParentAndMode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ChangeParentAndMode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserLoginSameIps",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserLoginSameIps.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportUserLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailOperationLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailOperationLog.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportMobile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportMobile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewAgentInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewAgentInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailClearPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailClearPoint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.SearchAppUserFromAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.SearchAppUserFromAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetSensitiveFieldsStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetSensitiveFieldsStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditCharacterField",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditCharacterField.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserDepositCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserDepositCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailSmsLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailSmsLog.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserCurrencyCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserCurrencyCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserWalletBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserWalletBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewUserLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewRegisterInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewRegisterInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditNickname",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditNickname.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.BatchGetAppUserDailyPaymentInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.BatchGetAppUserDailyPaymentInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRegion.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ListAppUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ListAppUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserMessageBoardLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserMessageBoardLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailAccountStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailAccountStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleRebateProduce",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleRebateProduce.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastLoginAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastLoginAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ManualUnfreeze",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ManualUnfreeze.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserTotalAssets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserTotalAssets.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditBirthday",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditBirthday.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateOrUpdateAppUserRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateOrUpdateAppUserRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportWithdrawStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportWithdrawStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailAuditAdjust",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailAuditAdjust.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleFreeze",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleFreeze.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewGender",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewGender.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportWithdrawCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportWithdrawCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportLastDepositAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportLastDepositAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportMobileVerifiedAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportMobileVerifiedAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleWithdrawPromo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleWithdrawPromo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditWithdrawAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportNickName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportNickName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastOrigin",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserLastOrigin.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentIdentifier",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserAgentIdentifier.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleSelfBet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleSelfBet.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleRebateReceive",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleRebateReceive.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateAppUserMustResetPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateAppUserMustResetPassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRegisterIp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRegisterIp.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserCharacterId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserCharacterId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportAgentIdentifier",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportAgentIdentifier.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportAgentMode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportAgentMode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailTogglePromoBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailTogglePromoBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailLimitWithdraw",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailLimitWithdraw.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserTagsByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserTagsByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.DeleteAppUserDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.DeleteAppUserDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawTimes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserWithdrawTimes.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateAppUserTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateAppUserTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.KickGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.KickGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportRealName.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailUserBasic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailUserBasic.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetBonusRecordCategories",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetBonusRecordCategories.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmailVerified",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserEmailVerified.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ImportSearchAppUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ImportSearchAppUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportDepositAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportDepositAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportIdentifier",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportIdentifier.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditWechat",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditWechat.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserWalletBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserWalletBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleAffiliateAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleAffiliateAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserAllBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserAllBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewMobile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewMobile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateOrUpdateDepositDiscounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateOrUpdateDepositDiscounts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewPointDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewPointDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditQQ",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditQQ.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateAppUserVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateAppUserVipLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ListTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ListTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ListCharacters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ListCharacters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailRemarkInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailRemarkInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportLastLoginAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportLastLoginAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UnmaskSensitiveFields",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UnmaskSensitiveFields.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ToggleTagTopStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ToggleTagTopStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderExportVip",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderExportVip.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.EditAppUserStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.EditAppUserStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailDeleteDelivery",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailDeleteDelivery.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewNickname",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewNickname.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.RevokeBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.RevokeBonus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleGlobalAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleGlobalAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailRegisterLogin",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailRegisterLogin.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.CreateTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.CreateTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.GetAppUserIdsByCharactersType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.GetAppUserIdsByCharactersType.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailEditTradePwd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailEditTradePwd.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidReward",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailToggleForbidReward.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditMemberLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserRegisterAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserRegisterAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.UpdateTagStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.UpdateTagStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailFundInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailFundInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderGetAppUserLoginHistories",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderGetAppUserLoginHistories.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailUserInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailUserInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.BindUserCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.BindUserCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.AddAppUserWithdrawCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.AddAppUserWithdrawCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditForcePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderAppUserUserBatchEditForcePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailViewTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailViewTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.ListSubFundStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.ListSubFundStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUser.PlaceholderDetailAuditList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUser/methods/appUserBackOffice.platformAppUser.PlaceholderDetailAuditList.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 21,
+    "type": "update_existing",
+    "filePath": "src/servers/app_user_back_office/services/platform_app_user_internal.ts",
+    "commitMessage": "fix(vip): FAQ-3260 修正會員權限搜尋 及 批次搜尋",
+    "commitHash": "a400c4c88eb990699a9d01013533109a253498ef",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AppUserBackOffice.PlatformAppUserInternalService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.CreateAppUserFromExternal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.CreateAppUserFromExternal.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SearchAppUserByIdentifier",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SearchAppUserByIdentifier.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserPrivilegesByPlatformId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserPrivilegesByPlatformId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SyncAgentProfile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SyncAgentProfile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SyncAppUserBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SyncAppUserBonusRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserIdsByRegisteredAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserIdsByRegisteredAt.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserDetailByIdentifiersOrUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserDetailByIdentifiersOrUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetRegisteredPlatformById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetRegisteredPlatformById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.EditAppUserDetailForExternal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.EditAppUserDetailForExternal.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserDetailForExternal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserDetailForExternal.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetBonusRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserCharacterType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserCharacterType.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SearchAppUserByCondition",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SearchAppUserByCondition.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.BatchGetAppUserPrivileges",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.BatchGetAppUserPrivileges.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.BatchGetRegisteredPlatformByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.BatchGetRegisteredPlatformByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.CheckAppUserHasCharactersType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.CheckAppUserHasCharactersType.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetTotalDepositFirstUserCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetTotalDepositFirstUserCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetNewRegisteredAppUserCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetNewRegisteredAppUserCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SearchAppUserByIdsOrIdentifiers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SearchAppUserByIdsOrIdentifiers.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.CreateDefaultUserCharacter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.CreateDefaultUserCharacter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetNotLoginUserCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetNotLoginUserCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserDetailForGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserDetailForGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.BatchGetAppUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.BatchGetAppUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.CreateUserForAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.CreateUserForAgent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetTotalMemberCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetTotalMemberCount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserPrivileges",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserPrivileges.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.GetAppUserLevels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.GetAppUserLevels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUserBackOffice.platformAppUserInternal.SearchAppUserFromAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUserBackOffice/services/PlatformAppUserInternal/methods/appUserBackOffice.platformAppUserInternal.SearchAppUserFromAgent.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 12,
+    "type": "update_existing",
+    "filePath": "src/servers/app_user/services/app_user.ts",
+    "commitMessage": "註冊整合 IP 配額系統並與建會員同交易原子扣額",
+    "commitHash": "d25a4fecf54e09df536a8a6dd8d53576c38bc145",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "AppUser.AppUserService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "appUser.appUser.GetTradePasswordVerifyRequirements",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetTradePasswordVerifyRequirements.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.Register",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.Register.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.RequestUnfreezeOtpCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.RequestUnfreezeOtpCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.Login",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.Login.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.BindMobile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.BindMobile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ChangePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ChangePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ForceChangePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ForceChangePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUserDeliveryAddressList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUserDeliveryAddressList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUserInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUserInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.RequestUnfreezeCaptcha",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.RequestUnfreezeCaptcha.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ReferralInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ReferralInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.DeleteUserDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.DeleteUserDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.BindEmail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.BindEmail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ChangeTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ChangeTradePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.SendEmailVerificationCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.SendEmailVerificationCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.RequestPasswordReset",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.RequestPasswordReset.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUserDetailForMessageBoard",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUserDetailForMessageBoard.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.RemoveUserDeviceRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.RemoveUserDeviceRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.DismissPasswordReminder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.DismissPasswordReminder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.SetUserDetailForMessageBoard",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.SetUserDetailForMessageBoard.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetVerificationData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetVerificationData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.SetTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.SetTradePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.CompleteResetTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.CompleteResetTradePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.VerifyLogin",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.VerifyLogin.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.Logout",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.Logout.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.EditProfile",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.EditProfile.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ResetTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ResetTradePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.CreateOrUpdateUserDeliveryAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.CreateOrUpdateUserDeliveryAddress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.VerifyOtpCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.VerifyOtpCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUserPlatformId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUserPlatformId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetAppRegistrationFieldConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetAppRegistrationFieldConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.SendMobileVerificationCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.SendMobileVerificationCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.GetUserDeviceRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.GetUserDeviceRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "appUser.appUser.ResetPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AppUser/services/AppUser/methods/appUser.appUser.ResetPassword.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

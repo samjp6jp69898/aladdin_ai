@@ -1,0 +1,864 @@
+[
+  {
+    "index": 14,
+    "type": "update_existing",
+    "filePath": "src/servers/fund_adjustment_back_office/services/fund_adjustment_platform.ts",
+    "commitMessage": "feat(agent): [FAQ-3140] 佣金會員詳情充值明細改為獨立分頁查詢",
+    "commitHash": "3de9c3664e284b31792df014ea78ad5cf191f665",
+    "newMethodHints": [
+      "methodListUserFundAdjustmentByIdsWithPage"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.GetUserFundAdjustmentReviewInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.GetUserFundAdjustmentReviewInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.BatchApplyAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.BatchApplyAdd.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ListApprovedUserFundAdjustments",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ListApprovedUserFundAdjustments.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFundAdjustmentByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFundAdjustmentByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ApplyDeduct",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ApplyDeduct.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.BatchApplyDeduct",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.BatchApplyDeduct.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.UserAdjustmentTotalByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.UserAdjustmentTotalByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.SumApprovedFundAdjustmentAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.SumApprovedFundAdjustmentAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ApplyAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ApplyAdd.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFundAdjustment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFundAdjustment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.GetUserAdjustmentInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.GetUserAdjustmentInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.AdjustmentReview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.AdjustmentReview.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFund",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/FundAdjustmentBackOffice/services/FundAdjustmentPlatform/methods/fundAdjustmentBackOffice.fundAdjustmentPlatform.ListUserFund.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 23,
+    "type": "update_existing",
+    "filePath": "src/servers/event_back_office/services/event_platform.ts",
+    "commitMessage": "fix(event):新增回應前端isp欄位",
+    "commitHash": "bfa5af8497ca502ede4729493b6cf859e3d58782",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "EventBackOffice.EventPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/EventBackOffice/services/EventPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "eventBackOffice.eventPlatform.GetUserBehaviorLogList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/EventBackOffice/services/EventPlatform/methods/eventBackOffice.eventPlatform.GetUserBehaviorLogList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "eventBackOffice.eventPlatform.ListUserBehaviorLogs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/EventBackOffice/services/EventPlatform/methods/eventBackOffice.eventPlatform.ListUserBehaviorLogs.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 30,
+    "type": "update_existing",
+    "filePath": "src/servers/point_back_office/services/point_platform.ts",
+    "commitMessage": "audit 補 then()",
+    "commitHash": "737fa89318febca8e904d53374044b85ef9ee162",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "pointBackOffice.PointPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ManualDeductPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ManualDeductPoint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ListAppUserTotalPoints",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ListAppUserTotalPoints.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.BatchManualAddPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.BatchManualAddPoint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.UpdateVipPointSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.UpdateVipPointSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ListPointTransactions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ListPointTransactions.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.GetPointSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.GetPointSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.GetVipPointSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.GetVipPointSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ListVipPointSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ListVipPointSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ManualDeductAllPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ManualDeductAllPoint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.UpdatePointSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.UpdatePointSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.BatchManualDeductPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.BatchManualDeductPoint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "pointBackOffice.pointPlatform.ManualAddPoint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PointBackOffice/services/PointPlatform/methods/pointBackOffice.pointPlatform.ManualAddPoint.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 32,
+    "type": "update_existing",
+    "filePath": "src/servers/rebate_back_office/services/rebate_platform.ts",
+    "commitMessage": "fixed:撤銷返水帳變",
+    "commitHash": "68f63ca39295fd0c4beb968e07aa99bfffee642d",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "rebateBackOffice.rebatePlatform._service",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.DeleteRebateConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.DeleteRebateConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateConfigNameList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateConfigNameList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateConfigs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateConfigs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateGlobalSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateGlobalSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.ClawBackRebateDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.ClawBackRebateDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.CreateOrUpdateRebateConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.CreateOrUpdateRebateConfig.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateSettlementList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateSettlementList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.VerifyRebateRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.VerifyRebateRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateConfigById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateConfigById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.GetRebateRecordList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.GetRebateRecordList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebateBackOffice.rebatePlatform.UpdateRebateGlobalSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RebateBackOffice/services/RebatePlatform/methods/rebateBackOffice.rebatePlatform.UpdateRebateGlobalSetting.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 57,
+    "type": "update_existing",
+    "filePath": "src/servers/rebate/services/app_rebate.ts",
+    "commitMessage": "fixed: 階層返水配置無法寫入",
+    "commitHash": "2ae40c95e5e7a983d2a93c6deab2e8bdf81cac73",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "rebate.appRebate._service",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "rebate.appRebate.GetRecordList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.GetRecordList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebate.appRebate.GetRebateInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.GetRebateInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebate.appRebate.GetRebateSettlementList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.GetRebateSettlementList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebate.appRebate.ClaimRebate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.ClaimRebate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebate.appRebate.GetUserRebateInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.GetUserRebateInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rebate.appRebate.DeductRebate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Rebate/services/AppRebate/methods/rebate.appRebate.DeductRebate.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 77,
+    "type": "update_existing",
+    "filePath": "src/servers/user_level_back_office/services/strategy.ts",
+    "commitMessage": "修改策略規則",
+    "commitHash": "aa1d34450fa290b0b8767ab34e4259ab5eac8023",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "UserLevelBackOffice.StrategyService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "userLevelBackOffice.strategy.AddRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/methods/userLevelBackOffice.strategy.AddRule.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "userLevelBackOffice.strategy.UpdateStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/methods/userLevelBackOffice.strategy.UpdateStrategy.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "userLevelBackOffice.strategy.GetList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/methods/userLevelBackOffice.strategy.GetList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "userLevelBackOffice.strategy.UpdateRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/methods/userLevelBackOffice.strategy.UpdateRule.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "userLevelBackOffice.strategy.DeleteRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/UserLevelBackOffice/services/Strategy/methods/userLevelBackOffice.strategy.DeleteRule.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 79,
+    "type": "update_existing",
+    "filePath": "src/servers/game_back_office/services/game_vendor_platform.ts",
+    "commitMessage": "feat(game_back_office): GameVendorPlatform.ListGames 支援 gameVendorTag 多組廠商×類型批次查詢",
+    "commitHash": "9c840a70a9e5838d7dae009ae974dbcd09b91251",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "GameBackOffice.GameVendorPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateBrandStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateBrandStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.GetGameVendorForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.GetGameVendorForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameVendorStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameVendorStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllGameRebateTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllGameRebateTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.KickUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.KickUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.CreateOrUpdateBrands",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.CreateOrUpdateBrands.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.CreateOrUpdateGameFrontendGroupTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.CreateOrUpdateGameFrontendGroupTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListGameVendorEnterLogs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListGameVendorEnterLogs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListGameVendors",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListGameVendors.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameVendorGameStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameVendorGameStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllGameVendors",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllGameVendors.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameVendorGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameVendorGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllBrands",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllBrands.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllTwoEightGames",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllTwoEightGames.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameVendor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameVendor.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameVendorMaintenanceStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameVendorMaintenanceStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.GetUploadGameImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.GetUploadGameImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.GetGameVendorGameForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.GetGameVendorGameForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.CreateOrUpdateGameRebateTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.CreateOrUpdateGameRebateTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllGameFrontendGroupTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllGameFrontendGroupTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.GetAllGameDisplayTagVendors",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.GetAllGameDisplayTagVendors.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListAllGameDisplayTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListAllGameDisplayTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameTagSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameTagSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.ListGames",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.ListGames.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.GetBrandForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.GetBrandForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.CreateOrUpdateGameDisplayTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.CreateOrUpdateGameDisplayTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.CollectAllVendorBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.CollectAllVendorBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameVendorPlatform.UpdateGameTagStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameVendorPlatform/methods/gameBackOffice.gameVendorPlatform.UpdateGameTagStatus.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 18,
+    "type": "update_existing",
+    "filePath": "src/servers/game_back_office/services/game_record_platform.ts",
+    "commitMessage": "[FAQ-3276]fix(game_back_office): 注單列表排序補 id DESC，修正分頁重複資料",
+    "commitHash": "07daf5c63d967ed4d6105d143dc8e3573fba22ff",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "GameBackOffice.GameRecordPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameRecordPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "gameBackOffice.gameRecordPlatform.ListGameRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameRecordPlatform/methods/gameBackOffice.gameRecordPlatform.ListGameRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameRecordPlatform.GetGameRecordStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameRecordPlatform/methods/gameBackOffice.gameRecordPlatform.GetGameRecordStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameRecordPlatform.GetGameRecordLink",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameRecordPlatform/methods/gameBackOffice.gameRecordPlatform.GetGameRecordLink.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "gameBackOffice.gameRecordPlatform.ManualFinishGameRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/GameBackOffice/services/GameRecordPlatform/methods/gameBackOffice.gameRecordPlatform.ManualFinishGameRecord.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 76,
+    "type": "update_existing",
+    "filePath": "src/servers/roulette/services/app_roulette.ts",
+    "commitMessage": "新增抽獎黑名單檢查",
+    "commitHash": "d8cf4ed327682bde26926ece7c0ebc5da50f415b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "roulette.appRoulette",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "roulette.appRoulette.GetRouletteConfigById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.GetRouletteConfigById.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "roulette.appRoulette.SpinRoulette",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.SpinRoulette.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "roulette.appRoulette.GetRecordByConfigId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.GetRecordByConfigId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "roulette.appRoulette.GetUnclaimedRecordByValidDay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.GetUnclaimedRecordByValidDay.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "roulette.appRoulette.GetRouletteRewardByRecordId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.GetRouletteRewardByRecordId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "roulette.appRoulette.GetAllRecordByConfigId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Roulette/services/AppRoulette/methods/roulette.appRoulette.GetAllRecordByConfigId.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 84,
+    "type": "update_existing",
+    "filePath": "src/servers/sport/services/world_cup.ts",
+    "commitMessage": "docs(jsdoc): sync method JSDoc from codebase knowledge base",
+    "commitHash": "040583475f41b24b18ac1d5733a9d59b8303e524",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Sport.WorldCupService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupNewsData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupNewsData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupInfoList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupInfoList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.SelectWorldCupTeam",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.SelectWorldCupTeam.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupFixturesInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupFixturesInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupTeam",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupTeam.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetMemberAchievementProgress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetMemberAchievementProgress.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.ClaimMemberMissionsReward",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.ClaimMemberMissionsReward.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupNewsRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupNewsRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetMemberMissionRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetMemberMissionRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "sport.worldCup.GetWorldCupInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Sport/services/WorldCup/methods/sport.worldCup.GetWorldCupInfo.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 50,
+    "type": "update_existing",
+    "filePath": "src/servers/admin/services/admin.ts",
+    "commitMessage": "修正系統後台權限管理的管理帳號列表上的最後登入時間",
+    "commitHash": "a0a88c339594305087daccb79a7de5ef6ccd6480",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "admin.admin",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "admin.admin.CreateSignKey",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.CreateSignKey.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.UpdateUserStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.UpdateUserStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.GetUsersByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.GetUsersByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.GetDefaultLanguageCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.GetDefaultLanguageCode.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.NewUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.NewUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.ListSignKeys",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.ListSignKeys.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.GetAppDownloadUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.GetAppDownloadUrl.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.UpdatePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.UpdatePassword.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.ListUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.ListUsers.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "admin.admin.SetAppDownloadUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Admin/services/Admin/methods/admin.admin.SetAppDownloadUrl.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 49,
+    "type": "update_existing",
+    "filePath": "src/servers/ranking/services/ranking.ts",
+    "commitMessage": "fix(ranking): 取得活動排行榜設定回傳的\"結束時間\"改為\"結算時間\"",
+    "commitHash": "0a9e0022907bb6d3f8d284450c5f9e7fa502f482",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "ranking.RankingService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/Ranking/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "ranking.ranking.GetActivityRankingSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/Ranking/methods/ranking.ranking.GetActivityRankingSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.ranking.GetMyActivityRanking",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/Ranking/methods/ranking.ranking.GetMyActivityRanking.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.ranking.GetActivityRankings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/Ranking/methods/ranking.ranking.GetActivityRankings.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 60,
+    "type": "update_existing",
+    "filePath": "src/servers/ranking/services/fixed_ranking.ts",
+    "commitMessage": "refactor(ranking): 調整fixed_ranking_period.ts位置",
+    "commitHash": "8d63be4157a9540c9912b5cde937d87ba343cf3b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "ranking.FixedRankingService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/FixedRanking/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "ranking.fixedRanking.GetFixedRankingEntries",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/FixedRanking/methods/ranking.fixedRanking.GetFixedRankingEntries.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.fixedRanking.GetFixedRankingSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/FixedRanking/methods/ranking.fixedRanking.GetFixedRankingSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.fixedRanking.GetMyFixedRanking",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/FixedRanking/methods/ranking.fixedRanking.GetMyFixedRanking.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 70,
+    "type": "update_existing",
+    "filePath": "src/servers/ranking/services/ranking_internal.ts",
+    "commitMessage": "feat(activity): 活動排行榜添加週期重置功能",
+    "commitHash": "f4804f386016a0d36046e1e90f443c0e46c47846",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "ranking.RankingInternalService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/RankingInternal/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "ranking.rankingInternal.GetEnabledRankingActivitySettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/RankingInternal/methods/ranking.rankingInternal.GetEnabledRankingActivitySettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.rankingInternal.IsRankingActivityStopped",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/RankingInternal/methods/ranking.rankingInternal.IsRankingActivityStopped.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "ranking.rankingInternal.UpdateRankingActivityRankingAt",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Ranking/services/RankingInternal/methods/ranking.rankingInternal.UpdateRankingActivityRankingAt.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 61,
+    "type": "update_existing",
+    "filePath": "src/servers/ranking_back_office/services/fixed_ranking_platform.ts",
+    "commitMessage": "refactor(ranking): 調整fixed_ranking_period.ts位置",
+    "commitHash": "8d63be4157a9540c9912b5cde937d87ba343cf3b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "rankingBackOffice.FixedRankingPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/FixedRankingPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "rankingBackOffice.fixedRankingPlatform.UpdateFixedRankingSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/FixedRankingPlatform/methods/rankingBackOffice.fixedRankingPlatform.UpdateFixedRankingSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.fixedRankingPlatform.ChangeFixedRankingStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/FixedRankingPlatform/methods/rankingBackOffice.fixedRankingPlatform.ChangeFixedRankingStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.fixedRankingPlatform.ListFixedRankingEntries",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/FixedRankingPlatform/methods/rankingBackOffice.fixedRankingPlatform.ListFixedRankingEntries.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.fixedRankingPlatform.ListFixedRankingSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/FixedRankingPlatform/methods/rankingBackOffice.fixedRankingPlatform.ListFixedRankingSettings.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 62,
+    "type": "update_existing",
+    "filePath": "src/servers/ranking_back_office/services/ranking_platform.ts",
+    "commitMessage": "fix(activitty): - 修改活動排行榜週期重置已平台時區為主 - 調整platform_timezone.ts位置，使statistic以外的系統也能使用",
+    "commitHash": "d1a173120fe9ffd35bc26ef373d1d4dfcb1a4fe7",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "rankingBackOffice.RankingPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/RankingPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "rankingBackOffice.rankingPlatform.GetPlatformRankingActivityList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/RankingPlatform/methods/rankingBackOffice.rankingPlatform.GetPlatformRankingActivityList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.rankingPlatform.ChangeActivityRankingSettingStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/RankingPlatform/methods/rankingBackOffice.rankingPlatform.ChangeActivityRankingSettingStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.rankingPlatform.CreateOrUpdateActivityRankingSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/RankingPlatform/methods/rankingBackOffice.rankingPlatform.CreateOrUpdateActivityRankingSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "rankingBackOffice.rankingPlatform.ListActivityRankingSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RankingBackOffice/services/RankingPlatform/methods/rankingBackOffice.rankingPlatform.ListActivityRankingSetting.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

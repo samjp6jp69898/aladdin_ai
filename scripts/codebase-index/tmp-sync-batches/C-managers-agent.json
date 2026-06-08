@@ -1,0 +1,958 @@
+[
+  {
+    "index": 7,
+    "type": "update_existing",
+    "filePath": "src/managers/agent_general_manager.ts",
+    "commitMessage": "feat(agent): 新增佣金會員充值明細與手動充值明細分頁 API",
+    "commitHash": "b12ccbd593da781d0dfbb843559e1820c84d1142",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.AgentGeneralManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setCommissionFlag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setCommissionFlag.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionAudit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setCommissionListAutoReviewSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setCommissionListAutoReviewSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setBatchAgentGeneralCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setBatchAgentGeneralCommissionSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.updateUserManualRecharge",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.updateUserManualRecharge.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getAgentDetailsInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getAgentDetailsInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setCommissionSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionMemberDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionMemberDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.rejectReferralDomainAudits",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.rejectReferralDomainAudits.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager._executeApplyTransaction",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager._executeApplyTransaction.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.createOrUpdatePromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.createOrUpdatePromotionReferralIntro.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.deletePromotionReferralAdBanner",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.deletePromotionReferralAdBanner.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionDetailsAuditList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionDetailsAuditList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getCommissionListAutoReviewSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getCommissionListAutoReviewSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager._applyCommissionFlagsInChunks",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager._applyCommissionFlagsInChunks.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getReferralDomainAuditByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getReferralDomainAuditByUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getPromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getPromotionReferralIntro.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.updatePromotionReferralAdBannerSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.updatePromotionReferralAdBannerSortOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getCommissionSettingObj",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getCommissionSettingObj.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setActiveMemberSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setActiveMemberSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionAuditImplement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionAuditImplement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.updateUserRecharge",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.updateUserRecharge.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionDetailsList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionDetailsList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.insertOrUpdateGeneralAgentAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.insertOrUpdateGeneralAgentAudit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.createOrUpdatePromotionReferralAdBanner",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.createOrUpdatePromotionReferralAdBanner.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.userList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.userList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionDetailsAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionDetailsAudit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.updateUserStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.updateUserStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.updateUserBet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.updateUserBet.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.commissionList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.commissionList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.checkExpiredCommission",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.checkExpiredCommission.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.approveReferralDomainAudit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.approveReferralDomainAudit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getPromotionReferralAdBanners",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getPromotionReferralAdBanners.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.editReferralDomainAuditRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.editReferralDomainAuditRemark.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.createDefaultAgentGeneralCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.createDefaultAgentGeneralCommissionSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.checkUserAlive",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.checkUserAlive.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.setBatchAgentGeneralCommissionSettingByAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.setBatchAgentGeneralCommissionSettingByAccount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getActiveMemberSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getActiveMemberSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.getCommissionSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.getCommissionSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralManager.fetchAllByPaging",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralManager/methods/Manager.AgentGeneralManager.fetchAllByPaging.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.validBetsDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.validBetsDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.collectCommission",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.collectCommission.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.getPromotionReferralAdBanners",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.getPromotionReferralAdBanners.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.getTeamProgress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.getTeamProgress.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.inviteDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.inviteDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.collectionRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.collectionRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.getPromotionReferralIntro",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.getPromotionReferralIntro.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.rechargeAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.rechargeAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.numberOfInvites",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.numberOfInvites.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.teamBets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.teamBets.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.getCommissionTrialCalculation",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.getCommissionTrialCalculation.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.commissionSchemeSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.commissionSchemeSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.teamRechargeDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.teamRechargeDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentGeneralAppManager.getTeamBasicInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentGeneralAppManager/methods/Manager.AgentGeneralAppManager.getTeamBasicInfo.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 0,
+    "type": "update_existing",
+    "filePath": "src/managers/agent_report_manager.ts",
+    "commitMessage": "feat(agent): 正名：普通扶持/重點扶持",
+    "commitHash": "a6c44b75aade049e2a7117c823cf1dc5005370a8",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.AgentReportManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getSubordinatesForCalculation",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getSubordinatesForCalculation.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getBatchAgentGeneralFriendReports",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getBatchAgentGeneralFriendReports.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGeneralFriendReportSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGeneralFriendReportSummary.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getDirectAndTeamMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getDirectAndTeamMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._fetchMemberListSnapshot",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._fetchMemberListSnapshot.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getMonthlyCommissionInvoiceStatisticsRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getMonthlyCommissionInvoiceStatisticsRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getBatchReports",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getBatchReports.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getReportStatisticsBundle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getReportStatisticsBundle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._resolveReportDetailsStatisticsRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._resolveReportDetailsStatisticsRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._buildMemberListRows",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._buildMemberListRows.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGeneralMemberOverview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGeneralMemberOverview.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getActivityPromotionRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getActivityPromotionRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getPersonalFinancePopup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getPersonalFinancePopup.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getRebateAmountsByMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getRebateAmountsByMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMyMemberReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMyMemberReport.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._handleBetRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._handleBetRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getSupportBonusRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getSupportBonusRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMemberReports",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMemberReports.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._buildMemberInfoMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._buildMemberInfoMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getAgentId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getAgentId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGameRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGameRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getTailReportStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getTailReportStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._buildMemberTypeMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._buildMemberTypeMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._isMemberValid",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._isMemberValid.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getTurnoverRebateInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getTurnoverRebateInvoice.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getFriendDetailReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getFriendDetailReport.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateMemberMultiTransMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateMemberMultiTransMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getRealtimeTeamStatisticsPatch",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getRealtimeTeamStatisticsPatch.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._fillRegisterAndFirstDepositStats",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._fillRegisterAndFirstDepositStats.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateTransactionAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateTransactionAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getRealtimeStatisticsTeamMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getRealtimeStatisticsTeamMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getAgentAndCommissionInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getAgentAndCommissionInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMyFinanceReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMyFinanceReport.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getReferralCommissionInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getReferralCommissionInvoice.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getReportDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getReportDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getCommissionInvoice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getCommissionInvoice.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMemberList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMemberList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMemberOverview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMemberOverview.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateBonusesFromTransactions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateBonusesFromTransactions.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getDepositMemberStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getDepositMemberStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getActivityBonusAmountsByMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getActivityBonusAmountsByMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getAgentReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getAgentReport.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGeneralBonusRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGeneralBonusRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getUserNameMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getUserNameMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getReports",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getReports.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateBonusAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateBonusAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getGeneralAgentReferralSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getGeneralAgentReferralSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getPlatformReports",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getPlatformReports.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getInvoiceReportStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getInvoiceReportStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getVentureSubordinates",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getVentureSubordinates.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getValidMemberAndDepositStats",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getValidMemberAndDepositStats.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._buildSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._buildSummary.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._handleMemberManagement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._handleMemberManagement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getBonusRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getBonusRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMemberInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMemberInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getCurrentAgentContext",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getCurrentAgentContext.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._handleTransactionRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._handleTransactionRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._filterByTimeType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._filterByTimeType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.snapshotGeneralAgentDailyValidMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.snapshotGeneralAgentDailyValidMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._normalizeTimeRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._normalizeTimeRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getDepositMemberStatisticsByMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getDepositMemberStatisticsByMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getActivityBonusAmounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getActivityBonusAmounts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateMemberVenueFeesMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateMemberVenueFeesMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._fillAgentRegistrationTimestamps",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._fillAgentRegistrationTimestamps.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateFeesAndActiveCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateFeesAndActiveCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getTotalRebateSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getTotalRebateSum.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getFinancialDataStored",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getFinancialDataStored.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getPersonalFinance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getPersonalFinance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._paginate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._paginate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getBasicReportStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getBasicReportStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getMemberRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getMemberRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGeneralReferralDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGeneralReferralDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateVenueFeeAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateVenueFeeAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._handleMemberStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._handleMemberStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getGeneralMemberStatsSnapshot",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getGeneralMemberStatsSnapshot.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getProfitSharingRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getProfitSharingRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._buildUserIdNumberMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._buildUserIdNumberMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._fillFinancialSummaries",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._fillFinancialSummaries.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._calculateGeneralActiveMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._calculateGeneralActiveMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getCommissionRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getCommissionRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getBatchFriendDetailStats",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getBatchFriendDetailStats.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getRebateAmounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getRebateAmounts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager._getCandidateMembers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager._getCandidateMembers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentReportManager.getGeneralFriendStatisticReport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentReportManager/methods/Manager.AgentReportManager.getGeneralFriendStatisticReport.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 53,
+    "type": "update_existing",
+    "filePath": "src/managers/agent_user_manager.ts",
+    "commitMessage": "[Add] tracing for agent related events for BackOfficeNotification",
+    "commitHash": "3123228583e682877ebc99188c841859b01f5bc1",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.AgentUserManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.validateAgentStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.validateAgentStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.isTransferAllowedByAgentMemberRelation",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.isTransferAllowedByAgentMemberRelation.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.setTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.setTradePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.agentIdentifierHasExisted",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.agentIdentifierHasExisted.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.createUserLoginHistory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.createUserLoginHistory.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.getTradePasswordStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.getTradePasswordStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.rejectApplication",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.rejectApplication.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.applicationDataToDbAgentApplication",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.applicationDataToDbAgentApplication.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.recordTradePasswordError",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.recordTradePasswordError.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.sendVerificationCodeToPhone",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.sendVerificationCodeToPhone.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.resetTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.resetTradePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.clearTradePasswordError",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.clearTradePasswordError.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.listReferralDomainsByAgentId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.listReferralDomainsByAgentId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.changePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.changePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.verifyTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.verifyTradePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.createUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.createUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.checkTradePasswordErrorLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.checkTradePasswordErrorLimit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.submitAgentApplication",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.submitAgentApplication.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.createCustomDataWhenCreateUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.createCustomDataWhenCreateUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.noOpPromise",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.noOpPromise.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.getReferralDomainsByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.getReferralDomainsByIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.isTransferAllowed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.isTransferAllowed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.approveApplication",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.approveApplication.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.createAgent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.createAgent.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.changePasswordByAgentId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.changePasswordByAgentId.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 10,
+    "type": "update_existing",
+    "filePath": "src/managers/app_user_manager.ts",
+    "commitMessage": "註冊整合 IP 配額系統並與建會員同交易原子扣額",
+    "commitHash": "d25a4fecf54e09df536a8a6dd8d53576c38bc145",
+    "newMethodHints": [
+      "createUserWithRegistrationIpQuota"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.AppUserManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.AppUserManager.frozenAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.frozenAccount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.createUserLoginHistory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.createUserLoginHistory.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.getUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.getUploadImageToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.createUserResetPasswordRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.createUserResetPasswordRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.isAccountFrozen",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.isAccountFrozen.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.fillVerifyLoginTokenData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.fillVerifyLoginTokenData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.fillSignData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.fillSignData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.verifyTranPasswordToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.verifyTranPasswordToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.generateTranPasswordToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.generateTranPasswordToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.createUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.createUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.canResetPassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.canResetPassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.addUserRelation",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.addUserRelation.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.createCustomDataWhenCreateUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.createCustomDataWhenCreateUser.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 39,
+    "type": "new_file",
+    "filePath": "src/managers/registration_ip_quota_manager.ts",
+    "commitMessage": "新增註冊 IP 配額後台管理 service 與 manager",
+    "commitHash": "dec59ef233b94d841400c5d916de3ff053ab2c06",
+    "newMethodHints": [],
+    "affectedNotes": []
+  }
+]

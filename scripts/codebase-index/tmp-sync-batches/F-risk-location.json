@@ -1,0 +1,92 @@
+[
+  {
+    "index": 35,
+    "type": "update_existing",
+    "filePath": "src/servers/risk/services/risk_internal.ts",
+    "commitMessage": "CheckIpRegion code review",
+    "commitHash": "38bfcf95d176ab8dfd2ab9a595cb000379396198",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Risk.RiskInternalService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Risk/services/RiskInternal/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "risk.riskInternal.GetWithdrawOrderRiskEvents",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Risk/services/RiskInternal/methods/risk.riskInternal.GetWithdrawOrderRiskEvents.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "risk.riskInternal.GetUserIdByRiskStrategyIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Risk/services/RiskInternal/methods/risk.riskInternal.GetUserIdByRiskStrategyIds.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 25,
+    "type": "update_existing",
+    "filePath": "src/servers/risk_back_office/services/risk_platform_ip_region.ts",
+    "commitMessage": "BatchDelete, BatchUpdate 批次作業, 優化call DB 次數",
+    "commitHash": "b6b387647e8dcc7f17691cd4db812a75d9244448",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.UpdateIpRegionStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.UpdateIpRegionStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.BatchDeleteIpRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.BatchDeleteIpRegion.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.BatchUpdateIpRegionStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.BatchUpdateIpRegionStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.DeleteIpRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.DeleteIpRegion.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.GetIpRegionList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.GetIpRegionList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "riskBackOffice.riskPlatformIpRegion.CreateOrUpdateIpRegion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/RiskBackOffice/services/RiskPlatformIpRegion/methods/riskBackOffice.riskPlatformIpRegion.CreateOrUpdateIpRegion.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 24,
+    "type": "update_existing",
+    "filePath": "src/servers/location/services/location.ts",
+    "commitMessage": "feat(location):新增IpdataCloud Adapter",
+    "commitHash": "92ee722576dbfee3bb75de8ef2657a043993ab4b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "location.location.QueryIpLocation",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Location/services/Location/methods/location.location.QueryIpLocation.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "location.location.QueryIpLocations",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/Location/services/Location/methods/location.location.QueryIpLocations.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

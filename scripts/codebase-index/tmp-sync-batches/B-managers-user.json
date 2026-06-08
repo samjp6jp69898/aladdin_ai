@@ -1,0 +1,322 @@
+[
+  {
+    "index": 20,
+    "type": "update_existing",
+    "filePath": "src/managers/user_vip_level_manager.ts",
+    "commitMessage": "fix(vip): FAQ-3260 修正會員權限搜尋 及 批次搜尋",
+    "commitHash": "a400c4c88eb990699a9d01013533109a253498ef",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.UserVipLevelManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager.changeLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.changeLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipHolidayBonusManager.sendHolidayGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipHolidayBonusManager.sendHolidayGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager._statisticsVipGiftCommon",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager._statisticsVipGiftCommon.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager.getVipLevelType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.getVipLevelType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendLevelGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendLevelGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.statisticsUserVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.statisticsUserVipLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.statisticsVipWeeklyGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.statisticsVipWeeklyGift.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendWeekGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendWeekGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.statisticsVipMonthlyGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.statisticsVipMonthlyGift.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendBirthGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendBirthGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager.statistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.statistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendGiftsBonusManualV2",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendGiftsBonusManualV2.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.updateUserVipLevelForBatch",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.updateUserVipLevelForBatch.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager._sendGiftBonusCommon",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager._sendGiftBonusCommon.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.statisticsVipDailyGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.statisticsVipDailyGift.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager._changeLevelCommon",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager._changeLevelCommon.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager._createUserVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager._createUserVipLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.syncUserVipLevelBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.syncUserVipLevelBonusRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.queryBetAndDepositSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.queryBetAndDepositSum.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager.sendBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.sendBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendLevelGiftsBonusManual",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendLevelGiftsBonusManual.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendDayGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendDayGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.UserVipLevelChangeManager.writeVipLevelChangeLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelChangeManager.writeVipLevelChangeLog.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.updateUserVipLevelManual",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.updateUserVipLevelManual.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipGiftBonusManager.sendMonthGiftsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipGiftBonusManager.sendMonthGiftsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipHolidayBonusManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipHolidayBonusManager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager.createUserVipLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager.createUserVipLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserVipLevelManager._getGroupGameConditions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserVipLevelManager/methods/Manager.UserVipLevelManager._getGroupGameConditions.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 11,
+    "type": "update_existing",
+    "filePath": "src/managers/user_manager.ts",
+    "commitMessage": "註冊整合 IP 配額系統並與建會員同交易原子扣額",
+    "commitHash": "d25a4fecf54e09df536a8a6dd8d53576c38bc145",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.UserManager.createCustomDataWhenCreateUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.createCustomDataWhenCreateUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.updateUserLoginDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.updateUserLoginDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager._createUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager._createUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/_overview.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.UserManager.findUserById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.findUserById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.fillVerifyLoginTokenData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.fillVerifyLoginTokenData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.bindLoginProvider",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.bindLoginProvider.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.createUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.createUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.createUserLoginDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.createUserLoginDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.checkUserIat",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.checkUserIat.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.generateLoginToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.generateLoginToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.findUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.findUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.getUserDatabase",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.getUserDatabase.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.verifyLoginToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.verifyLoginToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.kickUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.kickUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.fillSignData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.fillSignData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.updateUserToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.updateUserToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager._getUserRoleId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager._getUserRoleId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.UserManager.createUserLoginHistory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/UserManager/Manager.UserManager.createUserLoginHistory.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.generateLoginToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.generateLoginToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.findUserById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.findUserById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.findUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.findUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.updateUserLoginDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.updateUserLoginDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AppUserManager.kickUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AppUserManager/methods/Manager.AppUserManager.kickUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.PlatformUserManager.kickUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PlatformUserManager/methods/Manager.PlatformUserManager.kickUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.generateLoginToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.generateLoginToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.kickUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.kickUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.updateUserLoginDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.updateUserLoginDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.AgentUserManager.findUserById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/AgentUserManager/methods/Manager.AgentUserManager.findUserById.md",
+        "type": "manager-method"
+      }
+    ]
+  }
+]

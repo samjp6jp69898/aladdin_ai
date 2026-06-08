@@ -1,0 +1,992 @@
+[
+  {
+    "index": 51,
+    "type": "update_existing",
+    "filePath": "src/servers/customer_service/services/customer_info.ts",
+    "commitMessage": "[Add] tracing for customer related events for BackOfficeNotification",
+    "commitHash": "b392f5d8453f26f23ad837f9cdff17fe738baa6b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "CustomerService.CustomerInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawWithdrawList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawWithdrawList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawCreateTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawCreateTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawPlayerBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawPlayerBalance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawLoginInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawLoginInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawReviewTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawReviewTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawPlayerPayOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawPlayerPayOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawPlayerBettingList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawPlayerBettingList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawFraudRateTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawFraudRateTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawPlayerInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawPlayerInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawBlackPlayer",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawBlackPlayer.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawWithdrawDetailList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawWithdrawDetailList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawDepositDetailList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawDepositDetailList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawPlayerDetailData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawPlayerDetailData.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customerInfo.HandleRawDepositList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/CustomerInfo/methods/CustomerService.CustomerInfo.handleRawDepositList.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 52,
+    "type": "update_existing",
+    "filePath": "src/servers/customer_service/services/customer_service.ts",
+    "commitMessage": "[Add] tracing for customer related events for BackOfficeNotification",
+    "commitHash": "b392f5d8453f26f23ad837f9cdff17fe738baa6b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "CustomerService.CustomerService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "customerService.customer.CreateIssueHandlingPay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.CreateIssueHandlingPay.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetConfigRestrictUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetConfigRestrictUrl.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetCategoryMenu",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetCategoryMenu.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetCustomerCenterToggle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetCustomerCenterToggle.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetUploadIssueImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetUploadIssueImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetCategoryLinkUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetCategoryLinkUrl.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.CreateIssueComplaint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.CreateIssueComplaint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetFaqRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetFaqRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetIssueHandlingPayRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetIssueHandlingPayRecord.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerService.customer.GetIssueComplaintRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerService/services/Customer/methods/customerService.customer.GetIssueComplaintRecord.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 29,
+    "type": "update_existing",
+    "filePath": "src/servers/customer_back_office/services/customer_platform.ts",
+    "commitMessage": "audit 補 then()",
+    "commitHash": "737fa89318febca8e904d53374044b85ef9ee162",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "CustomerBackOffice.CustomerPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateCustomerTicketAccept",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateCustomerTicketAccept.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateCustomerDepartment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateCustomerDepartment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetIssueComplaintTemplateList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetIssueComplaintTemplateList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateFaqType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateFaqType.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerCenterToggle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerCenterToggle.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCategoryMenu",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCategoryMenu.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerConfigRestrict",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerConfigRestrict.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateReviewTwo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateReviewTwo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateFaqQuestion",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateFaqQuestion.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateIssueComplaint",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateIssueComplaint.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerRoleIdDepartment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerRoleIdDepartment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateReviewThree",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateReviewThree.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.ReviewContentWordList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.ReviewContentWordList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateFaqStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateFaqStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateComplaintTemplate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateComplaintTemplate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.DeleteComplaintTemplate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.DeleteComplaintTemplate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateReviewOne",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateReviewOne.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetReviewContentWordStatusOpen",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetReviewContentWordStatusOpen.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CheckUserLevelIdUnfreeze",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CheckUserLevelIdUnfreeze.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateCustomerTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateCustomerTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.ListDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.ListDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CustomerTicketReview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CustomerTicketReview.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateFaqSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateFaqSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateCustomerCenter",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateCustomerCenter.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateReviewContentWordStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateReviewContentWordStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CustomerTicketTransfer",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CustomerTicketTransfer.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.SetCustomerConfigRestrict",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.SetCustomerConfigRestrict.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetDisplayIconToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetDisplayIconToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetIssuePayList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetIssuePayList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.ReviewCustomerTicket",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.ReviewCustomerTicket.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerTicketReviews",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerTicketReviews.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateReviewContentWordSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateReviewContentWordSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerTickets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerTickets.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetIssueComplaintList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetIssueComplaintList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateCategoryStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateCategoryStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.ReviewIssuePayRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.ReviewIssuePayRemark.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.GetCustomerTicketDepartment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.GetCustomerTicketDepartment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.FaqHelpCenterQuestionList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.FaqHelpCenterQuestionList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.FaqHelpCenterTypeList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.FaqHelpCenterTypeList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.UpdateCategorySortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.UpdateCategorySortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.ReviewIssuePayStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.ReviewIssuePayStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "customerBackOffice.customerPlatform.CreateOrUpdateCategory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/CustomerBackOffice/services/CustomerPlatform/methods/customerBackOffice.customerPlatform.CreateOrUpdateCategory.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 41,
+    "type": "update_existing",
+    "filePath": "src/servers/message_board/services/message_board.ts",
+    "commitMessage": "feat(FAQ-3158):修改開啟他人可見回傳值",
+    "commitHash": "956bffd1ea0755faa32db956ae63f527955d0b33",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "MessageBoard.MessageBoardService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetLimitSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetLimitSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.HasUnreadFeeds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.HasUnreadFeeds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetLevels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetLevels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.FollowUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.FollowUser.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetUploadVideoToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetUploadVideoToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetCommentReplies",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetCommentReplies.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.UpdateUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.UpdateUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.AddCommentLike",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.AddCommentLike.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.DeleteUserFeeds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.DeleteUserFeeds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetPosts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetPosts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.CanChangeUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.CanChangeUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.AddComment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.AddComment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.RemoveComment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.RemoveComment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.UpdateShowBetAndProfit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.UpdateShowBetAndProfit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetDefaultAvatarBackgrounds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetDefaultAvatarBackgrounds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetUserFeeds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetUserFeeds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.SendGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.SendGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.UpdateFeedNotification",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.UpdateFeedNotification.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetCommentsAndGifts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetCommentsAndGifts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetUserPosts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetUserPosts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.AddPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.AddPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.AddPostLike",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.AddPostLike.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetMyLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetMyLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetShowGifts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetShowGifts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.GetUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.GetUserDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoard.messageBoard.RemovePost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoard/services/MessageBoard/methods/messageBoard.messageBoard.RemovePost.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 75,
+    "type": "update_existing",
+    "filePath": "src/servers/message_board_back_office/services/message_board_platform.ts",
+    "commitMessage": "fix(message_board): 後台打賞紀錄顯示平台操作者真實帳號名",
+    "commitHash": "b4e34772ef4f5873a7151ea9795525e3ffb35fe4",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "MessageBoardBackOffice.MessageBoardPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.ResetUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.ResetUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetMessageBoardPostSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetMessageBoardPostSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddPostSendLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddPostSendLimit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemovePostSendLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemovePostSendLimit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetGiftRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetGiftRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUserLevels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUserLevels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.CancelUserDetailReviewItem",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.CancelUserDetailReviewItem.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetLevels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetLevels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.BatchReviewPosts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.BatchReviewPosts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetIsHotPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetIsHotPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemovePostSendWhitelist",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemovePostSendWhitelist.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetIsReceiveGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetIsReceiveGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditComment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditComment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.InnerGetUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.InnerGetUserDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetMessageBoardTippingIncomeList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetMessageBoardTippingIncomeList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUserDetails.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPostSendWhitelist",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPostSendWhitelist.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddOfficialPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddOfficialPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditOfficialPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditOfficialPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditUserLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetIsPinnedPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetIsPinnedPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetTipAuditList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetTipAuditList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.ReviewComments",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.ReviewComments.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SendGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SendGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddLevel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPostComments",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPostComments.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditGift",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditGift.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.ReviewUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.ReviewUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddPostSendWhitelist",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddPostSendWhitelist.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetPostRecommend",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetPostRecommend.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPostSendLimits",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPostSendLimits.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemoveComments",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemoveComments.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.ReviewTipAudits",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.ReviewTipAudits.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetShowGifts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetShowGifts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemoveDefaultAvatarBackground",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemoveDefaultAvatarBackground.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPostGiftRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPostGiftRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPointRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPointRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetDefaultAvatarBackground",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetDefaultAvatarBackground.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddComment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddComment.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetPointMultipleSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetPointMultipleSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditDefaultAvatarBackground",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditDefaultAvatarBackground.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetOfficialPostShow",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetOfficialPostShow.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.ReviewPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.ReviewPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetUserDetailStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetUserDetailStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.AddDefaultAvatarBackground",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.AddDefaultAvatarBackground.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetPointMultipleSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetPointMultipleSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetLevelsList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetLevelsList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SetUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SetUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditOfficialPostUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditOfficialPostUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetDefaultAvatarBackgroundList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetDefaultAvatarBackgroundList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetGifts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetGifts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetOfficialPosts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetOfficialPosts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RelistPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RelistPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetMessageBoardComments",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetMessageBoardComments.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetOfficialPostUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetOfficialPostUserDetail.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetShowGiftByProductId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetShowGiftByProductId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.EditPostSendLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.EditPostSendLimit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUserDetailReviewItems",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUserDetailReviewItems.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.DelistPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.DelistPost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemovePost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemovePost.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetMessageBoardPostSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetMessageBoardPostSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.RemoveUserDetailCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.RemoveUserDetailCache.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.SortDefaultAvatarBackgroundList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.SortDefaultAvatarBackgroundList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetMessageBoardPosts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetMessageBoardPosts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetUploadVideoToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetUploadVideoToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "messageBoardBackOffice.messageBoardPlatform.GetLevelUpRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/MessageBoardBackOffice/services/MessageBoardPlatform/methods/messageBoardBackOffice.messageBoardPlatform.GetLevelUpRecords.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 82,
+    "type": "update_existing",
+    "filePath": "src/servers/information_back_office/services/notif_center_platform.ts",
+    "commitMessage": "docs(jsdoc): sync method JSDoc from codebase knowledge base",
+    "commitHash": "040583475f41b24b18ac1d5733a9d59b8303e524",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "InformationBackOffice.NotifCenterPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.CreateNotificationGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.CreateNotificationGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.UpdateNotificationGroupStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.UpdateNotificationGroupStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.UpdateNotificationSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.UpdateNotificationSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.GetNotificationGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.GetNotificationGroups.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.BatchDeleteNotificationGroupChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.BatchDeleteNotificationGroupChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.DeleteNotificationGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.DeleteNotificationGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.AddNotificationGroupChannel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.AddNotificationGroupChannel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.UpdateNotificationGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.UpdateNotificationGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.GetNotificationSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.GetNotificationSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.TestNotificationGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.TestNotificationGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.GetNotificationGroupChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.GetNotificationGroupChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.DeleteNotificationGroupChannel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.DeleteNotificationGroupChannel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.UpdateNotificationGroupChannelStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.UpdateNotificationGroupChannelStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "informationBackOffice.notifCenterPlatform.GetNotificationSendLogs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InformationBackOffice/services/NotifCenterPlatform/methods/informationBackOffice.notifCenterPlatform.GetNotificationSendLogs.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

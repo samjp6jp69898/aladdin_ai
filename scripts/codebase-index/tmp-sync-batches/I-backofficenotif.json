@@ -1,0 +1,20 @@
+[
+  {
+    "index": 65,
+    "type": "new_file",
+    "filePath": "src/servers/back_office_notification/services/back_office_notification.ts",
+    "commitMessage": "[Add] boilerplate for BackOfficeNotification service",
+    "commitHash": "c65e96bb496da5b1521f407f8b2b80d65b364f6f",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 66,
+    "type": "new_file",
+    "filePath": "src/servers/back_office_notification/services/back_office_notification_setting.ts",
+    "commitMessage": "[Add] implement BackOfficeNotificationSettingService for managing notification settings",
+    "commitHash": "ad839199a04711a15a65af487d37c55864ee363c",
+    "newMethodHints": [],
+    "affectedNotes": []
+  }
+]

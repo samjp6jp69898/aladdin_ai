@@ -1,0 +1,109 @@
+[
+  {
+    "index": 34,
+    "type": "update_existing",
+    "filePath": "src/managers/risk_ip_manager.ts",
+    "commitMessage": "CheckIpRegion code review",
+    "commitHash": "38bfcf95d176ab8dfd2ab9a595cb000379396198",
+    "newMethodHints": [
+      "checkIpRegion"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.RiskIpManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskIpManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.RiskIpManager.isValidEnumValue",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskIpManager/Manager.RiskIpManager.isValidEnumValue.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskIpManager.validatePositiveIntegers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskIpManager/Manager.RiskIpManager.validatePositiveIntegers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskIpManager.buildOrCondition",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskIpManager/Manager.RiskIpManager.buildOrCondition.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 55,
+    "type": "update_existing",
+    "filePath": "src/managers/risk_manager.ts",
+    "commitMessage": "[Add] tracing for risk log for BackOfficeNotification",
+    "commitHash": "72512cd26cc9bf6aa1d3cd069975b1fa1ba72ecf",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.RiskManager.getCurrencyConditions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.getCurrencyConditions.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.getWithdrawOrderRiskEvents",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.getWithdrawOrderRiskEvents.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.handleSignal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.handleSignal.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.triggerRiskStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.triggerRiskStrategy.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.buildConditionModel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.buildConditionModel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.RiskManager.getUserIdByRiskStrategyIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.getUserIdByRiskStrategyIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.handleRiskStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.handleRiskStrategy.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.getRiskStrategyCodeListByTrigger",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.getRiskStrategyCodeListByTrigger.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.createRiskStrategySignal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.createRiskStrategySignal.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.updatePlatformRiskStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.updatePlatformRiskStrategy.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.createRiskStrategyEvent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.createRiskStrategyEvent.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.RiskManager.getConditionJson",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/RiskManager/Manager.RiskManager.getConditionJson.md",
+        "type": "manager-method"
+      }
+    ]
+  }
+]

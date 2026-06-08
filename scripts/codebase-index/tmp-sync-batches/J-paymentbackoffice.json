@@ -1,0 +1,1009 @@
+[
+  {
+    "index": 15,
+    "type": "update_existing",
+    "filePath": "src/servers/payment_back_office/services/deposit_platform.ts",
+    "commitMessage": "feat(agent): [FAQ-3140] 佣金會員詳情充值明細改為獨立分頁查詢",
+    "commitHash": "3de9c3664e284b31792df014ea78ad5cf191f665",
+    "newMethodHints": [
+      "methodListDepositOrderByIdsWithPage"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "PaymentBackOffice.DepositPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UserDepositTotalByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UserDepositTotalByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositOrders",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositOrders.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositMethodStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositMethodStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositChannelOfflineCryptoForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositChannelOfflineCryptoForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositChannelOfflineBankForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositChannelOfflineBankForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositMethod.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOfflineBank",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOfflineBank.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositAdapters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositAdapters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositChannelsOfflineCrypto",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositChannelsOfflineCrypto.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositChannelsOnline",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositChannelsOnline.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositMonitorEventForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositMonitorEventForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetUserCreateDepositOrderInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetUserCreateDepositOrderInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositChannelsOfflineBank",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositChannelsOfflineBank.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositMethodForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositMethodForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpsertDiscountUserGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpsertDiscountUserGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositDiscount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositDiscount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOfflineCrypto",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOfflineCrypto.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdatePlatformDepositPendingLimitSettingStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdatePlatformDepositPendingLimitSettingStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositAdapterInstanceForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositAdapterInstanceForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositMethodForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositMethodForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositDiscountForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositDiscountForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpsertDiscountRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpsertDiscountRule.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositChannelsOnline",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositChannelsOnline.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOfflineBank",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOfflineBank.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositDiscounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositDiscounts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ReviewDepositOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ReviewDepositOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDiscountRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDiscountRules.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDiscountTemplateForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDiscountTemplateForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDiscountTemplates",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDiscountTemplates.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOnline",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositChannelOnline.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositMethod.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositAdapterInstances",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositAdapterInstances.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositChannelOfflineCryptoForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositChannelOfflineCryptoForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositChannelSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositChannelSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListAgentDepositOnlineRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListAgentDepositOnlineRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositTabs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositTabs.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositOrderForReview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositOrderForReview.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDiscountRuleForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDiscountRuleForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositTab",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositTab.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositMonitorEvent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositMonitorEvent.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOnline",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOnline.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositChannelsOfflineCrypto",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositChannelsOfflineCrypto.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateDepositAdapterInstance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateDepositAdapterInstance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositOrderByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositOrderByIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositMehtodShowNameList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositMehtodShowNameList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositSettingTimeout",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositSettingTimeout.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositAdapterInstances",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositAdapterInstances.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositMethodIsRecommend",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositMethodIsRecommend.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositTabSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositTabSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositChannelsOfflineBank",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositChannelsOfflineBank.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetPlatformDepositPendingLimitSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetPlatformDepositPendingLimitSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositMonitorEvents",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositMonitorEvents.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOfflineCrypto",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdateAgentDepositChannelOfflineCrypto.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositMethodShowChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositMethodShowChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpsertDiscountTemplate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpsertDiscountTemplate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositChannelStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositChannelStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositFirst.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateOrUpdatePlatformDepositPendingLimitSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateOrUpdatePlatformDepositPendingLimitSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.CreateDepositDiscount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.CreateDepositDiscount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositStatistics.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositSettingSwitch",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositSettingSwitch.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDiscountUserGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDiscountUserGroups.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositChannelOnlineForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositChannelOnlineForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositTabStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositTabStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.QueryCompleteOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.QueryCompleteOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositOnlineRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositOnlineRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ListDepositOrders",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ListDepositOrders.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositMethodSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositMethodSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.UpdateDepositSettingDifferentNamesWarning",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.UpdateDepositSettingDifferentNamesWarning.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDiscountUserGroupForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDiscountUserGroupForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositChannelOnlineForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositChannelOnlineForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.ManualCreateDepositOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.ManualCreateDepositOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetAgentDepositChannelOfflineBankForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetAgentDepositChannelOfflineBankForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.depositPlatform.GetDepositChannelsByMehtodId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/DepositPlatform/methods/paymentBackOffice.depositPlatform.GetDepositChannelsByMehtodId.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 3,
+    "type": "update_existing",
+    "filePath": "src/servers/payment_back_office/services/statistic_payment_internal.ts",
+    "commitMessage": "fix(agent_report): currencyCode='' 跳過幣別過濾，修復代理報表充值/提現欄位顯示 0 [FAQ-3075]",
+    "commitHash": "27b834bfa13f50cc0c33e1220af2d86f7345e4f5",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "PaymentBackOffice.StatisticPaymentInternalService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetWithdrawSuccessSummaryByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetWithdrawSuccessSummaryByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositFirstSum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositFirstSum.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetUsersPendingWithdrawAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetUsersPendingWithdrawAmount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDailyWithdrawReportSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDailyWithdrawReportSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetWithdrawTgSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetWithdrawTgSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositSuccessSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositSuccessSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetWithdrawSuccessSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetWithdrawSuccessSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositTgSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositTgSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositSuccessSummaryByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositSuccessSummaryByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDailyDepositReportSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDailyDepositReportSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetWithdrawSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetWithdrawSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetDepositSummary",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetDepositSummary.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.statisticPaymentInternal.GetUserPendingWithdrawAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/StatisticPaymentInternal/methods/paymentBackOffice.statisticPaymentInternal.GetUserPendingWithdrawAmount.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 83,
+    "type": "update_existing",
+    "filePath": "src/servers/payment_back_office/services/withdraw_platform.ts",
+    "commitMessage": "docs(jsdoc): sync method JSDoc from codebase knowledge base",
+    "commitHash": "040583475f41b24b18ac1d5733a9d59b8303e524",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "PaymentBackOffice.WithdrawPlatformService",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannelsByOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannelsByOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.RiskUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.RiskUnlockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawChannelStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawChannelStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.FinanceUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.FinanceUnlockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetUserIdByAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetUserIdByAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawRiskRemarkTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawRiskRemarkTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawDiscounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawDiscounts.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentWithdrawMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentWithdrawMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListPlatformWithdrawBanks",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListPlatformWithdrawBanks.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdateAgentWithdrawChannel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdateAgentWithdrawChannel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAccountsByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAccountsByUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListAgentWithdrawMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListAgentWithdrawMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawAdapters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawAdapters.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetDiscountUserGroupForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetDiscountUserGroupForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawAdapterInstance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawAdapterInstance.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetBanks",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetBanks.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.BanUserAllAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.BanUserAllAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListAgentWithdrawOrders",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListAgentWithdrawOrders.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpsertWithdrawDiscount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpsertWithdrawDiscount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ManualCreateWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ManualCreateWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannelForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannelForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawChannelsByOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawChannelsByOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListDiscountRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListDiscountRules.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.RiskLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.RiskLockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawChannelForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawChannelForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.RiskHangWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.RiskHangWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.FinanceManaualPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.FinanceManaualPayWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ReWithdrawUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ReWithdrawUnlockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetPlatformWithdrawCategorySettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetPlatformWithdrawCategorySettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListPlatformWithdrawLimitSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListPlatformWithdrawLimitSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateAccountStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateAccountStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingForDailyType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingForDailyType.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawAutoReviewRiskSettingForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawAutoReviewRiskSettingForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawAdapterInstanceForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawAdapterInstanceForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetPlatformWithdrawBankTypes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetPlatformWithdrawBankTypes.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawAdapterInstances",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawAdapterInstances.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.FinanceVendorPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.FinanceVendorPayWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.TimeoutLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.TimeoutLockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateAccount.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingForVerify",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingForVerify.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingSwitch",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawSettingSwitch.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ReWithdrawManaualPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ReWithdrawManaualPayWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.DetailStatusEventList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.DetailStatusEventList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawCategorySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawCategorySetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.RiskPassWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.RiskPassWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpsertDiscountRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpsertDiscountRule.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetPlatformWithdrawLimitSettingsForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetPlatformWithdrawLimitSettingsForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentWithdrawMethodForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentWithdrawMethodForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListAgentWithdrawChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListAgentWithdrawChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetUploadImageToken.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawMethod.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawMehtodShowNameList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawMehtodShowNameList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawAutoReviewRiskSettingStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawAutoReviewRiskSettingStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawAdapterInstances",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawAdapterInstances.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetDiscountRuleForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetDiscountRuleForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawMethodForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawMethodForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawMethods.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodIsRecommend",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodIsRecommend.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawRiskRemarkTags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawRiskRemarkTags.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentAccountsByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentAccountsByUserId.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpsertDiscountTemplate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpsertDiscountTemplate.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ReWithdrawRejectWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ReWithdrawRejectWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAccountsCountByUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAccountsCountByUserIds.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawChannelSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawChannelSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetAgentWithdrawChannels.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.TimeoutManualSuccessWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.TimeoutManualSuccessWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListDiscountTemplates",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListDiscountTemplates.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawAutoReviewRiskSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawAutoReviewRiskSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawLimitSettingsStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawLimitSettingsStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetDiscountTemplateForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetDiscountTemplateForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ReWithdrawLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ReWithdrawLockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawDiscountForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawDiscountForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListDiscountUserGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListDiscountUserGroups.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ReWithdrawVendorPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ReWithdrawVendorPayWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetUserCreateWithdrawOrderInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetUserCreateWithdrawOrderInfo.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawBankStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdatePlatformWithdrawBankStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawChannel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawChannel.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.GetWithdrawRiskRemarkTagForEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.GetWithdrawRiskRemarkTagForEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.TimeoutManualFailWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.TimeoutManualFailWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateAgentWithdrawMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateAgentWithdrawMethod.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.RiskRejectWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.RiskRejectWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.FinanceRejectWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.FinanceRejectWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpdateWithdrawMethodSortOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.ListWithdrawOrders",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.ListWithdrawOrders.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdatePlatformWithdrawLimitSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdatePlatformWithdrawLimitSettings.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.FinanceLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.FinanceLockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawRiskRemarkTag",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.CreateOrUpdateWithdrawRiskRemarkTag.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.UpsertDiscountUserGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.UpsertDiscountUserGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.TimeoutUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.TimeoutUnlockWithdrawOrder.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "paymentBackOffice.withdrawPlatform.AccountStatusEventList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/PaymentBackOffice/services/WithdrawPlatform/methods/paymentBackOffice.withdrawPlatform.AccountStatusEventList.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]

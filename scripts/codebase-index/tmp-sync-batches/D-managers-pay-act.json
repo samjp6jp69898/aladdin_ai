@@ -1,0 +1,3290 @@
+[
+  {
+    "index": 56,
+    "type": "update_existing",
+    "filePath": "src/managers/payment_manager.ts",
+    "commitMessage": "[Add] tracing for deposit and withdrawal reviews for BackOfficeNotification",
+    "commitHash": "2fa8a5ce56c51bd48f61e629ec6dbc4882eb663b",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "DepositManager.vendorNotify",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.vendorNotify.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.confirmOnlineOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.confirmOnlineOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawOrders",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawOrders.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkFinanceLockPrivate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkFinanceLockPrivate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.Strategy.WithdrawFeeStrategyAlways",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.Strategy.WithdrawFeeStrategyAlways.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.generateTxOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.generateTxOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getMethodSpecialRealCurrencyHandle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getMethodSpecialRealCurrencyHandle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.addDepositWagering",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.addDepositWagering.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.Strategy.WithdrawFeeStrategyFactory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.Strategy.WithdrawFeeStrategyFactory.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.validateNotifyCreateGate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.validateNotifyCreateGate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getDbPlatformWithdrawLimitSettingsByTypeAndTargetId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getDbPlatformWithdrawLimitSettingsByTypeAndTargetId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAccounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAccounts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.validateCreateGate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.validateCreateGate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskPassWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskPassWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.offLineCalculateRealAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.offLineCalculateRealAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getPendingDepositOrderCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getPendingDepositOrderCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.orderGenerateSign",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.orderGenerateSign.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.alreadyFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.alreadyFirst.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.DepositManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.DepositManager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.increaseUserBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.increaseUserBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.updateOrderNextTransactionCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.updateOrderNextTransactionCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.completeOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.completeOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskHangWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskHangWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.syncDepositDiscountBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.syncDepositDiscountBonusRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskLockWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.withdrawOrderVendorCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.withdrawOrderVendorCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDbPlatformDepositExclusiveBind",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDbPlatformDepositExclusiveBind.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.createUserOrderLastSnapshot",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.createUserOrderLastSnapshot.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.fetchFailedOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.fetchFailedOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getVerifyBankCardDailyCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getVerifyBankCardDailyCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getPlatformBanks",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getPlatformBanks.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.reduceUserBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.reduceUserBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getWithdrawFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getWithdrawFirst.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateCreateResourceByMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateCreateResourceByMethod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.getPaymentRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.getPaymentRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getPlatformWithdrawCategorySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getPlatformWithdrawCategorySetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager._getDayRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager._getDayRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.intersect",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.intersect.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updateDepositMethodTutorialTabsByMethodId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updateDepositMethodTutorialTabsByMethodId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.updatePlatformWithdrawCategorySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.updatePlatformWithdrawCategorySetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.createOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.createOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.completeOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.completeOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.verifyCurrencyAmounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.verifyCurrencyAmounts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.CreateOrUpdateWithdrawFeeRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.CreateOrUpdateWithdrawFeeRule.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getChannelById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getChannelById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.createOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.createOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkAccountRealName",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkAccountRealName.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.getPlatformWithdrawSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.getPlatformWithdrawSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.manualCreateOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.manualCreateOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.syncWithdrawDiscountBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.syncWithdrawDiscountBonusRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAndValidateCreateResource",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAndValidateCreateResource.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getTodayDepositOrderCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getTodayDepositOrderCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkInProcessingOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkInProcessingOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.setVerifyBankCardDailyCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.setVerifyBankCardDailyCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.autoReviewRisk",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.autoReviewRisk.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.timeoutManualFailWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.timeoutManualFailWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.timeoutNextStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.timeoutNextStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateExclusiveAddressResource",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateExclusiveAddressResource.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.DepositManager.getPaymentRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.DepositManager.getPaymentRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.validateGetExclusiveAddressGate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.validateGetExclusiveAddressGate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAvailableCurrencyChannelsObject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAvailableCurrencyChannelsObject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositChannelById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositChannelById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.retryPartialFailedDiscountRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.retryPartialFailedDiscountRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkFinanceLock",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkFinanceLock.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.Model.WithdrawFeeContext",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.Model.WithdrawFeeContext.md",
+        "type": "model"
+      },
+      {
+        "fqn": "DepositManager.getAvailableCurrencyMethodIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAvailableCurrencyMethodIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getOrderByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getOrderByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.PaymentManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "PaymentManager.getPaymentRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getPaymentRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAvailableLevelAndVipMethodIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAvailableLevelAndVipMethodIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDbPlatformDepositExclusiveBindByNotify",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDbPlatformDepositExclusiveBindByNotify.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositOrderById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositOrderById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.existsWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.existsWithdrawAccount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.DepositManager.getRealCurrencySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.DepositManager.getRealCurrencySetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawRiskOperator",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawRiskOperator.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.otpVerify",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.otpVerify.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.updateOrderStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.updateOrderStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskUnlockWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.checkOtpVerifySubType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.checkOtpVerifySubType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.financeRejectWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.financeRejectWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawChannelById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawChannelById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.withdrawSuccessHandle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.withdrawSuccessHandle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawOrderByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawOrderByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.confirmOnlineOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.confirmOnlineOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getCurrencyLinkValue",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getCurrencyLinkValue.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getPlatformDepositPendingLimitSettingLimitFromUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getPlatformDepositPendingLimitSettingLimitFromUserLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.createOnlineOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.createOnlineOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.DepositManager.getDepositFirsts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.DepositManager.getDepositFirsts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateCreateDepositMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateCreateDepositMethod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.getPlatformUsersIdentifierMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.getPlatformUsersIdentifierMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.handleWithdrawAccountFields",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.handleWithdrawAccountFields.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.createAccounts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.createAccounts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.debitWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.debitWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updateOrderWaitIncreaseBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updateOrderWaitIncreaseBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.checkChannelAndAdapterSpecial",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.checkChannelAndAdapterSpecial.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getDecimalPlacesByCurrencyCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getDecimalPlacesByCurrencyCode.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.validateCreateGate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.validateCreateGate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getUserDepositLastSnapshot",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getUserDepositLastSnapshot.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.verifyBankCard",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.verifyBankCard.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawMethodById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawMethodById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAvailableUserLevelChannelIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAvailableUserLevelChannelIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getExclusiveAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getExclusiveAddress.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getRealCurrencySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getRealCurrencySetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskRejectWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskRejectWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateNotifyCreateDepositMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateNotifyCreateDepositMethod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updateOrderStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updateOrderStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.vendorCallback",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.vendorCallback.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager._distributeBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager._distributeBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.financeUnlockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.financeUnlockWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.setFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.setFirst.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.timeoutManualSuccessWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.timeoutManualSuccessWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateNotifyCreateResource",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateNotifyCreateResource.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.createDbPlatformDepositExclusiveBind",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.createDbPlatformDepositExclusiveBind.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.createWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.createWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.calculateFee",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.calculateFee.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getVerifyBankCardDailyCountKey",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getVerifyBankCardDailyCountKey.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositMethodById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositMethodById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.createOfflineOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.createOfflineOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.checkWithdrawAccountLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.checkWithdrawAccountLimit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkPlatformBank",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkPlatformBank.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAvailableCurrencyChannelsObject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAvailableCurrencyChannelsObject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager._retryDistributeBonusForRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager._retryDistributeBonusForRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getMethods.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawAutoReviewRiskSettingsByPlatformId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawAutoReviewRiskSettingsByPlatformId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getWithdrawFirsts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getWithdrawFirsts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getMethods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getMethods.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawFeeRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawFeeRule.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.createNotifyOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.createNotifyOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.riskNextStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.riskNextStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.isFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.isFirst.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.generateOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.generateOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.timeoutStatusStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.timeoutStatusStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getOrderCurrencyInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getOrderCurrencyInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkShowVerifyBankSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkShowVerifyBankSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.updateAccountStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.updateAccountStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getDepositFirsts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getDepositFirsts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.DepositManager.getPlatformUsersIdentifierMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.DepositManager.getPlatformUsersIdentifierMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkMethodSupportCurrency",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkMethodSupportCurrency.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "DepositManager.vendorCallback",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.vendorCallback.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawOrderById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawOrderById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.generateOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.generateOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.getOrderLastSnapshotByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.getOrderLastSnapshotByUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.rePayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.rePayWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.checkDifferentNameLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.checkDifferentNameLimit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.financeLockWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.financeLockWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getDepositFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getDepositFirst.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawFeeRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawFeeRules.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.nextStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.nextStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.setDepositChannelRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.setDepositChannelRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositOrderByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositOrderByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.reviewOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.reviewOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAvailableUserVipMethodIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAvailableUserVipMethodIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updatePlatformDepositSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updatePlatformDepositSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getTimeout",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getTimeout.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositMethodTutorialTabsByMethodIdAndLanguage",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositMethodTutorialTabsByMethodIdAndLanguage.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getPlatformWithdrawCategorySettingMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getPlatformWithdrawCategorySettingMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.vendorPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.vendorPayWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getSuccessWithdrawOrderTotalAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getSuccessWithdrawOrderTotalAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.increaseUserBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.increaseUserBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositTabs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositTabs.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager._markPartialFailed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager._markPartialFailed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawAccountById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawAccountById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.checkSuccessWithdrawOrderLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.checkSuccessWithdrawOrderLimit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.checkOtpVerifySubType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.checkOtpVerifySubType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getTimeout",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getTimeout.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getWithdrawAutoReviewRiskTagsById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getWithdrawAutoReviewRiskTagsById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getMethodSpecialRealCurrencyHandle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getMethodSpecialRealCurrencyHandle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updateOrderComplete",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updateOrderComplete.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getPlatformUsersIdentifierMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getPlatformUsersIdentifierMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getPlatformDepositSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getPlatformDepositSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.reWithdrawNextStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.reWithdrawNextStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAvailableCurrencyMethodIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAvailableCurrencyMethodIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.uploadCertification",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.uploadCertification.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.updateOrderNextTransactionCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.updateOrderNextTransactionCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.manualCreateOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.manualCreateOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.manaualPayWithdrawOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.manaualPayWithdrawOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.updatePlatformWithdrawSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.updatePlatformWithdrawSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager._syncDiscountBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager._syncDiscountBonusRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.setWithdrawCountDaily",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.setWithdrawCountDaily.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getDepositMethodTutorialTabsByMethodId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getDepositMethodTutorialTabsByMethodId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getOrderLastSnapshotByUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getOrderLastSnapshotByUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.generateTxOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.generateTxOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateExclusiveAddressDepositMethod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateExclusiveAddressDepositMethod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getPlatformWithdrawSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getPlatformWithdrawSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getDecimalPlaces",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getDecimalPlaces.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.calculateFee",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.calculateFee.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkWagering",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkWagering.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkRiskLock",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkRiskLock.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkChannelSupportCurrency",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkChannelSupportCurrency.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAvailableLevelAndVipChannelIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAvailableLevelAndVipChannelIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.Model.WithdrawFeeStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.Model.WithdrawFeeStrategy.md",
+        "type": "model"
+      },
+      {
+        "fqn": "WithdrawManager.financeNextStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.financeNextStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAvailableUserVipChannelIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAvailableUserVipChannelIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.checkChannelAndAdapterSpecial",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.checkChannelAndAdapterSpecial.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.getOrderById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.getOrderById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getPlatformDepositPendingLimitSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getPlatformDepositPendingLimitSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getAvailableUserLevelMethodIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getAvailableUserLevelMethodIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getUserDepositInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getUserDepositInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.getFee",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.getFee.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "WithdrawManager.reWithdrawStatusStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/WithdrawManager.reWithdrawStatusStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.buildChangeAmountInfoString",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.buildChangeAmountInfoString.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.WithdrawManager.existsWithdrawAccount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/Manager.WithdrawManager.existsWithdrawAccount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.getAndValidateCreateResource",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.getAndValidateCreateResource.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "PaymentManager.Strategy.HourNumberFeeStrategy",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/PaymentManager.Strategy.HourNumberFeeStrategy.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "DepositManager.setFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/PaymentManager/DepositManager.setFirst.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 74,
+    "type": "update_existing",
+    "filePath": "src/managers/payment_vendor_manager.ts",
+    "commitMessage": "支付通道限制跨幣別提醒",
+    "commitHash": "5dc13fbb0d15a672e84ed926e1749e7f186289bf",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.VendorPaymentManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getOnlineOrderCurrencyInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getOnlineOrderCurrencyInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getRequestCurrencySetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getRequestCurrencySetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getDecimalPlaces",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getDecimalPlaces.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getAdapterInstanceById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getAdapterInstanceById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getOnlineRecordById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getOnlineRecordById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getAdapterById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getAdapterById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getPaymentRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getPaymentRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getRequestAmountRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getRequestAmountRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getDecimalPlacesByCurrencyCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getDecimalPlacesByCurrencyCode.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorPaymentManager.getAdapterByKey",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorPaymentManager/methods/Manager.VendorPaymentManager.getAdapterByKey.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.generateTransactionOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.generateTransactionOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.buildWithdrawVendorQueryParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.buildWithdrawVendorQueryParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.manualCompleteOnlineRecordByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.manualCompleteOnlineRecordByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getAdapterById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getAdapterById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.completeOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.completeOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getWithdrawAdapterInstanceById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getWithdrawAdapterInstanceById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getCallbackUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getCallbackUrl.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.testQueryOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.testQueryOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.createOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.createOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.buildWithdrawVendorCreateParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.buildWithdrawVendorCreateParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getWithdrawOnlineRecordByTransactionOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getWithdrawOnlineRecordByTransactionOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getOnlineRecordsByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getOnlineRecordsByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.failedOnlineRecordByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.failedOnlineRecordByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.vendorCallback",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.vendorCallback.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getWithdrawAdapterById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getWithdrawAdapterById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.vendorQueryOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.vendorQueryOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.getWithdrawAdapterInstanceByChannelId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.getWithdrawAdapterInstanceByChannelId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.vendorCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.vendorCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.testCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.testCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.failedOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.failedOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorWithdrawManager.prepareDataByInstanceId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorWithdrawManager/methods/Manager.VendorWithdrawManager.prepareDataByInstanceId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorQueryParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorQueryParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testGetAmountList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testGetAmountList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositAdapterById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositAdapterById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorGetRateParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorGetRateParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.manualCompleteOnlineRecordByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.manualCompleteOnlineRecordByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorUploadCertificationParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorUploadCertificationParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.failedOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.failedOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorQueryOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorQueryOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testUploadCertification",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testUploadCertification.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositAdapterInstanceById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositAdapterInstanceById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.prepareBaseByDepositAdapterInstanceId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.prepareBaseByDepositAdapterInstanceId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorCancelOrderParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorCancelOrderParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getCallbackUrl",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getCallbackUrl.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.syncVendorRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.syncVendorRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testQueryOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testQueryOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.createOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.createOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.completeOnlineRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.completeOnlineRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorCreateParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorCreateParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.prepareDataByChannelId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.prepareDataByChannelId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositOnlineRecordByTransactionOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositOnlineRecordByTransactionOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getAdapterById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getAdapterById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getOnlineRecordsByOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getOnlineRecordsByOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorCreateAddressParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorCreateAddressParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getAdapterInstanceById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getAdapterInstanceById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorCallback",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorCallback.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getVendorRate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getVendorRate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testCreateAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testCreateAddress.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorGetExclusiveAddress",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorGetExclusiveAddress.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorGetAmountListParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorGetAmountListParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testCancelOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testCancelOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.generateTransactionOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.generateTransactionOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.confirmOnlineOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.confirmOnlineOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorNotifyCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorNotifyCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositOnlineRecordByVendorOrderId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositOnlineRecordByVendorOrderId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.testCreate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.testCreate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositOnlineRecordById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositOnlineRecordById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorNotify",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorNotify.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.getDepositAdapterInstanceByChannelId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.getDepositAdapterInstanceByChannelId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorSyncRateParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorSyncRateParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorCancelOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorCancelOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.prepareDataByAdapterInstanceId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.prepareDataByAdapterInstanceId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorUploadCertification",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorUploadCertification.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.buildDepositVendorNotifyParams",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.buildDepositVendorNotifyParams.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.VendorDepositManager.vendorCheckMatchingAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/VendorDepositManager/methods/Manager.VendorDepositManager.vendorCheckMatchingAmount.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 58,
+    "type": "update_existing",
+    "filePath": "src/managers/activity_manager.ts",
+    "commitMessage": "feat(activity): 後台領獎後，同樣清除app端快取",
+    "commitHash": "820106cf7f414de6e7f2651018c2aff4500f4997",
+    "newMethodHints": [
+      "invalidateRewardCenterByUserIds",
+      "invalidateDetailByUserActivityPairs"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.ActivityItemRequirementManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkWhiteCode",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkWhiteCode.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager._checkPartType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager._checkPartType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkClaimType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkClaimType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager._isInDisplayPeriod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager._isInDisplayPeriod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkAppPackage",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkAppPackage.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager._getUserRequirementMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager._getUserRequirementMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkClaimTime",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkClaimTime.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkJoinActivity",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkJoinActivity.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkBlackIps",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkBlackIps.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager._checkTimeSingle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager._checkTimeSingle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkRegisterDay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkRegisterDay.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkDisplayTime",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkDisplayTime.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkDisplayPartType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkDisplayPartType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkPartType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkPartType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkBlackUserIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkBlackUserIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkTime",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkTime.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityItemRequirementManager.checkBlackAgentIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityItemRequirementManager/methods/Manager.ActivityItemRequirementManager.checkBlackAgentIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.getPeriod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.getPeriod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager._check",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager._check.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkNormals",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkNormals.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkClaim",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkClaim.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkDisplayAll",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkDisplayAll.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkDisplays",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkDisplays.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkNormalAll",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkNormalAll.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.getPeriods",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.getPeriods.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager._dataProvider",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager._dataProvider.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkDisplay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkDisplay.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkNormal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkNormal.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkDisplayAllForApp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkDisplayAllForApp.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityRequirementManager.checkClaims",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityRequirementManager/methods/Manager.ActivityRequirementManager.checkClaims.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.getEnabledActivityBaseConfigAll",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.getEnabledActivityBaseConfigAll.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.clearStatusCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.clearStatusCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.getEnabledActivityBaseConfigById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.getEnabledActivityBaseConfigById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.getProgressIconMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.getProgressIconMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.getStatusFlags",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.getStatusFlags.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.clearActivityConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.clearActivityConfig.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigCacheManager.publishClearActivityConfig",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigCacheManager/methods/Manager.ActivityConfigCacheManager.publishClearActivityConfig.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimingLogger",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimingLogger/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityTimingLogger.log",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimingLogger/methods/Manager.ActivityTimingLogger.log.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimingLogger.pushRaw",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimingLogger/methods/Manager.ActivityTimingLogger.pushRaw.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimingLogger.push",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimingLogger/methods/Manager.ActivityTimingLogger.push.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimingLogger.create",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimingLogger/methods/Manager.ActivityTimingLogger.create.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityClaimUniqueManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityClaimUniqueManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityClaimUniqueManager.record",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityClaimUniqueManager/methods/Manager.ActivityClaimUniqueManager.record.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityClaimUniqueManager.check",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityClaimUniqueManager/methods/Manager.ActivityClaimUniqueManager.check.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityBlackUserManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityBlackUserManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityBlackUserManager.checkUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityBlackUserManager/methods/Manager.ActivityBlackUserManager.checkUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityBlackUserManager.checkUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityBlackUserManager/methods/Manager.ActivityBlackUserManager.checkUsers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.getDateZero",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.getDateZero.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.sortWeekByResetDay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.sortWeekByResetDay.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper._getOffset",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper._getOffset.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.getMonthlyPeriod",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.getMonthlyPeriod.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.getWeekOffsetByResetDay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.getWeekOffsetByResetDay.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.getYesterdayDateZero",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.getYesterdayDateZero.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper._getLocalDateKey",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper._getLocalDateKey.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.yyyymmddToDate",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.yyyymmddToDate.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.getDailyLocalRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.getDailyLocalRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper._hhmmSplit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper._hhmmSplit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper.dayDiff",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper.dayDiff.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper._getMonthEndDay",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper._getMonthEndDay.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityTimeHelper._hhmmssSplit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityTimeHelper/methods/Manager.ActivityTimeHelper._hhmmssSplit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getActivityBaseConfigById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getActivityBaseConfigById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._handleCheckInQuestConfigGet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._handleCheckInQuestConfigGet.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getEnabledActivityBaseConfigById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getEnabledActivityBaseConfigById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._rewardHandleCurrencyValue",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._rewardHandleCurrencyValue.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._rowsHandler",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._rowsHandler.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._getExtraConfigSingle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._getExtraConfigSingle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._getServiceIdByGameKey",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._getServiceIdByGameKey.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._getProgressIconMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._getProgressIconMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getEnabledActivityBaseConfigAll",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getEnabledActivityBaseConfigAll.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getUserJoinActivityTimeById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getUserJoinActivityTimeById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._listToMapList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._listToMapList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._getExtraConfigList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._getExtraConfigList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getActivityBaseConfigByIds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getActivityBaseConfigByIds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager.getAppStepQuestStepByStepId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager.getAppStepQuestStepByStepId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._conditionHandleCurrencyValue",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._conditionHandleCurrencyValue.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._handleQuestConditionGet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._handleQuestConditionGet.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._listToMapSingle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._listToMapSingle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ActivityConfigManager._handleQuestRewardGet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/ActivityConfigManager/methods/Manager.ActivityConfigManager._handleQuestRewardGet.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 16,
+    "type": "update_existing",
+    "filePath": "src/managers/message_board_manager.ts",
+    "commitMessage": "fix: 修正大舞台改個資充值金額門檻單位錯誤 (FAQ-3268)",
+    "commitHash": "47ae67af5bd8c74a6ac12134ab93859936de5c60",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogic.cancel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogic.cancel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getLevelIconByNum",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getLevelIconByNum.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getPlatformUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getPlatformUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPlatformPointMultipleSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPlatformPointMultipleSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkInWhiteList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkInWhiteList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setOfficialPostUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setOfficialPostUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeReplyLogic.checkUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeReplyLogic.checkUserLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPointMultipleSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPointMultipleSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.unlockUpdateUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.unlockUpdateUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getUploadImageToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.reloadTotalPostsCountInTimeRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.reloadTotalPostsCountInTimeRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.checkMsgParent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.checkMsgParent.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.edit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.edit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.isInWhiteList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.isInWhiteList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getAppUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getAppUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.setPostCommentIdsMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.setPostCommentIdsMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.splitPostCommentsByStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.splitPostCommentsByStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getActiveAchievementsByRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getActiveAchievementsByRule.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.setDepositTotal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.setDepositTotal.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.getCommentLogic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.getCommentLogic.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeReplyLogic.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeReplyLogic.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPointsRangeByLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPointsRangeByLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkPostsUserAuth",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkPostsUserAuth.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getUserAllDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getUserAllDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.reject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.reject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPost.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.refreshUnusableAchievements",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.refreshUnusableAchievements.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.findGiftByProductId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.findGiftByProductId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.checkMsgBeforeAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.checkMsgBeforeAdd.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GiftCondsInfo.fromDB",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.GiftCondsInfo.fromDB.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getPostLikes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getPostLikes.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getDefaultUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getDefaultUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getApprovedParentComment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getApprovedParentComment.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getOfficialPostUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getOfficialPostUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getLevels",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getLevels.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.reloadDepositRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.reloadDepositRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.remove",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.remove.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.tryShortCircuit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.tryShortCircuit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getAppUserDetailContent",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getAppUserDetailContent.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getGiftList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getGiftList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.getUpdateCommentsPostsWhenApproveFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.getUpdateCommentsPostsWhenApproveFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.reloadPostsCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.reloadPostsCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.add",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.add.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getBetStatistics",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getBetStatistics.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getDepositTotal",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getDepositTotal.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.getUpdateCommentsRepliesPostsWhenRemoveFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.getUpdateCommentsRepliesPostsWhenRemoveFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager._buildListMallProductsSearch",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager._buildListMallProductsSearch.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getGiftList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getGiftList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.getDepositRecordsTimeRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.getDepositRecordsTimeRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager._loadProductsPaged",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager._loadProductsPaged.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.getUpdateCommentsPostsWhenApproveFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.getUpdateCommentsPostsWhenApproveFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.remove",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.remove.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setPointMultipleSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setPointMultipleSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.deleteUserFeed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.deleteUserFeed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.setParentCommentIdsMap",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.setParentCommentIdsMap.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.removeUserDetailCaches",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.removeUserDetailCaches.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPostLikes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPostLikes.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.isUrlGroupChanged",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.isUrlGroupChanged.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.tryShortCircuit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.tryShortCircuit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.reloadDepositRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.reloadDepositRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.addUrlGroupByContext",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.addUrlGroupByContext.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.officialEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.officialEdit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getAddCommentResponseData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getAddCommentResponseData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.removeUserDetailCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.removeUserDetailCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkTitle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkTitle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getUploadVideoToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getUploadVideoToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.loadDefaultAvatarBackground",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.loadDefaultAvatarBackground.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkGiftConds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkGiftConds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.loadRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.loadRules.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeCommentLogic.checkMsgBeforeAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeCommentLogic.checkMsgBeforeAdd.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.reloadPostsCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.reloadPostsCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.addUrlGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.addUrlGroup.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkBannedUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkBannedUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.cancel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.cancel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setCustomBetProfitAndPostAmountType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setCustomBetProfitAndPostAmountType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkPostCommentStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkPostCommentStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkTitle",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkTitle.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.getUpdateCommentsRepliesPostsWhenRemoveFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.getUpdateCommentsRepliesPostsWhenRemoveFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.refreshUnusableAchievements",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.refreshUnusableAchievements.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.edit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.edit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.useAchievementByType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.useAchievementByType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getLevelNumByPoints",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getLevelNumByPoints.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getDbSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getDbSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getUrlGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getUrlGroups.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkSensitiveWord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkSensitiveWord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogic.remove",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogic.remove.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getUserAllDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getUserAllDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.deleteUserFeed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.deleteUserFeed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.remove",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.remove.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getGiftCondsInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getGiftCondsInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getUrlGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getUrlGroups.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeCommentLogic.checkUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeCommentLogic.checkUserLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.updateUserDetailByNoReview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.updateUserDetailByNoReview.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.reloadTotalPostsCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.reloadTotalPostsCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkGiftConds",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkGiftConds.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkUpdateUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkUpdateUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getDepositRecordsTimeRange",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getDepositRecordsTimeRange.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkBannedUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkBannedUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.getUsableAchievement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.getUsableAchievement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogic.getUpdateCommentsRepliesPostsWhenRemoveFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogic.getUpdateCommentsRepliesPostsWhenRemoveFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.getAddCommentUpdatePostWhenAddFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.getAddCommentUpdatePostWhenAddFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkTypeData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkTypeData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getModifiedAppUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getModifiedAppUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeCommentLogic.edit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeCommentLogic.edit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getByType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getByType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ReplyLogic.cancel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ReplyLogic.cancel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GiftCondsInfo.toDB",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.GiftCondsInfo.toDB.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setAppUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setAppUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.getInstance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.getInstance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getPostSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getPostSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.verifySendGiftTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.verifySendGiftTradePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getDbUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getDbUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getUploadVideoToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getUploadVideoToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.lockUpdateUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.lockUpdateUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getCommentLogic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getCommentLogic.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.createReviewAmountUpdateCasesSql",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.createReviewAmountUpdateCasesSql.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.insertUserFeed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.insertUserFeed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.remove",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.remove.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.unbanUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.unbanUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getListScore",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getListScore.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.addUrlGroupByContext",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.addUrlGroupByContext.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogic.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogic.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getLevelsPaged",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getLevelsPaged.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.loadRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.loadRules.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getCommentReplyLikes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getCommentReplyLikes.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeCommentLogic.approve",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeCommentLogic.approve.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailRule.constructor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailRule.constructor.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getAddCommentResponseData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getAddCommentResponseData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.verifySendGiftTradePassword",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.verifySendGiftTradePassword.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeReplyLogic.checkMsgBeforeAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeReplyLogic.checkMsgBeforeAdd.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.findGiftByProductId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.findGiftByProductId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkSendGiftInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkSendGiftInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getListScore",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getListScore.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.refreshUnusableAchievements",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.refreshUnusableAchievements.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager._loadAllProductsWithInternalPaging",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager._loadAllProductsWithInternalPaging.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getDbUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getDbUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.reject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.reject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setDbSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setDbSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.reloadDepositRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.reloadDepositRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getCommentLogic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getCommentLogic.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getUploadImageToken",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getUploadImageToken.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.deleteUrlGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.deleteUrlGroup.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getOfficialPostUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getOfficialPostUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkPostsUserAuth",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkPostsUserAuth.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.add",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.add.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkPostCommentStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkPostCommentStatus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.setPostSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.setPostSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.add",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.add.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPostSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPostSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getActiveChargeAchievements",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getActiveChargeAchievements.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.getActiveAchievementsByRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.getActiveAchievementsByRule.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.getDepositRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.getDepositRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.insertUserFeed",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.insertUserFeed.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getGiftIncome",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getGiftIncome.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.reloadPostsCount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.reloadPostsCount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager._assembleMessageBoardGifts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager._assembleMessageBoardGifts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.setHourDepositAmount",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.setHourDepositAmount.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.edit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.edit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getRecentGames",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getRecentGames.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPostVersions",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPostVersions.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.checkBannedUserByDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.checkBannedUserByDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getModifiedAppUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getModifiedAppUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getOfficialPostSettings",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getOfficialPostSettings.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.getReplyLogic",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.getReplyLogic.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.isMinChargeReached",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.isMinChargeReached.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkSendGiftInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkSendGiftInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.updateUserDetailByReview",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.updateUserDetailByReview.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getPointsRangeByLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getPointsRangeByLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.isInWhiteList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.isInWhiteList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkTypeData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkTypeData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.useAchievement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.useAchievement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.removeUserDetailCaches",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.removeUserDetailCaches.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.isInWhiteList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.isInWhiteList.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.clearLevelsCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.clearLevelsCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.getUsableAchievement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.getUsableAchievement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.checkMsgData",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.checkMsgData.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getLevelsPaged",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getLevelsPaged.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getRecentPostThumbs",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getRecentPostThumbs.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.checkUserLevel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.checkUserLevel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogic.reject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogic.reject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getLevelNumByPoints",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getLevelNumByPoints.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkBannedUserByDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkBannedUserByDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentAndReplyLogic.cancel",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentAndReplyLogic.cancel.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.removeUserDetailCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.removeUserDetailCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.getPost",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.getPost.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.BackOfficeReplyLogic.edit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.BackOfficeReplyLogic.edit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChargeAchievementManager.getUsableAchievement",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChargeAchievementManager.getUsableAchievement.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.banUserDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.banUserDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.ChangeUserDetailAchievementManager.loadRules",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.ChangeUserDetailAchievementManager.loadRules.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.CommentLogicBase.getAddCommentUpdatePostWhenAddFunc",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.CommentLogicBase.getAddCommentUpdatePostWhenAddFunc.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getPlatformUserDetails",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.getPlatformUserDetails.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.useAchievementByType",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager.useAchievementByType.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.SendPostLimitAchievementManager.getActiveAchievementsByRule",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.SendPostLimitAchievementManager.getActiveAchievementsByRule.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager._loadEnabledOnlyProducts",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardManager._loadEnabledOnlyProducts.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardClientManager.checkSensitiveWord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/Manager.MessageBoardClientManager.checkSensitiveWord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.defaultUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/methods/Manager.MessageBoardManager.defaultUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.maxCustomBetProfit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/methods/Manager.MessageBoardManager.maxCustomBetProfit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.detectAndRecordLevelUp",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/methods/Manager.MessageBoardManager.detectAndRecordLevelUp.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.defaultSortOrder",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/methods/Manager.MessageBoardManager.defaultSortOrder.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.MessageBoardManager.getLevelUpRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/MessageBoardManager/methods/Manager.MessageBoardManager.getLevelUpRecords.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 33,
+    "type": "update_existing",
+    "filePath": "src/managers/fund_adjustment_manager.ts",
+    "commitMessage": "fix(fund_adjustment): FAQ-3089 修正手動下分時，帳變記錄備註缺少審核時的備註問題",
+    "commitHash": "746ad2eeda222f08651dba22fe53970bda8132e5",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.FundAdjustmentManager",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/_manager.md",
+        "type": "manager-overview"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.createSyncBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.createSyncBonusRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.applyDeduct",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.applyDeduct.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.addBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.addBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.addBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.addBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.add",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.add.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.reviewReject",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.reviewReject.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.applyAdd",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.applyAdd.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.getAdjustmentsBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.getAdjustmentsBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.isGiveModeBonus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.isGiveModeBonus.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.updateUserFundAdjustmentReviewPass",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.updateUserFundAdjustmentReviewPass.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.getUserFundAdjustment",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.getUserFundAdjustment.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.setFirstDeposit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.setFirstDeposit.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.deduct",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.deduct.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.batchGetPlatformUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.batchGetPlatformUsers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.getUserFundAdjustmentDetail",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.getUserFundAdjustmentDetail.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.isBonusCategory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.isBonusCategory.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.transactionRemark",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.transactionRemark.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.reviewPass",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.reviewPass.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.FundAdjustmentManager.walletSyncAppUserBonusRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/FundAdjustmentManager/methods/Manager.FundAdjustmentManager.walletSyncAppUserBonusRecord.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 43,
+    "type": "update_existing",
+    "filePath": "src/managers/transaction_category_manager.ts",
+    "commitMessage": "fix(agent): 合營統計提現還款應計為負數減項 [FAQ-3103]",
+    "commitHash": "f1f2ba5292b8df8cc9f7e40159577eeb570ee59c",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.TransactionCategoryManager.getFilteredCategories",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/TransactionCategoryManager/methods/Manager.TransactionCategoryManager.getFilteredCategories.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 17,
+    "type": "update_existing",
+    "filePath": "src/managers/in_house_game_manager.ts",
+    "commitMessage": "fix(in_house_game): 修補跨使用者全局回合限額的 TOCTOU 漏洞，改為 round 鎖內原子預留",
+    "commitHash": "ab3644f6f794e8ba85a44efcff5ee65718146482",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.InHouseGameManager.load",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.load.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.clearPlayGroupCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.clearPlayGroupCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.transitionRoundState",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.transitionRoundState.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.setPlayGroupCache",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.setPlayGroupCache.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameRoundManager.refundRound",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameRoundManager.refundRound.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.getRoundHistoryByGameId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.getRoundHistoryByGameId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.getActiveGames",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.getActiveGames.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameRoundManager.lockRound",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameRoundManager.lockRound.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameRoundManager.supplementRound",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameRoundManager.supplementRound.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.getSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.getSetting.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.getRoundInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.getRoundInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.enrichWinItems",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.enrichWinItems.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.batchGetRoundInfo",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.batchGetRoundInfo.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.InHouseGameManager.getEnabledPlayGroups",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/InHouseGameManager/methods/Manager.InHouseGameManager.getEnabledPlayGroups.md",
+        "type": "manager-method"
+      }
+    ]
+  },
+  {
+    "index": 81,
+    "type": "update_existing",
+    "filePath": "src/managers/game_vendor_manager.ts",
+    "commitMessage": "risk: RiskInternal add CheckIpRegion for game check",
+    "commitHash": "46ca88b10320a5ed5f58600543cb33e9df496bb5",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorUsers",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorUsers.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.prepareDataByGameVendorIdAndUsername",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.prepareDataByGameVendorIdAndUsername.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager._getBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager._getBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.createUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.createUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.prepareDataByGameVendorId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.prepareDataByGameVendorId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.updateGameRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.updateGameRecords.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorUser",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorUser.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getAllVendorBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getAllVendorBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.prepareDataByGameVendorIdAndUserId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.prepareDataByGameVendorIdAndUserId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameRecord.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorGameById",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorGameById.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorGameByGameId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorGameByGameId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getBadgeLink",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getBadgeLink.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getBalanceByGameId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getBalanceByGameId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.enterGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.enterGame.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getBalance",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getBalance.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.prepareDataByGameId",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.prepareDataByGameId.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.writeEnterLog",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.writeEnterLog.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorGameIdByGameIdAndOther",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorGameIdByGameIdAndOther.md",
+        "type": "manager-method"
+      },
+      {
+        "fqn": "Manager.GameVendorManager.getGameVendorGameIdByGameIdAndOtherForSport",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Managers/GameVendorManager/methods/Manager.GameVendorManager.getGameVendorGameIdByGameIdAndOtherForSport.md",
+        "type": "manager-method"
+      }
+    ]
+  }
+]

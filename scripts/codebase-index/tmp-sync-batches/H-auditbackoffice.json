@@ -1,0 +1,68 @@
+[
+  {
+    "index": 47,
+    "type": "new_file",
+    "filePath": "src/servers/audit_back_office/services/handlers/implementations/risk_associate_member_frozen_change_handler.ts",
+    "commitMessage": "关联會員查询",
+    "commitHash": "da8d9bc0467566ef47e709003d04e8c02af8bc9a",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 73,
+    "type": "new_file",
+    "filePath": "src/servers/audit_back_office/services/handlers/implementations/risk_limit_ip_region_new_edited_handler.ts",
+    "commitMessage": "限制遊戲IP/地區-日誌",
+    "commitHash": "f8a8dfeb92b46aa8ddcc38d7831bac40e793306f",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 72,
+    "type": "new_file",
+    "filePath": "src/servers/audit_back_office/services/handlers/implementations/risk_limit_ip_region_delete_handler.ts",
+    "commitMessage": "限制遊戲IP/地區-日誌",
+    "commitHash": "f8a8dfeb92b46aa8ddcc38d7831bac40e793306f",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 80,
+    "type": "new_file",
+    "filePath": "src/servers/audit_back_office/services/handlers/implementations/user_revoke_bonus_handler.ts",
+    "commitMessage": "fix(app_user_back_office):修改彩金撤回操作紀錄",
+    "commitHash": "b0a5c092149cfa4b00f542bc4c706a97a7803233",
+    "newMethodHints": [],
+    "affectedNotes": []
+  },
+  {
+    "index": 46,
+    "type": "update_existing",
+    "filePath": "src/servers/audit_back_office/services/handlers/implementations/index.ts",
+    "commitMessage": "关联會員查询",
+    "commitHash": "da8d9bc0467566ef47e709003d04e8c02af8bc9a",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "auditBackOffice.HandlerList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AuditBackOffice/handlers/auditBackOffice.HandlerList.md",
+        "type": "manager-overview"
+      }
+    ]
+  },
+  {
+    "index": 78,
+    "type": "update_existing",
+    "filePath": "src/servers/audit_back_office/services/helpers/formatters.ts",
+    "commitMessage": "fix(app_user_back_office):修改彩金撤回操作紀錄審核時間格式",
+    "commitHash": "15969d1e1ffe86d040ecccdfc7984272797277e3",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "auditBackOffice.Formatters",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/AuditBackOffice/helpers/auditBackOffice.Formatters.md",
+        "type": "manager-method"
+      }
+    ]
+  }
+]

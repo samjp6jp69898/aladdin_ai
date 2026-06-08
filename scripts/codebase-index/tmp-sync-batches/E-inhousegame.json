@@ -1,0 +1,240 @@
+[
+  {
+    "index": 48,
+    "type": "update_existing",
+    "filePath": "src/servers/in_house_game_back_office/services/in_house_game_records.ts",
+    "commitMessage": "feat(in_house_game): 新增下注方式、玩家撤單與後台實時下注單",
+    "commitHash": "1d3d8515790fc5c316b32ce024ed841d9ff19383",
+    "newMethodHints": [
+      "methodListRealtimeBetRecords"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.RefundRoundSecond",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.RefundRoundSecond.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.SupplementRoundSecond",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.SupplementRoundSecond.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.SupplementRoundFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.SupplementRoundFirst.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.ListRoundRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.ListRoundRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.LockRoundSecond",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.LockRoundSecond.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.GetLockRoundTimeLimit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.GetLockRoundTimeLimit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.ListBetRecords",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.ListBetRecords.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.RefundRoundFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.RefundRoundFirst.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.LockRoundFirst",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.LockRoundFirst.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameRecords.GetRoundBets",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameRecords/methods/inHouseGameBackOffice.inHouseGameRecords.GetRoundBets.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 38,
+    "type": "update_existing",
+    "filePath": "src/servers/in_house_game_back_office/services/in_house_game_back_office.ts",
+    "commitMessage": "feat(in_house_game): 對沖設置改為後台可設定",
+    "commitHash": "7e8258996faa60de1ef54704c5d214c1a5ebe24d",
+    "newMethodHints": [
+      "methodGetTwoEightHedgeSetting",
+      "methodUpdateTwoEightHedgeSetting"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.CreateVendor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.CreateVendor.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdateGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdateGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetGameEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetGameEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdateTwoEightBetLimitSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdateTwoEightBetLimitSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.CreateGame",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.CreateGame.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.CreatePlayGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.CreatePlayGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdatePlayGroup",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdatePlayGroup.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetGameList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetGameList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetTwoEightOddsSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetTwoEightOddsSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdateVendor",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdateVendor.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.ListAvailableGameCodes",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.ListAvailableGameCodes.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetTwoEightBetLimitSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetTwoEightBetLimitSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdateTwoEightOddsSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdateTwoEightOddsSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetPlayGroupList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetPlayGroupList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdatePlayGroupStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdatePlayGroupStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.UpdateVendorStatus",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.UpdateVendorStatus.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetVendorList",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetVendorList.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetPlayGroupEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetPlayGroupEdit.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameBackOffice.inHouseGameBackOffice.GetVendorEdit",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameBackOffice/services/InHouseGameBackOffice/methods/inHouseGameBackOffice.inHouseGameBackOffice.GetVendorEdit.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 67,
+    "type": "update_existing",
+    "filePath": "src/servers/in_house_game_api/services/in_house_game_api.ts",
+    "commitMessage": "channel註冊發送整合,遊戲bot優化",
+    "commitHash": "aa91a9dc9829c271c46164d7b456421fd8ec0256",
+    "newMethodHints": [
+      "methodEnterGame",
+      "methodLeaveGame"
+    ],
+    "affectedNotes": [
+      {
+        "fqn": "inHouseGameApi.inHouseGameApi",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/InHouseGameApi/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "inHouseGameApi.inHouseGameApi.GetRoundHistory",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/InHouseGameApi/methods/inHouseGameApi.inHouseGameApi.GetRoundHistory.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameApi.inHouseGameApi.GetTwoEightOddsSetting",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/InHouseGameApi/methods/inHouseGameApi.inHouseGameApi.GetTwoEightOddsSetting.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameApi.inHouseGameApi.GetCurrentRound",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/InHouseGameApi/methods/inHouseGameApi.inHouseGameApi.GetCurrentRound.md",
+        "type": "rpc-method"
+      },
+      {
+        "fqn": "inHouseGameApi.inHouseGameApi.GetUserBetRecord",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/InHouseGameApi/methods/inHouseGameApi.inHouseGameApi.GetUserBetRecord.md",
+        "type": "rpc-method"
+      }
+    ]
+  },
+  {
+    "index": 9,
+    "type": "update_existing",
+    "filePath": "src/servers/in_house_game_api/services/betting_handler.ts",
+    "commitMessage": "chore: 撤單失敗分支加臨時 debug log (CancelDebug, 測完刪)",
+    "commitHash": "a6e7265b47a88bed21741c40fc07c313b1d9df41",
+    "newMethodHints": [],
+    "affectedNotes": [
+      {
+        "fqn": "inHouseGameApi.bettingHandler",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/BettingHandler/_service.md",
+        "type": "service-overview"
+      },
+      {
+        "fqn": "inHouseGameApi.bettingHandler.PlaceBet",
+        "path": "/Users/user/aladdin/obsidian/Codebase/Servers/InHouseGameApi/services/BettingHandler/methods/inHouseGameApi.bettingHandler.PlaceBet.md",
+        "type": "rpc-method"
+      }
+    ]
+  }
+]
