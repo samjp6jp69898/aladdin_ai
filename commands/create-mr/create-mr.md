@@ -487,13 +487,17 @@ reviewer_email: {reviewer_email}
 
 成功開出 MR 後，向該技術發私訊（永不阻斷流程，僅記 log）：
 
+> **路徑紀律：`tg-notify.sh` 固定位於根目錄 scripts —— `/Users/user/aladdin/scripts/tg-notify.sh`。呼叫前必須先以 `ls` 確認該檔存在；若一時找不到，務必實際檢查 `/Users/user/aladdin/scripts/` 目錄，嚴禁僅憑記憶或前一階段的舊判斷斷定「腳本不存在」就略過通知（該檔可能在 pipeline 執行期間才被加入根目錄 scripts）。**
+
 ```bash
+TG_SH=/Users/user/aladdin/scripts/tg-notify.sh   # 固定根目錄 scripts；呼叫前先確認
+ls "$TG_SH" >/dev/null 2>&1 || { echo "TG_FAIL: 根目錄 scripts 查無 tg-notify.sh（請實際檢查 /Users/user/aladdin/scripts/，勿憑記憶斷定）"; }
 TG_MSG="✅ [已開 MR] {ticket_id}
 AI 已完成修復並開出 MR，待你 review：
 {對每個 affected repo 一行：'{repo}: {mr_url}'}
 分析文件：{drive_link}
 Notion：{notion_url}"
-bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "$TG_MSG"
+bash "$TG_SH" --email "{reviewer_email}" --text "$TG_MSG"
 ```
 
 把輸出（`TG_SENT` / `TG_SKIP_NOT_TECH` / `TG_SKIP_NO_CHATID` / `TG_FAIL`）存入 `tg_notify_result`。
@@ -593,13 +597,17 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
 
 TG 通知該技術（待釐清）：
 
+> **路徑紀律：`tg-notify.sh` 固定位於根目錄 scripts —— `/Users/user/aladdin/scripts/tg-notify.sh`。呼叫前必須先以 `ls` 確認該檔存在；若一時找不到，務必實際檢查 `/Users/user/aladdin/scripts/` 目錄，嚴禁僅憑記憶或前一階段的舊判斷斷定「腳本不存在」就略過通知（該檔可能在 pipeline 執行期間才被加入根目錄 scripts）。**
+
 ```bash
+TG_SH=/Users/user/aladdin/scripts/tg-notify.sh   # 固定根目錄 scripts；呼叫前先確認
+ls "$TG_SH" >/dev/null 2>&1 || { echo "TG_FAIL: 根目錄 scripts 查無 tg-notify.sh（請實際檢查 /Users/user/aladdin/scripts/，勿憑記憶斷定）"; }
 TG_MSG="🟡 [待釐清] {ticket_id}
 AI 在實證 grounding 階段發現 bug 單與 CQA 實況可能有出入，需你確認：
 {qa_question}
 分析文件：{drive_link}
 Notion：{notion_url}"
-bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "$TG_MSG"
+bash "$TG_SH" --email "{reviewer_email}" --text "$TG_MSG"
 ```
 
 把輸出存入 `tg_notify_result`。（`already_fixed` / `i18n_manual_handoff` / `failed` 分支不發 TG。）

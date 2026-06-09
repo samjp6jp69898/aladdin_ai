@@ -5,10 +5,12 @@
 #   tg-notify.sh --notion-user-ids "<id1 id2 ...>" --text "<msg>" [--dry-run]
 #   tg-notify.sh --chat-id "<chat_id>"             --text "<msg>" [--dry-run]   # 直送，繞過 CSV，供獨立測試
 # 紀律：一律 exit 0、永不阻斷 pipeline；結果印一行供呼叫端記 log。
+# Bot token 來源（依序）：1) 根目錄 /Users/user/aladdin/.env 的 TG_BOT_TOKEN（優先）  2) /Users/user/.claude/channels/telegram/.env 的 TELEGRAM_BOT_TOKEN（後備）
 set -uo pipefail
 
 CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv}"
-ENV_FILE="${TG_ENV_FILE:-/Users/user/aladdin/.env}"
+ENV_FILE="${TG_ENV_FILE:-/Users/user/.claude/channels/telegram/.env}"
+ROOT_ENV_FILE="${TG_ROOT_ENV_FILE:-/Users/user/aladdin/.env}"   # 根目錄 .env，優先來源（鍵名 TG_BOT_TOKEN）
 API_BASE="${TG_API_BASE:-https://api.telegram.org}"
 
 EMAIL=""; IDS=""; TEXT=""; DRY=0; CHAT_DIRECT=""
@@ -64,7 +66,9 @@ fi
 if [ "$DRY" = "1" ]; then echo "TG_SENT(dry-run): $MATCH_EMAIL chat_id=$MATCH_CHAT"; exit 0; fi
 
 TOKEN=""
-[ -f "$ENV_FILE" ] && TOKEN="$(grep -E '^TELEGRAM_BOT_TOKEN=' "$ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]')"
+# 優先讀根目錄 .env 的 TG_BOT_TOKEN；找不到才後備讀 channel .env 的 TELEGRAM_BOT_TOKEN
+[ -f "$ROOT_ENV_FILE" ] && TOKEN="$(grep -E '^TG_BOT_TOKEN=' "$ROOT_ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]')"
+[ -z "$TOKEN" ] && [ -f "$ENV_FILE" ] && TOKEN="$(grep -E '^TELEGRAM_BOT_TOKEN=' "$ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]')"
 [ -z "$TOKEN" ] && { echo "TG_FAIL: $MATCH_EMAIL (no bot token)"; exit 0; }
 
 HTTP="$(curl -s -o /dev/null -w '%{http_code}' \

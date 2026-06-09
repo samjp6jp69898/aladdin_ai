@@ -92,6 +92,7 @@ function buildFilter(): object {
                 or: [
                     { property: '狀態', select: { equals: '仍有問題' } },
                     { property: '狀態', select: { equals: '待處理' } },
+                    { property: '狀態', select: { equals: '處理中' } },
                 ],
             },
             {
@@ -274,36 +275,53 @@ type: project
     writeFileSync(TRACKER_PATH, header + rows.join('\n') + '\n', 'utf-8');
 }
 
-function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
+function mergeToTracker(items: BugItem[]): { added: number; addedRerun: number; reset: number; skipped: number } {
     const existing = readTracker();
     const existingByFaq = new Map(existing.map(e => [e.faqNumber, e]));
     const today = new Date().toISOString().slice(0, 10);
 
     let added = 0;
+    let addedRerun = 0;
+    let reset = 0;
     let skipped = 0;
 
     for (const item of items) {
+        const isRerun = item.aiAnalysis === '需要重跑';
         const entry = existingByFaq.get(item.faqNumber);
 
         if (entry) {
-            // 既存：不覆寫狀態，避免把 in_progress / done / failed 拉回
-            skipped++;
+            if (isRerun) {
+                // 重送分析：一律把既有紀錄拉回處理佇列，不論原本是 done/failed/pending
+                entry.status = 'rerun';
+                entry.severity = item.severity;
+                entry.url = item.url;
+                entry.addedAt = today;
+                entry.doneAt = undefined;
+                reset++;
+            } else {
+                // 待分析 + 已存在：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
+                skipped++;
+            }
         } else {
             existing.push({
                 faqNumber: item.faqNumber,
                 url: item.url,
                 severity: item.severity,
-                status: 'pending',
+                status: isRerun ? 'rerun' : 'pending',
                 addedAt: today,
             });
-            added++;
+            if (isRerun) {
+                addedRerun++;
+            } else {
+                added++;
+            }
         }
     }
 
     existing.sort((a, b) => b.faqNumber - a.faqNumber);
     writeTracker(existing);
 
-    return { added, skipped };
+    return { added, addedRerun, reset, skipped };
 }
 
 // ── 主程式 ──
@@ -311,7 +329,7 @@ function mergeToTracker(items: BugItem[]): { added: number; skipped: number } {
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=仍有問題,待處理 | AI分析=待分析,需要重跑 | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=仍有問題,待處理,處理中 | AI分析=待分析,需要重跑 | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
 
     const techUsers = loadTechUsers();
     console.log(`  Tech 名單載入: ${techUsers.length} 人`);
@@ -330,8 +348,8 @@ async function main() {
         printTable(items);
     }
 
-    const { added, skipped } = mergeToTracker(items);
-    console.log(`  Tracker 更新: 新增 ${added} 筆 (pending), 略過 ${skipped} 筆（已存在）`);
+    const { added, addedRerun, reset, skipped } = mergeToTracker(items);
+    console.log(`  Tracker 更新: 新增 ${added} 筆 (pending), 新增 ${addedRerun} 筆 (rerun), 重置 ${reset} 筆 (→rerun), 略過 ${skipped} 筆（已存在）`);
     console.log(`  檔案: ${TRACKER_PATH}\n`);
 }
 
