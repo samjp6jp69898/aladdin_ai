@@ -69,6 +69,8 @@ bun call-graph-scanner.ts same-server-callers "<targetFile>" "<targetClass>" "<t
 
 ```bash
 bun call-graph-scanner.ts cross-server-callers "<RpcMethodName>" "<targetServer>" "<rajahServiceName>"
+# 或便捷格式（自動解析 server / rajahServiceName，RPC name 與 method 前綴 handler name 皆可）：
+bun call-graph-scanner.ts cross-server-callers "<ServiceClass.RpcMethodName>"
 ```
 
 注意：這裡用 **RPC method name**（PascalCase，無 `method` 前綴），因為跨 server 呼叫用的是 `context.remote.*.*.RpcMethodName()`。

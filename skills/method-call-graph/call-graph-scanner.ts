@@ -5,7 +5,7 @@
  * Subcommands:
  *   resolve-method <ServiceClass.method | filePath:method>
  *   same-server-callers <file> <class> <method> <server> [--base-class=X] [--base-method=Y]
- *   cross-server-callers <method> <server> <rajahServiceName>
+ *   cross-server-callers <method> <server> <rajahServiceName> | cross-server-callers <ServiceClass.method>
  *   frontend-callers <method>
  *   detect-entries
  *   reverse-bfs-to-entries <file> <class> <method> <server> [--entries-json=<path>]
@@ -184,7 +184,7 @@ function relPath(absPath: string): string {
 
 // ─── Subcommand: resolve-method ───
 
-function resolveMethod(input: string) {
+function resolveMethodInfo(input: string) {
     let targetFile: string;
     let methodName: string;
 
@@ -200,16 +200,14 @@ function resolveMethod(input: string) {
         const files = results.map(r => parseGrepLine(r)?.file).filter(Boolean) as string[];
         const uniqueFiles = [ ...new Set(files) ];
         if (uniqueFiles.length === 0) {
-            console.log(JSON.stringify({ error: `class ${ className } not found` }));
-            return;
+            return { error: `class ${ className } not found` };
         }
         targetFile = uniqueFiles[0];
     }
 
     const line = findMethodLine(targetFile, methodName);
     if (line < 0) {
-        console.log(JSON.stringify({ error: `method ${ methodName } not found in ${ targetFile }` }));
-        return;
+        return { error: `method ${ methodName } not found in ${ targetFile }` };
     }
 
     const classes = findClassInFile(targetFile);
@@ -227,7 +225,7 @@ function resolveMethod(input: string) {
         if (baseMatch) { rajahServiceName = baseMatch[1]; }
     }
 
-    console.log(JSON.stringify({
+    return {
         targetFile,
         targetLine: line,
         targetClass: targetClass?.name || null,
@@ -235,7 +233,11 @@ function resolveMethod(input: string) {
         targetMethod: methodName,
         targetServer: server,
         rajahServiceName,
-    }));
+    };
+}
+
+function resolveMethod(input: string) {
+    console.log(JSON.stringify(resolveMethodInfo(input)));
 }
 
 // ─── Subcommand: same-server-callers (BFS) ───
@@ -1307,7 +1309,39 @@ switch (cmd) {
     }
 
     case 'cross-server-callers':
-        safeRun('cross-server-callers', () => crossServerCallers(args[1], args[2], args[3]));
+        safeRun('cross-server-callers', () => {
+            let method = args[1];
+            let server = args[2];
+            let rajahServiceName = args[3];
+            // 便捷格式: cross-server-callers <ServiceClass.method> — 透過 resolve-method 邏輯自動補 server / rajahServiceName
+            if (method && method.includes('.') && !method.includes(':') && !method.includes('/')) {
+                const [ className, rawName ] = method.split('.');
+                let info = resolveMethodInfo(method);
+                // service handler 命名為 method<RpcName>;輸入 RPC name(如契約上的 CancelRound)時補 method 前綴重試解析
+                if ('error' in info && rawName && !rawName.startsWith('method')) {
+                    const retry = resolveMethodInfo(`${ className }.method${ rawName }`);
+                    if (!('error' in retry)) { info = retry; }
+                }
+                if ('error' in info) {
+                    console.log(JSON.stringify({ error: 'subcommand_failed', subcommand: 'cross-server-callers', message: info.error }));
+                    process.exit(2);
+                }
+                // 跨服呼叫長相為 context.remote.*.*.<RpcName>(),grep 一律用無 method 前綴的 RPC name
+                method = info.targetMethod.replace(/^method(?=[A-Z])/, '');
+                server = server ?? info.targetServer ?? undefined;
+                rajahServiceName = rajahServiceName ?? info.rajahServiceName ?? undefined;
+            }
+            if (!method || !server || !rajahServiceName) {
+                console.log(JSON.stringify({
+                    error: 'bad_arguments',
+                    subcommand: 'cross-server-callers',
+                    message: 'usage: cross-server-callers <method> <server> <rajahServiceName>, or cross-server-callers <ServiceClass.method> (auto-resolves server + rajahServiceName); run resolve-method first if unsure',
+                    got: { method: method ?? null, server: server ?? null, rajahServiceName: rajahServiceName ?? null },
+                }));
+                process.exit(1);
+            }
+            crossServerCallers(method, server, rajahServiceName);
+        });
         break;
 
     case 'frontend-callers':
