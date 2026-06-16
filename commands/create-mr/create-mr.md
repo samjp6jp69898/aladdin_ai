@@ -1,5 +1,5 @@
 ---
-description: For tech-personnel assigned tickets only. Reads bug_analysis_tracker.md (shared with /analyze-bugs), claims one pending ticket, analyzes, traces root cause (with mandatory method-call-graph evidence), fixes code + writes pure L0 unit tests in worktree (base = origin/dev), reviews via single solution-reviewer, then pushes branch and opens MR against dev with the assignee's git email as reviewer.
+description: For tech-personnel assigned tickets only. Reads bug_analysis_tracker.md (shared with /analyze-bugs), claims one pending/rerun ticket (rerun first), analyzes, traces root cause (with mandatory method-call-graph evidence), fixes code + writes pure L0 unit tests in worktree (base = origin/dev), reviews via single solution-reviewer, then pushes branch and opens MR against dev with the assignee's git email as reviewer.
 argument-hint: "[ticket_id]"
 ---
 
@@ -27,7 +27,7 @@ Shared with `/analyze-bugs`. Maintained by both `bun scripts/notion-bug-query.ts
 
 Where `狀態 ∈ {pending, rerun, in_progress, done, failed}`.
 
-`/create-mr` 只認 `pending` 狀態；`rerun` 是 `/analyze-bugs` 的訊號（AI分析=需要重跑），本 pipeline 略過。
+`/create-mr` 認 `pending` 與 `rerun` 狀態（`rerun` = AI分析「需要重跑」訊號，**優先於 pending 處理**）。`rerun` 與 `/analyze-bugs` 共享，靠 Step 0.1 的 atomic claim（`bug-lock.sh`）去重——誰先搶到鎖誰處理。
 
 ## Tech Users Reference
 
@@ -102,8 +102,8 @@ worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id}
    and exit.
 
 2. **Pick target row**:
-   - If `$ARGUMENTS` includes a ticket_id (e.g., `FAQ-1702`): find that row. Row must have `狀態 = pending`. If not pending or not in tracker → output `SKIPPED: {ticket_id} not pending` and exit.
-   - If `$ARGUMENTS` is empty: pick the first row with `狀態 = pending`, sorted by FAQ number descending (newest first). **Skip rows with `狀態 = rerun`** — those belong to `/analyze-bugs`。
+   - If `$ARGUMENTS` includes a ticket_id (e.g., `FAQ-1702`): find that row. Row must have `狀態 ∈ {pending, rerun}`. If neither (or not in tracker) → output `SKIPPED: {ticket_id} not claimable (狀態 must be pending/rerun)` and exit.
+   - If `$ARGUMENTS` is empty: pick the first claimable row with `狀態 ∈ {pending, rerun}`, **`rerun` 優先於 `pending`**，同狀態內依 FAQ number descending (newest first)。`rerun` 與 `/analyze-bugs` 共享，下方 atomic claim 會去重。
 
 3. **Extract** from the row: `ticket_id`, `notion_url`. Compute `page_id` from `notion_url` (32-char hex after last `-` or `/`, convert to UUID format 8-4-4-4-12). `reviewer_email` 在 Step 0.5 從 Notion 查得後填入。
 
@@ -114,7 +114,7 @@ worktree_path = ""            # set to /Users/user/aladdin/worktrees/{ticket_id}
    - Exit code 0 (`CLAIMED`) → proceed.
    - Exit code 1 (`LOCKED`) → another session owns this ticket. Output `SKIPPED: {ticket_id} already locked by another session` and exit.
 
-5. **Mark tracker** `pending → in_progress` for this row (use Edit tool).
+5. **Mark tracker** `pending`/`rerun` → `in_progress` for this row (use Edit tool).
 
 6. **On any failure after this point**, the lock MUST be released and the row MUST be set to `failed` before exiting. See "Pipeline Failure" at the bottom.
 

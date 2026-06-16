@@ -1,16 +1,16 @@
 ---
-description: Batch pipeline — Reads pending tickets from bug_analysis_tracker.md (populated by notion-bug-query-v2.ts), claims them one by one via bug-lock.sh, and dispatches each to /create-mr to run the full analyze + fix + MR pipeline. Target 10 completed tickets per session.
+description: Batch pipeline — Reads pending/rerun tickets from bug_analysis_tracker.md (populated by notion-bug-query-v2.ts), claims them one by one via bug-lock.sh, and dispatches each to /create-mr to run the full analyze + fix + MR pipeline. Target 10 completed tickets per session.
 ---
 
 # /create-mrs Batch Pipeline (Claim + Dispatch /create-mr × 10)
 
-Reads `pending` tasks from the shared bug tracker, claims them (newest FAQ first), and dispatches each one to `/create-mr` to run the full pipeline (claim → analyze → trace → fix → tests → review → push MR → Notion writeback).
+Reads `pending`/`rerun` tasks from the shared bug tracker (rerun first, then newest FAQ first), and dispatches each one to `/create-mr` to run the full pipeline (claim → analyze → trace → fix → tests → review → push MR → Notion writeback).
 
 ## Parameters
 
 **No parameters required.** Simply run `/create-mrs`.
 
-The bug list to be processed is pre-imported into `bug_analysis_tracker.md` by `bun obsidian/scripts/notion-bug-query-v2.ts`. This command is only responsible for claiming `pending` tasks and dispatching them.
+The bug list to be processed is pre-imported into `bug_analysis_tracker.md` by `bun obsidian/scripts/notion-bug-query-v2.ts`. This command is only responsible for claiming `pending`/`rerun` tasks and dispatching them.
 
 ---
 
@@ -29,7 +29,7 @@ Shared with `/analyze-bugs`. Maintained by both `bun scripts/notion-bug-query.ts
 | Status | Meaning |
 |--------|---------|
 | `pending` | Not yet processed; available to claim |
-| `rerun` | AI分析=需要重跑 訊號（由 v1 import）；`/create-mrs` 略過此狀態,由 `/analyze-bugs` 處理 |
+| `rerun` | AI分析=需要重跑 訊號；`/create-mrs` 與 `/analyze-bugs` 皆可領，`/create-mrs` **優先於 pending** 處理，靠 atomic lock 去重 |
 | `in_progress` | Claimed by a session and currently being processed |
 | `done` | Pipeline completed (success / already_fixed / i18n_manual_handoff) |
 | `failed` | Pipeline failed (exceeded retry limit / Step 0.5 assignee check failed / other error) |
@@ -57,24 +57,24 @@ mkdir -p /Users/user/aladdin/worktrees
 ### Step 1: Read Tracker
 
 1. Read the tracker file `/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md`
-2. If the file does not exist or has no `pending` rows, prompt the user to populate it first:
+2. If the file does not exist or has no `pending`/`rerun` rows, prompt the user to populate it first:
    ```
-   bug_analysis_tracker.md has no pending rows. Please run:
+   bug_analysis_tracker.md has no claimable (pending/rerun) rows. Please run:
    bun obsidian/scripts/notion-bug-query-v2.ts
    ```
 3. Parse all rows in the table.
 
-### Step 2: Filter Pending Tasks
+### Step 2: Filter Claimable Tasks
 
-Filter all rows with **status = `pending`**（**略過 `rerun` 狀態**——那是 `/analyze-bugs` 的訊號）。
+Filter all rows with **status ∈ {`rerun`, `pending`}**（`rerun` = AI分析「需要重跑」訊號，與 `/analyze-bugs` 共享，靠 atomic lock 去重）。
 
-Sort by ticket number descending (newest first).
+Sort: **`rerun` first, then `pending`**; within each group by ticket number descending (newest first).
 
 Take **up to 10 tickets** from the sorted list as the initial working list.
 
-If no `pending` rows exist, report and stop:
+If no `rerun`/`pending` rows exist, report and stop:
 ```
-No pending tickets to process (all are rerun/in_progress/done/failed).
+No claimable tickets to process (all are in_progress/done/failed).
 To query new tickets, run: bun obsidian/scripts/notion-bug-query-v2.ts
 ```
 
@@ -109,7 +109,7 @@ bash /Users/user/aladdin/scripts/bug-lock.sh claim FAQ-{ticket_id}
 - **Exit code 0** (`CLAIMED`) → proceed to 4b
 - **Exit code 1** (`LOCKED`) → already claimed by another session, **skip and go to 4e to refill**
 
-Use Edit tool to change the tracker row status `pending → in_progress`.
+Use Edit tool to change the tracker row status `pending`/`rerun` → `in_progress`.
 
 #### 4b. Dispatch /create-mr
 
@@ -159,8 +159,8 @@ Check:
 2. **List check**: If the current working list still has unprocessed tickets → return to **4a**
 3. **Refill**: If the working list is exhausted but `completed counter < 10`:
    - Re-read the tracker for a fresh snapshot
-   - Filter all rows with **status = `pending`** (excluding any ticket already in the working list)
-   - Sort by FAQ number descending
+   - Filter all rows with **status ∈ {`rerun`, `pending`}** (excluding any ticket already in the working list)
+   - Sort `rerun` first, then `pending`, each by FAQ number descending
    - If new tickets exist → add up to `10 - completed` and return to **4a**
    - If no new tickets exist → proceed to **Step 5** (work exhausted)
 
@@ -193,7 +193,7 @@ git worktree remove /Users/user/aladdin/worktrees/{ticket_id}
 
 ## Notes
 
-1. **Reads from `bug_analysis_tracker.md` only**: Never queries Notion directly. To refresh the list, run `bun obsidian/scripts/notion-bug-query-v2.ts`. 與 `/analyze-bugs` 共用同一份 tracker（pending / rerun / in_progress / done / failed），但 `/create-mrs` 僅認 `pending`。
+1. **Reads from `bug_analysis_tracker.md` only**: Never queries Notion directly. To refresh the list, run `bun obsidian/scripts/notion-bug-query-v2.ts`. 與 `/analyze-bugs` 共用同一份 tracker（pending / rerun / in_progress / done / failed），`/create-mrs` 認 `pending` 與 `rerun`（rerun 與 /analyze-bugs 共享，靠 lock 去重）。
 2. **Shared lock dir**: Uses `/tmp/bug-analysis-locks/` (same as `/analyze-bugs`). A ticket being analyzed by `/analyze-bugs` will be skipped by `/create-mrs` and vice versa — by design.
 3. **Atomic claim**: `bash /Users/user/aladdin/scripts/bug-lock.sh claim FAQ-{ticket_id}` is backed by `mkdir`, OS-guaranteed atomic. Multiple parallel `/create-mrs` sessions will not double-claim.
 4. **Serial processing**: One ticket at a time; wait for `/create-mr` to finish before claiming the next. Each `/create-mr` may take 20-40 minutes (tracer + fixer + reviewer + push + Drive).
