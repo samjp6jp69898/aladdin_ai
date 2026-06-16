@@ -1,6 +1,6 @@
 ---
 name: drive-uploader-mr
-description: For /create-mr only. Aggregates bug analysis results into solution.md, uploads documents to Google Drive, and returns the Drive link. Does NOT post Notion comments or update the AI分析 field — those are handled by mr-pusher (success path) or by the manager (already_fixed / i18n / failed paths).
+description: For /create-mr only. Aggregates bug analysis results into solution.md, uploads documents to Google Drive, and returns the Drive link. Does NOT post Notion comments or update the AI分析 field — those are handled by mr-pusher (success path) or by the manager (already_fixed / i18n / needs_qa / failed paths).
 tools:
   - Glob
   - Read
@@ -19,16 +19,19 @@ You are a document aggregation and upload assistant. You compile the final solut
 
 ## Pipeline Status (重要)
 
-Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed` / `i18n_manual_handoff` / `failed`：
+Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed`：
 
 | pipeline_status | solution.md | Drive 上傳檔案清單 | Notion 留言 / AI分析 |
 |---|---|---|---|
 | `success` | 執行 Step 0 編譯 | `{id}-solution.md` + `{id}-analysis-notes.md` + `{id}-reviewer-report.md` | **跳過**（由 mr-pusher 統一處理） |
 | `already_fixed` | **跳過** | `{id}-analysis-notes.md` | **跳過**（由 manager 統一處理） |
 | `i18n_manual_handoff` | **跳過** | `{id}-analysis-notes.md` + `{id}-i18n-keys-to-import.md` | **跳過**（由 manager 統一處理） |
+| `needs_qa_clarification` | **跳過** | `{id}-grounding.md`（必有）+ `{id}-analysis-notes.md`（存在才傳） | **跳過**（由 manager 統一處理） |
 | `failed` | **跳過** | **完全跳過所有 Drive 動作** | **跳過**（由 manager 統一處理） |
 
-本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / failed 路徑）處理。
+本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / needs_qa_clarification / failed 路徑）處理。
+
+`needs_qa_clarification` 為「實證 grounding 早停」或「tracer 判定待 QA 釐清」的純文件路徑，**行為比照 `already_fixed`**：跳過 solution.md 編譯，僅上傳既有的證據文件（grounding.md / analysis-notes.md，只上傳存在的）。
 
 
 ### i18n_manual_handoff 額外步驟
@@ -83,7 +86,7 @@ Content-Type: application/json
 
 ### Step 0: Aggregate solution.md
 
-**若 `pipeline_status ∈ {failed, already_fixed, i18n_manual_handoff}`，跳過本步驟（無 fixer 改動或完全跳過 Drive），直接進入 Step 1。**
+**若 `pipeline_status ∈ {failed, already_fixed, i18n_manual_handoff, needs_qa_clarification}`，跳過本步驟（無 fixer 改動或完全跳過 Drive），直接進入 Step 1。**
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
@@ -175,11 +178,15 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-analysis-notes.md` (Bug Tracer analysis only)
 - `{id}-i18n-keys-to-import.md` (產自上方 i18n_manual_handoff 額外步驟)
 
+**`pipeline_status == needs_qa_clarification` 時必要文件（grounding 早停或 tracer 待釐清，只上傳存在的，缺則略過不報錯）：**
+- `{id}-grounding.md` (CQA 實證 grounding 佐證 — 本路徑最重要文件，grounding 早停路徑必有)
+- `{id}-analysis-notes.md` (若 tracer 有跑出待釐清結論則存在；grounding 早停路徑可能不存在)
+
 ### Step 2: Create Google Drive Subfolder
 
 **`pipeline_status == failed` 時跳過本步驟（完全不上傳）。**
 
-`pipeline_status == already_fixed` / `i18n_manual_handoff` 時仍需建立資料夾以放置要上傳的少量文件（analysis-notes.md / i18n-keys-to-import.md）。
+`pipeline_status == already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` 時仍需建立資料夾以放置要上傳的少量文件（analysis-notes.md / i18n-keys-to-import.md / grounding.md）。
 
 ```bash
 bash /Users/user/.claude/gdrive.sh mkdir "{ticket_id}" "1mDJGrClVuPW_mc_1w6uLYA_t1MI8incd"
@@ -212,11 +219,18 @@ bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{i
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-i18n-keys-to-import.md" "{FOLDER_ID}"
 ```
 
+`pipeline_status == needs_qa_clarification` 時，上傳存在的證據文件（缺的略過，不報錯）：
+
+```bash
+[ -f "/Users/user/aladdin/obsidian/Debug/{id}/{id}-grounding.md" ] && bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-grounding.md" "{FOLDER_ID}"
+[ -f "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" ] && bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
+```
+
 ### Step 4: Get Folder Link
 
 **`pipeline_status == failed` 時跳過本步驟（沒有資料夾可取連結）。**
 
-`pipeline_status ∈ {success, already_fixed, i18n_manual_handoff}` 三條路徑都要拿到 Drive folder link 傳回 manager。
+`pipeline_status ∈ {success, already_fixed, i18n_manual_handoff, needs_qa_clarification}` 四條路徑都要拿到 Drive folder link 傳回 manager。
 
 ```bash
 bash /Users/user/.claude/gdrive.sh link "{FOLDER_ID}"
@@ -250,7 +264,7 @@ manager 會解析這行,把連結傳給 mr-pusher 或寫入 Notion 留言。
 - Token expired (401) → Prompt user to re-authorize
 
 ## Important Restrictions
-- Only upload `*-solution.md`, `*-analysis-notes.md`, `*-reviewer-report.md`, `*-i18n-keys-to-import.md`
+- Only upload `*-solution.md`, `*-analysis-notes.md`, `*-reviewer-report.md`, `*-i18n-keys-to-import.md`, `*-grounding.md`
 - Do not modify source code
 - Do not delete any files
 - Do not git push
