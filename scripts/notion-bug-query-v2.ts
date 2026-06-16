@@ -10,6 +10,10 @@
  *   ~/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md
  *   （與 /analyze-bugs 共用同一份 tracker；schema 保持一致 6 欄）
  *
+ * 每次執行除了「合併新單」外，也會依 Notion 現狀「清理」tracker：
+ *   tracker 中狀態仍為 pending、但該單在 Notion 已被改成非（仍有問題/待處理/處理中）者，
+ *   視為已失效，從 tracker 移除（rerun / in_progress / done / failed 一律保留）。
+ *
  * 用法：
  *   bun obsidian/scripts/notion-bug-query-v2.ts [選項]
  *
@@ -85,16 +89,19 @@ function loadTechUsers(): TechUser[] {
 
 // ── Notion API 呼叫 ──
 
+// 「想要的狀態」單一事實來源：查詢新單與 tracker 清理判定都以此為準
+const WANTED_STATUSES = ['仍有問題', '待處理', '處理中'];
+
+function buildStatusOnlyFilter(): object {
+    return {
+        or: WANTED_STATUSES.map(s => ({ property: '狀態', select: { equals: s } })),
+    };
+}
+
 function buildFilter(): object {
     return {
         and: [
-            {
-                or: [
-                    { property: '狀態', select: { equals: '仍有問題' } },
-                    { property: '狀態', select: { equals: '待處理' } },
-                    { property: '狀態', select: { equals: '處理中' } },
-                ],
-            },
+            buildStatusOnlyFilter(),
             {
                 or: [
                     { property: 'AI分析', select: { equals: '待分析' } },
@@ -142,6 +149,21 @@ async function queryDatabase(filter: object, limit: number) {
     }
 
     return allResults.slice(0, limit);
+}
+
+/**
+ * 抓取「目前仍處於想要狀態」的所有單號全集（不限 AI分析、不限 assignee）。
+ * 用途：判定 tracker 中 pending 的單在 Notion 是否已被改成非想要狀態。
+ * 注意：必須抓「全部」（不可受 --limit 影響），否則會把未抓到的單誤判為已離開狀態而誤刪。
+ */
+async function fetchWantedFaqSet(): Promise<Set<number>> {
+    const pages = await queryDatabase(buildStatusOnlyFilter(), Number.MAX_SAFE_INTEGER);
+    const set = new Set<number>();
+    for (const page of pages) {
+        const n = page.properties?.['單號']?.unique_id?.number;
+        if (typeof n === 'number') set.add(n);
+    }
+    return set;
 }
 
 // ── 資料擷取 ──
@@ -275,8 +297,7 @@ type: project
     writeFileSync(TRACKER_PATH, header + rows.join('\n') + '\n', 'utf-8');
 }
 
-function mergeToTracker(items: BugItem[]): { added: number; addedRerun: number; reset: number; skipped: number } {
-    const existing = readTracker();
+function applyMerge(existing: TrackerEntry[], items: BugItem[]): { added: number; addedRerun: number; reset: number; skipped: number } {
     const existingByFaq = new Map(existing.map(e => [e.faqNumber, e]));
     const today = new Date().toISOString().slice(0, 10);
 
@@ -318,10 +339,24 @@ function mergeToTracker(items: BugItem[]): { added: number; addedRerun: number; 
         }
     }
 
-    existing.sort((a, b) => b.faqNumber - a.faqNumber);
-    writeTracker(existing);
-
     return { added, addedRerun, reset, skipped };
+}
+
+/**
+ * 清理：tracker 中狀態仍為 pending、但 Notion 現狀已不在 WANTED_STATUSES 的單，從 tracker 移除。
+ * 僅針對 pending（rerun / in_progress / done / failed 一律保留，避免動到處理中或已完成的紀錄）。
+ * `existing` 會被就地過濾。
+ */
+function applyCleanup(existing: TrackerEntry[], wantedFaqSet: Set<number>): TrackerEntry[] {
+    const removed: TrackerEntry[] = [];
+    for (let i = existing.length - 1; i >= 0; i--) {
+        const e = existing[i];
+        if (e.status === 'pending' && !wantedFaqSet.has(e.faqNumber)) {
+            removed.push(e);
+            existing.splice(i, 1);
+        }
+    }
+    return removed;
 }
 
 // ── 主程式 ──
@@ -348,8 +383,31 @@ async function main() {
         printTable(items);
     }
 
-    const { added, addedRerun, reset, skipped } = mergeToTracker(items);
+    // 讀一次 tracker，先合併新單，再依 Notion 現狀清理失效的 pending，最後寫回一次
+    const existing = readTracker();
+    const { added, addedRerun, reset, skipped } = applyMerge(existing, items);
+
+    // 抓 Notion 目前仍處於想要狀態的單號全集（不限 AI分析 / assignee）作為清理依據
+    const wantedFaqSet = await fetchWantedFaqSet();
+    console.log(`  Notion 現處於 ${WANTED_STATUSES.join('/')} 的單號全集: ${wantedFaqSet.size} 筆`);
+
+    let removed: TrackerEntry[] = [];
+    if (wantedFaqSet.size === 0) {
+        // 防呆：全集為空多半是查詢異常，若據此清理會一次誤刪所有 pending，故跳過
+        console.log('  ⚠ 想要狀態全集為空，略過 pending 清理（避免誤刪）');
+    } else {
+        removed = applyCleanup(existing, wantedFaqSet);
+    }
+
+    existing.sort((a, b) => b.faqNumber - a.faqNumber);
+    writeTracker(existing);
+
     console.log(`  Tracker 更新: 新增 ${added} 筆 (pending), 新增 ${addedRerun} 筆 (rerun), 重置 ${reset} 筆 (→rerun), 略過 ${skipped} 筆（已存在）`);
+    console.log(`  Tracker 清理: 移除 ${removed.length} 筆（pending 但 Notion 狀態已非 ${WANTED_STATUSES.join('/')}）`);
+    if (removed.length > 0) {
+        const list = removed.sort((a, b) => b.faqNumber - a.faqNumber).map(e => `FAQ-${e.faqNumber}`).join(', ');
+        console.log(`    ${list}`);
+    }
     console.log(`  檔案: ${TRACKER_PATH}\n`);
 }
 

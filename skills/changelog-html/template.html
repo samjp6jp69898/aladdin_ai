@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>Aladdin 平台變更摘要 — 2026 年 5 月三版 v3</title>
+<title>Aladdin 平台版本變更摘要</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; color: #1f2937; background: #f8fafc; }
@@ -169,6 +169,12 @@ const TYPE_META = {
 // ({ id, short, full, cls, color, bg, fg, desc? }). Adding a new release = append to the JSON only.
 const VERSIONS = (window.__DATA__.versions || []);
 const VER_IDS = VERSIONS.map(v => v.id);
+// 月份標籤由版本 short（MMDD）動態推導，避免硬編月份過期
+const VER_MONTHS = [...new Set(VERSIONS.map(v => String(v.short || '').slice(0, 2)).filter(Boolean))].sort();
+const MONTH_LABEL = '2026 年 ' + (VER_MONTHS.length
+  ? VER_MONTHS.map(m => parseInt(m, 10)).join('–') + ' 月'
+  : '');
+document.title = 'Aladdin 平台變更摘要 — ' + MONTH_LABEL.trim();
 const VER_META = {};
 for (const v of VERSIONS) VER_META[v.id] = { short: v.short, full: v.full, cls: v.cls, desc: v.desc || '' };
 const ALL_APPS = ['platform', 'admin', 'n8', 'ny', 'pk'];
@@ -589,7 +595,7 @@ function renderOverview(main) {
   const overview = document.createElement('div');
   overview.className = 'overview';
   overview.innerHTML = `
-    <h2>2026 年 5 月版本變更摘要 <span style="font-size:12px;color:#0ea5e9;font-weight:600;vertical-align:3px;">含影響範圍 + 前端篩選</span></h2>
+    <h2>${MONTH_LABEL}版本變更摘要 <span style="font-size:12px;color:#0ea5e9;font-weight:600;vertical-align:3px;">含影響範圍 + 前端篩選</span></h2>
     <p>本文件按 <strong>abu/platform、abu/admin、lago</strong> 真實菜單階層整理 ${verShorts} 共 ${VER_IDS.length} 個 feature 分支的變更，每段呈現相對於上一版的新增。</p>
     <p>左側為完整菜單樹（abu 嚴格三級對齊 menu.ts），右側顯示該分頁的變更條目。可勾選「顯示無變更項目」查看完整菜單，並用上方「前端」chip 篩選只看特定 app 的變更。</p>
     <p style="background:#f0f9ff;border-left:3px solid #0ea5e9;padding:8px 12px;border-radius:0 4px 4px 0;font-size:13px;">
