@@ -28,11 +28,11 @@ Shared with `/analyze-bugs`. Maintained by both `bun scripts/notion-bug-query.ts
 
 | Status | Meaning |
 |--------|---------|
-| `pending` | Not yet processed; available to claim |
+| `pending` | Not yet processed; available to claim。**也包含 Step 0.5 判定當前指派為非技術人員而還原的單**（非技術人員的單不是失敗，保留 pending 待 re-query 或指派變更後再領，不標 failed） |
 | `rerun` | AI分析=需要重跑 訊號；`/create-mrs` 與 `/analyze-bugs` 皆可領，`/create-mrs` **優先於 pending** 處理，靠 atomic lock 去重 |
 | `in_progress` | Claimed by a session and currently being processed |
 | `done` | Pipeline completed (success / already_fixed / i18n_manual_handoff) |
-| `failed` | Pipeline failed (exceeded retry limit / Step 0.5 assignee check failed / other error) |
+| `failed` | Pipeline failed (exceeded retry limit / other error)。**注意：Step 0.5 當前指派非技術人員 → 還原 `pending`，不算 failed** |
 
 ---
 

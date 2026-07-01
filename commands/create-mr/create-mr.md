@@ -144,7 +144,7 @@ done < <(tail -n +2 /Users/user/aladdin/obsidian/commands/create-mr/references/t
 
 if [ -z "$MATCHED_EMAIL" ]; then
   echo "SKIPPED: {ticket_id} 當前指派不在 tech-users.csv 名單中"
-  # 釋放鎖 + 標記 tracker → failed（非技術人員的單,本流程不處理）
+  # 釋放鎖 + tracker 還原為 pending（非技術人員的單,本流程不處理；保留 pending 待 re-query 或指派變更後再領,不標 failed）
   exit 0
 fi
 
@@ -152,7 +152,7 @@ reviewer_email="$MATCHED_EMAIL"
 assignee_check_passed=true
 ```
 
-未命中 tech 名單 → 釋放 lock,tracker 標記為 `failed`,直接結束指令（不留 Notion 留言、不更新 AI分析 欄位、不啟動任何 sub agent）。
+未命中 tech 名單 → 釋放 lock,**tracker 還原為 `pending`**（非技術人員的單**不是分析失敗**,只是不歸本流程處理；保留 `pending` 待之後 re-query 或當前指派變更後再被領取,**不得標 `failed`**），直接結束指令（不留 Notion 留言、不更新 AI分析 欄位、不啟動任何 sub agent）。
 
 命中 → 設 `assignee_check_passed = true`,記下 `reviewer_email`,繼續 Step 1。
 
@@ -624,7 +624,8 @@ bash "$TG_SH" --email "{reviewer_email}" --text "$TG_MSG"
    ```
 2. Edit tracker row for `{ticket_id}`:
    - `pipeline_status ∈ {success, already_fixed, i18n_manual_handoff}` → `狀態` = `done`, 完成時間 = `YYYY-MM-DD HHMM`
-   - `pipeline_status == failed` 或 Step 0.5 SKIPPED → `狀態` = `failed`, 完成時間 = now
+   - `pipeline_status == failed` → `狀態` = `failed`, 完成時間 = now
+   - Step 0.5 SKIPPED（當前指派非技術人員）→ `狀態` 還原為 `pending`, 完成時間留空（**非失敗**,保留待後續 re-query 或指派變更後再領）
    - `pipeline_status == needs_qa_clarification` → `狀態` = `needs_qa`, 完成時間 = now
 
 ---
