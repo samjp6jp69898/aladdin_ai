@@ -30,6 +30,17 @@ const until = getArg('until');
 const commitArg = getArg('commits');
 const specificCommits = commitArg?.split(',').filter(Boolean);
 
+// ─── Branch guard: only scan "dev" to avoid documenting not-yet-merged state as current fact ───
+async function checkOnDevBranch(repoPath: string, label: string): Promise<void> {
+    const branch = (await $`git branch --show-current`.cwd(repoPath).text()).trim();
+    if (branch !== 'dev') {
+        console.error(`\nERROR: ${label} (${repoPath}) is checked out on branch "${branch || '(detached HEAD)'}", not "dev".`);
+        console.error(`codebase-sync only scans "dev" to avoid writing not-yet-merged (e.g. feature/*) state into the knowledge base as current fact.`);
+        console.error(`Please run: git -C ${repoPath} checkout dev`);
+        process.exit(1);
+    }
+}
+
 // ─── Main ───
 async function main() {
     console.log('=== Incremental Codebase Sync ===');
@@ -46,6 +57,10 @@ async function main() {
         await runFinalize(today, effectiveSince, effectiveUntil);
         return;
     }
+
+    // ─── Branch guard ───
+    await checkOnDevBranch(AGRABAH_REPO, 'agrabah');
+    await checkOnDevBranch(RAJAH_REPO, 'rajah');
 
     // ─── Stage 1: Collect git diffs ───
     console.log('\n--- Stage 1: Collecting git diffs ---');
