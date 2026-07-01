@@ -1,0 +1,165 @@
+/**
+ * Notion Bug List — 一人一列、跨嚴重性等級分布的樞紐表（pivot），技術/非技術區分，輸出 CSV 報告。
+ *
+ * 篩選：狀態 = 仍有問題 OR 待處理（兩個 select 值）
+ * 列：當前指派（people）以 person id 為主鍵；未指派獨立成「（未指派）」列
+ * 欄：嚴重性（select，值如 P1重點 / P2較高 / P3一般 / P4較低；未填歸「（未分級）」）
+ *     —— 每個等級一欄，依 P 後數字由小到大排序（P0 最優先），未分級殿後；末欄「小計」= 該人跨等級總量
+ * 分類：以 tech-users.csv 的 notion_user_id 比對 → 技術人員 / 非技術人員 / 未指派
+ *       （刻意用 id 而非姓名比對：Notion 端顯示名常帶前後空白，靠姓名會誤判）
+ *
+ * 用法：
+ *   bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>]
+ *
+ * 選項：
+ *   --out <path>   另存 CSV 到指定路徑（預設：/Users/user/aladdin/tmp/bug-status-by-assignee.csv）
+ *
+ * 輸出：CSV 永遠印到 stdout，同時寫入 --out 指定（或預設）路徑。
+ * 欄位：當前指派人員,類別,<各嚴重性等級…>,小計
+ *       全檔末尾附跨人員彙總「技術人員小計 / 非技術人員小計 / 未指派小計 / 總計」（各欄亦為等級分布）。
+ *
+ * 口徑：人次加總 = ticket 去重總數（此 DB 每張單最多一位指派人，無多重指派重複計算）。
+ *       同一人跨多個等級的 ticket，於同一列各等級欄分別計數，小計為其加總。
+ * 注意：Notion 即時資料，兩次查詢間總數可能微幅變動屬正常。
+ */
+
+import { readFileSync } from 'fs';
+
+const NOTION_TOKEN = '***REMOVED-NOTION-TOKEN***';
+const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
+const NOTION_API = 'https://api.notion.com/v1';
+const WANTED_STATUSES = ['仍有問題', '待處理'] as const;
+const TECH_USERS_CSV = '/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv';
+const DEFAULT_OUT = '/Users/user/aladdin/tmp/bug-status-by-assignee.csv';
+
+// ── 參數 ──
+function parseOut(): string {
+    const args = process.argv.slice(2);
+    const i = args.indexOf('--out');
+    if (i >= 0 && args[i + 1]) return args[i + 1];
+    return DEFAULT_OUT;
+}
+
+// ── 載入技術人員名單（以 notion_user_id 為比對主鍵）──
+function loadTechIds(): Set<string> {
+    const lines = readFileSync(TECH_USERS_CSV, 'utf-8').split('\n').filter(l => l.trim());
+    const [header, ...rows] = lines;
+    const idIdx = header.split(',').indexOf('notion_user_id');
+    const ids = new Set<string>();
+    for (const row of rows) {
+        const id = row.split(',')[idIdx]?.trim();
+        if (id) ids.add(id);
+    }
+    return ids;
+}
+
+async function queryAll(filter: object) {
+    const all: any[] = [];
+    let startCursor: string | undefined;
+    let hasMore = true;
+    while (hasMore) {
+        const body: any = { filter, page_size: 100 };
+        if (startCursor) body.start_cursor = startCursor;
+        const res = await fetch(`${NOTION_API}/data_sources/${DATA_SOURCE_ID}/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${NOTION_TOKEN}`,
+                'Notion-Version': '2025-09-03',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`Notion API error ${res.status}: ${await res.text()}`);
+        const data = await res.json();
+        all.push(...data.results);
+        hasMore = data.has_more;
+        startCursor = data.next_cursor;
+    }
+    return all;
+}
+
+const outPath = parseOut();
+const techIds = loadTechIds();
+const filter = { or: WANTED_STATUSES.map(s => ({ property: '狀態', select: { equals: s } })) };
+const pages = await queryAll(filter);
+
+type Cat = '技術人員' | '非技術人員' | '未指派';
+interface Stat { name: string; cat: Cat; bySev: Map<string, number>; total: number }
+
+const SEV_EMPTY = '（未分級）';
+// 一人一列、跨等級分布：assignee key → Stat（bySev 內含各等級張數）
+const byKey = new Map<string, Stat>();
+const sevSet = new Set<string>();
+const ensure = (key: string, name: string, cat: Cat) => {
+    if (!byKey.has(key)) byKey.set(key, { name, cat, bySev: new Map(), total: 0 });
+    return byKey.get(key)!;
+};
+const bump = (s: Stat, sev: string) => {
+    s.bySev.set(sev, (s.bySev.get(sev) ?? 0) + 1);
+    s.total++;
+    sevSet.add(sev);
+};
+
+for (const page of pages) {
+    const props = page.properties;
+    const status = props['狀態']?.select?.name ?? '';
+    if (!WANTED_STATUSES.includes(status)) continue;
+    const sev = props['嚴重性']?.select?.name?.trim() || SEV_EMPTY;
+    const people = (props['當前指派']?.people ?? []) as any[];
+    if (people.length === 0) {
+        bump(ensure('__UNASSIGNED__', '（未指派）', '未指派'), sev);
+    } else {
+        for (const p of people) {
+            const id = p.id ?? '';
+            const name = (p.name ?? '（無名稱）').trim() || '（無名稱）';
+            const cat: Cat = techIds.has(id) ? '技術人員' : '非技術人員';
+            bump(ensure(id || name, name, cat), sev);
+        }
+    }
+}
+
+// ── 等級欄排序：依 P 後數字由小到大（P0→P4…），未分級殿後 ──
+const sevRank = (s: string) => { const m = s.match(/^P(\d+)/); return m ? Number(m[1]) : 999; };
+const sevOrder = [...sevSet].sort((a, b) => sevRank(a) - sevRank(b) || a.localeCompare(b));
+
+// ── 排序：技術人員 → 非技術人員 → 未指派；各組內依小計（跨等級總量）由高到低 ──
+const catOrder: Record<Cat, number> = { '技術人員': 0, '非技術人員': 1, '未指派': 2 };
+const sorted = [...byKey.values()].sort((a, b) =>
+    catOrder[a.cat] - catOrder[b.cat] || b.total - a.total
+);
+
+// ── 組 CSV：一人一列，欄位為各嚴重性等級 + 小計 ──
+const cell = (s: Stat, sev: string) => s.bySev.get(sev) ?? 0;
+const rows: string[] = [['當前指派人員', '類別', ...sevOrder, '小計'].join(',')];
+const groupSum: Record<Cat, { sev: Map<string, number>; total: number }> = {
+    '技術人員': { sev: new Map(), total: 0 },
+    '非技術人員': { sev: new Map(), total: 0 },
+    '未指派': { sev: new Map(), total: 0 },
+};
+for (const s of sorted) {
+    rows.push([s.name, s.cat, ...sevOrder.map(sev => cell(s, sev)), s.total].join(','));
+    const g = groupSum[s.cat];
+    for (const sev of sevOrder) g.sev.set(sev, (g.sev.get(sev) ?? 0) + cell(s, sev));
+    g.total += s.total;
+}
+rows.push('');
+
+// ── 跨人員彙總：每類別一列（亦為等級分布）+ 總計 ──
+const sumRow = (label: string, cat: string, g: { sev: Map<string, number>; total: number }) =>
+    [label, cat, ...sevOrder.map(sev => g.sev.get(sev) ?? 0), g.total].join(',');
+const grand: { sev: Map<string, number>; total: number } = { sev: new Map(), total: 0 };
+for (const cat of ['技術人員', '非技術人員', '未指派'] as Cat[]) {
+    const g = groupSum[cat];
+    rows.push(sumRow(`${cat}小計`, cat, g));
+    for (const sev of sevOrder) grand.sev.set(sev, (grand.sev.get(sev) ?? 0) + (g.sev.get(sev) ?? 0));
+    grand.total += g.total;
+}
+rows.push(sumRow('總計', '全部', grand));
+
+const csv = rows.join('\n') + '\n';
+await Bun.write(outPath, csv);
+
+const sevSummary = sevOrder.map(sev => `${sev}:${grand.sev.get(sev) ?? 0}`).join(' / ');
+console.error(`技術名單載入: ${techIds.size} 人 | 等級欄: ${sevOrder.join(', ')} | 各等級張數: ${sevSummary} | 總計: ${grand.total}`);
+console.error(`已寫入: ${outPath}`);
+console.log(csv);

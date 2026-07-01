@@ -11,6 +11,7 @@ description: "根據 git 歷史紀錄增量更新 Obsidian Codebase 知識庫筆
 
 - `obsidian/Codebase/` 目錄已存在（由初始建構 pipeline 產生）
 - `obsidian/scripts/codebase-index/` 下的腳本已安裝依賴（`bun install`）
+- **agrabah、rajah 兩個 repo 都必須 checkout 在 `dev` 分支**：`sync-from-git.ts`（`--finalize` 以外的模式）執行前會自動檢查，若非 `dev` 會直接中止並印出 `git checkout dev` 提示，不會自動切換分支。這是為了避免把 `feature/*` 等尚未合併進 `dev` 的 commit 內容當成「當前事實」寫進知識庫（2026-07-01 踩坑：agrabah 誤留在 `uat` 分支，同步把尚未上 dev 的 commit 也寫進了筆記）。
 
 ## 快速參考
 
