@@ -40,4 +40,8 @@
 - **型別規範補充**：`INT`/`SMALLINT` 不定義長度；`VARBINARY` 欄位名以 `_binary` 結尾
 - **Migration 補充**：新增 database 是否在 `migrations/database.sql` 中加入 `CREATE DATABASE IF NOT EXISTS`
 
+- **分頁 ORDER BY 唯一 tie-breaker**：分頁查詢的 `ORDER BY` 末尾必須含唯一鍵（如 `, id ASC`）作最終排序鍵；只用非唯一欄位（`created_at`）排序會在跨頁時重複或漏筆。壞：`ORDER BY gacd.created_at DESC`；好：`ORDER BY gacd.created_at DESC, gacd.id DESC`
+- **JOIN 後同名欄位加表別名**：多表 JOIN 後，兩表皆有的同名欄位（`id`、`created_at`、`status`）在 SELECT / WHERE / ORDER BY 引用時必須加表別名消歧，否則觸發 "column is ambiguous" 執行期錯誤
+- **VARCHAR 長度足夠**：新增或沿用 VARCHAR 欄位時評估寫入內容的最大長度與成長性（風控備註、序列化 JSON、多語拼接）；可能超長者用足夠長度或改 `TEXT`，避免 data truncation 寫入失敗（實例：`risk_remark VARCHAR(20)` 過短、`configs.value VARCHAR(4000)` 裝不下深層 JSON）
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

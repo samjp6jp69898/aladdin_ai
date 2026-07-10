@@ -35,4 +35,6 @@
 - **跨服務資料一致性**：涉及多個服務的複合操作（如送禮 = 扣款 + 扣道具 + 記錄）是否有最終一致性策略（先建 pending 記錄，由 Job 處理後續），失敗時是否有補償機制
 - **Job 失敗處理**：Job handler 是否有明確的失敗處理策略（最大重試次數、失敗狀態標記、補償機制如退款），是否使用 globalLock 防止 Job 併發處理同一批資料
 
+- **新增 enum / 業務類型的窮盡性（跨 repo）**：新增一個 enum 值或業務類型時，grep 該 enum 找出所有必須處理它的地點——後端結算 / job processor 註冊表、`_onAddMessageHandlers()` / `_onAddJobConsumers()`、狀態機連帶的狀態紀錄表，以及前端（abu / lago）的 `switch` / `Record` 映射 / dispatch——逐一確認新值都有對應分支。缺分支＝靜默漏處理（不報錯），典型後果為結算漏派彩、狀態表未更新、前端該類型無反應。enum 定義在 rajah 時，該 rajah commit 的 diff 看不到前端 map 缺漏，務必跨進消費端 repo 檢查
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

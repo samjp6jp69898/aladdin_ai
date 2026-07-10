@@ -27,6 +27,7 @@
 - **函式缺少 null guard**：display 函式（如 `displayRate(value)`）接收 nullable 值時，若未檢查 `null`/`undefined`，直接做算術運算（`value / 100`）會顯示 `NaN`
 - **陣列索引 vs 值比對**：使用 `options[value]` 做查找時，若 `value` 不等於陣列 index 會取到錯誤項目。應改用 `.find(opt => opt.value === value)`
 - **跨檔案一致性**：同類型頁面（如 DepositOrderList / AgentDepositOrderList / WithdrawOrderList / AgentWithdrawOrderList）的修改是否完整同步。常見遺漏：部分檔案的 `loadData` / `onSearchReset` 缺少相同的修正
+- **金額 / 費率顯示前套換算**：金額或費率欄位在 UI 綁定顯示前必須以對應 helper 換算——金額用 `RateHelper.storedToNormal`、費率用其專屬 scale（勿用幣別 `Exchange.storedToNormal`）；禁止直接綁 stored 值（如 `{{ String(bonus) }}`、直接顯示 `depositAmountStr` 未套費率折扣），否則顯示值與相鄰已換算欄位不一致
 
 ## 刪除操作追查（必查）
 

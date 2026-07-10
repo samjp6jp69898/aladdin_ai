@@ -30,4 +30,7 @@
 - **page/pageSize 位置**：`page` 和 `pageSize` 參數是否放在函式末尾，而非包在 model 中
 - **@Union model 正確性**：`@Union` model 的欄位是否互斥（同一時間只有一個有值），提交時是否建立全新 Union 物件（`UnionModel.create()`）而非修改既有物件，`valueType` 鑑別欄位是否正確使用
 
+- **費率 / 倍數欄位標 `@Type Rate:<scale>`**：費率、倍數、百分比類數值欄位必須標 `@Type "Rate:<scale>"`（如 `Rate:10000`），否則前端 Reflection 不做 scale 換算而顯示放大整數。壞：`i64 auditMultiplier;`；好：`@Type("Rate:10000") i64 auditMultiplier;`（`@Type 正確性`只列了 Currency / File / DateTimeRange，Rate 同等必要）
+- **@Permission key 跨端逐字一致**：新增或改動 `@Permission` key 時，grep 前端 `menu.ts` / `hasPermission()` / `canEdit` 引用，確認 key 字串跨 repo（rajah ↔ abu / lago）**逐字相符**；不一致會導致前端按鈕權限判斷失效或選單消失（此為 key 內容一致性，與「Permission name ≤ 50 字元」的長度規範不同層次）
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。
