@@ -202,20 +202,25 @@ echo "EXIT_CODE: $?"
 
 （綜合 5 維度,列出每個 FAIL 維度的具體退回理由。若全 PASS / N/A 不擋,輸出 PASSED。）
 
+FAIL_KIND: N/A
 REVIEW_RESULT: PASSED
 ```
 
-報告最後一行必須是 `REVIEW_RESULT: PASSED` 或 `REVIEW_RESULT: FAILED`（manager 抓這行做決策）。
+報告與最終輸出的**最後兩行**必須是（manager 抓這兩行做決策）：
+- `FAIL_KIND: implementation|analysis|N/A` — FAILED 時判定問題屬**實作**（測試/lint/涵蓋不過、diff 寫法問題）還是 **tracer 分析本身**（「diff 對齊」維度不過且原因是 analysis-notes 的結論與程式碼現實不符、root cause 指錯位置）。PASSED 一律填 N/A。
+- `REVIEW_RESULT: PASSED` 或 `REVIEW_RESULT: FAILED`
 
 ### Step 8: Report
 
-直接把 reviewer report 路徑與最終結果輸出到 stdout 結尾,確保 manager 能解析。最後一行格式：
+直接把 reviewer report 路徑與最終結果輸出到 stdout 結尾,確保 manager 能解析。最後兩行格式：
 
 ```
+FAIL_KIND: N/A
 REVIEW_RESULT: PASSED
 ```
 或
 ```
+FAIL_KIND: implementation
 REVIEW_RESULT: FAILED
 ```
 

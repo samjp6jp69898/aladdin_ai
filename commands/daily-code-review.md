@@ -1,403 +1,132 @@
 ---
 name: daily-code-review
-description: Daily code review manager — scans commit authors, groups by workload, dispatches review agents with progressive dimension loading, then QA agents for quality assurance.
+description: Daily code review manager — deterministic scan script builds the dispatch plan and per-agent prompt files; manager only dispatches review agents batch by batch, QA per batch, then aggregates critical issues to CSV via script.
 user-invocable: true
 ---
 
-# Daily Code Review v2 Workflow
+# Daily Code Review v3 Workflow
 
-You are a technical manager who dispatches sub agents. Your responsibility is to scan each project's **`origin/dev` branch for commits not yet merged into `origin/pro` whose commit date falls within the requested date window**, calculate workload per author, group authors by repo type and workload, then dispatch Review Agents and Report QA Agents in a pipeline.
+You are the review **manager**. 掃描、身份消歧、工作量分組、model 指派、agent prompt 組裝已全部由腳本確定性完成——你的工作只剩：**跑腳本 → 按 dispatch.json 派工 → 驗收 → 跑聚合腳本 → 回報**。
 
-## Review Scope
+鐵律（違反即為事故）：
+- 你自己**不**解析 `git log`、**不**計算工作量、**不**手寫/改寫 review agent prompt 內容、**不**在對話中累積 issue 清單（事實源永遠是檔案）。
+- 本指令為自主 pipeline：superpowers 的 brainstorming 等互動式流程 skill 不適用，全程不停下來等使用者（除了本檔明寫的回報時機）。
+
+## Review Scope（不變式）
 
 - **Branches reviewed:** `origin/dev` of `agrabah` / `abu` / `lago` / `rajah` **only**. `origin/pro` is used only as the exclusion baseline. `origin/feature/*` branches are **not** scanned.
-- **Commits reviewed:** every commit reachable from `origin/dev` but not from `origin/pro`, **whose commit date falls within the requested date window** (a single day or an inclusive range). `git log` emits each SHA once, so no extra de-duplication is needed. Re-running a date window re-reviews it — there is no cross-run dedup.
+- **Commits reviewed:** every commit reachable from `origin/dev` but not from `origin/pro`, whose **commit date** falls within the requested date window.
 
-> ⚠️ **掃描範圍守則 — 請勿移除 `origin/dev`**：`origin/dev` 是本流程**唯一**的掃描來源（`origin/pro` 僅作排除基準），移除它等同整個流程掃不到任何 commit、所有開發者連續多日完全無報告且無錯誤訊息（2026-05-21 曾因把 `origin/dev` 移出掃描、只留 `origin/feature/*` 而踩過此坑）。本流程已於 2026-06-01 起改為**只掃 `origin/dev`、不再掃 `origin/feature/*`**：`feature/*` 是從 `dev` cherry-pick 組出來的，原始 authored commit 都在 `dev` 上，因此只掃 `dev` 不會漏人，也不再需要 patch-id 去重。代價是**只存在於 `feature/*`、從未進過 `dev` 的 commit 不在審查範圍內**（依分支策略本不應發生）。請勿在未充分評估下移除 `origin/dev`。
+> ⚠️ **掃描範圍守則 — 請勿移除 `origin/dev`**：`origin/dev` 是本流程**唯一**的掃描來源（`origin/pro` 僅作排除基準），移除它等同整個流程掃不到任何 commit、所有開發者連續多日完全無報告且無錯誤訊息（2026-05-21 曾因把 `origin/dev` 移出掃描、只留 `origin/feature/*` 而踩過此坑）。本流程已於 2026-06-01 起改為**只掃 `origin/dev`、不再掃 `origin/feature/*`**：`feature/*` 是從 `dev` cherry-pick 組出來的，原始 authored commit 都在 `dev` 上，因此只掃 `dev` 不會漏人，也不再需要 patch-id 去重。代價是**只存在於 `feature/*`、從未進過 `dev` 的 commit 不在審查範圍內**（依分支策略本不應發生）。掃描邏輯現位於 `scan-workload.ts`；修改該腳本前先讀本守則與 `.claude/doctrine/40-maintenance-protocol.md`。
+
+> 註：同一窗口在不同日子重跑，結果本來就可能不同——今天已 merge 進 `origin/pro` 的 commit 不再入列（實證：20260702 窗口在 07-03 重掃時，Vic 的 `838175c1` 已進 pro 故不再出現）。這是設計行為，不是掃描 bug。
 
 ## Parameters
 
-`$ARGUMENTS` format: `/daily-code-review [date1] [date2] [concurrent]`
+`$ARGUMENTS` format: `/daily-code-review [date1] [date2] [concurrent]`（token 依形狀分類：8 位數字＝日期、其他數字＝每批併發數，位置無關）
 
-Arguments are position-free — each token is classified by shape:
-
-- **date1 / date2** (optional): 8-digit `YYYYMMDD`. Together they define the review date window (matched against **commit date**):
-  - **no date** → default to **yesterday** (single day)
-  - **one date** → that single day
-  - **two dates** → inclusive range; the earlier date is the start, the later the end (order is normalized — `20260520 20260515` also works)
-  - **three or more dates** → print usage and terminate
-- **concurrent** (optional): the non-8-digit number — sub agents per batch, defaults to `5`.
+**你不需要自己解析參數**——把 `$ARGUMENTS` 原樣接在腳本後面即可（見 Step 1）。腳本規則：無日期＝台北時區的昨天；一個日期＝單日；兩個日期＝閉區間（自動排序）；併發預設 5。
 
 Examples:
-- `/daily-code-review` → review yesterday, 5 per batch
-- `/daily-code-review 20260520` → review 2026-05-20, 5 per batch
-- `/daily-code-review 20260515 20260520` → review 2026-05-15 ~ 2026-05-20, 5 per batch
-- `/daily-code-review 20260515 20260520 10` → same range, 10 per batch
-- `/daily-code-review 20260520 10` → review 2026-05-20, 10 per batch (`10` is not 8 digits → concurrent)
-
----
+- `/daily-code-review` → 昨天，5 per batch
+- `/daily-code-review 20260520` → 2026-05-20
+- `/daily-code-review 20260515 20260520 10` → 區間，10 per batch
 
 ## Execution Flow
 
-### Step 0: Run Bootstrap, then Parse Parameters
-
-**0.0 — Run the daily bootstrap (每次執行都必跑，無條件):**
-
-Before anything else, run the bootstrap script from the repo root. This is unconditional — it runs on **every** invocation, with no flag-based skip.
+### Step 0: Bootstrap（每次執行都必跑，無條件）
 
 ```bash
 cd /Users/user/aladdin && sh daily_bootstrap.sh
 ```
 
-Wait for it to finish before continuing. The script refreshes rajah (`update.sh` + `bootstrap.sh`) and writes the day's `review/.${TODAY}.bootstrap_ready` flag; any failure inside it is logged to `review/bootstrap.log` but does **not** abort the review.
+等它跑完再繼續（失敗會記在 `review/bootstrap.log`，不中斷本流程）。**為什麼無條件跑**：review agent 會用 Read 讀修改檔案的工作樹全文，bootstrap 內的 `update.sh` 會把所有 repo 工作樹 pull 到最新 dev——不跑它，agent 讀到的檔案內容可能落後於被審的 commit。
 
-**0.1 — Parse parameters:**
-
-1. Classify each whitespace-separated token in `$ARGUMENTS`:
-   - an 8-digit number → a **date**
-   - any other number → `CONCURRENT_COUNT`
-2. Resolve the **date window** from the collected dates:
-   - **0 dates** → `DATE_START = DATE_END =` yesterday (macOS: `TZ=Asia/Taipei date -v-1d +%Y%m%d`)
-   - **1 date** → `DATE_START = DATE_END =` that date
-   - **2 dates** → `DATE_START =` the earlier date, `DATE_END =` the later date (sort the pair)
-   - **≥3 dates** → print `Usage: /daily-code-review [date1] [date2] [concurrent]` and terminate
-3. `CONCURRENT_COUNT` defaults to `5` when no non-date number was given.
-4. Derive (with `fmt(d)` = `${d:0:4}-${d:4:2}-${d:6:2}`):
-   - `DATE_START_FMT = fmt(DATE_START)` and `DATE_END_FMT = fmt(DATE_END)` — `YYYY-MM-DD`, used for git date filtering and the report header
-   - `REVIEW_LABEL` = `DATE_START` for a single-day window, otherwise `${DATE_START}-${DATE_END}` (e.g. `20260520` or `20260515-20260520`)
-
-> **`REVIEW_LABEL` only names the outputs** — the report folder `review/{REVIEW_LABEL}/`, the report filenames, and the CSV filename. The **date window `[DATE_START, DATE_END]`** decides which commits are reviewed: commit scope = "`origin/dev` not yet merged into `origin/pro`, with commit date inside the window" (see Step 2).
-
----
-
-### Step 1: Fetch All Repos (Remote Refs)
-
-The scan in Step 2 reads the `origin/pro` and `origin/dev` **remote-tracking refs** directly — it never touches the local working tree or local branches. The only freshness requirement is therefore that each repo's remote-tracking refs are up to date, which a plain `git fetch` guarantees (it is unaffected by `git-lfs` smudge / checkout failures, which only hit the working tree).
-
-For each repo in `agrabah`, `abu`, `lago`, `rajah`:
+### Step 1: 掃描與派工計畫（腳本，一條指令）
 
 ```bash
-REPO_DIR=/Users/user/aladdin/<repo>
-git -C "$REPO_DIR" fetch --quiet --prune origin
+bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts $ARGUMENTS
 ```
 
-`--prune` keeps the local remote-tracking refs tidy by dropping branches deleted on the remote; it is not required for correctness now that only `origin/dev` is scanned.
+- stdout 第一行印 `[DONE] ...` → 窗口內無 commit（或 `--skip-existing` 下全部已完成）：把該行回報使用者，流程結束。
+- 否則 stdout 是派工摘要表；完整計畫已寫入 `review/{LABEL}/_dispatch/dispatch.json`（含每個 agent 的 `model`、`prompt_file`、每位 author 的 `report_file` / `critical_file`、`batches` 切分）。
+- **中斷後接續**：重跑同一指令並加 `--skip-existing`（**最新一代報告＋critical 檔配對俱全**的 author 才會被跳過；只有報告、缺 critical 者視為未完成會重新入列）。不加的話，既有報告不會被覆蓋，本輪報告自動改用 `_r2` / `_r3` 後綴（re-review 語意）。
+- 身份消歧（同人多 email、同名不同人防呆）由腳本按單一來源 `obsidian/skills/daily-code-review/author-identities.json` 處理。掃描摘要或報告中發現新的身份亂象時：先依該檔 `_comment` 的規則更新它，再重跑本步驟。
+- 腳本失敗（非 0 exit 且非 `[DONE]`）：把錯誤原文回報使用者並停止，不要自己用 git 指令替代腳本。
 
-| Situation | Action |
-|-----------|--------|
-| `fetch` exit code 0 | OK, continue |
-| `fetch` fails | Log the failure with the repo name, continue with the other repos, and note in the final CSV that this repo was skipped. Do NOT abort the review. |
+### Step 2: 批次派 Review Agents（你唯一的核心工作）
 
-After all 4 repos are fetched, proceed to Step 2.
+依 `dispatch.json` 的 `batches` 順序處理每一批：
 
----
+1. **同一則訊息**並行派出該批全部 agent（禁止逐一序列派）。每個 agent 用 Agent tool，`model` 用 dispatch.json 該 agent 的值（`opus` 或 `sonnet`），prompt **照抄**下面模板、只替換路徑：
 
-### Step 2: Scan All Repos — Collect Unmerged Commits + Author Workload
+   ```
+   You are a review agent. Read the file below and follow ALL instructions in it exactly:
+   /Users/user/aladdin/review/{LABEL}/_dispatch/agent-{N}.md
+   Your final message must end with the machine-readable AUTHOR_DONE / RESULT lines that file requires.
+   ```
 
-For each of the 4 repos, list every commit reachable from `origin/dev` but **not** reachable from `origin/pro` **whose commit date is inside the date window**, with `--numstat` for line counts. `git log` walks the commit graph and emits each unique SHA only once; a branch already fully merged into `pro` contributes zero commits automatically. Because only `origin/dev` is scanned, there is no `dev` / `feature/*` overlap and **no patch-id de-duplication is needed**.
+   （effort 無法 per-call 指定，會繼承主對話——這是 harness 事實，見 `.claude/doctrine/10-model-dispatch.md` 第 0 節；不要在派工參數裡編造 effort 欄位。）
+
+2. 該批全部回報後，跑**該批**的驗收（`--batch {B}` 必帶——不帶會連尚未派工的後續批次一起列成 MISSING，那不是缺檔）：
+
+   ```bash
+   bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL} --check --batch {B}
+   ```
+
+3. 有缺檔或 agent 回 `RESULT: PARTIAL` / `RESULT: BLOCKED` → 走 `.claude/doctrine/10-model-dispatch.md` 第 5 節升降級（同一子任務 sonnet 連錯 2 次升 opus 並附完整失敗軌跡；總計最多 3 次嘗試）。重派時 prompt 仍用同一個 `agent-{N}.md`，另加一行 `Only process author(s): <缺的名單>; other authors in the file are already done.`。3 次仍失敗 → 記下該 author，流程繼續，最後回報使用者。
+
+4. 派該批的 **QA agent**（`model: sonnet`，一批一個）：
+
+   ```
+   You are a report QA agent. Read the file below and follow ALL instructions in it exactly:
+   /Users/user/aladdin/review/{LABEL}/_dispatch/qa-batch-{B}.md
+   Your final message must end with the machine-readable QA_COMPLETE / RESULT lines that file requires.
+   ```
+
+5. QA 執行期間可以並行派下一批的 review agents（QA 只碰報告檔，review 只寫新檔，不互斥）。**不確定時序列執行（等 QA 完再派下一批）也完全正確**——寧慢勿亂。
+
+每批完成後在對話裡只留一行進度（例：`batch 2/3 done, 6 reports + QA ok`），其他細節不要複述——都在檔案裡。
+
+### Step 3: 最終閘門 + 聚合 CSV（腳本，兩條指令）
+
+全部批次（review + QA）完成後，先跑**全量**完成度閘門（不帶 `--batch`）：
 
 ```bash
-# Run on each repo: agrabah, abu, lago, rajah
-git -C /Users/user/aladdin/<repo> log --format="COMMIT_START|%an|%ae|%H|%s" --numstat \
-  --after="${DATE_START_FMT} 00:00:00" --before="${DATE_END_FMT} 23:59:59" \
-  origin/dev --not origin/pro
+bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL} --check
 ```
 
-- **Date filter** — `--after` / `--before` keep only commits whose **commit date** falls within `[DATE_START, DATE_END]`. For a single-day window `DATE_START_FMT` and `DATE_END_FMT` are the same date.
-- If a repo has no `origin/dev` ref, the command has no positive ref → skip that repo (it contributes no commits).
-- If the scan yields zero commits across all 4 repos, print `[DONE] {REVIEW_LABEL} no commits in the date window to review.` and terminate.
+- 有 MISSING → 回 Step 2.3 對缺的 author 補派（同樣的升降級與次數上限），補齊後重跑本閘門。**閘門不過，不准聚合**——否則缺的 critical 檔會被靜默略過、CSV 不完整卻無錯誤。
+- 3 次嘗試仍缺的 author：明確記下，聚合照做，但必須在 Step 4 回報中列出「未納入 CSV 的 author」。
 
-Parse the output to build a workload table per author:
-
-| Author | Email | Repos | Commits (SHAs) | Lines Changed | Group | Agent Type | Model |
-|--------|-------|-------|----------------|---------------|-------|------------|-------|
-
-**Parsing rules:**
-- Lines starting with `COMMIT_START|` mark a new commit → extract author (`%an`), email (`%ae`), full SHA (`%H`), and the repo
-- Subsequent lines with `<added>\t<deleted>\t<filepath>` are numstat → sum added+deleted per author
-- **Deduplicate by `%ae` (email), NOT by `%an`**. The canonical display name is the most recent `%an` observed for that email.
-- When collecting an author's commits in later steps, always filter by `%ae`, never by `%an`.
-- **Record the full SHA list per author per repo** — these drive each Review Agent's commit list (Step 5).
-
----
-
-### Step 2.1: Author Identity Disambiguation (MANDATORY)
-
-Before grouping, verify the author table against the known identity-collision hazards in this repo. These have bitten us before — do not skip.
-
-**Case A: Same email used by multiple `%an` values** (usually same person; one `git config` mistake)
-```bash
-# detect: any email with >1 distinct %an this scan
-```
-Action: merge into one logical author; use the most recent `%an` as the canonical name; record the alias list in the report header note.
-
-**Case B: Different emails that look similar to another author's name** (DIFFERENT people — the Jeffrey/JeffKuo trap)
-Known confusing pairs — treat each as distinct author and NEVER merge:
-
-| `%an` | `%ae` | Note |
-|-------|-------|------|
-| `Jeffrey` | `pkh_ian.h@photons.com.tw` | NOT the same person as JeffKuo |
-| `JeffKuo` | `pkh_jeffrey@photons.com.tw` | email prefix `pkh_jeffrey` ≠ `%an` Jeffrey |
-| `ian` | `pkh_ian.lin@photons.com.tw` | shares "ian" prefix with Jeffrey's email — still distinct |
-| `Dylan` | `pkh_yotsai@photons.com.tw` | email prefix `yotsai` also appears as a separate `%an` `yotsai` (gmail); confirm both when present |
-| `yotsai` | `r8613266@gmail.com` | external gmail, distinct from Dylan |
-| `JLee` / `jonathan` | `pkh_aceryue@photons.com.tw` | Case A — same person using two names |
-| `Kevin Kung KHH` / `Kevin` | `pkh_kevin@photons.com.tw` | Case A — same person |
-| `maxyeh` | `pkh_maxeh666` / `pkh_maxyeh666` | typo'd email — same person; prefer newer address |
-
-**General rule: the `pkh_<name>` email prefix is NOT a reliable identity signal.** Always key off the full `%ae`, and when writing report filenames use the `%an` that actually appears on the commits you are reviewing.
-
-**Report filename rule:** `<%an>_<REVIEW_LABEL>.md`. If two distinct emails happen to produce the same sanitized `%an` (extremely rare in this repo — not currently observed), disambiguate by appending the email local-part: `<%an>.<email-local>_<REVIEW_LABEL>.md`. Before finalizing filenames, run a collision check and alert if any two distinct emails resolve to the same file.
-
----
-
-### Step 3: Group & Assign Strategy
-
-#### 3a. Repo Type Grouping
-
-For each author, determine their repo group based on which repos they have commits in:
-
-| Group | Condition | Dimensions to Load |
-|-------|-----------|-------------------|
-| Backend | Only agrabah and/or rajah | A, B, C, D, E, G |
-| Frontend | Only abu and/or lago (may include rajah) | A, C, D, E, F |
-| Cross-domain | Both agrabah and abu/lago | A, B, C, D, E, F, G |
-
-#### 3b. Workload Merging (within each group)
-
-**Independent agent** if author meets ANY of:
-- ≥ 5 commits
-- ≥ 200 lines changed
-
-**Merge candidate** otherwise. Merge candidates in the same group are combined into merge groups:
-- Add candidates sequentially to a merge group
-- Start a new merge group when cumulative total exceeds 12 commits OR 500 lines changed
-- Each merge group still produces **per-author independent reports**
-
-#### 3c. Dynamic Model Assignment
-
-| Condition | Model |
-|-----------|-------|
-| Independent agent (≥5 commits or ≥200 lines) | opus, medium effort |
-| Merge group (total ≥8 commits or ≥300 lines) | opus, medium effort |
-| Merge group (total <8 commits and <300 lines) | sonnet, high effort |
-| Report QA Agent | sonnet, high effort |
-
-#### 3d. Build Dimension Read List
-
-For each agent, build the list of dimension files to read based on the group's Dimensions:
-
-```
-/Users/user/aladdin/obsidian/skills/daily-code-review/dimensions/dim-a-architecture.md
-/Users/user/aladdin/obsidian/skills/daily-code-review/dimensions/dim-b-database.md
-... (only the ones matching the group)
-```
-
----
-
-### Step 4: Create Review Directory
-
-1. Ensure the directory exists: `/Users/user/aladdin/review/{REVIEW_LABEL}/`
-2. Every author from Step 2 has commits inside the date window and must be reviewed — there is **no** "completed author" filter. (Termination on an empty scan is already handled at the end of Step 2.)
-3. If a report file `{author}_{REVIEW_LABEL}.md` already exists (e.g. re-running the same date window), do NOT overwrite it — write this run's report with the next free suffix (`{author}_{REVIEW_LABEL}_r2.md`, `_r3.md`, …) and track the actual filename for Steps 6–7.
-
----
-
-### Step 5: Dispatch Review Agents in Batches
-
-Take agents from the assignment list; each batch launches up to `CONCURRENT_COUNT` agents.
-
-**Each batch:**
-1. Take up to `CONCURRENT_COUNT` unprocessed agents (each agent = 1 independent author OR 1 merge group)
-2. **Call multiple Agent tools simultaneously in a single message** — must not serialize
-3. Wait for all agents in batch to complete
-4. Confirm each author's report file exists
-5. Repeat until all agents dispatched
-
-**Review Agent Prompt Template** (replace `{PLACEHOLDERS}` with actual values):
-
-```
-You are a senior code review expert for the Aladdin project. Follow the instructions below to conduct a complete code review.
-
-## Language Requirement
-**All report content must be in Traditional Chinese (繁體中文).** Code snippets, file paths, variable names remain in original form.
-
-## Review Standards — Read in Order
-1. Read the core rules: /Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md
-2. Read ONLY these dimension files:
-{DIMENSION_FILE_LIST}
-3. Read the project conventions: /Users/user/aladdin/CLAUDE.md
-
-## Task Parameters
-- Authors: {AUTHOR_LIST} (format: "name|email" per line)
-- Review window: {DATE_START_FMT} ~ {DATE_END_FMT} (same date when a single day); REVIEW_LABEL: {REVIEW_LABEL} — for the report header only
-- Repo paths:
-  - agrabah: /Users/user/aladdin/agrabah
-  - abu: /Users/user/aladdin/abu
-  - lago: /Users/user/aladdin/lago
-  - rajah: /Users/user/aladdin/rajah
-
-## Commits to Review
-
-Review EXACTLY these commit SHAs — one block per author. Do NOT scan branches or filter by date yourself; these SHAs are the complete and only set for each author.
-
-{COMMITS_TO_REVIEW}
-
-Each block has the form:
-### Author: <name> <email>
-- <repo>: <sha> <sha> ...
-(repos with no commits for that author are omitted)
-
-## Author Isolation Protocol (CRITICAL)
-
-You may receive multiple authors. Each author MUST be processed in complete isolation — as if each author is a separate, independent task. **Never carry over commit data, diff content, or review findings from one author to another.**
-
-The workflow is strictly sequential per author:
-```
-Author A: collect → diff → read files → review → WRITE REPORT → done
-Author B: collect → diff → read files → review → WRITE REPORT → done
-```
-
-**Violation indicators (you must self-check):**
-- Referencing a file path that was not in the current author's commits
-- Describing code changes that don't match the current author's diff output
-- Copy-pasting an issue from a previous author's review into the current report
-
-## Execution Steps
-
-Process authors ONE AT A TIME. Complete ALL steps (1→5) for one author, write their report, then start step 1 for the next author.
-
-### 1. Take the provided commit list for the CURRENT author
-
-Read this author's block under "## Commits to Review" above. Those SHAs — grouped by repo — are the ONLY commits you may review for this author. **Do not run `git log` to discover commits and do not filter by date.** Skip any repo with no SHAs listed for this author.
-
-### 2. Read the diff for each commit, verifying author ownership
-
-For each commit hash from step 1:
+閘門通過（或已明確記錄殘缺名單）後聚合：
 
 ```bash
-git -C /Users/user/aladdin/<repo> show <commit_hash> --stat --unified=5
+bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL}
 ```
 
-**Verify**: The `Author:` line in git show output must match the current author. If it does not, skip this commit and flag the discrepancy.
+- 事實源是 `review/{LABEL}/_critical/*.critical.md`（review agent 落檔、QA agent 同步過 severity），**不是** agent 的對話回報。
+- exit 1 並列出 `PARSE_ERRORS` → 對每個列出的檔案：讀該檔與對應報告，把 critical 檔修成規定格式——`AUTHOR:` 與 `WINDOW:` 頭兩行，之後每個 issue 一行、行首寫 `P0` 或 `P1`（擇一，例：`P0 ||| 描述 ||| 位置`），無 P0/P1 則單獨一行小寫 `none`；只收報告 Issue List 內的 P0/P1。修完重跑本指令。腳本冪等，重跑不會重複 append。
 
-### 3. Read full content of modified files
+### Step 4: 回報使用者
 
-For each key modified file (excluding generated/ and node_modules/), use Read tool for full review context.
-
-### 4. Execute code review per review-core.md and loaded dimensions
-
-Cover all loaded review dimensions. Apply severity per the 5-level system in review-core.md.
-
-**Scope check**: Every issue you raise must reference a file and line that appeared in THIS author's diffs from step 2. If you cannot trace an issue back to a specific diff from step 2, do not include it.
-
-### 5. Write this author's report BEFORE proceeding
-
-Write the report to: /Users/user/aladdin/review/{REVIEW_LABEL}/{AUTHOR_NAME}_{REVIEW_LABEL}.md
-
-Follow the output format in review-core.md.
-
-**Only after the Write tool confirms success**, proceed to step 1 for the next author. Do NOT batch-write reports at the end.
-
-## Security Constraints
-- Do not modify any source code
-- Do not execute destructive operations
-- Only use: Read, Write (for report output only), Glob, Grep, Bash (git commands only)
-
-## After Completion
-Report each author's P0/P1 issues using this exact format (one per line):
-
-```
-CRITICAL_ISSUE ||| <P0 or P1> ||| <Issue Description> ||| <Issue Location>
-```
-
-If no P0/P1 issues: `CRITICAL_ISSUE ||| none`
-```
-
-**Review Agent settings:**
-- model: as determined in Step 3c
-- effort: as determined in Step 3c
-- permissionMode: inherited
-
----
-
-### Step 6: Dispatch Report QA Agents Per Batch
-
-After each batch of Review Agents completes, dispatch ONE Report QA Agent to check all reports from that batch.
-
-**Report QA Agent Prompt Template:**
-
-```
-You are a report quality assurance specialist. Your job is to ensure all code review reports meet formatting standards and have reasonable severity ratings. You do NOT re-review code.
-
-## QA Standards
-Read the QA specification: /Users/user/aladdin/obsidian/skills/daily-code-review/report-qa.md
-
-Also read the core rules for reference: /Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md
-
-## Reports to Check
-{REPORT_FILE_LIST}
-
-## Execution
-1. Read each report file
-2. Run through the checklist in report-qa.md
-3. Fix issues directly by rewriting the report with Write tool
-4. Report results when done
-
-## Constraints
-- You can downgrade and upgrade severity if needed
-- You cannot add new issues or delete existing ones
-- You cannot re-review code
-- Only use: Read, Write, Glob
-```
-
-**Report QA Agent settings:**
-- model: sonnet
-- effort: high
-- permissionMode: inherited
-
----
-
-### Step 7: Compile CRITICAL_ISSUES CSV
-
-After ALL batches (Review + QA) are complete:
-
-1. Collect all `CRITICAL_ISSUE` lines from Review Agents (these reflect pre-QA severity)
-2. Re-read each report file to get the final (post-QA) severity for each issue
-3. Only include P0 and P1 issues in the CSV
-
-Write to: `/Users/user/aladdin/review/{REVIEW_LABEL}/CRITICAL_ISSUES_{REVIEW_LABEL}.csv`
-
-**CSV Format:**
-
-Header (write once if creating new file):
-```
-問題描述,程式碼位置（檔案＋行數）,Author,Date
-```
-
-Rules:
-- Delimiter: comma `,`
-- If field contains comma, double-quote, or newline: wrap in double-quotes, escape internal double-quotes by doubling
-- Author field: author name (e.g. `ashliu`, `pkh_tom`)
-- Date field: the review window — a single-day run uses `YYYY/MM/DD` (e.g. `2026/05/20`); a date-range run uses `YYYY/MM/DD-YYYY/MM/DD` (e.g. `2026/05/15-2026/05/20`)
-- 不需要 Severity 欄位（因為只收錄 P0 和 P1，級別已透過收錄門檻隱含）
-
-Example:
-```
-問題描述,程式碼位置（檔案＋行數）,Author,Date
-"SQL injection: 使用字串拼接而非 placeholder",agrabah/src/servers/payment/models/order.ts:142,farus,2026/04/05
-"Missing @Permission on sensitive API",rajah/services/agent_back_office.rajah:1970,jonathan,2026/04/05
-```
-
-If file already exists, read current content, append new rows only (do not re-write header).
-
----
+一則訊息收尾，含：
+- 窗口與 label、審了幾位 author / 幾個 agent / 幾批
+- P0/P1 摘要（直接引用 CSV 內容行；無則明說「本窗口無 P0/P1」）
+- 被跳過的 repo（fetch 失敗等，見 dispatch.json `skipped_repos`）、`--skip-existing` 跳過的 author、重派後仍失敗的 author（如有）
+- 報告目錄：`/Users/user/aladdin/review/{LABEL}/`
 
 ## Notes
 
-1. **Concurrent launch**: Each batch must call multiple Agent tools simultaneously — serial waiting is forbidden
-2. **Author deduplication**: Same author across multiple repos = one author, reviewed by one agent across all repos
-3. **Report naming**: Keep original author name from git `%an` even if it contains spaces/special chars
-4. **Agent independence**: Each sub agent reviews independently
-5. **Bootstrap runs every time**: Step 0 runs `sh daily_bootstrap.sh` from the repo root unconditionally on every invocation (no flag-based skip). The `date1` / `date2` arguments select which commits are reviewed (commit date inside the window); `REVIEW_LABEL` only names the output folder / files
-6. **QA is mandatory**: Every batch must go through QA before the next batch starts (but QA and the next batch's Review Agents can run in parallel if there are remaining batches)
+1. **併發**：每批必須同一則訊息並行派出；批間依 Step 2.5 規則。
+2. **Re-run 語意**：同窗口重跑預設產生 `_r2` 報告（不覆蓋）；接續中斷才用 `--skip-existing`。
+3. **QA 的權限邊界**（downgrade/upgrade 規則、可改什麼）以 `obsidian/skills/daily-code-review/report-qa.md` 為唯一權威，本檔不重複。
+4. **Prompt 內容的唯一事實源**是 `obsidian/skills/daily-code-review/templates/*.tpl.md`（由腳本代入變數生成 `_dispatch/*.md`）。要改 review/QA 行為 → 改模板或 review-core.md / report-qa.md，**不要**改派工三行式、也不要在派工時往 prompt 塞額外指示（僅有的兩個例外：Step 2.3 的重派名單行、升級重派時按 doctrine/10 第 5 節必附的失敗軌跡）。
+5. **Bootstrap 每次必跑**、不設 flag 跳過（歷史決策，見 Step 0 理由）。
+6. **檔案結構**：`review/{LABEL}/` 下——報告 `*.md`、`CRITICAL_ISSUES_{LABEL}.csv`、`_dispatch/`（計畫與 prompt）、`_critical/`（結構化 issue，兼作 per-author 完成 marker）。
+7. **回歸測試**：修改 `scan-workload.ts` / `collect-critical.ts` / `templates/*.tpl.md` 後，**必跑** `bash /Users/user/aladdin/obsidian/skills/daily-code-review/test-dcr.sh` 且全綠才算完成（21 案，全沙盒執行、不碰真實 review/）。
+8. **覆蓋稽核（唯讀輔助，非 pipeline 主流程）**：`bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts coverage-audit [起] [迄] [--no-fetch]` 列出「未被任何 review 目錄涵蓋、但當日 origin/dev 有 commit」的漏批日（純 stdout、不寫檔）。用於常態偵測排程漏批——例行跑 review 前後可掃一次，確認無日曆空洞。
+
+## v3 變更摘要（2026-07-03，供追溯）
+
+v2 → v3：掃描/消歧/分組/prompt 組裝從 manager 手工改為 `scan-workload.ts` 確定性生成（舊版 Step 1–5 的手工規則全數遷入腳本與 `author-identities.json`）；CRITICAL_ISSUE 從「agent 對話回報＋manager 手寫 CSV」改為「agent 落檔 `_critical/` ＋ `collect-critical.ts` 冪等聚合」；QA 改 Edit-only 並負責同步 critical 檔；移除無效的 per-call effort 宣稱；agent prompt 不再要求重讀 CLAUDE.md（subagent 自動載入）。動機與證據：`.claude/doctrine/00-diagnosis-20260703.md`（漏洞 1/2、易錯 1）。舊版全文備份：`.claude/backups/20260703-fable-dcr/daily-code-review.md.obsidian-commands`。

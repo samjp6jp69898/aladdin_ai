@@ -42,4 +42,12 @@
 - **內部 Header 不足時的處理**：RPC 呼叫缺少的 header 是否直接當 API 參數傳入，而非修改基底的 `TransferHeaders`（`genie/src/common/request_header.ts`）
 - **空值處理**：是否有 `undefined`/`null` 防護（`|| ''`、`?.`、`?? defaultValue` 等）
 
+## 業務語意正確性（必查）
+
+- **傳值取自正確實體與層級**：對 create / update / RPC / 餘額變動傳入的每個 ID 或欄位值，逐一確認取自**正確的實體與正確的層級**——不是姊妹欄位（`name` 誤填 `bankCode`）、不是扁平化漏了巢狀（`row.userId` 應為 `row.userBaseDetail.userId`）、不是另一個實體的 ID（打賞情境用 `postUserDetail.userId` 而非 `userDetail.userId`）、不是恆為預設值的欄位（`item.rewardRecordId` 恆為 0 應用 `rawId`）。同一欄位被重複賦值兩次＝複製貼上漏改屬性名
+- **邊界比較運算子**：凡「達標 / 區間 / 索引 / 天數」的比較，逐一確認 `>` vs `>=`、`<` vs `<=` 與 index 起點（0 或 1）。**明寫出臨界輸入與預期業務結果再判定**，勿以「看起來合理」帶過（「達到 N 即完成」通常是 `>=`）。壞：`if (streakDays <= stepIndex)`；好：`if (streakDays < stepIndex)`（並註明 stepIndex=0 / streakDays=1 的預期）
+- **匯出 / 回傳層金額費率換算**：金額 / 費率欄位在 CSV / Excel 匯出、RPC 回傳、篩選送出前必須以**對應** helper 換算（金額用 `RateHelper.storedToNormal`，費率用其專屬 scale，勿用幣別 `Exchange`）；禁止直接送 stored 值
+- **回傳路徑正確性**：逐條走查每個回傳路徑——成功路徑須顯式回傳成功值（漏 `return` 會落到後續錯誤分支）；合法空結果（空陣列 / 0 筆）不可回傳 error；回傳的 response / DTO 的衍生 / 動態欄位須在回傳前填充；勿以單一 `boolean` 化約多態結果致呼叫端誤判
+- **組裝寫入物件的 NOT NULL 欄位齊備**：組裝 insert / update 物件（含反射 `create()`、繼承 base class、批量編輯 model）時，對照目標表 NOT NULL / 業務必填欄位逐一確認皆賦值；繼承欄位不會自動帶入時須顯式設定，否則觸發非空違反或 SQL 寫入失敗
+
 > 以上為重點檢查項，不限於此。基於你的專業判斷，覆蓋該維度的其他潛在問題。

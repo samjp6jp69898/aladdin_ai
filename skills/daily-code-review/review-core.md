@@ -116,33 +116,22 @@
 10. **Dimension 清單是下限，不是上限**：每個 dimension 的檢查項是「必須覆蓋的最低要求」。你必須基於資深架構師的專業判斷，主動發現清單之外的問題 — 包括但不限於 JavaScript 語言陷阱、業務邏輯漏洞、跨 commit 的不一致、隱含的資料正確性問題等。清單未列出的問題不代表不需要審查。
 11. **每個 commit 的每個修改點都必須獨立審查**：不可因 commit 數量多而跳過或簡略帶過任何 commit。每個 diff hunk 都必須逐一檢視，確保問題覆蓋面的完整性。特別注意跨 commit 之間的時序依賴和中間狀態問題。
 12. **刪除操作必須追查引用點**：當 commit 刪除元件、路由、函式、變數時，必須主動搜索（Grep/Glob）是否有其他檔案仍在引用被刪除的目標。殘留的引用會導致 runtime crash、白屏、404 等嚴重問題，屬於 P0/P1 級別。
-13. **Author 身份比對必須用 email（`%ae`），不是名字（`%an`）**：收集某 author 的 commits 一律用 `git log --author="<email>"`。報告檔名雖用 `%an`，但檔名本身不是身份證 — 實際審查內容必須以 `%ae` 為鎖定鍵。補掃 / 更新既有報告時：
+13. **Author 身份比對必須用 email（`%ae`），不是名字（`%an`）**：報告檔名雖用 `%an`，但檔名本身不是身份證 — 實際審查內容必須以 `%ae` 為鎖定鍵。自動派工的 review agent **不自行探索 commit**：commit 清單由派工 prompt 給定，email 只作驗證錨（`git show` 的 `Author:` 行必須與當前 author 的 email 相符）。以下 (a)(b)(c) **僅適用於人工補掃／更新既有報告的情境**（不適用自動派工的 review agent）；該情境下收集 commits 一律用 `git log --author="<email>"`：
     - (a) **先用 email 查 git**，確認 commits 實際屬於該人；
     - (b) 再用 email 確認既有 `<%an>_YYYYMMDD.md` 檔案的身份（讀檔內既有 agrabah/abu/lago/rajah 段的 commit hash，反查 `%ae`）；
     - (c) 若既有檔案的 `%ae` 與目前要補的 commits 的 `%ae` 不一致，**絕對不可 append，必須另開新檔**。
-    已知高風險混淆對（歷史踩坑紀錄，請更新到這個列表）：
-    - `Jeffrey`（`pkh_ian.h@photons.com.tw`）vs `JeffKuo`（`pkh_jeffrey@photons.com.tw`）— 不同人，email prefix 反而像對方名字。
-    - `JLee` / `jonathan` 共用 `pkh_aceryue@photons.com.tw` — 同一人兩個 `%an`。
-    - `Kevin Kung KHH` / `Kevin` 共用 `pkh_kevin@photons.com.tw` — 同一人兩個 `%an`。
-    - `maxyeh` 有 `pkh_maxeh666` 與 `pkh_maxyeh666` 兩個 email（typo）— 同一人。
-    `pkh_<name>` 形式的 email prefix **不保證** 等於 git `%an`；永遠以 `%ae` 為準。
+    已知混淆對（同人多 email、同名不同人）的**單一事實源**：`obsidian/skills/daily-code-review/author-identities.json`（發現新亂象請更新該檔，不要在本檔或 command 檔另立清單）。`pkh_<name>` 形式的 email prefix **不保證** 等於 git `%an`；永遠以 `%ae` 為準。
+14. **每位 author 的報告寫完後，必須立刻寫對應的 critical-issues 檔**（路徑與格式見派工 prompt 的 Authors & Output Files 表與 Execution Steps 第 6 步）：只收錄該報告 Issue List 中的 P0/P1；無則寫 `none`。此檔兼作該 author 的完成 marker，之後由 `collect-critical.ts` 聚合成 CSV — **不寫此檔＝該 author 視同未完成**。
 
 ---
 
 ## 4. 回報格式
 
-完成審查後，回報主代理時使用以下格式：
-
-每個 P0/P1 issue 獨立一行，欄位以 ` ||| ` 分隔：
+P0/P1 的完整內容寫在每位 author 的 critical-issues 檔（規則 14），**不要**把 issue 明細貼回對話。回報主代理只用（每 author 一行＋最後一行 RESULT）：
 
 ```
-CRITICAL_ISSUE ||| <P0 或 P1> ||| <Issue Description> ||| <Issue Location: file / method name / line number>
+AUTHOR_DONE ||| <author name> ||| P0:<count> P1:<count> ||| <report file path>
+RESULT: COMPLETED
 ```
 
-範例：
-```
-CRITICAL_ISSUE ||| P0 ||| SQL injection: 使用字串拼接而非 placeholder ||| agrabah/src/servers/payment/models/order.ts:142 / createOrder
-CRITICAL_ISSUE ||| P1 ||| Missing @Permission on GetCommissionInvoiceOriginalData ||| rajah/services/agent_back_office.rajah:1970
-```
-
-若無 P0/P1 issues：`CRITICAL_ISSUE ||| none`
+無法完成某 author 時，仍為其輸出 AUTHOR_DONE 行（能寫多少寫多少），並以 `RESULT: PARTIAL ||| <缺什麼、為什麼>` 結尾。

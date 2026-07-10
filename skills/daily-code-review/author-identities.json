@@ -1,0 +1,44 @@
+{
+  "_comment": "Author 身份消歧單一來源。scan-workload.ts 只讀 merge_emails（把多個 email 合併為同一人，第一個 email 為 canonical key）；其餘段落是給人與 LLM 看的防呆紀錄。修改本檔前先讀 obsidian/skills/daily-code-review/review-core.md 規則 13 與 .claude/doctrine/40-maintenance-protocol.md。歷史來源：daily-code-review.md Step 2.1 與 review-core.md 規則 13 的兩張表（2026-07-03 合併於此，舊表已改為指向本檔）。",
+  "rules": {
+    "identity_key": "一律以完整 email（%ae，小寫比對）為身份鍵，絕不以 %an 或 email prefix 判定同人",
+    "display_name": "同一身份鍵下取最近一次 commit 的 %an 作為報告顯示名與檔名",
+    "pkh_prefix_warning": "pkh_<name> 形式的 email prefix 不保證等於 git %an，不可當身份訊號"
+  },
+  "merge_emails": [
+    {
+      "emails": ["pkh_maxeh666@photons.com.tw", "pkh_maxyeh666@photons.com.tw"],
+      "person": "maxyeh",
+      "note": "email typo 造成兩個地址，同一人；偏好較新地址。domain 為推測（舊表只記 localpart），若掃描出現其他 domain 的此 localpart，人工確認後更新本檔"
+    }
+  ],
+  "same_person_multi_name": [
+    {
+      "email": "pkh_aceryue@photons.com.tw",
+      "names": ["JLee", "jonathan"],
+      "note": "同一人兩個 %an；單一 email 會被腳本自動歸併，此處僅為紀錄"
+    },
+    {
+      "email": "pkh_kevin@photons.com.tw",
+      "names": ["Kevin Kung KHH", "Kevin"],
+      "note": "同一人兩個 %an"
+    }
+  ],
+  "distinct_warnings": [
+    {
+      "a": { "name": "Jeffrey", "email": "pkh_ian.h@photons.com.tw" },
+      "b": { "name": "JeffKuo", "email": "pkh_jeffrey@photons.com.tw" },
+      "note": "不同人。email prefix 互相像對方的名字（Jeffrey/JeffKuo trap），絕不可合併"
+    },
+    {
+      "a": { "name": "ian", "email": "pkh_ian.lin@photons.com.tw" },
+      "b": { "name": "Jeffrey", "email": "pkh_ian.h@photons.com.tw" },
+      "note": "不同人。共用 ian 字樣前綴，仍為兩個身份"
+    },
+    {
+      "a": { "name": "Dylan", "email": "pkh_yotsai@photons.com.tw" },
+      "b": { "name": "yotsai", "email": "r8613266@gmail.com" },
+      "note": "不同人。Dylan 的 email localpart（yotsai）與另一位 %an 相同；兩者同時出現時逐一確認"
+    }
+  ]
+}

@@ -9,16 +9,26 @@
 ### 可以做
 - 修正格式問題（章節順序、表格格式、markdown 語法）
 - 將 emoji shortcode 替換為 Unicode emoji
-- 根據 severity 判定指引將 severity 往下調（P0→P1、P1→P2 等）
+- 根據 severity 判定指引將 severity 往下調（P0→P1、P1→P2 等），並加 `[QA: 從 PX 降級為 PY，原因：...]`
+- 將 severity 往上調——**僅限**「報告自己的描述與 severity 定義文字不符」的校準情形（例：描述明寫「會導致資金異常/資料遺失」卻只標 P3——按 review-core.md 的 P0 定義該升），且必須加 `[QA: 從 PX 升級為 PY，原因：...]`。**不可**基於你自己對程式碼的想像升級——你沒看 code，描述沒寫到的風險不存在
 - 標記缺少具體位置的 issue：在 description 後加上 `[QA: 缺少具體位置]`
 - 補上遺漏的 Cross-repo Impact Analysis 章節提醒
 - 確認報告包含正面回饋（✅），若無則在 Overall Score 前加入 `[QA: 本報告缺少正面回饋，請確認是否遺漏]`
 
 ### 不可以做
-- 重新審查程式碼
+- 重新審查程式碼（包括為了「確認 severity」去讀 source——你的判斷材料只有報告文字）
 - 新增原報告沒有的 issue
 - 刪除任何 issue
-- 將 severity 往上調
+- 用 Write 整檔重寫報告（見下方執行紀律）
+
+### 執行紀律（防內容遺失）
+1. **只用 Edit 工具做精準替換**（old_string→new_string），一次改一處。整檔 Write 重寫會靜默丟內容，一律禁止。
+2. 每份報告改完後自檢：**修改前後 issue 條目數必須一致**，除非差異都有你加的 `[QA: ...]` 標記解釋。不一致 → 恢復原狀重做。
+3. **critical 檔同步**：任何 P0/P1 的 severity 調整，都必須同步修改該 author 的 critical-issues 檔（`review/{LABEL}/_critical/<report_basename>.critical.md`）：
+   - 降出 P0/P1 範圍（如 P1→P2）→ 刪該行；若刪後無任何 P0/P1 行 → 補一行 `none`
+   - P0↔P1 互調 → 改該行行首的 `P0`/`P1` 欄位
+   - 升入 P0/P1 → 新增一行，行首寫 `P0` 或 `P1` 擇一（例：`P1 ||| <描述> ||| <位置>`；**不要**照抄「P0|P1」這個字面）；若原本只有 `none`，把它移除
+   critical 檔是 CSV 聚合的唯一事實源，忘記同步＝CSV 錯。
 
 ---
 
@@ -82,14 +92,12 @@
 
 ## 輸出
 
-QA 完成後，回報主代理：
+QA 完成後，回報主代理（最後幾行必須是這個格式）：
 
 ```
 QA_COMPLETE ||| <已檢查報告數量> ||| <severity 調整數量> ||| <格式修正數量>
-```
-
-若有 severity 調整，另外列出：
-
-```
 QA_SEVERITY_CHANGE ||| <Author> ||| <Original PX> → <New PY> ||| <原因>
+RESULT: COMPLETED
 ```
+
+`QA_SEVERITY_CHANGE` 每筆調整一行，無調整則省略該行。有報告檔缺失或讀不到時，改以 `RESULT: PARTIAL ||| <哪個檔、為什麼>` 結尾。

@@ -7,7 +7,7 @@ argument-hint: "<NotionURL> [ticket_id] [--force-critical|--force-simple]"
 
 You are the pipeline manager responsible for dispatching engineers. Your role is to sequentially dispatch sub agents to complete the bug analysis pipeline. **You do not read any Notion content or code yourself** — you only manage pipeline state and coordinate agents.
 
-**Always use the specified prompt document to create the corresponding sub agent.**
+**Dispatch every registered agent via the Agent tool with the specified `subagent_type` — a registered agent's definition file IS its system prompt. Never tell an agent to "use all text in some agent .md as the prompt"; that double-loads tens of KB per dispatch.**（inline 步驟如 pre-check / fix-planner / reviewer 仍照其段落內嵌 prompt 派 general-purpose。）
 
 ## Parameters
 
@@ -48,11 +48,11 @@ Extract NotionURL, ticket_id, force-flag from `$ARGUMENTS`. Extract page_id from
 
 ### Step 1: Bug Report Analyst
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-report-analyst.md`:
+Dispatch `subagent_type: bug-report-analyst`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/bug-report-analyst.md} as the prompt. Please parse the following Notion bug ticket and create the analysis document according to your responsibilities.
+Please parse the following Notion bug ticket and create the analysis document according to your responsibilities.
 Notion URL: {Notion URL from $ARGUMENTS}
 
 When done, return the ticket ID and screenshot status in your last two lines:
@@ -175,11 +175,11 @@ PRE_CHECK_AFFECTED_REPOS: [list]（從命中 commit 改的檔提取的 repo list
 
 **僅當 `pre_check_verdict != ALREADY_FIXED_HIGH` 時執行**（已修復的單不需 grounding）。
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/cqa-grounder.md`:
+Dispatch `subagent_type: cqa-grounder`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/cqa-grounder.md} as the prompt. Please ground the bug against CQA real data and judge ticket-vs-reality discrepancy.
+Please ground the bug against CQA real data and judge ticket-vs-reality discrepancy.
 ticket_id: {ticket_id}
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
@@ -287,11 +287,12 @@ FIX_PLANNER_FILES_COUNT: {n}（fix-plan.md 內提到要改幾個檔）
 
 只跑 critical 路徑。**Increment tracer_attempt_count + total_attempt_count.**
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-tracer.md`:
+Dispatch `subagent_type: bug-tracer`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/bug-tracer.md} as the prompt. Please analyze the bug, trace the root cause through the codebase, and write a detailed analysis document.
+Please analyze the bug, trace the root cause through the codebase, and write a detailed analysis document.
+歷史失效模式素材：先讀 /Users/user/aladdin/obsidian/Rules/_index.md 的「分析與失效模式（回測踩坑）」分類，挑出與本 ticket 模組相關的條目讀完再開始追因（回測 885 單顯示 13.5% 分析錯誤多為重複模式，先讀可避開）。
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 spec document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
 ticket_id: {ticket_id}
@@ -380,11 +381,11 @@ bootstrap.sh 失敗（例如 sync-all 連不到 DB）→ 記錄錯誤但繼續�
 **Increment fixer_attempt_count + total_attempt_count.**
 **Hard cap**: if total_attempt_count > 3, go to Pipeline Failure.
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/bug-fixer-with-tests.md`:
+Dispatch `subagent_type: bug-fixer-with-tests`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/bug-fixer-with-tests.md} as the prompt. Please implement the code fix in the worktree AND write L0 unit tests in the same commit.
+Please implement the code fix in the worktree AND write L0 unit tests in the same commit.
 analysis notes path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
 analytics document path: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
@@ -473,11 +474,11 @@ REVIEW_VERDICT: PASS / WEAK_PASS / FAIL
 
 ### Step 7: Drive Uploader
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
+Dispatch `subagent_type: drive-uploader`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. Please compile the solution document, upload to Google Drive, and comment on Notion.
+Please compile the solution document, upload to Google Drive, and comment on Notion.
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: {worktree_path or N/A if no worktree built}
@@ -525,7 +526,7 @@ grounding_doc: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-ground
 
 > **重要：呼叫端控制權交還規則**
 >
-> 若本次呼叫來自 `/analyze-bugs` batch 流程（或任何外層迴圈 skill），完成本步驟後**必須立即返回外層 Step 4c 繼續迴圈**（release lock → 標記 done → 計數 +1 → 回到 4a 處理下一張單），不可在此停止或等待使用者指令。本 Completion Report 僅是單張單的階段性回報，不是整個 batch 的終點。
+> 若本次呼叫來自 `/analyze-bugs` batch 流程（或任何外層迴圈 skill），完成本步驟後**必須立即返回外層繼續迴圈**——先過外層 4b 之後的 Pipeline status 分流：`needs_qa_clarification` → release lock ＋ `tracker.sh set FAQ-{ticket_id} needs_qa`（**不是** done）；其餘成功狀態 → 外層 4c（release lock → 標記 done）。兩者都計數 +1，之後由外層 4e 判斷是否繼續／refill 下一張單，不可在此停止或等待使用者指令。本 Completion Report 僅是單張單的階段性回報，不是整個 batch 的終點。
 
 ---
 
@@ -535,11 +536,11 @@ grounding_doc: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-ground
 
 **needs_qa_clarification 不是 failed**：它是「等 QA 釐清」的正常暫停，走 Step 7（drive-uploader 設 AI分析=待釐清 + 留言 qa_question + 上傳 grounding 文件），不留失敗留言、不標分析失敗。
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/drive-uploader.md`:
+Dispatch `subagent_type: drive-uploader`:
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/drive-uploader.md} as the prompt. The pipeline has failed. Do NOT upload any files or create any Drive folder. Only post a failure comment on Notion and update the Notion "AI分析" property to "分析失敗".
+The pipeline has failed. Do NOT upload any files or create any Drive folder. Only post a failure comment on Notion and update the Notion "AI分析" property to "分析失敗".
 ticket_id: {ticket_id}
 Notion URL: {Notion URL from $ARGUMENTS}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id} or N/A
@@ -574,7 +575,7 @@ Mark all remaining pending tasks as `completed` with a failure note.
 
 > **重要：呼叫端控制權交還規則**
 >
-> 若本次呼叫來自 `/analyze-bugs` batch 流程（或任何外層迴圈 skill），即使本張單以失敗收尾，也**必須立即返回外層 Step 4d 繼續迴圈**（release lock → 標記 failed → 計數 +1 → 回到 4a 處理下一張單），不可在此停止或等待使用者指令。
+> 若本次呼叫來自 `/analyze-bugs` batch 流程（或任何外層迴圈 skill），即使本張單以失敗收尾，也**必須立即返回外層 Step 4d 繼續迴圈**（release lock → 標記 failed → 計數 +1 → 由外層 4e 判斷是否繼續／refill 下一張單），不可在此停止或等待使用者指令。
 
 ---
 

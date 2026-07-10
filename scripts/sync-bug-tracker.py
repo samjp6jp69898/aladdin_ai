@@ -41,9 +41,24 @@ TRACKER_PATH = Path(
     "/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md"
 )
 DEBUG_DIR = Path("/Users/user/aladdin/obsidian/Debug")
-NOTION_TOKEN = os.environ.get(
-    "NOTION_TOKEN", "***REMOVED-NOTION-TOKEN***"
-)
+def _load_notion_token() -> str:
+    # token 單一來源：環境變數 > /Users/user/aladdin/.env（禁止把明文寫回程式碼）
+    tok = os.environ.get("NOTION_TOKEN", "")
+    if not tok:
+        try:
+            with open("/Users/user/aladdin/.env") as _f:
+                for _line in _f:
+                    if _line.startswith("NOTION_TOKEN="):
+                        tok = _line.split("=", 1)[1].strip().strip("\"'")
+                        break
+        except OSError:
+            pass
+    if not tok.startswith("ntn_"):
+        raise SystemExit("ERROR: NOTION_TOKEN 未設定（請在 /Users/user/aladdin/.env 加 NOTION_TOKEN=ntn_xxx）")
+    return tok
+
+
+NOTION_TOKEN = _load_notion_token()
 NOTION_API = "https://api.notion.com/v1"
 NOTION_VERSION = "2025-09-03"
 TAIPEI = timezone(timedelta(hours=8))

@@ -30,7 +30,21 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
-const NOTION_TOKEN = '***REMOVED-NOTION-TOKEN***';
+// token 單一來源：環境變數 > /Users/user/aladdin/.env（bun 從專案根執行時會自動載入 .env）
+const NOTION_TOKEN = (() => {
+  let t = process.env.NOTION_TOKEN ?? '';
+  if (!t) {
+    try {
+      const env = require('fs').readFileSync('/Users/user/aladdin/.env', 'utf8');
+      t = env.match(/^NOTION_TOKEN=(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, '') ?? '';
+    } catch {}
+  }
+  if (!t.startsWith('ntn_')) {
+    console.error('ERROR: NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加 NOTION_TOKEN=ntn_xxx');
+    process.exit(1);
+  }
+  return t;
+})();
 const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const MEMORY_DIR = join(homedir(), '.claude', 'projects', '-Users-user-aladdin', 'memory');
@@ -248,7 +262,7 @@ interface TrackerEntry {
     faqNumber: number;
     url: string;
     severity: string;
-    status: 'pending' | 'rerun' | 'in_progress' | 'done' | 'failed';
+    status: 'pending' | 'rerun' | 'in_progress' | 'done' | 'failed' | 'needs_qa';
     addedAt: string;
     doneAt?: string;
 }
@@ -319,8 +333,17 @@ function applyMerge(existing: TrackerEntry[], items: BugItem[]): { added: number
                 entry.addedAt = today;
                 entry.doneAt = undefined;
                 reset++;
+            } else if (entry.status === 'needs_qa') {
+                // needs_qa 是「等 QA 釐清」的暫停狀態；當 Notion AI分析 從「待釐清」被改回「待分析」，
+                // 代表釐清已處理、要求重新分析，拉回處理佇列（比照 rerun，讓 /create-mrs 能重新認領）
+                entry.status = 'rerun';
+                entry.severity = item.severity;
+                entry.url = item.url;
+                entry.addedAt = today;
+                entry.doneAt = undefined;
+                reset++;
             } else {
-                // 待分析 + 已存在：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
+                // 待分析 + 已存在（done/failed/in_progress/rerun）：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
                 skipped++;
             }
         } else {

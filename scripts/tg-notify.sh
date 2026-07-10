@@ -69,9 +69,17 @@ TOKEN=""
 [ -f "$ROOT_ENV_FILE" ] && TOKEN="$(grep -E '^(TG_BOT_TOKEN|TELEGRAM_BOT_TOKEN)=' "$ROOT_ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]')"
 [ -z "$TOKEN" ] && { echo "TG_FAIL: $MATCH_EMAIL (no bot token in $ROOT_ENV_FILE)"; exit 0; }
 
-HTTP="$(curl -s -o /dev/null -w '%{http_code}' \
+# 同時取回應 body 與 HTTP code（body 在前、最後一行為 code），失敗時帶出 Telegram 的 description
+RESP="$(curl -s -w $'\n%{http_code}' \
   -X POST "$API_BASE/bot$TOKEN/sendMessage" \
   --data-urlencode "chat_id=$MATCH_CHAT" \
   --data-urlencode "text=$TEXT")"
-[ "$HTTP" = "200" ] && echo "TG_SENT: $MATCH_EMAIL" || echo "TG_FAIL: $MATCH_EMAIL (http $HTTP)"
+HTTP="${RESP##*$'\n'}"   # 最後一行＝HTTP code
+BODY="${RESP%$'\n'*}"    # 其餘＝回應 body
+if [ "$HTTP" = "200" ]; then
+  echo "TG_SENT: $MATCH_EMAIL"
+else
+  DESC="$(printf '%s' "$BODY" | sed -n 's/.*"description":"\([^"]*\)".*/\1/p')"
+  [ -n "$DESC" ] && echo "TG_FAIL: $MATCH_EMAIL (http $HTTP: $DESC)" || echo "TG_FAIL: $MATCH_EMAIL (http $HTTP)"
+fi
 exit 0
