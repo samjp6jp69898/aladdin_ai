@@ -9,7 +9,7 @@ argument-hint: "<ticket_id>"
 
 You are the pipeline manager. 你只管理 pipeline 狀態與派工，**不自己讀 MR 留言、不自己改 code**。所有留言解讀、程式碼修改、測試與推送都由 sub agent 完成。
 
-**Always use the specified prompt document to create the corresponding sub agent.**
+**派工一律用 Agent tool 的 `subagent_type` 直接引用註冊 agent——定義檔即其 system prompt，禁止叫 agent「把某 agent .md 全文當 prompt 讀」（那會每次多燒上萬 token）。prompt 只放本單變數、路徑與回報格式。**
 
 ## Parameters
 
@@ -178,13 +178,13 @@ bootstrap.sh 失敗（例如 sync-all 連不到 DB）只記錄、不中止；只
 
 **Increment `per_repo[repo].fixer_attempt_count`。**
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/mr-feedback-fixer.md`：
+派工 `subagent_type: mr-feedback-fixer`（註冊 agent 的定義檔即其 system prompt，**禁止**叫它「把某 agent .md 全文當 prompt 讀」——那會每次多燒上萬 token）：
 
 **首次派工：**
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/mr-feedback-fixer.md} as the prompt. Please read the MR review comments, address the actionable ones, run lint, and commit on the existing branch.
+Please read the MR review comments, address the actionable ones, run lint, and commit on the existing branch.
 ticket_id: {ticket_id}
 repo: {repo}
 mr_iid: {iid}
@@ -222,11 +222,11 @@ Re-read the MR review comments, verify and complete the existing uncommitted cha
 
 #### Step 4: Dispatch mr-feedback-evaluator（僅 refine_status == committed）
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/mr-feedback-evaluator.md`：
+派工 `subagent_type: mr-feedback-evaluator`：
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/mr-feedback-evaluator.md} as the prompt. Please run the related unit tests for the fixer's changes and produce the evaluation report.
+Please run the related unit tests for the fixer's changes and produce the evaluation report.
 ticket_id: {ticket_id}
 repo: {repo}
 worktree_path: /Users/user/aladdin/worktrees/{ticket_id}
@@ -247,11 +247,11 @@ EVAL_RESULT: FAILED
 
 #### Step 5: Dispatch mr-feedback-pusher（僅 evaluator PASSED）
 
-Create a sub agent using the prompt at `/Users/user/aladdin/.claude/agents/mr-feedback-pusher.md`：
+派工 `subagent_type: mr-feedback-pusher`：
 
 ```
 prompt:
-Use all text in {/Users/user/aladdin/.claude/agents/mr-feedback-pusher.md} as the prompt. Please push the new commits to the existing MR branch and post a summary note on the MR.
+Please push the new commits to the existing MR branch and post a summary note on the MR.
 ticket_id: {ticket_id}
 repo: {repo}
 mr_iid: {iid}

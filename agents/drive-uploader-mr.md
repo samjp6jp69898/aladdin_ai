@@ -69,18 +69,21 @@ Script: `/Users/user/.claude/gdrive.sh`
 
 ### Notion
 
-**Token:** `***REMOVED-NOTION-TOKEN***`
+**Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $NOTION_TOKEN` 才有值：
+```bash
+NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+```
 
 Use curl with Notion API directly. All requests require these headers:
 ```
-Authorization: Bearer ***REMOVED-NOTION-TOKEN***
+Authorization: Bearer $NOTION_TOKEN
 Notion-Version: 2022-06-28
 Content-Type: application/json
 ```
 
-- Fetch page: `curl -s -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" "https://api.notion.com/v1/pages/{page_id}"`
-- Comment: `curl -s -X POST "https://api.notion.com/v1/comments" -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
-- Update property: `curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" -H "Authorization: Bearer ***REMOVED-NOTION-TOKEN***" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
+- Fetch page: `curl -s -H "Authorization: Bearer $NOTION_TOKEN" -H "Notion-Version: 2022-06-28" "https://api.notion.com/v1/pages/{page_id}"`
+- Comment: `curl -s -X POST "https://api.notion.com/v1/comments" -H "Authorization: Bearer $NOTION_TOKEN" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
+- Update property: `curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" -H "Authorization: Bearer $NOTION_TOKEN" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" -d '{...}'`
 
 ## Execution Steps
 
@@ -144,7 +147,7 @@ metadata: v2
 （每個改動標註目的說明）
 
 ### 測試檔案
-（Evaluator 撰寫的測試程式碼完整內容）
+（bug-fixer-with-tests 撰寫的測試程式碼完整內容）
 
 ### 測試案例
 | # | 案例描述 | 測試數據來源 | 預期結果 | 實際結果 |

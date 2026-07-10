@@ -25,9 +25,9 @@ NOTION_SH="/Users/user/aladdin/obsidian/scripts/notion.sh"
 **Notion 總需求池資料庫（Planning Database）ID:** `21d87d78618a806ea8d7ea43d37e9f55`
 對應網址：`https://www.notion.so/21d87d78618a806ea8d7ea43d37e9f55`
 
-搜尋資料庫使用 curl（Token 從 notion.sh 提取，API 版本固定用 `2022-06-28`）：
+搜尋資料庫使用 curl（Token 從 `/Users/user/aladdin/.env` 讀取——單一來源，禁止寫死明文；API 版本固定用 `2022-06-28`）：
 ```bash
-NOTION_TOKEN=$(grep '^NOTION_TOKEN=' "$NOTION_SH" | cut -d'"' -f2)
+NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
 NOTION_API_VER="2022-06-28"
 ```
 
@@ -181,12 +181,12 @@ Save to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md`:
 若所有候選關鍵字都 0 命中，或所有命中頁面（含展開子頁面）均為空殼或僅含無法讀取的外部連結，仍需產出 spec.md：
 ```
 ### 備註
-未找到相關規格書（已嘗試關鍵字：XXX / YYY / ZZZ）。Evaluator 應基於代碼邏輯和 analytics 描述撰寫測試。
+未找到相關規格書（已嘗試關鍵字：XXX / YYY / ZZZ）。後續寫測試的 agent（bug-fixer-with-tests）應基於代碼邏輯和 analytics 描述撰寫測試。
 ```
 
 The pipeline will continue — a missing spec does not block analysis.
 
-若有找到外部連結但內容在 Notion 以外（Google Sheets、axshare、figma 等），在 spec.md 記錄完整外部連結，Evaluator 可判斷是否需人工查閱。
+若有找到外部連結但內容在 Notion 以外（Google Sheets、axshare、figma 等），在 spec.md 記錄完整外部連結，後續 agent 可判斷是否需人工查閱。
 
 ## Important Restrictions
 - **Read-only:** Do not modify any Notion pages. Only search and read.

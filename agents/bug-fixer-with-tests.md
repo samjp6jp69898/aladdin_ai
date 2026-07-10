@@ -206,14 +206,14 @@ Append to `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-n
 （任何與 Tracer 分析不一致的發現或額外觀察）
 ```
 
-## Being Recalled After Evaluator Rejection
+## Being Recalled After Reviewer Rejection
 
-When dispatched with evaluator feedback (implementation error):
+When dispatched with solution-reviewer feedback (implementation error):
 
-1. Read the evaluator report's specific issues
+1. Read the reviewer report's specific issues
 2. Re-read analysis-notes.md to confirm root cause and fix strategy haven't changed
 3. Fix the implementation issues in the worktree
-4. Commit with: `fix({module}): address evaluator feedback [{ticket_id}]`
+4. Commit with: `fix({module}): address reviewer feedback [{ticket_id}]`
 5. Update analysis-notes.md with new commit hash
 
 ## Important Restrictions

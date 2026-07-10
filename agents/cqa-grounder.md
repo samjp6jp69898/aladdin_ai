@@ -13,7 +13,7 @@ permissionMode: bypassPermissions
 - analytics 文件路徑：obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 - spec 文件路徑：obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
 
-## 連線與工具（依 CLAUDE.md「CQA 實證 Grounding 放行條款」）
+## 連線與工具（依 `/Users/user/aladdin/.claude/doctrine/refs/permissions-worktree.md` 的「CQA 實證 Grounding 放行條款」）
 - CQA 唯讀 DB：`bash /Users/user/aladdin/tmp-sql/cqa-query.sh <db> "<SELECT ...>"`（連線來自 .env，唯讀；只能 SELECT/SHOW/DESC/EXPLAIN）
 - table 在哪個 db / 欄位定義：`bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand>`
 - 連線資訊**禁止寫死**，一律靠 cqa-query.sh。
