@@ -1,5 +1,5 @@
 /**
- * Notion Bug List — 一人一列、跨嚴重性等級分布的樞紐表（pivot），技術/非技術區分，輸出 CSV 報告。
+ * Notion Bug List — 一人一列、跨嚴重性等級分布的樞紐表（pivot），技術/非技術區分，依 FF / 巨星 / 未分類拆成三份 CSV。
  *
  * 篩選：狀態 = 仍有問題 OR 待處理（兩個 select 值）
  * 列：當前指派（people）以 person id 為主鍵；未指派獨立成「（未指派）」列
@@ -7,16 +7,20 @@
  *     —— 每個等級一欄，依 P 後數字由小到大排序（P0 最優先），未分級殿後；末欄「小計」= 該人跨等級總量
  * 分類：以 tech-users.csv 的 notion_user_id 比對 → 技術人員 / 非技術人員 / 未指派
  *       （刻意用 id 而非姓名比對：Notion 端顯示名常帶前後空白，靠姓名會誤判）
+ * 品牌拆分：以「影響端口」(multi_select) 判斷 → 值含「巨星」(如 巨星-前端/平台/系統) 歸巨星；
+ *       否則若「問題摘要」(title) 含「巨星」字樣亦歸巨星；其餘歸 FF；
+ *       「影響端口」為空或僅勾「未分配」歸未分類。三組各自輸出一份 CSV。
  *
  * 用法：
  *   bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>]
  *
  * 選項：
- *   --out <path>   另存 CSV 到指定路徑（預設：/Users/user/aladdin/tmp/bug-status-by-assignee.csv）
+ *   --out <path>   CSV 基準路徑，實際會拆成三份（預設基準：/Users/user/aladdin/tmp/bug-status-by-assignee.csv）：
+ *                  bug-status-by-assignee-FF.csv / -巨星.csv / -未分類.csv
  *
- * 輸出：CSV 永遠印到 stdout，同時寫入 --out 指定（或預設）路徑。
+ * 輸出：三份 CSV 依序印到 stdout，並各自寫入對應路徑。
  * 欄位：當前指派人員,類別,<各嚴重性等級…>,小計
- *       全檔末尾附跨人員彙總「技術人員小計 / 非技術人員小計 / 未指派小計 / 總計」（各欄亦為等級分布）。
+ *       每份檔案末尾附跨人員彙總「技術人員小計 / 非技術人員小計 / 未指派小計 / 總計」（各欄亦為等級分布）。
  *
  * 口徑：人次加總 = ticket 去重總數（此 DB 每張單最多一位指派人，無多重指派重複計算）。
  *       同一人跨多個等級的 ticket，於同一列各等級欄分別計數，小計為其加總。
@@ -38,6 +42,13 @@ function parseOut(): string {
     const i = args.indexOf('--out');
     if (i >= 0 && args[i + 1]) return args[i + 1];
     return DEFAULT_OUT;
+}
+
+// ── 依基準路徑推導各品牌的輸出路徑（在副檔名前插入品牌後綴）──
+function brandOutPath(base: string, brand: Brand): string {
+    const dot = base.lastIndexOf('.');
+    if (dot < 0) return `${base}-${brand}`;
+    return `${base.slice(0, dot)}-${brand}${base.slice(dot)}`;
 }
 
 // ── 載入技術人員名單（以 notion_user_id 為比對主鍵）──
@@ -78,7 +89,18 @@ async function queryAll(filter: object) {
     return all;
 }
 
-const outPath = parseOut();
+// ── 品牌分類：影響端口含「巨星」→ 巨星；否則問題摘要含「巨星」→ 巨星；其餘 → FF；空/僅未分配 → 未分類 ──
+type Brand = 'FF' | '巨星' | '未分類';
+const BRANDS: Brand[] = ['FF', '巨星', '未分類'];
+function classifyBrand(ports: string[], title: string): Brand {
+    const meaningful = ports.filter(p => p !== '未分配');
+    if (meaningful.length === 0) return '未分類';
+    if (meaningful.some(p => p.includes('巨星'))) return '巨星';
+    if (title.includes('巨星')) return '巨星';
+    return 'FF';
+}
+
+const outBase = parseOut();
 const techIds = loadTechIds();
 const filter = { or: WANTED_STATUSES.map(s => ({ property: '狀態', select: { equals: s } })) };
 const pages = await queryAll(filter);
@@ -87,79 +109,98 @@ type Cat = '技術人員' | '非技術人員' | '未指派';
 interface Stat { name: string; cat: Cat; bySev: Map<string, number>; total: number }
 
 const SEV_EMPTY = '（未分級）';
-// 一人一列、跨等級分布：assignee key → Stat（bySev 內含各等級張數）
-const byKey = new Map<string, Stat>();
-const sevSet = new Set<string>();
-const ensure = (key: string, name: string, cat: Cat) => {
-    if (!byKey.has(key)) byKey.set(key, { name, cat, bySev: new Map(), total: 0 });
-    return byKey.get(key)!;
-};
-const bump = (s: Stat, sev: string) => {
-    s.bySev.set(sev, (s.bySev.get(sev) ?? 0) + 1);
-    s.total++;
-    sevSet.add(sev);
-};
 
+// ── 依品牌分桶 ──
+const pagesByBrand: Record<Brand, any[]> = { 'FF': [], '巨星': [], '未分類': [] };
 for (const page of pages) {
     const props = page.properties;
     const status = props['狀態']?.select?.name ?? '';
     if (!WANTED_STATUSES.includes(status)) continue;
-    const sev = props['嚴重性']?.select?.name?.trim() || SEV_EMPTY;
-    const people = (props['當前指派']?.people ?? []) as any[];
-    if (people.length === 0) {
-        bump(ensure('__UNASSIGNED__', '（未指派）', '未指派'), sev);
-    } else {
-        for (const p of people) {
-            const id = p.id ?? '';
-            const name = (p.name ?? '（無名稱）').trim() || '（無名稱）';
-            const cat: Cat = techIds.has(id) ? '技術人員' : '非技術人員';
-            bump(ensure(id || name, name, cat), sev);
+    const ports = ((props['影響端口']?.multi_select ?? []) as any[]).map(m => m.name as string);
+    const title = ((props['問題摘要']?.title ?? []) as any[]).map(t => t.plain_text).join('');
+    pagesByBrand[classifyBrand(ports, title)].push(page);
+}
+
+// ── 單一品牌分桶內：組出一人一列、跨等級分布的 pivot CSV ──
+function buildCsv(brandPages: any[]): { csv: string; summary: string } {
+    const byKey = new Map<string, Stat>();
+    const sevSet = new Set<string>();
+    const ensure = (key: string, name: string, cat: Cat) => {
+        if (!byKey.has(key)) byKey.set(key, { name, cat, bySev: new Map(), total: 0 });
+        return byKey.get(key)!;
+    };
+    const bump = (s: Stat, sev: string) => {
+        s.bySev.set(sev, (s.bySev.get(sev) ?? 0) + 1);
+        s.total++;
+        sevSet.add(sev);
+    };
+
+    for (const page of brandPages) {
+        const props = page.properties;
+        const sev = props['嚴重性']?.select?.name?.trim() || SEV_EMPTY;
+        const people = (props['當前指派']?.people ?? []) as any[];
+        if (people.length === 0) {
+            bump(ensure('__UNASSIGNED__', '（未指派）', '未指派'), sev);
+        } else {
+            for (const p of people) {
+                const id = p.id ?? '';
+                const name = (p.name ?? '（無名稱）').trim() || '（無名稱）';
+                const cat: Cat = techIds.has(id) ? '技術人員' : '非技術人員';
+                bump(ensure(id || name, name, cat), sev);
+            }
         }
     }
+
+    // 等級欄排序：依 P 後數字由小到大（P0→P4…），未分級殿後
+    const sevRank = (s: string) => { const m = s.match(/^P(\d+)/); return m ? Number(m[1]) : 999; };
+    const sevOrder = [...sevSet].sort((a, b) => sevRank(a) - sevRank(b) || a.localeCompare(b));
+
+    // 排序：技術人員 → 非技術人員 → 未指派；各組內依小計（跨等級總量）由高到低
+    const catOrder: Record<Cat, number> = { '技術人員': 0, '非技術人員': 1, '未指派': 2 };
+    const sorted = [...byKey.values()].sort((a, b) =>
+        catOrder[a.cat] - catOrder[b.cat] || b.total - a.total
+    );
+
+    // 組 CSV：一人一列，欄位為各嚴重性等級 + 小計
+    const cell = (s: Stat, sev: string) => s.bySev.get(sev) ?? 0;
+    const rows: string[] = [['當前指派人員', '類別', ...sevOrder, '小計'].join(',')];
+    const groupSum: Record<Cat, { sev: Map<string, number>; total: number }> = {
+        '技術人員': { sev: new Map(), total: 0 },
+        '非技術人員': { sev: new Map(), total: 0 },
+        '未指派': { sev: new Map(), total: 0 },
+    };
+    for (const s of sorted) {
+        rows.push([s.name, s.cat, ...sevOrder.map(sev => cell(s, sev)), s.total].join(','));
+        const g = groupSum[s.cat];
+        for (const sev of sevOrder) g.sev.set(sev, (g.sev.get(sev) ?? 0) + cell(s, sev));
+        g.total += s.total;
+    }
+    rows.push('');
+
+    // 跨人員彙總：每類別一列（亦為等級分布）+ 總計
+    const sumRow = (label: string, cat: string, g: { sev: Map<string, number>; total: number }) =>
+        [label, cat, ...sevOrder.map(sev => g.sev.get(sev) ?? 0), g.total].join(',');
+    const grand: { sev: Map<string, number>; total: number } = { sev: new Map(), total: 0 };
+    for (const cat of ['技術人員', '非技術人員', '未指派'] as Cat[]) {
+        const g = groupSum[cat];
+        rows.push(sumRow(`${cat}小計`, cat, g));
+        for (const sev of sevOrder) grand.sev.set(sev, (grand.sev.get(sev) ?? 0) + (g.sev.get(sev) ?? 0));
+        grand.total += g.total;
+    }
+    rows.push(sumRow('總計', '全部', grand));
+
+    const csv = rows.join('\n') + '\n';
+    const sevSummary = sevOrder.map(sev => `${sev}:${grand.sev.get(sev) ?? 0}`).join(' / ');
+    const summary = `等級欄: ${sevOrder.join(', ') || '(無)'} | 各等級張數: ${sevSummary || '(無)'} | 總計: ${grand.total}`;
+    return { csv, summary };
 }
 
-// ── 等級欄排序：依 P 後數字由小到大（P0→P4…），未分級殿後 ──
-const sevRank = (s: string) => { const m = s.match(/^P(\d+)/); return m ? Number(m[1]) : 999; };
-const sevOrder = [...sevSet].sort((a, b) => sevRank(a) - sevRank(b) || a.localeCompare(b));
-
-// ── 排序：技術人員 → 非技術人員 → 未指派；各組內依小計（跨等級總量）由高到低 ──
-const catOrder: Record<Cat, number> = { '技術人員': 0, '非技術人員': 1, '未指派': 2 };
-const sorted = [...byKey.values()].sort((a, b) =>
-    catOrder[a.cat] - catOrder[b.cat] || b.total - a.total
-);
-
-// ── 組 CSV：一人一列，欄位為各嚴重性等級 + 小計 ──
-const cell = (s: Stat, sev: string) => s.bySev.get(sev) ?? 0;
-const rows: string[] = [['當前指派人員', '類別', ...sevOrder, '小計'].join(',')];
-const groupSum: Record<Cat, { sev: Map<string, number>; total: number }> = {
-    '技術人員': { sev: new Map(), total: 0 },
-    '非技術人員': { sev: new Map(), total: 0 },
-    '未指派': { sev: new Map(), total: 0 },
-};
-for (const s of sorted) {
-    rows.push([s.name, s.cat, ...sevOrder.map(sev => cell(s, sev)), s.total].join(','));
-    const g = groupSum[s.cat];
-    for (const sev of sevOrder) g.sev.set(sev, (g.sev.get(sev) ?? 0) + cell(s, sev));
-    g.total += s.total;
+console.error(`技術名單載入: ${techIds.size} 人`);
+for (const brand of BRANDS) {
+    const path = brandOutPath(outBase, brand);
+    const { csv, summary } = buildCsv(pagesByBrand[brand]);
+    await Bun.write(path, csv);
+    console.error(`[${brand}] ${summary}`);
+    console.error(`已寫入: ${path}`);
+    console.log(csv);
 }
-rows.push('');
-
-// ── 跨人員彙總：每類別一列（亦為等級分布）+ 總計 ──
-const sumRow = (label: string, cat: string, g: { sev: Map<string, number>; total: number }) =>
-    [label, cat, ...sevOrder.map(sev => g.sev.get(sev) ?? 0), g.total].join(',');
-const grand: { sev: Map<string, number>; total: number } = { sev: new Map(), total: 0 };
-for (const cat of ['技術人員', '非技術人員', '未指派'] as Cat[]) {
-    const g = groupSum[cat];
-    rows.push(sumRow(`${cat}小計`, cat, g));
-    for (const sev of sevOrder) grand.sev.set(sev, (grand.sev.get(sev) ?? 0) + (g.sev.get(sev) ?? 0));
-    grand.total += g.total;
-}
-rows.push(sumRow('總計', '全部', grand));
-
-const csv = rows.join('\n') + '\n';
-await Bun.write(outPath, csv);
-
-const sevSummary = sevOrder.map(sev => `${sev}:${grand.sev.get(sev) ?? 0}`).join(' / ');
-console.error(`技術名單載入: ${techIds.size} 人 | 等級欄: ${sevOrder.join(', ')} | 各等級張數: ${sevSummary} | 總計: ${grand.total}`);
-console.error(`已寫入: ${outPath}`);
-console.log(csv);
