@@ -2,75 +2,34 @@
 
 規則：只准填 `<>` 佔位符與增減表格列；開頭標記逐字保留；模板外不加自由段落。
 
-### T0 環境檢查未通過
+### T0 環境檢查未通過（Notion API Token）
 
 ```markdown
 🔌 [audit-log-sync] T0 環境檢查未通過
-
-| 檢查項 | 結果 |
-|--------|------|
-| 系統總表直接讀取 | ❌ 失敗 |
-| 失敗原因 | <無可用的 Notion 讀取工具 ｜ 未授權/無權限 ｜ 讀取錯誤：<訊息>> |
-
-（本次比對流程已停止）
-
-<僅 Claude Code 環境加上這段詢問：>
-要我現在幫你註冊官方 Notion 連接器嗎？我會執行 `claude mcp add --transport http notion https://mcp.notion.com/mcp`；
-註冊後仍需你自己完成兩步：輸入 `/mcp` → 選 notion 完成瀏覽器 OAuth → 重新執行 `/audit-log-sync`。
-<非 Claude Code 環境改為：>
-請依 `lamp/skills/audit-log-sync/README.md`「環境設定」章節完成 Notion 連接器設定後重試。
-```
-
-使用者同意註冊並執行完成後，輸出固定收尾句：
-
-```markdown
-✅ 已執行連接器註冊指令。請接著：輸入 `/mcp` → 選擇 notion → 完成瀏覽器 OAuth（授權需涵蓋兩份操作日誌總表所在的 workspace）→ 重新執行 `/audit-log-sync`。若 `/mcp` 看不到 notion，請重啟 Claude Code session 再試。
-```
-
-渲染範例：
-
-```markdown
-🔌 [audit-log-sync] T0 環境檢查未通過
-
-| 檢查項 | 結果 |
-|--------|------|
-| 系統總表直接讀取 | ❌ 失敗 |
-| 失敗原因 | 讀取錯誤：Too many redirects (exceeded 10)（僅有一般 WebFetch，無法通過 Notion 認證） |
-
-（本次比對流程已停止）
-
-要我現在幫你註冊官方 Notion 連接器嗎？我會執行 `claude mcp add --transport http notion https://mcp.notion.com/mcp`；
-註冊後仍需你自己完成兩步：輸入 `/mcp` → 選 notion 完成瀏覽器 OAuth → 重新執行 `/audit-log-sync`。
-```
-
-### T0b 環境檢查未通過（Todo 模式專用）
-
-```markdown
-🔌 [audit-log-sync] T0b 環境檢查未通過（Todo 模式）
 
 | 檢查項 | 結果 |
 |--------|------|
 | Notion API Token（`.env` 的 `ALD_RO`） | ❌ 失敗 |
 | 失敗原因 | <未設定 ALD_RO ｜ token 無效/過期（401/403）｜ 呼叫錯誤：<訊息>> |
 
-（本次 todo 查詢已停止）
+（本次比對流程已停止）
 
-請確認 `<skill-dir>/.env`（本 SKILL.md 所在目錄）是否已設定 `ALD_RO=<Notion Read-only Integration Token>`（該 integration 須已被分享兩份操作日誌總表 database；沒有 `.env` 可先複製同層的 `.env.example`），或改用 `/audit-log-sync <節點連結>`（url 模式）。
+請確認 `<skill-dir>/.env`（本 SKILL.md 所在目錄）是否已設定 `ALD_RO=<Notion Read-only Integration Token>`（該 integration 須已被分享兩份操作日誌總表 database；沒有 `.env` 可先複製同層的 `.env.example`）。詳細申請與設定步驟見 `README.md`「環境設定」。
 ```
 
 渲染範例：
 
 ```markdown
-🔌 [audit-log-sync] T0b 環境檢查未通過（Todo 模式）
+🔌 [audit-log-sync] T0 環境檢查未通過
 
 | 檢查項 | 結果 |
 |--------|------|
 | Notion API Token（`.env` 的 `ALD_RO`） | ❌ 失敗 |
 | 失敗原因 | 未設定 ALD_RO（該目錄下找不到 .env，或 .env 內沒有此變數） |
 
-（本次 todo 查詢已停止）
+（本次比對流程已停止）
 
-請確認 `~/.claude/skills/audit-log-sync/.env` 是否已設定 `ALD_RO=<Notion Read-only Integration Token>`（該 integration 須已被分享兩份操作日誌總表 database；沒有 `.env` 可先複製同層的 `.env.example`），或改用 `/audit-log-sync <節點連結>`（url 模式）。
+請確認 `~/.claude/skills/audit-log-sync/.env` 是否已設定 `ALD_RO=<Notion Read-only Integration Token>`（該 integration 須已被分享兩份操作日誌總表 database；沒有 `.env` 可先複製同層的 `.env.example`）。詳細申請與設定步驟見 `README.md`「環境設定」。
 ```
 
 ### T1 使用說明（無參數時，僅無 AskUserQuestion 工具的環境使用；有該工具一律走「無參數時的模式選擇」）

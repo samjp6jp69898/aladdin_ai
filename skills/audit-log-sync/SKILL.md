@@ -15,28 +15,26 @@ allowed-tools: Read Grep Glob Bash Edit Write AskUserQuestion
 1. **Notion 唯讀**：任何情況下不得寫入/留言/修改 Notion
 2. **禁改 `localizations/*.json`**：i18n 缺漏只產 CSV 清單（T5），由開發者貼 Google Sheets
 3. **不跑生成/lint/測試、不 commit**：一律由開發者事後自行執行（T6 提醒）
-4. **所有面向使用者的輸出必須使用 `references/templates.md` 的 T0–T6 模板（含 T0b／T1b／T2b）**，只准填佔位符；模板外禁止自由段落，補充說明寫進模板預留欄位
+4. **所有面向使用者的輸出必須使用 `references/templates.md` 的 T0–T6 模板（含 T1b／T2b）**，只准填佔位符；模板外禁止自由段落，補充說明寫進模板預留欄位
 5. **結構性事實必附 `檔案:行號`**，且該行必須真的讀過；禁止憑記憶回答 enum 值 / 簽名 / 欄位
 6. **規格缺漏 → 提醒＋停止**，不得以程式碼現況腦補規格
 7. `audit()` 第 5 參數在原始碼中拼寫為 `tagetId`（`agrabah/src/common_services/audit_log.ts:5`），屬歷史拼寫；位置參數呼叫不受影響，**勿順手改名**
-8. **Token 不得寫死**：todo 模式用的 Notion Token 一律從**本 SKILL.md 所在目錄**的 `.env`（`ALD_RO`）讀取；任何情況下不得把實際 token 值寫進 SKILL.md／程式碼／對話輸出
+8. **Token 不得寫死**：Notion Token 一律從**本 SKILL.md 所在目錄**的 `.env`（`ALD_RO`）讀取；任何情況下不得把實際 token 值寫進 SKILL.md／程式碼／對話輸出
 
 ## 常數
 
 | 常數 | 值 |
 |------|-----|
-| 系統總表 URL | `https://app.notion.com/p/39787d78618a80cda573c3de3c4e81ff?source=copy_link`（database「總表」） |
-| 平台總表 URL | `https://app.notion.com/p/39387d78618a80e5afb3cd7bca695a0f?source=copy_link`（database「全總表」） |
-
-> URL 格式注意（實測）：Notion MCP 對「複製連結」格式（帶 `?source=copy_link`）的解析較可靠。讀取任何 Notion URL 失敗時，先在同一 URL 加上／移除 `?source=copy_link` 重試一次，兩種形式都失敗才算失敗。
+| 系統總表 URL（human 參考，非程式呼叫用） | `https://app.notion.com/p/39787d78618a80cda573c3de3c4e81ff?source=copy_link`（database「總表」） |
+| 平台總表 URL（human 參考，非程式呼叫用） | `https://app.notion.com/p/39387d78618a80e5afb3cd7bca695a0f?source=copy_link`（database「全總表」） |
 | 系統總表 → gate | `admin`（`GateId.admin`；項目類型走 `AdminActionIdEnum`；讀取端 `audit_admin.ts`，**無**會員帳號欄） |
 | 平台總表 → gate | `platform`（`GateId.platform`；項目類型走 `PlatformActionIdEnum`；讀取端 `audit_platform.ts`，會員帳號＝`target_id` 反查 identifier） |
 | 節點頁 title 屬性＝`-` | 企劃標記本節點**不需要任何操作日誌**（免寫）；空白或其他文字＝正常節點，照常五層比對。系統總表的 title 屬性欄名為「操作日誌總表」、平台總表為「操作日誌規則」，兩者皆為各自 database 的主鍵（title 型別）屬性——判斷時看該頁 **title 型別**屬性的值，不依賴確切表頭字串 |
-| 系統總表 database ID（todo 模式查詢用） | `dfe87d78618a82d0b95b818f7f503ba9`（data source `e4d87d78-618a-836e-9d00-875c2ea8b8b4`） |
-| 平台總表 database ID（todo 模式查詢用） | `80b87d78618a8211b84301527e4ac9bc`（data source `d8187d78-618a-82e5-9675-878700ddc5fa`） |
-| Todo 模式 Token | 讀**本 SKILL.md 所在目錄**的 `.env`（`ALD_RO`＝Notion Read-only Integration Token；capability 僅 `Read content`＋`Read user information without email`；僅分享兩份總表 database 給該 integration）。`.env` 不進版控，同層的 `.env.example` 是安全範本 |
+| 系統總表 database ID | `dfe87d78618a82d0b95b818f7f503ba9`（data source `e4d87d78-618a-836e-9d00-875c2ea8b8b4`） |
+| 平台總表 database ID | `80b87d78618a8211b84301527e4ac9bc`（data source `d8187d78-618a-82e5-9675-878700ddc5fa`） |
+| Notion Token | 讀**本 SKILL.md 所在目錄**的 `.env`（`ALD_RO`＝Notion Read-only Integration Token；capability 僅 `Read content`＋`Read user information without email`；僅分享兩份總表 database 給該 integration）。`.env` 不進版控，同層的 `.env.example` 是安全範本。Step 0／Step 1b／Step 2 全程共用同一把 token，一律直呼 REST API（`api.notion.com`），不經 MCP 連接器 |
 
-> database ID 由總表頁面內的 inline database 區塊解析而得（fetch 總表 URL 後，內容裡 `<database url="...">` 標籤即該 database 的頁面 URL，取其 ID）。**總表搬家／URL 變更時**，這兩個 database ID 需要一併重新解析並更新此表。
+> database ID 由總表頁面內的 inline database 區塊解析而得：`GET /v1/blocks/{總表頁 page_id}/children` 找 `type=="child_database"` 的 block，其 `id` 即為該 database 的 ID（用「系統總表 URL」「平台總表 URL」取 page_id 的方式同 Step 2「URL → page_id」）。**總表搬家／URL 變更時**，這兩個 database ID 需要一併重新解析並更新此表。
 
 ## 背景知識：操作日誌五層鏈路
 
@@ -54,18 +52,15 @@ allowed-tools: Read Grep Glob Bash Edit Write AskUserQuestion
 
 ## 執行流程
 
-### Step 0：Notion 連通性驗證（fetch 節點時執行）
+### Step 0：Notion API Token 驗證（呼叫 skill 時最先執行一次，url／todo 兩模式共用）
 
-本步驟只用於「準備 fetch 某個節點頁」之前——不論該節點 URL 是使用者直接貼的，還是 Step 1b todo 清單選出來的；todo 模式本身（清單查詢階段）不依賴本步驟，走 Step 1b 自己的 Token 檢查。
+1. `<skill-dir>` 記作**本 SKILL.md 檔案實際所在的目錄**（例如你是從 `~/.claude/skills/audit-log-sync/SKILL.md` 或 workspace `.claude/skills/audit-log-sync/SKILL.md` 讀到這份流程，`<skill-dir>` 就是該路徑去掉檔名的目錄；不要假設任何固定絕對路徑，每個人／每個 workspace 的安裝位置不同）。讀 `<skill-dir>/.env` 的 `ALD_RO`。缺 `.env`／缺 `ALD_RO` → 輸出 **T0** 並**停止**
+2. 呼叫 `GET https://api.notion.com/v1/users/me`（headers：`Authorization: Bearer ${ALD_RO}`、`Notion-Version: 2022-06-28`）驗證 token 有效：
+   - 200 → 通過，繼續 Step 1
+   - 401/403 → 輸出 **T0**（token 無效/過期，或該 integration 沒有權限）並**停止**
+   - 其他網路／未知錯誤 → 輸出 **T0**（把實際錯誤訊息填進去）並**停止**
 
-**不要先檢查「有沒有連接器工具」——直接嘗試讀取一次系統總表 URL**（用環境中可用的 Notion 讀取途徑，一般是 Notion 連接器提供的頁面讀取工具）：
-
-1. 讀取成功（能取得 database 標題）→ 通過，繼續 Step 1
-2. 讀取失敗 → 先依「常數」節的 URL 格式注意事項加上／移除 `?source=copy_link` 重試一次
-3. 仍失敗（環境沒有任何可讀 Notion 的工具／未授權／無權限／讀取錯誤）→ 輸出 **T0**（把實際失敗原因填進去）並**停止**本次流程
-3. **T0 之後的引導（僅 Claude Code 環境）**：OAuth 授權是 `/mcp` 的互動式 UI，你無法代替使用者完成，但可以代跑註冊指令。輸出 T0 後接著詢問使用者是否要現在註冊（照 T0 模板內建的詢問句）：
-   - 使用者同意 → 先以 `claude mcp list` 檢查是否已註冊 `notion`；未註冊才執行 `claude mcp add --transport http notion https://mcp.notion.com/mcp`；然後輸出 T0 模板內建的收尾句，引導使用者輸入 `/mcp` 完成 OAuth 後重跑 `/audit-log-sync`
-   - 使用者拒絕或非 Claude Code 環境 → 指向 README「環境設定」即可，流程結束
+本步驟通過後，Step 1b（清單查詢）與 Step 2（fetch 節點頁）共用同一把已驗證的 token，不再重複檢查。
 
 ### Step 1：參數解析
 
@@ -87,7 +82,7 @@ allowed-tools: Read Grep Glob Bash Edit Write AskUserQuestion
 
 依回覆分流：
 
-- 選「貼 Notion 節點連結」→ 回覆一句「請貼上要處理的 Notion 節點頁連結」，等待使用者下一則訊息帶連結，取得後視同 `<notion-url>` 呼叫形式，進 Step 0（fetch 模式環境檢查）→ Step 2
+- 選「貼 Notion 節點連結」→ 回覆一句「請貼上要處理的 Notion 節點頁連結」，等待使用者下一則訊息帶連結，取得後視同 `<notion-url>` 呼叫形式，進 Step 2
 - 選「查詢我負責的節點清單」→ 回覆一句「請輸入你的 Notion 顯示名」，等待使用者下一則訊息帶人名，取得後視同 `todo <負責技術人名>` 呼叫形式，進 **Step 1b**
 - 使用者選 Other 自行輸入其他文字 → 依文字內容判斷像連結還是人名，分別比照上述兩支分流；無法判斷 → 重新輸出 T1 文字說明
 
@@ -95,14 +90,13 @@ allowed-tools: Read Grep Glob Bash Edit Write AskUserQuestion
 
 ### Step 1b：Todo 模式（僅 `todo <負責技術人名>` 呼叫形式進入）
 
-Notion 官方 MCP 的資料庫查詢工具受 workspace 方案限制（需 Business plan），無法用於列清單；本模式改用**唯讀 Notion Integration Token**直呼 Notion 官方 REST API（`api.notion.com`），不經 MCP，不受此限制。
+Notion 官方 MCP 的資料庫查詢工具受 workspace 方案限制（需 Business plan），無法用於列清單；本模式改用 Step 0 已驗證的**唯讀 Notion Integration Token**直呼 Notion 官方 REST API（`api.notion.com`），不經 MCP，不受此限制。
 
-1. **Token 檢查**：`<skill-dir>` 記作**本 SKILL.md 檔案實際所在的目錄**（例如你是從 `~/.claude/skills/audit-log-sync/SKILL.md` 或 workspace `.claude/skills/audit-log-sync/SKILL.md` 讀到這份流程，`<skill-dir>` 就是該路徑去掉檔名的目錄；不要假設任何固定絕對路徑，每個人／每個 workspace 的安裝位置不同）。讀 `<skill-dir>/.env` 的 `ALD_RO`。缺 `.env`／缺 `ALD_RO`，或呼叫 `GET https://api.notion.com/v1/users` 失敗（401/403/網路錯誤）→ 輸出 **T0b** 並**停止**（引導使用者依 README 在 `<skill-dir>/.env` 設定 token，或改用 url 模式）
-2. **姓名 → user id 解析**：分頁呼叫 `GET /v1/users?page_size=100`（`has_more=true` 時帶 `start_cursor` 續讀直到讀完），只保留 `type=="person"` 的項目，比對 `name` 欄位是否包含輸入的人名（不分大小寫、子字串比對，因為 Notion 顯示名常有 `KHH` 等前綴）
+1. **姓名 → user id 解析**：分頁呼叫 `GET /v1/users?page_size=100`（`has_more=true` 時帶 `start_cursor` 續讀直到讀完），只保留 `type=="person"` 的項目，比對 `name` 欄位是否包含輸入的人名（不分大小寫、子字串比對，因為 Notion 顯示名常有 `KHH` 等前綴）
    - 0 命中 → 用 **T1b「情況一」**回報查無此人並停止
    - ≥2 命中 → 用 **T1b「情況二」**列出候選顯示名，請使用者回覆更精確的名字或選編號，重跑本步驟
    - 1 命中 → 取得 user id，繼續
-3. **查詢兩份總表**：對「常數」節的兩個 database ID 各呼叫一次
+2. **查詢兩份總表**：對「常數」節的兩個 database ID 各呼叫一次
 
    ```bash
    set -a; source <skill-dir>/.env; set +a
@@ -114,9 +108,9 @@ Notion 官方 MCP 的資料庫查詢工具受 workspace 方案限制（需 Busin
    ```
 
    `has_more=true` 時帶 `next_cursor` 當 `start_cursor` 續讀，直到兩份總表都讀完；某一份中途持續失敗 → 該份總表的結果視為「已讀範圍」不完整，於 T1b 註記
-4. **解析每一列**（`properties.<欄位>`）：`一級菜單`＝`select.name`；`二級菜單`／`三級菜單`＝`rich_text[].plain_text` 串接；`版本`＝`select.name`；`處理完成`＝`checkbox`；節點連結＝該列頂層 `url` 欄位；「來源」依 database ID 對應系統／平台
-5. 輸出 **T1b「情況三」**：依「處理完成」分成「未完成」「已完成（可複檢）」兩段表格
-6. 使用者回覆編號 → 取出對應列的 `url`，視同使用者直接貼上該連結，**進入 Step 0（fetch 模式環境檢查）→ Step 2**，之後與 url 模式完全相同流程
+3. **解析每一列**（`properties.<欄位>`）：`一級菜單`＝`select.name`；`二級菜單`／`三級菜單`＝`rich_text[].plain_text` 串接；`版本`＝`select.name`；`處理完成`＝`checkbox`；節點連結＝該列頂層 `url` 欄位；「來源」依 database ID 對應系統／平台
+4. 輸出 **T1b「情況三」**：依「處理完成」分成「未完成」「已完成（可複檢）」兩段表格
+5. 使用者回覆編號 → 取出對應列的 `url`，視同使用者直接貼上該連結，**進入 Step 2**，之後與 url 模式完全相同流程
 
 「處理完成」勾選不是門檻：todo 清單同樣列出已完成節點，供複檢。
 
@@ -124,11 +118,15 @@ Step 1b 全程主線程執行（純資料查詢與過濾，不涉及五層比對
 
 ### Step 2：fetch 規格 → 規格中間格式
 
-1. 讀取節點頁的 database 列屬性（一/二/三級菜單、版本、負責技術、處理完成、不支援批量/單個分開、**title 屬性**）
-2. **判定 gate**：依頁面 parent 屬於哪份總表（系統→`admin`、平台→`platform`）。**parent 不屬於任一已知總表**（貼錯連結、子頁）→ 用 T2 的停止形式回報「無法判定所屬總表」並**停止，不預設 gate**
-3. **免寫早退檢查**：該頁 title 屬性值 trim 後＝`-` → 視為企劃標記本節點不需要任何操作日誌，**不讀內頁「操作日志詳情」表格**，輸出 **T2b** 並**停止**，不進入 Step 3 之後任何流程（不比對、不改 code）；title 為空白或其他文字 → 視為正常節點，繼續下一步
-4. 讀內頁「操作日志詳情」表格，**按表頭名稱**辨識欄位（不按位置）：`系統項目`／`項目類型`／`會員帳號`（平台）／`操作前-中文`／`操作前-英文`／`操作後-中文`／`操作後-英文`／`備註` 或 `示意`（兩名稱都映射到 remark，屬**選配欄**）
-5. 整理成規格中間格式（內部工作資料，不直接輸出）：
+1. **URL → page_id**：網址帶 `p=` query 參數（貼開子頁時複製的連結會有這個參數，代表實際開啟的頁面）→ 取該參數的 32 碼 hex；沒有 `p=` 參數 → 取路徑最後一段的 32 碼 hex。取到後轉成標準 UUID 格式（`8-4-4-4-12` 加 dash）
+2. **讀節點頁**：`GET https://api.notion.com/v1/pages/{page_id}`（headers 同 Step 0：`Authorization: Bearer ${ALD_RO}`、`Notion-Version: 2022-06-28`）。非 200（404／其他錯誤）→ 用 T2 的停止形式回報「讀取節點頁失敗：<訊息>」並停止
+3. **判定 gate**：比對回傳 `parent.database_id` 是否等於「常數」節的兩個 database ID（系統→`admin`、平台→`platform`）。**不屬於任一已知 database**（貼錯連結、子頁）→ 用 T2 的停止形式回報「無法判定所屬總表」並**停止，不預設 gate**
+4. **解析頁面屬性**（`properties.<欄位>`）：`一級菜單`＝`select.name`；`二級菜單`／`三級菜單`＝`rich_text[].plain_text` 串接；`版本`＝`select.name`；`負責技術`＝`people[].name` 陣列；`處理完成`／`不支援批量/單個分開`＝`checkbox`；**title 屬性**（查 `type=="title"` 的那一欄，不依賴確切欄名字串——系統為「操作日誌總表」、平台為「操作日誌規則」）＝`title[].plain_text` 串接
+5. **免寫早退檢查**：title 屬性值 trim 後＝`-` → 視為企劃標記本節點不需要任何操作日誌，**不讀內頁「操作日志詳情」表格**，輸出 **T2b** 並**停止**，不進入 Step 3 之後任何流程（不比對、不改 code）；title 為空白或其他文字 → 視為正常節點，繼續下一步
+6. **找內頁「操作日志詳情」表格**：分頁呼叫 `GET /v1/blocks/{page_id}/children?page_size=100`（`has_more=true` 時帶 `start_cursor` 續讀），找 `type=="child_database"` 且 `child_database.title=="操作日志詳情"` 的 block，取其 `id` 作為表格的 database id。找不到 → 進 Step 3 判定為「內頁沒有「操作日志詳情」表格」
+7. **查表格列**：分頁呼叫 `POST /v1/databases/{該 id}/query`（headers 同上，`Content-Type: application/json`，body 可傳 `{"page_size":100}`；`has_more=true` 時帶 `next_cursor` 當 `start_cursor` 續讀）取得全部列
+8. **按表頭名稱**（`properties.<表頭>`，不按位置）辨識欄位：`系統項目`／`項目類型`／`會員帳號`（平台）／`操作前-中文`／`操作前-英文`／`操作後-中文`／`操作後-英文`／`備註` 或 `示意`（兩名稱都映射到 remark，屬**選配欄**）；每欄依實際回傳的 property type 取顯示文字（`title[].plain_text` 或 `rich_text[].plain_text` 串接、或 `select.name`），不假設固定型別
+9. 整理成規格中間格式（內部工作資料，不直接輸出）：
 
 ```json
 {
@@ -273,4 +271,4 @@ reviewer 以「規格中間格式＋兩份內部產物」為輸入，**獨立**�
 
 ## 輸出模板（T0–T6）
 
-輸出模板全文（含 T0b／T1b／T2b 與每個模板的完整渲染範例）獨立收錄於 `references/templates.md`，**產出任一 T_ 模板前必須先讀該檔對應段落**，只准填 `<>` 佔位符與增減表格列；開頭標記逐字保留；模板外不加自由段落。模板清單：T0（環境檢查未通過）、T0b（Todo 模式環境檢查未通過）、T1（使用說明）、T1b（Todo 查詢結果）、T2（規格摘要）、T2b（免寫節點）、T3（五層差異報告）、T4（變更清單）、T5（i18n 待補清單）、T6（收尾提醒）。
+輸出模板全文（含 T1b／T2b 與每個模板的完整渲染範例）獨立收錄於 `references/templates.md`，**產出任一 T_ 模板前必須先讀該檔對應段落**，只准填 `<>` 佔位符與增減表格列；開頭標記逐字保留；模板外不加自由段落。模板清單：T0（環境檢查未通過）、T1（使用說明）、T1b（Todo 查詢結果）、T2（規格摘要）、T2b（免寫節點）、T3（五層差異報告）、T4（變更清單）、T5（i18n 待補清單）、T6（收尾提醒）。
