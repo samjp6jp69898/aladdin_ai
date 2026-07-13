@@ -18,6 +18,18 @@ description: 從 Notion Bug List 查狀態為「仍有問題 / 待處理」的 t
 ## 使用方式
 
 ```bash
+bash /Users/user/aladdin/cron/bug-report-run.sh
+```
+
+與本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是**同一支腳本**，只維護一份，行為完全一致：
+
+1. 跑 `bug-assignee-report.ts` 產出 FF / 巨星 / 未分類三份 CSV 到 `/tmp/bug-status-by-assignee-<品牌>.csv`。
+2. 用 Telegram bot（token 讀 `/Users/user/aladdin/.env` 的 `TELEGRAM_BOT_TOKEN`）把三份 CSV 各自當文件推送到固定 `chat_id`（`5022865804`，Landon），caption 為「Bug 指派人員統計 - <品牌>（日期）」。
+3. 任一步驟失敗（報表腳本出錯、CSV 為空、Telegram 推送失敗）會先發一則 `⚠️ Bug 報表排程失敗：...` 文字通知，不會靜默。
+
+若只需要 CSV 內容本身、不需要發 Telegram（例如要在對話中直接分析數字），改跑底層報表腳本即可：
+
+```bash
 bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>]
 ```
 
