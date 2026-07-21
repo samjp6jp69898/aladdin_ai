@@ -1,10 +1,11 @@
 #!/bin/bash
 # sync-mirrors.sh — 鏡像同步 + 單一來源健檢
 #
-# 實況（2026-07-03 以 inode 實測確認）：
+# 實況（2026-07-21 以 inode 實測確認）：
 #   - .claude/commands → symlink → obsidian/commands   ┐
 #   - .claude/agents   → symlink → obsidian/agents     ├ 同一份檔案，天然不會漂移
 #   - .claude/skills   → symlink → obsidian/skills     │（但 symlink 若被誤換成真目錄，漂移風險立刻回來）
+#   - .claude/doctrine → symlink → obsidian/doctrine   │
 #   - scripts          → symlink → obsidian/scripts    ┘
 #   - CLAUDE.md（專案根）↔ obsidian/CLAUDE.md：**唯一真正的雙實體複本**，需要本腳本同步
 #
@@ -51,6 +52,7 @@ check_link() { # $1=link path, $2=expected target
 check_link "$ROOT/.claude/commands" "$ROOT/obsidian/commands"
 check_link "$ROOT/.claude/agents"   "$ROOT/obsidian/agents"
 check_link "$ROOT/.claude/skills"   "$ROOT/obsidian/skills"
+check_link "$ROOT/.claude/doctrine" "$ROOT/obsidian/doctrine"
 check_link "$ROOT/scripts"          "$ROOT/obsidian/scripts"
 
 echo "DONE ($MODE)"
