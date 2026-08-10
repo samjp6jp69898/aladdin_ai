@@ -139,8 +139,10 @@ else
   if ( cd "$WT/rajah" && sh bootstrap.sh ) >"$BLOG" 2>&1; then
     echo "bootstrap: OK"
   else
-    if grep -qE 'ECONNREFUSED|unknownDatabaseError|can not found connection string' "$BLOG"; then
+    if grep -qE 'ECONNREFUSED|unknownDatabaseError|can not found connection string|migrate \[[A-Za-z]+\] error\(|script "(sync-all|sync-configurations)" exited' "$BLOG"; then
       # DB 資料供給層卡點（migrate ControlCenter / sync-configurations / sync-all）。
+      # 2026-07-30：原本只認連線層錯誤，schema 漂移（如 ER_DUP_FIELDNAME 導致的
+      # migrate [Agent] error(12)）會誤判成「未知失敗」把整批 pipeline 擋死，故納入樣式。
       # 在此之前的程式碼生成（generate-genie / generate-configuration-files / generate-entries / generate-all）已完成，
       # 是後續 fixer 需要的東西。詳見 pitfalls-worktree.md「獨立問題」段。
       BOOTSTRAP_STATUS="partial"

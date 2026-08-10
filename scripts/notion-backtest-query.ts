@@ -23,16 +23,16 @@ import { join } from 'path';
 import { homedir } from 'os';
 
 // token 單一來源：環境變數 > /Users/user/aladdin/.env（bun 從專案根執行時會自動載入 .env）
-const NOTION_TOKEN = (() => {
-  let t = process.env.NOTION_TOKEN ?? '';
+const ALD_NOTION_TOKEN = (() => {
+  let t = process.env.ALD_NOTION_TOKEN ?? '';
   if (!t) {
     try {
       const env = require('fs').readFileSync('/Users/user/aladdin/.env', 'utf8');
-      t = env.match(/^NOTION_TOKEN=(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, '') ?? '';
+      t = env.match(/^ALD_NOTION_TOKEN=(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, '') ?? '';
     } catch {}
   }
   if (!t.startsWith('ntn_')) {
-    console.error('ERROR: NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加 NOTION_TOKEN=ntn_xxx');
+    console.error('ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加 ALD_NOTION_TOKEN=ntn_xxx');
     process.exit(1);
   }
   return t;
@@ -109,7 +109,7 @@ async function queryDatabase(filter: object, limit: number) {
         const res = await fetch(`${NOTION_API}/data_sources/${DATA_SOURCE_ID}/query`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${NOTION_TOKEN}`,
+                'Authorization': `Bearer ${ALD_NOTION_TOKEN}`,
                 'Notion-Version': '2025-09-03',
                 'Content-Type': 'application/json',
             },

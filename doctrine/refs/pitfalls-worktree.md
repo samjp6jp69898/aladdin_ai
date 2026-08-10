@@ -41,3 +41,10 @@ bootstrap.sh 卡住的位置在 `migrate ControlCenter` / `sync-configurations` 
 ## 歷史踩坑：跨 repo cherry-pick 漏 pick（2026-06-01）
 
 `e7d7a734c`（agrabah）打賞審核修復有同步，但 rajah 對應節點漏 pick 到 `feature/20260609`，導致正式環境 `GetTipAuditList` 回傳空白列表。→ 跨 repo 同一功能的所有節點必須全部 pick 完整。
+
+## bootstrap DB schema 漂移被誤判成「未知失敗」擋死整批 pipeline（2026-07-30）
+症狀：`setup-worktree.sh` 最後一行 `SETUP_FAIL:bootstrap 未知錯誤`，bootstrap.log 尾為 `error: migrate [Agent] error(12) at [202607291718_add_settle_to_general_agent_id_to_agent_commission_invoice.sql]`，上游 mysql 錯誤 `ER_DUP_FIELDNAME / Duplicate column name 'settle_to_general_agent_id'`、`error: script "sync-all" exited with code 1`。連跑兩次同錯。
+根因：`Duplicate column name` 字面意義是欄位已存在——dev DB schema 其實正確，只是 migration 版本記錄未同步。但 :142 的 db-seed 分類器只 grep 連線層樣式（ECONNREFUSED / unknownDatabaseError / can not found connection string），schema 漂移型錯誤落到 else 判 SETUP_FAIL。又因 bootstrap（:139）**無條件執行、與 affected_repos 無關**，連純 lago 前端單也被 agrabah 的 DB 擋死 → /create-mrs 整批每張都會先燒 25–40 分鐘 analyst/grounder/tracer 再死在 Step 4，並被錯標 failed 污染 tracker 與 Notion。
+判別法：看 bootstrap.log 是否含 `migrate [X] error(N)` 或 `script "sync-all" exited`；若程式碼生成階段（generate-*）已完成、失敗只落在 migrate/sync-*，即屬此坑而非真環境失敗。人工復核：在主 repo 跑同指令，同錯 = 本機既有問題，與 worktree 無關。
+修法：已固化進 `setup-worktree.sh`——分類器樣式加入 `migrate \[[A-Za-z]+\] error\(` 與 `script "(sync-all|sync-configurations)" exited`，改判 `SETUP_OK BOOTSTRAP_PARTIAL:db-seed` 續行（本 pipeline 只跑 L0 測試不連 DB）。真正未知錯誤仍判 SETUP_FAIL。
+影響範圍：`scripts/setup-worktree.sh`、/create-mr Step 4、/create-mrs 整批、/analyze-bugs 系列共用同一腳本。
