@@ -7,13 +7,16 @@
 #   notion.sh update-prop <page_id> <prop_name> select <value>  - 更新 select 屬性
 #   notion.sh get-user <user_id>                          - 查詢用戶資訊
 #   notion.sh list-users                                  - 列出工作區全體成員（唯讀）
+#   notion.sh query-datasource <data_source_id> ['<filter_json>'] - 查詢 data source（唯讀）
+#   notion.sh upload-file <filepath> [content_type]       - 上傳檔案（<20MB），回傳 file_upload id
+#   notion.sh create-page <data_source_id> '<properties_json>' - 在 database 建立新頁面
 
-# token 單一來源：/Users/user/aladdin/.env 的 NOTION_TOKEN（或已 export 的同名環境變數）。
+# token 單一來源：/Users/user/aladdin/.env 的 ALD_NOTION_TOKEN（或已 export 的同名環境變數）。
 # 禁止把明文 token 寫回本檔或任何 prompt/文件——輪替 token 時只需改 .env 一處。
-NOTION_TOKEN="${NOTION_TOKEN:-$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
+NOTION_TOKEN="${ALD_NOTION_TOKEN:-$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
 case "$NOTION_TOKEN" in
     ntn_*) ;;
-    *) echo "ERROR: NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加一行 NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
+    *) echo "ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加一行 ALD_NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
 esac
 NOTION_API="https://api.notion.com/v1"
 NOTION_VERSION="2025-09-03"
@@ -208,6 +211,92 @@ print(json.dumps({'properties': {sys.argv[1]: {'rich_text': [{'type': 'text', 't
             -H "Content-Type: application/json"
         ;;
 
+    query-datasource)
+        # 唯讀：查詢 data source（POST /v1/data_sources/<id>/query）
+        # 用法：notion.sh query-datasource <data_source_id> ['<filter_json>']
+        #   例：notion.sh query-datasource 21c87d78-618a-817f-ae71-000baa9ab11b '{"property":"單號","unique_id":{"equals":3843}}'
+        #   filter_json 省略時查全部（page_size 100，不分頁）
+        DS_ID="$2"
+        FILTER_JSON="$3"
+        if [ -z "$DS_ID" ]; then
+            echo "Usage: notion.sh query-datasource <data_source_id> ['<filter_json>']"
+            exit 1
+        fi
+        BODY=$(python3 -c "
+import json, sys
+filter_json = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
+body = {'page_size': 100}
+if filter_json:
+    body['filter'] = json.loads(filter_json)
+print(json.dumps(body))
+" "$FILTER_JSON")
+        curl -s -X POST "${NOTION_API}/data_sources/${DS_ID}/query" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY"
+        ;;
+
+    upload-file)
+        # 上傳檔案到 Notion File Upload（僅支援 single_part，即 <20MB 檔案），回傳 file_upload 物件（含 id）
+        # 用法：notion.sh upload-file <filepath> [content_type]
+        FILEPATH="$2"
+        CONTENT_TYPE="${3:-text/html}"
+        if [ -z "$FILEPATH" ] || [ ! -f "$FILEPATH" ]; then
+            echo "Usage: notion.sh upload-file <filepath> [content_type]"
+            exit 1
+        fi
+        FILENAME=$(basename "$FILEPATH")
+        CREATE_RESULT=$(curl -s -X POST "${NOTION_API}/file_uploads" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -H "Content-Type: application/json" \
+            -d "{\"filename\": \"${FILENAME}\", \"content_type\": \"${CONTENT_TYPE}\"}")
+        UPLOAD_ID=$(echo "$CREATE_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+        UPLOAD_URL=$(echo "$CREATE_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('upload_url',''))" 2>/dev/null)
+        if [ -z "$UPLOAD_ID" ] || [ -z "$UPLOAD_URL" ]; then
+            echo "ERROR: 建立 file_upload 失敗：$CREATE_RESULT" >&2
+            exit 1
+        fi
+        SEND_RESULT=$(curl -s -X POST "$UPLOAD_URL" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -F "file=@${FILEPATH};type=${CONTENT_TYPE}")
+        echo "$SEND_RESULT"
+        STATUS=$(echo "$SEND_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
+        if [ "$STATUS" != "uploaded" ]; then
+            echo "ERROR: 上傳未完成，status=$STATUS" >&2
+            exit 1
+        fi
+        ;;
+
+    create-page)
+        # 在指定 database（data source）建立新頁面
+        # 用法：notion.sh create-page <data_source_id> '<properties_json>'
+        #   例：notion.sh create-page 37d87d78-618a-80a1-9aad-000b02c4f2cf '{"標題":{"title":[{"text":{"content":"0714"}}]},"更新日期":{"date":{"start":"2026-07-14"}},"html檔案":{"files":[{"type":"file_upload","file_upload":{"id":"<upload_id>"},"name":"xxx.html"}]}}'
+        DS_ID="$2"
+        PROPS_JSON="$3"
+        if [ -z "$DS_ID" ] || [ -z "$PROPS_JSON" ]; then
+            echo "Usage: notion.sh create-page <data_source_id> '<properties_json>'"
+            exit 1
+        fi
+        BODY=$(python3 -c "
+import json, sys
+props = json.loads(sys.argv[1])
+print(json.dumps({'parent': {'type': 'data_source_id', 'data_source_id': sys.argv[2]}, 'properties': props}))
+" "$PROPS_JSON" "$DS_ID")
+        RESULT=$(curl -s -X POST "${NOTION_API}/pages" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY")
+        echo "$RESULT"
+        ERROR=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('object',''))" 2>/dev/null)
+        if [ "$ERROR" = "error" ]; then
+            exit 1
+        fi
+        ;;
+
     *)
         echo "Notion API CLI Tool"
         echo "Usage:"
@@ -219,5 +308,8 @@ print(json.dumps({'properties': {sys.argv[1]: {'rich_text': [{'type': 'text', 't
         echo "  notion.sh update-prop <page_id> <prop> select|status|text <val> - 更新屬性"
         echo "  notion.sh get-user <user_id>                                 - 查詢用戶資訊"
         echo "  notion.sh list-users                                         - 列出工作區全體成員（唯讀）"
+        echo "  notion.sh query-datasource <data_source_id> ['<filter_json>']  - 查詢 data source（唯讀）"
+        echo "  notion.sh upload-file <filepath> [content_type]              - 上傳檔案（<20MB），回傳 file_upload id"
+        echo "  notion.sh create-page <data_source_id> '<properties_json>'   - 在 database 建立新頁面"
         ;;
 esac

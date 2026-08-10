@@ -1,0 +1,129 @@
+{
+  "_comment": [
+    "dep-audit 的掃描範圍與驗證指令唯一事實源。dep-scan.ts 與 dep-worktree.sh 都讀本檔。",
+    "新增專案時：確認 path 下有 package.json，並實測 verify 指令在主 repo 可跑（否則基準線會全紅、比較失去意義）。",
+    "verify.cmd 內若含全量 lint / build / vue-tsc，必須自帶 NODE_OPTIONS=--max-old-space-size=8192（CLAUDE.md 硬規則）。",
+    "audience: public = 對外站台（漏洞可被外部觸發，優先級加權）；internal = 內部後台/後端服務。",
+    "verifyNote 必須誠實描述該專案的驗證強度，HTML 報告會原樣引用——不要寫得比實際執行的更強。",
+    "sharedLinks 為相對路徑依賴（../genie 等），worktree 驗證環境必須把它們 symlink 進來，否則 bun install 解不到。"
+  ],
+  "root": "/Users/user/aladdin",
+  "sharedLinks": ["genie", "jafar", "jasmine"],
+  "projects": [
+    {
+      "id": "agrabah",
+      "repo": "agrabah",
+      "path": "agrabah",
+      "kind": "backend",
+      "audience": "internal",
+      "install": "bun install",
+      "verify": [
+        { "name": "typecheck", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bunx tsc --noEmit -p tsconfig.json" },
+        { "name": "lint", "cmd": "NODE_OPTIONS=--max-old-space-size=16384 bun run lint" }
+      ],
+      "verifyNote": "驗證強度中，且**兩個步驟的基準線本來就是紅的**——必須用逐行 diff 判定，不能用 PASS/FAIL。2026-07-29 實測：主 repo `bunx tsc --noEmit` 有 753 個既有型別錯誤（worktree 755，差異來自主 repo 的未提交變更），大宗是 TS2304，且部分出自 symlink 進來的 genie；`bun run lint` 亦有既有 error。這代表升版回歸會淹沒在雜訊裡，判定時務必比對錯誤行集合。typecheck 仍保留，因為它是抓型別層 breaking change 最便宜的手段。不跑 bun test 全量，因 agrabah 測試多需要 DB，worktree 未跑 bootstrap/migrate，失敗率高且與升版無關；針對被升套件的相關測試由 /dep-audit Step 5.4 額外指定執行。"
+    },
+    {
+      "id": "abu-platform",
+      "repo": "abu",
+      "path": "abu/platform",
+      "kind": "frontend",
+      "audience": "internal",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "abu-admin",
+      "repo": "abu",
+      "path": "abu/admin",
+      "kind": "frontend",
+      "audience": "internal",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "rajah",
+      "repo": "rajah",
+      "path": "rajah",
+      "kind": "tooling",
+      "audience": "internal",
+      "install": "bun install",
+      "verify": [
+        { "name": "pbjs-codegen", "cmd": "printf 'syntax=\"proto3\";\\nmessage T { string a = 1; }\\n' > .dep-audit-smoke.proto && ./node_modules/.bin/pbjs -t static-module .dep-audit-smoke.proto > /dev/null && rm -f .dep-audit-smoke.proto" },
+        { "name": "protobufjs-roundtrip", "cmd": "bun -e 'const p=require(\"protobufjs\");const r=p.Root.fromJSON({nested:{T:{fields:{a:{type:\"string\",id:1}}}}});const M=r.lookupType(\"T\");const b=M.encode(M.create({a:\"ok\"})).finish();if(M.decode(b).a!==\"ok\")process.exit(1)'" }
+      ],
+      "verifyNote": "驗證強度中。rajah 的 package.json build script 指向不存在的 build.ts（2026-07-29 實測 origin/dev 即如此，非 worktree 造成），無法作為驗證。改以兩步實測涵蓋升 protobufjs / protobufjs-cli 真正會打壞的環節：pbjs 對一份臨時 .proto 跑 static-module 產碼（驗 CLI 與其 protobufjs peer），以及 protobufjs encode/decode 往返（驗 runtime）。注意 `pbjs --version` 印完橫幅仍 exit 1，不能拿來當 smoke test。更強的驗證需跑 generate-*.sh，但那會寫入 genie/jafar（worktree 內是主 repo 的 symlink），故不納入。"
+    },
+    {
+      "id": "lago-pk-gaming",
+      "repo": "lago",
+      "path": "lago/pk-gaming",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "lago-ny-gaming",
+      "repo": "lago",
+      "path": "lago/ny-gaming",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "lago-n8-gaming",
+      "repo": "lago",
+      "path": "lago/n8-gaming",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "lago-landing-page",
+      "repo": "lago",
+      "path": "lago/landing-page",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "lago-agent-backend",
+      "repo": "lago",
+      "path": "lago/agent-backend",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "bun install",
+      "verify": [
+        { "name": "build", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 bun run build" }
+      ]
+    },
+    {
+      "id": "lago-promo-page",
+      "repo": "lago",
+      "path": "lago/promo-page",
+      "kind": "frontend",
+      "audience": "public",
+      "install": "npm install",
+      "verify": [
+        { "name": "build-landing", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 npm run build:landing" },
+        { "name": "build-register", "cmd": "NODE_OPTIONS=--max-old-space-size=8192 npm run build:register" }
+      ]
+    }
+  ]
+}

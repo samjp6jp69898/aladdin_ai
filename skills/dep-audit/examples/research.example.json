@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "research.json 的格式範例（內容為示意，非真實研究結論）。",
+    "由 /dep-audit Step 3 的模型寫入 audit-reports/dep-audit-<label>/research.json。",
+    "key 必須逐字對應 scan.json 內的 package + '@' + version，否則 build-report.ts join 不到，該項會顯示為「未做網路研究」。",
+    "沒查到的東西就留空陣列，不要編。sources 必須是真的讀過的網址。",
+    "凡是決定不研究的項目，寫進 notResearched 並附理由——報告會把它列進「已知限制」，不會靜默消失。"
+  ],
+  "label": "YYYYMMDD",
+  "researchedAt": "2026-07-29T01:00:00.000Z",
+  "items": [
+    {
+      "key": "handlebars@4.7.8",
+      "priority": "P0",
+      "priorityReason": "CRITICAL 且為 agrabah 的直接 runtime 依賴，修補版為同 major patch，升版成本極低",
+      "exploitability": "示意：說明在本專案的實際用法下漏洞是否可被觸發。要具體到「誰能控制輸入」——例如樣板來源是否為使用者可控、是否只吃內部固定樣板。",
+      "usageEvidence": [
+        "agrabah/src/xxx/yyy.ts:123 — 示意：實際 import 與呼叫位置",
+        "agrabah/templates/*.hbs — 示意：樣板來源"
+      ],
+      "targetDecision": "4.7.9",
+      "targetReason": "示意：為何選這個版本而非 latest 或其他版本",
+      "breakingChanges": [
+        "示意：官方 release notes / CHANGELOG 明列的破壞性變更；沒有就留空陣列"
+      ],
+      "knownRegressions": [
+        "示意：GitHub issue 中該版本發布後的回歸回報；沒查到就留空陣列"
+      ],
+      "migrationSteps": [
+        "改 agrabah/package.json 的版本宣告",
+        "bun install",
+        "跑 typecheck 與相關單元測試"
+      ],
+      "risks": [
+        "示意：升版後仍存在的殘留風險"
+      ],
+      "sources": [
+        { "title": "GHSA-2w6w-674q-4c4q（GitHub Advisory）", "url": "https://github.com/advisories/GHSA-2w6w-674q-4c4q" },
+        { "title": "handlebars.js CHANGELOG v4.7.9", "url": "https://github.com/handlebars-lang/handlebars.js/releases" }
+      ]
+    }
+  ],
+  "notResearched": [
+    { "key": "min-document@2.19.0", "reason": "LOW 且為間接 build-time 依賴，本輪不投入研究成本" }
+  ]
+}

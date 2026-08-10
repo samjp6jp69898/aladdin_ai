@@ -15,7 +15,7 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 - 「想知道每個改動會連帶影響哪些其他功能」（v2 流程）
 - 「我要 changelog 但讀者只關心某個前端 app（例如只看 pk 受影響的）」（v3 流程）
 
-## 流程總覽（7 階段）
+## 流程總覽（8 階段）
 
 ```
 1. 確認 branch 與基準           ← 與用戶確認 diff 三角
@@ -25,6 +25,7 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 5. 影響範圍分析（12 並行 worker）← 4 repos × 3 versions，跑 method-call-graph + grep
 6. 業務語言改寫（1 rewriter agent）← 用 i18n-lookup + 中英辭典翻譯成客戶語言
 7. 組裝 HTML                    ← build-html.js
+8. 上傳到 Notion「更新報告」資料庫 ← notion.sh upload-file + create-page（**強制，不可省略**）
 ```
 
 > **v1 流程**（沒有影響範圍分析）只需階段 1–4 + 7，跳過 5、6。
@@ -64,14 +65,15 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 2. 合併出每條 change 的 `commits`，並產出**覆蓋率審計** `data/commit-audit-<YYYY-MM>.md`：逐一列出每個 commit 對應到哪條 change（或排除理由）。**若有實質 commit 對應不到任何 change（idx:null），多半是 mapper 遺漏 → 必須補回該條 change**（實例：5/29 審計抓到漏掉「撤銷返水」，已補回 idx 69）。
 3. 覆蓋率目標：實質 commit 100% 對應；只有 merge / 單親 squash commit 可列排除。
 
-**FAQ-[XXXX] → Notion bug ticket 連結（強制）**：當 commit / change 帶 `FAQ-[XXXX]` 工單號時，**必須**附上對應的 Notion bug ticket 連結。Notion bug 資料庫的「單號」屬性（`unique_id`）即 FAQ 編號，用 data_sources query 查 url：
+**FAQ-[XXXX] → Notion bug ticket 連結（強制）**：當 commit / change 帶 `FAQ-[XXXX]` 工單號時，**必須**附上對應的 Notion bug ticket 連結。Notion bug 資料庫的「單號」屬性（`unique_id`）即 FAQ 編號，一律透過 `notion.sh`（禁止手寫含 token 的 curl）查 url：
 
 ```bash
-curl -s -X POST "https://api.notion.com/v1/data_sources/21c87d78-618a-817f-ae71-000baa9ab11b/query" \
-  -H "Authorization: Bearer <NOTION_TOKEN，見 scripts/notion.sh>" \
-  -H "Notion-Version: 2025-09-03" -H "Content-Type: application/json" \
-  -d '{"filter":{"property":"單號","unique_id":{"equals":<編號數字>}}}'
+bash /Users/user/aladdin/obsidian/scripts/notion.sh query-datasource \
+  21c87d78-618a-817f-ae71-000baa9ab11b \
+  '{"property":"單號","unique_id":{"equals":<編號數字>}}'
 ```
+
+token 由 `notion.sh` 內部從 `/Users/user/aladdin/.env` 的 `ALD_NOTION_TOKEN` 讀取，不需要（也不應該）在此手動帶入。
 
 取回的 `results[0].url` 填入 change 的 `ticketUrls` map（`{"FAQ-XXXX":"https://www.notion.so/..."}`）；tags 統一正規化為 `FAQ-XXXX`（純數字補前綴）。template.html 的 FAQ tag 會自動渲染為可點連結（開新分頁 ↗）。
 
@@ -443,6 +445,47 @@ node /Users/user/aladdin/.claude/skills/changelog-html/build-html.js \
 
 ---
 
+## 階段 8：上傳到 Notion「更新報告」資料庫（強制，每次產出 HTML 後都要做）
+
+> 每次組裝完 HTML，**必須**上傳一份到既有的 Notion「更新報告」database，讓非技術讀者可以直接從 Notion 頁面下載。這一步不可省略，也不是「使用者要求才做」的選項——階段 7 產出 HTML 後直接接著做。
+
+Notion 頁面：`https://app.notion.com/p/2df87d78618a80de997cf73896b6bd5b`（標題「版本更新內容」，內嵌一個 child database「更新報告」）。
+
+- database 的 data source id：`37d87d78-618a-80a1-9aad-000b02c4f2cf`
+- schema：`標題`（title，填版本號如 `0714`）、`更新日期`（date，填 `YYYY-MM-DD`）、`html檔案`（files，附件實體上傳，不是外部連結）、`備註`（rich_text，選填）
+
+**Token 來源**：`ALD_NOTION_TOKEN`（見 `/Users/user/aladdin/.env`），一律透過 `notion.sh` 存取，**禁止**在指令或 prompt 內手寫含 token 的 curl。
+
+### 執行步驟
+
+```bash
+# 1. 上傳檔案，取得 file_upload id（單一 HTML 檔遠小於 20MB，用 single_part 即可）
+bash /Users/user/aladdin/obsidian/scripts/notion.sh upload-file \
+  "/Users/user/aladdin/obsidian/Projects/changelog/Release Changelog <YYYY-MMDD>.html" \
+  "text/html"
+# 回傳 JSON 裡的 "id" 欄位即 <upload_id>，同時確認 "status":"uploaded"
+
+# 2. 用 upload_id 建立 database 新頁面
+bash /Users/user/aladdin/obsidian/scripts/notion.sh create-page \
+  37d87d78-618a-80a1-9aad-000b02c4f2cf \
+  '{"標題":{"title":[{"text":{"content":"<版本號，如 0714>"}}]},"更新日期":{"date":{"start":"<YYYY-MM-DD>"}},"html檔案":{"files":[{"type":"file_upload","file_upload":{"id":"<upload_id>"},"name":"Release Changelog <YYYY-MMDD>.html"}]}}'
+```
+
+完成後跑一次 `query-datasource` 用標題過濾確認新列存在且檔案已附上：
+
+```bash
+bash /Users/user/aladdin/obsidian/scripts/notion.sh query-datasource \
+  37d87d78-618a-80a1-9aad-000b02c4f2cf \
+  '{"property":"標題","title":{"equals":"<版本號>"}}'
+```
+
+**踩坑（2026-07-14）：新列在畫面上的顯示順序可能不照日期**。這個 database view 目前用的是**手動順序（manual order）**，不是「依更新日期主動排序」——歷史資料只是剛好按建立順序 = 日期順序，所以肉眼看起來像有排序，一旦用 API 新建一列，Notion 會把它插進手動順序裡的某個位置（不保證是「日期正確的位置」，實測曾插在次新列與最新列之間，導致新列日期反而比它上面那列舊）。**Notion 公開 API 不支援設定頁面在手動順序裡的位置**，無法用程式修正。上傳完成後：
+1. 一定要跑上面的 `query-datasource` 確認資料正確（標題/日期/附件都對即可，這步驟一定沒問題）
+2. 接著**明確提醒使用者**去 Notion UI 確認畫面上的列順序是否正確；若這個 view 還沒設過排序規則，建議請使用者一次性加上「更新日期」遞增排序（工具列篩選漏斗旁的 ↑↓ icon），設定後往後每次上傳都會自動排對，不用再手動拖曳
+3. 不要自行斷言「順序一定正確」——上傳完成 ≠ 顯示順序正確，這兩件事要分開驗證
+
+---
+
 ## 完整範例（2026 年 5 月四版）
 
 來源檔已保留：
@@ -485,6 +528,17 @@ v4 階段統計（**JSON-first 增量**：沿用 v3 三版資料不重跑 git，
 - 529 業務標籤：後端服務 51、後台介面 10、玩家端 App 14
 - **菜單改名校驗實例**：5/29 把 `activity-management` 從 item 改為 group，舊三版資料的該 leaf 已用 route/perm 比對對齊到承接葉 `activity-settings`，否則舊版 HTML 會生成失敗
 
+v5 階段統計（**新增階段 8 Notion 上傳**：7/14 版，沿用 7/10 版 audit 精確 snapshot 終點增量，涵蓋 703/707/709/710/714 五版）：
+
+- 歷史資料持久化於 `data/changes-2026-0714.json`（五版累積 360 條），舊四版零重算
+- stage 2 並行 4 sub-agent 提取 78 條 714 版 changes
+- stage 5 4 worker（4 repo × 單版 714）跑影響範圍，78 條全覆蓋，27 條有實質下游影響
+- stage 6 rewriter 把 90 句 impact 翻為業務語言（TECH 驗證 `total bad: 0`）
+- commit 可追溯性：201 個 commit 100% 對應（199 對應到 change，2 個是同版互相抵銷的 revert 組合法排除）
+- 45 個 FAQ 編號全數串上 Notion bug ticket 連結
+- **新增階段 8**：`notion.sh` 補上 `upload-file`（File Upload API，single_part）與 `create-page` 兩個子指令，把組裝好的 HTML 實體上傳到 Notion「更新報告」database（`data_source_id: 37d87d78-618a-80a1-9aad-000b02c4f2cf`），這一步過去曾被遺漏，現已列為**強制**階段
+- **踩坑**：`.env` 裡實際 key 名是 `ALD_NOTION_TOKEN`，不是舊文件寫的 `NOTION_TOKEN`；`notion.sh` 與本 SKILL.md 已同步修正
+
 ## 限制與注意事項
 
 - **不修改任何程式碼**：本 skill 只讀 menu.ts / git / source code，不會 edit/write source
@@ -495,6 +549,7 @@ v4 階段統計（**JSON-first 增量**：沿用 v3 三版資料不重跑 git，
 - **apps 欄位向後相容**：build-html.js 不驗證 apps（缺值時 template 視為全 5）。v3 流程的 mapper 必須在輸出前自行跑 apps validation（見階段 4）
 - **影響範圍嚴禁編造**：worker 只能引用 method-call-graph / grep 輸出真實看到的 caller；rewriter 只能引用 i18n-lookup / 辭典查到的業務名
 - **避免 worker stall**：若 method-call-graph 某 method 有 100+ caller，或 grep 某 super-shared 元件有 300+ importer（如 abu DataTable），worker 必須直接寫總結句「影響後台 N+ 頁」，不要逐一列舉。stage 5 派工時務必在 prompt 內提醒 time-cap（每條 ≤ 30 秒、call-graph ≤ 1 次）
+- **階段 8（Notion 上傳）不可省略**：組裝完 HTML 後一定要接著上傳到 Notion「更新報告」database（見階段 8），不是使用者額外要求才做的步驟；Notion token 一律走 `notion.sh`，禁止手寫含 token 的 curl
 
 ## 檔案清單
 

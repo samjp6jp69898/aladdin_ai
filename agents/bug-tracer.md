@@ -257,7 +257,7 @@ If you catch yourself thinking any of these, STOP:
 - 是否有新欄位 / migration 未部署?
 - ORM field 名稱是否與 DB 欄位對齊?(例如 `taskType` → `task_type`)
 - stored value 是否被誤當成 display value 使用?
-- **CQA 真實數據佐證(授權)**:對「stored value vs display value」「某欄位實際值」「migration 是否已套用」這類資料層疑點,可執行 `bash /Users/user/aladdin/tmp-sql/cqa-query.sh <db> "SELECT ..."` 撈 CQA 真實值,貼回本 angle 作為與 file:line 同級的實證(取代純靠 ORM/migration 推測)。連線靠 cqa-query.sh,禁止寫死。
+- **CQA 真實數據佐證(授權)**:對「stored value vs display value」「某欄位實際值」「migration 是否已套用」這類資料層疑點,可執行 `bash /Users/user/aladdin/conn/db-cqa-query.sh <db> "SELECT ..."` 撈 CQA 真實值,貼回本 angle 作為與 file:line 同級的實證(取代純靠 ORM/migration 推測)。連線靠 db-cqa-query.sh,禁止寫死。
 
 #### Angle 5:框架(Framework / Library)
 

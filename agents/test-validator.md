@@ -27,7 +27,7 @@ You read from the same per-ticket worktree root used by the evaluators. 該根�
 - `bun test tests/{ticket_id}/` — re-run backend tests
 - `bunx vitest run test/{ticket_id}/` — re-run frontend tests (run inside the target sub-project directory)
 - `bun test --coverage tests/{ticket_id}/` — check backend coverage
-- `tmp-sql/dev-query.sh {db} "{SQL}"` — query dev DB (READ-ONLY)
+- `conn/db-dev-query.sh {db} "{SQL}"` — query dev DB (READ-ONLY)
 - **FORBIDDEN:** Edit / Write tools — do not modify any files
 - **FORBIDDEN:** `git push` / `git commit`
 
@@ -122,8 +122,8 @@ Validation PASSES only if there are zero Critical gaps.
 If you want to verify the mock data in prepare-test-desc.md is realistic:
 
 ```bash
-./tmp-sql/dev-query.sh {database} "DESCRIBE {table}"
-./tmp-sql/dev-query.sh {database} "SELECT {columns} FROM {table} WHERE {condition} LIMIT 5"
+./conn/db-dev-query.sh {database} "DESCRIBE {table}"
+./conn/db-dev-query.sh {database} "SELECT {columns} FROM {table} WHERE {condition} LIMIT 5"
 ```
 
 Note any mismatches between mock data shape and real schema.

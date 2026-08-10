@@ -12,7 +12,7 @@ description: CQA 測試站（PK/6T app、admin、PK/6T platform）的 Playwright
 - lib：`/Users/user/aladdin/cqa-e2e/lib/{env,login-backend,login-app,capture}.cjs`
 - 登入態 storageState：`/Users/user/aladdin/cqa-e2e/sessions/<site>-state.json`（可被 capture 重用）
 - **登入態判定一律看 localStorage key `lt`（JWT）非空**（不是 cookie；abu `common/api/auth.ts` 的 LOGIN_TOKEN_KEY='lt'）
-- DB grounding（非瀏覽器）：`bash /Users/user/aladdin/tmp-sql/cqa-query.sh <db> "<SELECT/SHOW/DESC/EXPLAIN>"`
+- DB grounding（非瀏覽器）：`bash /Users/user/aladdin/conn/db-cqa-query.sh <db> "<SELECT/SHOW/DESC/EXPLAIN>"`
 - **DB `platform_id` 對照（CQA 撈 platform 級資料時的過濾值）**：**PK = `2`**（已驗證：ticket 帳號 belindapk32 屬 platform 2，且 PK 大舞台 `post_send_limit` 規則皆在 platform 2）。`platform_id` 是 runtime `i32`、**無 source enum**，故記於此。6T 對應值尚未驗證（CQA `message_board.post_send_limit` 另見 platform_id 4，未確認是否為 6T，用前請自行查證）。
 
 ## 5 站速查

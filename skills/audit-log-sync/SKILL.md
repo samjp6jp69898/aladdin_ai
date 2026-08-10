@@ -210,7 +210,7 @@ grep -rn "<業務關鍵字>" rajah/services/service_common.rajah
 |----|------|-----------|
 | 1. rajah enum | `SystemIdEnum` 有無對應系統項目；`AdminActionIdEnum`／`PlatformActionIdEnum`（依 gate）有無語意對應的 actionId | 新增 enum 值：在同業務域編號區段內遞增選號，不跳段亂編；附中文註解 |
 | 2. 呼叫端 | 是否呼叫 `audit(context, systemId, actionId, data, targetId?)`；「操作前」空→`createNew`、前後皆有→`createUpdate`、刪除類→`createDelete`；before/after 物件是否涵蓋規格全部顯示欄位；**平台規格「會員帳號」有值 → 第 5 參數必傳被操作會員的 userId**（歷史踩坑：打賞審核曾誤傳打賞紀錄 ID 而非會員 ID） | 補 `audit()` 呼叫／修正 `AuditData` 內容／修正 targetId |
-| 3. handler | `buildResult` 輸出 keys 是否與規格「操作後（中/英文）」**逐行一一對應（含順序）**；enum 值欄位需用 `title:<i18n-key>;enum:<EnumName>` meta | 新增 handler（照 `advertisement_change_status_handler.ts` 樣板：interface＋class＋`buildResult`）或修改輸出 keys |
+| 3. handler | `buildResult` 輸出 keys 是否與規格「操作後（中/英文）」**逐行一一對應（含順序）**；enum 值欄位需用 `title:<i18n-key>;enum:<EnumName>` meta（前端 `AuditLogList.vue` 的 `enumFormatter` 靠此 meta 才會把數值翻成 enum 成員文字；沒有 meta 的欄位只會走 `defaultFormatter` 直出原始數字） | 新增 handler（照 `currency_status_handler.ts` 樣板：interface＋class＋`buildResult`，**含 enum meta 寫法**）或修改輸出 keys |
 | 4. 註冊 | `AUDIT_HANDLERS` 中 actionId 是否註冊在正確 gate（系統→`GateId.admin`、平台→`GateId.platform`）；多 actionId 共用 handler 用陣列 | 補註冊項（含 import） |
 | 5. i18n | 每個 key 查 `abu/{admin|platform}/localizations/{zh-TW,zh-CN,en-US}.json`；**meta key 先解析**：label 查 `model.<title值>`、enum 值查 `enum.<kebab-case-enum>-<enum 成員名>`（**成員名非數值**，數值→成員名由前端 ReflectionHelper 映射）；一般 key 查 `model.<key>`。翻譯值必須等於 Notion 中/英文欄位文字 | **不改 JSON**；缺漏/不符記入內部 i18n 缺漏清單 |
 
@@ -221,6 +221,7 @@ grep -rn "<業務關鍵字>" rajah/services/service_common.rajah
 - 現有 handler 是舊式 `JSON.stringify(data)` 直出 → 改寫成 key/value 陣列格式
 - gate 錯置（系統節點註冊在 platform 等）→ 判定 ⚠️ 不符，動作寫遷移方式
 - **enum meta 的 `<EnumName>` 必須取自呼叫端實際型別**（method 參數或 model 欄位宣告的 enum，開檔確認），不得用顯示語意相近的其他 enum 替代（踩坑：狀態欄誤用 `ActiveStatusEnum`，實際型別是 `StatusEnum`——啟用/停用值恰好相同，但 frozen/deleted 等值會解析失敗）
+- **既有 handler 程式碼不能當作「已符合規格」的預設參考**：`implementations/` 目錄下不少既有檔案（跨多位作者，含 `url_configuration_status_change_handler.ts:20` 等）對實際為 enum 的欄位只寫 plain key（如 `{ key: 'status', value: data.status }`），沒有 `title:/enum:` meta，會導致前端直出數字而非翻譯文字。比對時一律依「呼叫端實際型別」判斷該欄位是不是 enum，缺 meta 一律判 ⚠️ 不符並補上，不因為「舊 handler 本來就這樣寫」而放行，也不要把這類舊檔案的寫法複製到新 handler
 
 輸出 **T3** 後**必須停下等開發者確認**：
 

@@ -1,0 +1,37 @@
+{
+  "_comment": [
+    "verify.json 的格式範例（內容為示意，非真實實測結果）。",
+    "由 /dep-audit Step 5 的模型寫入 audit-reports/dep-audit-<label>/verify.json。",
+    "baseline 一定要跑：worktree 內未升版時就已經 FAIL 的項目，升版後 FAIL 不能算成回歸。",
+    "verdict 語意：",
+    "  SAFE               — 基準線綠、升版後也綠",
+    "  SAFE_WITH_CHANGES  — 升版後需連帶改碼才綠（改了什麼寫在 codeChangesNeeded）",
+    "  BLOCKED            — 升版後仍紅且無法在合理成本內解決",
+    "  NOT_VERIFIED       — 沒實測（連 install 都沒跑成功也算）",
+    "禁止把沒跑過的步驟填成 PASS。沒跑就整項放進 notVerified。"
+  ],
+  "label": "YYYYMMDD",
+  "worktree": "/Users/user/aladdin/worktrees/dep-audit-YYYYMMDD",
+  "runs": [
+    {
+      "key": "handlebars@4.7.8",
+      "project": "agrabah",
+      "from": "4.7.8",
+      "to": "4.7.9",
+      "baseline": [
+        { "name": "typecheck", "status": "PASS", "durationSec": 96, "note": "" },
+        { "name": "lint", "status": "FAIL", "durationSec": 210, "note": "示意：基準線本來就紅，與升版無關，詳見附註" }
+      ],
+      "after": [
+        { "name": "typecheck", "status": "PASS", "durationSec": 98, "note": "" },
+        { "name": "lint", "status": "FAIL", "durationSec": 214, "note": "示意：與基準線同樣的錯誤數與錯誤碼，判定非回歸" }
+      ],
+      "verdict": "SAFE",
+      "verdictNote": "示意：說明判定理由，特別是基準線本來就 FAIL 的項目為何仍判 SAFE。",
+      "codeChangesNeeded": []
+    }
+  ],
+  "notVerified": [
+    { "key": "brace-expansion@1.1.12", "reason": "間接依賴且無父套件可升，需改用 overrides，本輪不實測" }
+  ]
+}

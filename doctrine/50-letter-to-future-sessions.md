@@ -28,7 +28,7 @@ SessionStart hook 每個 session 注入約 1.2k token 的「任何動作前必�
 ## 三、交接：未竟事項
 
 - [x] `analyze-single-bug.md`、`refine-mr.md` 的「Use all text in {agent.md} as the prompt」雙重載入、`analyze-bugs.md` 的「SlashCommand tool」— **2026-07-03 已完成**（9 處雙載改 `subagent_type` 直引、SlashCommand→Skill、analyze-bugs 的 tracker 整檔讀/Edit 直改全部改走 tracker.sh；見 change-log）。
-- [x] CQA 唯讀 DB 連線——**2026-07-03 實測已恢復**：TCP 通、`ai` 帳號可查全部服務 schema（歷史筆記說的「反覆連不上」已不成立）。注意：`landon_ai` 是帳號不是庫名，查詢要用服務 schema（core/payment/…）。若 grounder 再回報 DEGRADED，先跑 `bash tmp-sql/cqa-query.sh information_schema "SHOW DATABASES"` 實測再接受降級，不要照歷史印象直接降。
+- [x] CQA 唯讀 DB 連線——**2026-07-03 實測已恢復**：TCP 通、`ai` 帳號可查全部服務 schema（歷史筆記說的「反覆連不上」已不成立）。注意：`landon_ai` 是帳號不是庫名，查詢要用服務 schema（core/payment/…）。若 grounder 再回報 DEGRADED，先跑 `bash conn/db-cqa-query.sh information_schema "SHOW DATABASES"` 實測再接受降級，不要照歷史印象直接降。
 - [x] tracer 失效模式閉環（見上文第一節之 2）— **2026-07-03 已完成第一步**：create-mr Step 3 與 analyze-single-bug Step 4b 的 tracer 派工 prompt 已加「先讀 Rules/_index.md『分析與失效模式』相關條目」素材行。進階項（每季蒸餾回測新錯誤模式進 tracer pre-flight checklist）仍待做，且應先用回測驗證第一步對錯誤率的實際效果。
 - [ ] 若本 session 的收尾對抗審查未完成（見 change-log 是否有「對抗審查」條目），請照 `30` 的 T5 模板，派 fresh-context agent 審查 doctrine 全部檔案 + 新版 create-mr/create-mrs + 五支腳本，重點查：規則互相打架、路徑錯誤、弱模型會誤讀的措辭。
 

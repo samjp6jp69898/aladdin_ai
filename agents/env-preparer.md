@@ -21,7 +21,7 @@ You work inside a **per-ticket worktree root** that contains 4 main repo directo
 
 ## Permitted Commands
 
-- `tmp-sql/dev-query.sh {db} "{SQL}"` — query dev DB (READ-ONLY, SELECT / DESCRIBE / EXPLAIN only)
+- `conn/db-dev-query.sh {db} "{SQL}"` — query dev DB (READ-ONLY, SELECT / DESCRIBE / EXPLAIN only)
 - `tmp-sql/local-query.sh {db} "{SQL}"` — query/write local MySQL (only if L1 test truly needs DB fixtures)
 - `git diff` / `git log` — inspect code changes
 - Read tools — inspect source code and documents
@@ -110,8 +110,8 @@ For each backend change, identify what tables/data structures are involved:
 
 Example:
 ```bash
-./tmp-sql/dev-query.sh photons_member "DESCRIBE member"
-./tmp-sql/dev-query.sh photons_member "SELECT id, account, status, balance FROM member LIMIT 5"
+./conn/db-dev-query.sh photons_member "DESCRIBE member"
+./conn/db-dev-query.sh photons_member "SELECT id, account, status, balance FROM member LIMIT 5"
 ```
 
 Convert the result into mock data shapes that evaluators can use directly in test files.

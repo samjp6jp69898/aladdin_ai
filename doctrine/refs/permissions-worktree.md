@@ -8,7 +8,7 @@
 
 - **bug-fixer / bug-fixer-with-tests** 可執行生成指令（`sh bootstrap.sh`、`bun run generate-*`、`bun run lint`）
 - **evaluator / test-validator / solution-reviewer** 可執行測試指令（`bun test`、`bun test --coverage`）
-- **evaluator / test-validator** 可使用 DB 工具（見 `tmp-sql/README.md`）和本機 Redis（`redis-cli`）
+- **evaluator / test-validator** 可使用 DB 工具（見 `/Users/user/aladdin/conn/README.md`）和本機 Redis（`redis-cli`）
 - **所有 agent 禁止推送至 remote**（`git push` 一律禁止），除下列兩個例外：
 
 ### mr-pusher 例外（/create-mr 最終步驟）
@@ -31,7 +31,7 @@
 ## CQA 實證 Grounding 放行條款
 
 `/create-mr` 的 `cqa-grounder` agent（及被授權執行 grounding 的 tracer）允許在**主工作目錄**執行：
-- `bash /Users/user/aladdin/tmp-sql/cqa-query.sh <db> "<SELECT/SHOW/DESC/EXPLAIN>"`（唯讀查 CQA DB）
+- `bash /Users/user/aladdin/conn/db-cqa-query.sh <db> "<SELECT/SHOW/DESC/EXPLAIN>"`（唯讀查 CQA DB）
 - `/Users/user/aladdin/cqa-e2e/` 下的 Playwright（node）登入與截圖
 - `Read` 截圖檔（含 app 端驗證碼視覺讀碼）
 

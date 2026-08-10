@@ -23,7 +23,7 @@ Usage:
     python3 sync-bug-tracker.py --only-local # only check rows whose local folder exists
 
 Environment:
-    NOTION_TOKEN overrides the bundled token if set.
+    ALD_NOTION_TOKEN overrides the bundled token if set.
 """
 
 from __future__ import annotations
@@ -43,18 +43,18 @@ TRACKER_PATH = Path(
 DEBUG_DIR = Path("/Users/user/aladdin/obsidian/Debug")
 def _load_notion_token() -> str:
     # token 單一來源：環境變數 > /Users/user/aladdin/.env（禁止把明文寫回程式碼）
-    tok = os.environ.get("NOTION_TOKEN", "")
+    tok = os.environ.get("ALD_NOTION_TOKEN", "")
     if not tok:
         try:
             with open("/Users/user/aladdin/.env") as _f:
                 for _line in _f:
-                    if _line.startswith("NOTION_TOKEN="):
+                    if _line.startswith("ALD_NOTION_TOKEN="):
                         tok = _line.split("=", 1)[1].strip().strip("\"'")
                         break
         except OSError:
             pass
     if not tok.startswith("ntn_"):
-        raise SystemExit("ERROR: NOTION_TOKEN 未設定（請在 /Users/user/aladdin/.env 加 NOTION_TOKEN=ntn_xxx）")
+        raise SystemExit("ERROR: ALD_NOTION_TOKEN 未設定（請在 /Users/user/aladdin/.env 加 ALD_NOTION_TOKEN=ntn_xxx）")
     return tok
 
 
