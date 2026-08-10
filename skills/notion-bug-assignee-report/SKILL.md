@@ -42,7 +42,7 @@ bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-
 | 需求 | 說明 / 失敗徵兆 |
 |------|----------------|
 | 網路可達 Notion API | 無網路 → fetch 拋錯；無輸出 CSV |
-| 內嵌 token 有效 | token 失效 → `Notion API error 401`；需更新腳本內 `NOTION_TOKEN`（與 `obsidian/scripts/notion.sh` 同一把） |
+| 內嵌 token 有效 | token 失效 → `Notion API error 401`；需更新腳本內 `ALD_NOTION_TOKEN`（與 `obsidian/scripts/notion.sh` 同一把） |
 | `tech-users.csv` 存在 | 路徑見下表；不存在 → `ENOENT`，全部會被歸成「非技術人員」之前就先 readFileSync 失敗 |
 
 跑前不需手動檢查目錄；失敗時先看 stderr 的錯誤類別（網路 / 401 / ENOENT）對號入座。

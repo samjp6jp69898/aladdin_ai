@@ -11,11 +11,11 @@
 ## BLOCKER（任一存在即不可上線）
 
 ### B1. resolve-reviewer.sh 的 token 提取對新版 notion.sh 格式失效 → 每張單 100% 死在 Step 0.5
-- 位置：`scripts/resolve-reviewer.sh:20-21`；根因在 `scripts/notion.sh:10` 本次改版（`NOTION_TOKEN="${NOTION_TOKEN:-ntn_…}"` env-override 格式）。
-- 問題：`sed 's/^NOTION_TOKEN="//; s/".*$//; …'` 對新格式取回**字面字串** `${NOTION_TOKEN:-ntn_…}`（含 shell 語法，非有效 token）。已實跑重現：`VERDICT: sed extraction BROKEN`；環境亦無 `NOTION_TOKEN` env（實測 NO）。curl 會送無效 Bearer → Notion 回 error → `ERROR:` → create-mr.md Step 0.5 規定二連 ERROR 即 `failed`。**整條 pipeline 每張單都會在 Step 0.5 標 failed 並寫「分析失敗」進 Notion。**
+- 位置：`scripts/resolve-reviewer.sh:20-21`；根因在 `scripts/notion.sh:10` 本次改版（`ALD_NOTION_TOKEN="${ALD_NOTION_TOKEN:-ntn_…}"` env-override 格式）。
+- 問題：`sed 's/^ALD_NOTION_TOKEN="//; s/".*$//; …'` 對新格式取回**字面字串** `${ALD_NOTION_TOKEN:-ntn_…}`（含 shell 語法，非有效 token）。已實跑重現：`VERDICT: sed extraction BROKEN`；環境亦無 `ALD_NOTION_TOKEN` env（實測 NO）。curl 會送無效 Bearer → Notion 回 error → `ERROR:` → create-mr.md Step 0.5 規定二連 ERROR 即 `failed`。**整條 pipeline 每張單都會在 Step 0.5 標 failed 並寫「分析失敗」進 Notion。**
 - 連帶：`obsidian/agents/spec-fetcher.md:30`（`cut -d'"' -f2`）同根因壞掉（實測同爛字串）→ Step 2 所有 DB query 401 → 永遠 SPEC_INCOMPLETE（靜默降級，功能全滅）。
-- 佐證：change-log.md:7 自承 resolve-reviewer 僅 `bash -n` 驗證、「API 呼叫待首次 pipeline 實跑驗證」——40 號協議第 2 節的一致性檢查（grep 改動關鍵字）若有做 `NOTION_TOKEN=` 就會抓到這兩個消費者。
-- 修法：resolve-reviewer.sh 與 spec-fetcher.md 改為 `grep -oE 'ntn_[A-Za-z0-9]+' notion.sh | head -1`，或統一改成 `TOKEN=$(bash -c 'source /Users/user/aladdin/scripts/notion.sh >/dev/null 2>&1; echo "$NOTION_TOKEN"')` 類單一出口；修完對真 API 打一發驗證。
+- 佐證：change-log.md:7 自承 resolve-reviewer 僅 `bash -n` 驗證、「API 呼叫待首次 pipeline 實跑驗證」——40 號協議第 2 節的一致性檢查（grep 改動關鍵字）若有做 `ALD_NOTION_TOKEN=` 就會抓到這兩個消費者。
+- 修法：resolve-reviewer.sh 與 spec-fetcher.md 改為 `grep -oE 'ntn_[A-Za-z0-9]+' notion.sh | head -1`，或統一改成 `TOKEN=$(bash -c 'source /Users/user/aladdin/scripts/notion.sh >/dev/null 2>&1; echo "$ALD_NOTION_TOKEN"')` 類單一出口；修完對真 API 打一發驗證。
 
 ### B2. bug-tracer-with-callgraph 輸出契約值域與 create-mr.md Step 3 互斥
 - 位置：`obsidian/agents/bug-tracer-with-callgraph.md:698` vs `obsidian/commands/create-mr/create-mr.md:124-127`。
