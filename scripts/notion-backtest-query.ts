@@ -23,7 +23,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 
 // token 單一來源：環境變數 > /Users/user/aladdin/.env（bun 從專案根執行時會自動載入 .env）
-const NOTION_TOKEN = (() => {
+const ALD_NOTION_TOKEN = (() => {
   let t = process.env.ALD_NOTION_TOKEN ?? '';
   if (!t) {
     try {
@@ -109,7 +109,7 @@ async function queryDatabase(filter: object, limit: number) {
         const res = await fetch(`${NOTION_API}/data_sources/${DATA_SOURCE_ID}/query`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${NOTION_TOKEN}`,
+                'Authorization': `Bearer ${ALD_NOTION_TOKEN}`,
                 'Notion-Version': '2025-09-03',
                 'Content-Type': 'application/json',
             },

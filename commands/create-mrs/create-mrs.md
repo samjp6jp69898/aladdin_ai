@@ -1,5 +1,5 @@
 ---
-description: Use when running the MR pipeline in batch — loops /create-mr over claimable (pending/rerun) tickets from bug_analysis_tracker.md until 10 are completed or the tracker runs dry.
+description: Use when running the MR pipeline in batch — loops /create-mr over claimable (pending/rerun) tickets from bug_analysis_tracker.md until 10 are completed, the tracker runs dry, or too many consecutive tickets are skipped (not-tech/locked).
 ---
 
 # /create-mrs Batch（依序把可認領工單餵給 /create-mr，目標 10 張）
@@ -23,7 +23,9 @@ ls -t /Users/user/aladdin/worktrees/.create-mrs-run-*.md | head -1   # 找到本
 ```
 讀它，而不是回憶。
 
-## Step 1：迴圈（直到 completed ≥ 10 或無單可領）
+## Step 1：迴圈（直到 completed ≥ 10、無單可領、或連續跳過過多）
+
+`consecutive_skip`（本場連續 SKIPPED 計數，初始 0；每次進 Step 1.2 判定）。
 
 每一輪：
 
@@ -35,7 +37,10 @@ ls -t /Users/user/aladdin/worktrees/.create-mrs-run-*.md | head -1   # 找到本
 
 2. **呼叫 /create-mr**：**每一張都重新**用 Skill tool 執行 `create-mr:create-mr`，args = `{ticket_id}`（不要憑記憶沿用上一張的流程文本——檔案與 Skill 才是事實來源）。
    - `/create-mr` 自己會 claim 鎖、標 in_progress、跑完整 pipeline、寫回終態並解鎖。
-   - 若它輸出 `SKIPPED: already locked`（別的 session 在跑）或 `SKIPPED: 當前指派不在 tech 名單` → 把該單加入 `skip_list`，**不計入 completed**，回到 1。
+   - 若它輸出 `SKIPPED: already locked`（別的 session 在跑）或 `SKIPPED: 當前指派不在 tech 名單` → 把該單加入 `skip_list`，**不計入 completed**，`consecutive_skip += 1`。
+     - `consecutive_skip ≥ 8` → 判定佇列剩餘可認領單多為非 tech 指派或已被鎖定，**不要問使用者**，直接跳 Step 2（收工，報告需註明「本場提前收工：連續 {consecutive_skip} 張跳過（非 tech 指派/已鎖定），研判佇列剩餘無更多可處理單」）。
+     - 否則回到 1。
+   - 若它產出實際 pipeline 結果（`done`/`failed`/`needs_qa`）→ `consecutive_skip = 0`，續 Step 1.3。
 
 3. **善後檢查**（`/create-mr` 崩潰的安全網）：
    ```bash
@@ -55,6 +60,7 @@ ls -t /Users/user/aladdin/worktrees/.create-mrs-run-*.md | head -1   # 找到本
 ```
 ## /create-mrs Batch Complete
 - 本場處理：{completed} 張（目標 10）
+{consecutive_skip 觸發收工時加一行：- 提前收工原因：連續 {consecutive_skip} 張跳過（非 tech 指派/已鎖定），研判佇列剩餘無更多可處理單}
 {把 run-log 表格貼上（它本來就 ≤ 12 行）}
 - Tracker 現況：{bash scripts/tracker.sh counts 的輸出}
 提醒：完成的 worktrees 可手動清理（git worktree list → git worktree remove /Users/user/aladdin/worktrees/{ticket}）
@@ -66,3 +72,4 @@ ls -t /Users/user/aladdin/worktrees/.create-mrs-run-*.md | head -1   # 找到本
 2. 鎖目錄 `/tmp/bug-analysis-locks/` 與 `/analyze-bugs` 共用；`rerun` 單兩邊都可領，靠原子鎖去重，`/create-mr` 內部已處理。
 3. 序列執行：一次一張，等 `/create-mr` 完全結束才進下一張（每張 20–40 分鐘）。
 4. 舊版行為差異（2026-07-03 v2）：本指令**不再**預先 claim / 標 in_progress——舊做法會讓 `/create-mr` Step 0.1 看到「已被鎖、狀態不對」而自我 SKIP，屬邏輯矛盾，勿回退。
+5. 連續跳過收工（2026-07-23）：pending 佇列可能長期堆積非 tech 指派的舊單（NOT_TECH 判定後會被還原回 `pending`，下一輪還會被挑到），若放任跑到 10 completed 會演變成大量空轉 claim/release。`consecutive_skip ≥ 8` 時**自行**停下收工回報，不要為此停下來問使用者——這是既定行為，非例外情況。
