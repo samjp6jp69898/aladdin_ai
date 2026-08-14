@@ -11,6 +11,7 @@
 #   bash scripts/tracker.sh row FAQ-1234         # 印該單整行（找不到印 NOT_FOUND，exit 1）
 #   bash scripts/tracker.sh set FAQ-1234 in_progress
 #   bash scripts/tracker.sh set FAQ-1234 done "2026-07-03 1530"   # 第三參數 = 完成時間（可省略）
+#   bash scripts/tracker.sh ensure-pending FAQ-1234 https://notion.so/...  # 存在則 set pending，不存在則安全 append 一行（見 telegram-dispatcher T7）
 #   bash scripts/tracker.sh counts               # 各狀態統計
 #   bash scripts/tracker.sh log-fail FAQ-1234 "step5 fixer 超過重試上限"  # 失敗原因記到 pipeline-failures.md
 #
@@ -65,6 +66,35 @@ case "$ACTION" in
     echo "SET: $T -> $ST${DONE_AT:+ ($DONE_AT)}"
     bash "$(dirname "$0")/tracker.sh" row "$T"
     ;;
+  ensure-pending)
+    # upsert：存在就 set 成 pending，不存在就安全 append 一行新資料——給
+    # dispatcher 觸發 /create-mr 前用，滿足其 Step 0 的 tracker 存在性檢查
+    # （dispatcher 自己完全不讀這裡的狀態、不用它做任何決策，見 telegram-dispatcher T7）
+    T="${2:?用法: tracker.sh ensure-pending FAQ-1234 <notion_link>}"
+    LINK="${3:?缺 notion_link}"
+    # 沿用 set 的同一把檔級自旋鎖：append 新行跟覆寫既有行一樣，都要防同時寫壞整檔
+    SETLOCK="/tmp/bug-analysis-locks/.tracker-set-lock"
+    mkdir -p "${SETLOCK%/*}"
+    n=0
+    until mkdir "$SETLOCK" 2>/dev/null; do
+      n=$((n+1)); [ "$n" -gt 50 ] && { echo "ERROR: tracker ensure-pending 鎖等待逾時（$SETLOCK 疑似殘留，確認無人在寫後可 rmdir）"; exit 1; }
+      sleep 0.1
+    done
+    trap 'rmdir "$SETLOCK" 2>/dev/null' EXIT
+    if grep -qE "^\| ${T} \|" "$TRACKER"; then
+      tmp=$(mktemp)
+      awk -F'|' -v OFS='|' -v t="$T" '
+        $2 == " " t " " { $5 = " pending " }
+        { print }
+      ' "$TRACKER" > "$tmp" && mv "$tmp" "$TRACKER"
+      echo "ENSURED(updated): $T -> pending"
+    else
+      TODAY="$(date '+%Y-%m-%d')"
+      printf '| %s | %s | 未知 | pending | %s |  |\n' "$T" "$LINK" "$TODAY" >> "$TRACKER"
+      echo "ENSURED(added): $T -> pending"
+    fi
+    bash "$(dirname "$0")/tracker.sh" row "$T"
+    ;;
   counts)
     grep -E "^\| FAQ-[0-9]+ \|" "$TRACKER" | awk -F'|' '{ s=$5; gsub(/ /,"",s); c[s]++ } END { for (k in c) printf "%s %d\n", k, c[k] }' | sort
     ;;
@@ -76,6 +106,6 @@ case "$ACTION" in
     echo "LOGGED: $T"
     ;;
   *)
-    echo "用法：tracker.sh {next|row|set|counts|log-fail} [args]（詳見檔頭註解）"; exit 1
+    echo "用法：tracker.sh {next|row|set|ensure-pending|counts|log-fail} [args]（詳見檔頭註解）"; exit 1
     ;;
 esac
