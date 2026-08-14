@@ -19,6 +19,13 @@
 #                                     同錯 = 本機既有環境問題，非 worktree 造成。
 #                                     只需 L0 測試的修復可續行，但必須在完成報告與 Notion 留言中明示披露）
 #   SETUP_FAIL:<原因>             — 環境建立失敗（exit 1）
+#
+# T16：環境變數 DISPATCHER_TRIGGERED=1（由 telegram-dispatcher 觸發時設定，見
+# telegram-dispatcher/lib/pipeline-runner/spawn-create-mr.ts）會強制把全部
+# MAIN_REPOS 都當 affected（拿到真 worktree，不再 symlink 回主 repo），根除
+# 多人同時觸發時共用主 repo bootstrap 碰撞的風險。單線 /create-mr、
+# /create-mrs 不受影響（從不設這個環境變數）。此模式下額外印
+# FORCED_FULL_ISOLATION 與 SETUP_DURATION_SEC:<秒數>（皆在最後一行之前）。
 # 踩坑完整敘事：/Users/user/aladdin/.claude/doctrine/refs/pitfalls-worktree.md
 set -u
 ROOT=/Users/user/aladdin
@@ -30,6 +37,30 @@ DRY=0
 if [ "${1:-}" = "--dry-run" ]; then DRY=1; shift; fi
 TICKET="${1:-}"; shift || true
 AFFECTED=("$@")
+
+# T16：經 telegram-dispatcher 觸發的 /create-mr 一律強制全部 repo 真隔離
+# （含未被 tracer 判定為 affected 的 repo，尤其 rajah）——不改變本腳本呼叫
+# 語法本身，靠環境變數辨識來源，單線 /create-mr、/create-mrs（不會設這個
+# 變數）行為完全不變。環境變數由 telegram-dispatcher/lib/pipeline-runner/
+# spawn-create-mr.ts 在 spawn claude -p 時設定，經 bash 子行程繼承鏈一路
+# 傳到這裡（跟 TG_DISPATCH_BOT_TOKEN 這類既有的「啟動時從環境變數讀」慣例
+# 同一套機制，不是新發明）。
+#
+# 根因（concurrency-and-locking 調查）：MAIN_REPOS 裡沒被列進 AFFECTED 的
+# repo 會在下面 symlink 回主 repo（第 80-82 行），bootstrap 的
+# generate-all.sh / migrate ControlCenter / sync-all 因此直接對主 repo 共用
+# 目錄操作——bug-lock.sh 只鎖 ticket 粒度，防不住兩個不同 ticket 同時撞上
+# 同一份共用生成產物與 DB migrate/sync。強制全部 repo 都拿到真 worktree後，
+# 這個碰撞源頭在結構上直接消失（不同 ticket 對應不同的 $WT_BASE/{ticket}
+# 目錄，跟現有「AFFECTED repo 本來就走真 worktree」用的是同一套、已驗證過
+# 的機制，只是把它套用到全部 4 個 repo，不是新機制）。
+if [ "${DISPATCHER_TRIGGERED:-}" = "1" ]; then
+  AFFECTED=("${MAIN_REPOS[@]}")
+  # review 建議：SETUP_DURATION_SEC 只是副作用式訊號（存在才代表模式生效），
+  # 加一行明確標記方便之後直接 grep log 統計「dispatcher 觸發的單子有幾成
+  # 真的拿到全隔離」，不用間接推論。
+  [ "$DRY" = 0 ] && echo "FORCED_FULL_ISOLATION: DISPATCHER_TRIGGERED=1，全部 repo 強制真隔離"
+fi
 
 # ---- 參數驗證 ----
 echo "$TICKET" | grep -qE '^FAQ-[0-9]+$' || { echo "SETUP_FAIL:ticket_id 格式錯誤（需 FAQ-數字，收到 ${TICKET} ）"; exit 1; }
@@ -44,6 +75,8 @@ run() { # dry-run 包裝：只用於「會改變狀態」的指令
 }
 
 is_affected() { local x; for x in "${AFFECTED[@]:-}"; do [ "$x" = "$1" ] && return 0; done; return 1; }
+
+SETUP_START_TS=$(date +%s)
 
 # ---- 1. 建 worktree ----
 run "mkdir -p '$WT'"
@@ -172,6 +205,13 @@ if [ "$DRY" = 0 ]; then
     done
   done
   echo "derived-sync: OK"
+fi
+
+# T16 AC3：強制隔離模式下記錄建置耗時，供之後評估是否要加取消/超時保護
+# （不影響既有 SETUP_OK/SETUP_FAIL 的「最後一行」契約——這行印在它之前）。
+# 只在 DISPATCHER_TRIGGERED 模式印，避免改動既有單線呼叫早已依賴的輸出格式。
+if [ "$DRY" = 0 ] && [ "${DISPATCHER_TRIGGERED:-}" = "1" ]; then
+  echo "SETUP_DURATION_SEC:$(( $(date +%s) - SETUP_START_TS ))"
 fi
 
 if [ "$BOOTSTRAP_STATUS" = "partial" ]; then
