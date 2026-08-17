@@ -3,6 +3,9 @@
 #
 # 用法：bash scripts/setup-worktree.sh [--dry-run] <ticket_id> [affected_repo ...]
 #   例：bash scripts/setup-worktree.sh FAQ-3710 agrabah rajah
+#   ticket_id 格式：FAQ-數字（Bug List）或 ALDREQ-數字（需求池，2026-08-17
+#   telegram-dispatcher T36 為需求 pipeline 擴充，使用者確認後放行，屬紅區
+#   語意變更非單純 bug 修復，見 .claude/doctrine/refs/change-log.md）
 #   affected_repo ∈ {agrabah, abu, lago, rajah}，可為空（全部 symlink，bootstrap 實質跑主 repo）
 #
 # 行為：
@@ -63,7 +66,7 @@ if [ "${DISPATCHER_TRIGGERED:-}" = "1" ]; then
 fi
 
 # ---- 參數驗證 ----
-echo "$TICKET" | grep -qE '^FAQ-[0-9]+$' || { echo "SETUP_FAIL:ticket_id 格式錯誤（需 FAQ-數字，收到 ${TICKET} ）"; exit 1; }
+echo "$TICKET" | grep -qE '^(FAQ|ALDREQ)-[0-9]+$' || { echo "SETUP_FAIL:ticket_id 格式錯誤（需 FAQ-數字 或 ALDREQ-數字，收到 ${TICKET} ）"; exit 1; }
 for r in "${AFFECTED[@]:-}"; do
   [ -z "$r" ] && continue
   case "$r" in agrabah|abu|lago|rajah) ;; *) echo "SETUP_FAIL:非法 repo ${r} （允許 agrabah/abu/lago/rajah）"; exit 1;; esac
