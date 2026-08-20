@@ -39,16 +39,25 @@ assert_eq "TG_SENT(dry-run): (direct) chat_id=5022865804" "$out" "直送模式�
 
 # C1 回歸：末尾旗標無值不得 abort（stdout 單行 + exit 0）
 out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --email alice@x.com --text)"; rc=$?
-assert_eq "TG_FAIL: missing --text" "$out" "末尾 --text 無值 → 不 abort（stdout）"
+assert_eq "TG_FAIL: missing --text or --file" "$out" "末尾 --text 無值 → 不 abort（stdout）"
 assert_eq "0" "$rc" "末尾 --text 無值 → exit 0"
 
-# 完全缺 --text
+# 完全缺 --text 與 --file
 out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --email alice@x.com)"
-assert_eq "TG_FAIL: missing --text" "$out" "缺 --text → TG_FAIL"
+assert_eq "TG_FAIL: missing --text or --file" "$out" "缺 --text 與 --file → TG_FAIL"
 
 # 缺 selector
 out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --text hi)"
 assert_eq "TG_FAIL: missing selector (--email/--notion-user-ids/--chat-id)" "$out" "缺 selector → TG_FAIL"
+
+# --file：dry-run 帶檔名
+TESTFILE="$TMP/doc.txt"; echo hi > "$TESTFILE"
+out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --email alice@x.com --file "$TESTFILE" --dry-run)"
+assert_eq "TG_SENT(dry-run): alice@x.com chat_id=111 file=$TESTFILE" "$out" "--file dry-run → 帶檔名"
+
+# --file：檔案不存在 → TG_FAIL
+out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --email alice@x.com --file "$TMP/no-such-file.txt" --dry-run)"
+assert_eq "TG_FAIL: file not found ($TMP/no-such-file.txt)" "$out" "--file 檔案不存在 → TG_FAIL"
 
 # 略過路徑 exit 0
 TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --email ghost@x.com --text hi --dry-run >/dev/null; rc=$?

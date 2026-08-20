@@ -4,6 +4,7 @@
 #   tg-notify.sh --email "<tech_email>"            --text "<msg>" [--dry-run]
 #   tg-notify.sh --notion-user-ids "<id1 id2 ...>" --text "<msg>" [--dry-run]
 #   tg-notify.sh --chat-id "<chat_id>"             --text "<msg>" [--dry-run]   # 直送，繞過 CSV，供獨立測試
+#   加 --file "<path>" 改發檔案（sendDocument）：--text 選填，帶了就當 caption（上限 1024 字，超過由 Telegram 回錯）
 # 紀律：一律 exit 0、永不阻斷 pipeline；結果印一行供呼叫端記 log。
 # Bot token 來源：根目錄 /Users/user/aladdin/.env 的 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN（檔內先出現者勝）；查無即 TG_FAIL，不再後備讀 channel .env
 set -uo pipefail
@@ -12,7 +13,7 @@ CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/obsidian/commands/create-mr/references
 ROOT_ENV_FILE="${TG_ROOT_ENV_FILE:-/Users/user/aladdin/.env}"   # 根目錄 .env，唯一 token 來源（鍵名 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN）
 API_BASE="${TG_API_BASE:-https://api.telegram.org}"
 
-EMAIL=""; IDS=""; TEXT=""; DRY=0; CHAT_DIRECT=""
+EMAIL=""; IDS=""; TEXT=""; DRY=0; CHAT_DIRECT=""; FILE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     # 各兩參數旗標：先取值（缺值則空字串，避免 set -u abort），再安全 shift（先移除旗標，值存在才再 shift）
@@ -20,14 +21,16 @@ while [ $# -gt 0 ]; do
     --notion-user-ids)  IDS="${2:-}";         shift; [ $# -gt 0 ] && shift;;
     --chat-id)          CHAT_DIRECT="${2:-}"; shift; [ $# -gt 0 ] && shift;;
     --text)             TEXT="${2:-}";        shift; [ $# -gt 0 ] && shift;;
+    --file)             FILE="${2:-}";        shift; [ $# -gt 0 ] && shift;;
     --dry-run)          DRY=1; shift;;
     *)                  shift;;   # 未知旗標刻意略過（永不阻斷）；email 優先於 notion-user-ids
   esac
 done
 
-[ -z "$TEXT" ] && { echo "TG_FAIL: missing --text"; exit 0; }
+[ -z "$TEXT" ] && [ -z "$FILE" ] && { echo "TG_FAIL: missing --text or --file"; exit 0; }
 # 至少要有一種 selector
 [ -z "$CHAT_DIRECT" ] && [ -z "$EMAIL" ] && [ -z "$IDS" ] && { echo "TG_FAIL: missing selector (--email/--notion-user-ids/--chat-id)"; exit 0; }
+[ -n "$FILE" ] && [ ! -f "$FILE" ] && { echo "TG_FAIL: file not found ($FILE)"; exit 0; }
 
 MATCH_EMAIL=""; MATCH_CHAT=""
 if [ -n "$CHAT_DIRECT" ]; then
@@ -62,7 +65,11 @@ else
   [ -z "$MATCH_CHAT" ] && { echo "TG_SKIP_NO_CHATID: $MATCH_EMAIL"; exit 0; }
 fi
 
-if [ "$DRY" = "1" ]; then echo "TG_SENT(dry-run): $MATCH_EMAIL chat_id=$MATCH_CHAT"; exit 0; fi
+if [ "$DRY" = "1" ]; then
+  if [ -n "$FILE" ]; then echo "TG_SENT(dry-run): $MATCH_EMAIL chat_id=$MATCH_CHAT file=$FILE"
+  else echo "TG_SENT(dry-run): $MATCH_EMAIL chat_id=$MATCH_CHAT"; fi
+  exit 0
+fi
 
 TOKEN=""
 # 只讀根目錄 .env 的 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN（檔內先出現者勝）；查無即 TG_FAIL，不再後備讀 channel .env
@@ -70,10 +77,17 @@ TOKEN=""
 [ -z "$TOKEN" ] && { echo "TG_FAIL: $MATCH_EMAIL (no bot token in $ROOT_ENV_FILE)"; exit 0; }
 
 # 同時取回應 body 與 HTTP code（body 在前、最後一行為 code），失敗時帶出 Telegram 的 description
-RESP="$(curl -s -w $'\n%{http_code}' \
-  -X POST "$API_BASE/bot$TOKEN/sendMessage" \
-  --data-urlencode "chat_id=$MATCH_CHAT" \
-  --data-urlencode "text=$TEXT")"
+if [ -n "$FILE" ]; then
+  # sendDocument：檔案當附件，--text（若有）當 caption；用陣列組 curl 參數避免 caption 含空白被字詞分割
+  CURL_ARGS=(-s -w $'\n%{http_code}' -X POST "$API_BASE/bot$TOKEN/sendDocument" -F "chat_id=$MATCH_CHAT" -F "document=@${FILE}")
+  [ -n "$TEXT" ] && CURL_ARGS+=(-F "caption=$TEXT")
+  RESP="$(curl "${CURL_ARGS[@]}")"
+else
+  RESP="$(curl -s -w $'\n%{http_code}' \
+    -X POST "$API_BASE/bot$TOKEN/sendMessage" \
+    --data-urlencode "chat_id=$MATCH_CHAT" \
+    --data-urlencode "text=$TEXT")"
+fi
 HTTP="${RESP##*$'\n'}"   # 最後一行＝HTTP code
 BODY="${RESP%$'\n'*}"    # 其餘＝回應 body
 if [ "$HTTP" = "200" ]; then
