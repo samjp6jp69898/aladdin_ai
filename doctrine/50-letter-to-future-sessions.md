@@ -5,7 +5,7 @@
 ## 一、三件沒被問到、但對這個環境最重要的事
 
 ### 1. 安全姿態需要使用者做兩個決定（AI 不可代做）
-- **Notion token 單源化＋輪替全部完成（2026-07-03）**：token 只存在 `/Users/user/aladdin/.env` 的 `NOTION_TOKEN=` 一行；9 個消費端全讀 .env（新 token 已實測 API 200）；使用者已輪替，備份與 git 歷史裡的舊值已失效。未來輪替 SOP：Notion 後台換發 → 改 .env 一行 → `notion.sh fetch <任一 page>` 驗證。
+- **Notion token 單源化＋輪替全部完成（2026-07-03）**：token 只存在 `/Users/user/aladdin/.env` 的 `ALD_NOTION_TOKEN=` 一行；9 個消費端全讀 .env（新 token 已實測 API 200）；使用者已輪替，備份與 git 歷史裡的舊值已失效。未來輪替 SOP：Notion 後台換發 → 改 .env 一行 → `notion.sh fetch <任一 page>` 驗證。
 - ~~使用者層 settings.json 的 mysql MCP root 寫權限~~ 已處理（2026-07-03）：整個 `mcpServers.mysql` 區塊依使用者指示移除（備份在 `backups/20260703-fable/settings.json.user.v2`，要復原貼回去即可）。專案層 `.mcp.json` 的 mysql-dev / mysql-local 不受影響。
 - ~~settings.json 寫死 fable model~~ 已處理（2026-07-03）：`model` key 已移除，回歸 Claude Code 預設；superpowers plugin 已依使用者指示全域停用（`enabledPlugins` 設 false，SessionStart hook 與其 skills 一併消失；要恢復改回 true 即可）。
 

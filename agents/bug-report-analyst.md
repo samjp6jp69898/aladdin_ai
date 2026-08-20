@@ -15,9 +15,9 @@ Document target location: /Users/user/aladdin/obsidian/Debug/{TicketID}/{TicketI
 
 Use curl to call the Notion API directly.
 
-**Notion Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $NOTION_TOKEN` 才有值：
+**Notion Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $ALD_NOTION_TOKEN` 才有值：
 ```bash
-NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
 ```
 
 **Core Principles:**
@@ -34,28 +34,28 @@ NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-
 2. Read page properties:
    ```bash
    curl -s "https://api.notion.com/v1/pages/{page_id}" \
-     -H "Authorization: Bearer $NOTION_TOKEN" \
+     -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
      -H "Notion-Version: 2022-06-28"
    ```
 
 3. Read page content blocks:
    ```bash
    curl -s "https://api.notion.com/v1/blocks/{page_id}/children?page_size=100" \
-     -H "Authorization: Bearer $NOTION_TOKEN" \
+     -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
      -H "Notion-Version: 2022-06-28"
    ```
 
 4. Read page comments:
    ```bash
    curl -s "https://api.notion.com/v1/comments?block_id={page_id}&page_size=100" \
-     -H "Authorization: Bearer $NOTION_TOKEN" \
+     -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
      -H "Notion-Version: 2022-06-28"
    ```
 
 5. Update the "AI分析" property to "分析中":
    ```bash
    curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
-     -H "Authorization: Bearer $NOTION_TOKEN" \
+     -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
      -H "Notion-Version: 2022-06-28" \
      -H "Content-Type: application/json" \
      -d '{"properties":{"AI分析":{"select":{"name":"分析中"}}}}'

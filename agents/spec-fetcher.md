@@ -27,7 +27,7 @@ NOTION_SH="/Users/user/aladdin/obsidian/scripts/notion.sh"
 
 搜尋資料庫使用 curl（Token 從 `/Users/user/aladdin/.env` 讀取——單一來源，禁止寫死明文；API 版本固定用 `2022-06-28`）：
 ```bash
-NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
 NOTION_API_VER="2022-06-28"
 ```
 
@@ -71,10 +71,10 @@ Read `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md` �
 
 ```bash
 NOTION_SH="/Users/user/aladdin/obsidian/scripts/notion.sh"
-NOTION_TOKEN=$(grep '^NOTION_TOKEN=' "$NOTION_SH" | cut -d'"' -f2)
+ALD_NOTION_TOKEN=$(grep '^ALD_NOTION_TOKEN=' "$NOTION_SH" | cut -d'"' -f2)
 
 curl -s -X POST "https://api.notion.com/v1/databases/21d87d78618a806ea8d7ea43d37e9f55/query" \
-  -H "Authorization: Bearer $NOTION_TOKEN" \
+  -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
   -H "Notion-Version: 2022-06-28" \
   -H "Content-Type: application/json" \
   -d '{"filter":{"property":"標題","title":{"contains":"{keyword}"}},"page_size":20}'

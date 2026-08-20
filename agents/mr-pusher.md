@@ -56,13 +56,13 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 ## Notion API
 
-**Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $NOTION_TOKEN` 才有值：
+**Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $ALD_NOTION_TOKEN` 才有值：
 ```bash
-NOTION_TOKEN=$(grep -m1 '^NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
 ```
 **Headers:**
 ```
-Authorization: Bearer $NOTION_TOKEN
+Authorization: Bearer $ALD_NOTION_TOKEN
 Notion-Version: 2022-06-28
 Content-Type: application/json
 ```
@@ -223,7 +223,7 @@ cat > /tmp/{ticket_id}-notion-comment.json <<EOF
 EOF
 
 curl -s -X POST "https://api.notion.com/v1/comments" \
-  -H "Authorization: Bearer $NOTION_TOKEN" \
+  -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
   -H "Notion-Version: 2022-06-28" \
   -H "Content-Type: application/json" \
   -d @/tmp/{ticket_id}-notion-comment.json
@@ -247,7 +247,7 @@ AI 分析 + 修復完成,但 MR 發送失敗,請人工介入。
 
 ```bash
 curl -s -X PATCH "https://api.notion.com/v1/pages/{page_id}" \
-  -H "Authorization: Bearer $NOTION_TOKEN" \
+  -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
   -H "Notion-Version: 2022-06-28" \
   -H "Content-Type: application/json" \
   -d '{"properties": {"AI分析": {"select": {"name": "分析成功"}}}}'
