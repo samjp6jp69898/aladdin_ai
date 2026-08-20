@@ -1,5 +1,7 @@
 # 制度檔變更流水帳（格式：- YYYY-MM-DD | 檔案 | 一句摘要 | 驗證方式）
 
+- 2026-08-20 | CLAUDE.md（硬規則 git push 例外清單） | （使用者核准，紅區：硬規則增刪改）唯二例外改唯三例外，新增 `aladdin-toolsmith` 的 `deploy-pipeline.ts` 在 `obsidian` repo 對 `main` 分支的 push 權限，限定 tsc 結構性檢查 + 獨立對抗性覆核 agent 皆通過才 push、任一關卡沒過即回滾不 push（配合同日新增的 toolsmith 部署管線功能：企劃自助擴充 tool，sub-agent 驗證通過後自動 commit+push+reload，不回傳程式碼） | 備份至 `.claude/backups/20260820/CLAUDE.md.pre-toolsmith-push-exception`；grep 一致性檢查（commands/agents/scripts/doctrine/CLAUDE.md）確認 `permissions-worktree.md` 因範圍僅限 worktree 環境（toolsmith 操作主工作目錄非 worktree）不受影響、不需同步修改；`sync-mirrors.sh` 全綠；CLAUDE.md 85 行（上限 120）
+
 - 2026-07-29 | scripts/notion-page-write.sh（新） | （使用者指示新增獨立腳本，非改 notion.sh）新增 update-title／append-blocks／clear-children 三個子命令，供把 skill 說明文件之類的內容直接寫入既有 Notion 頁面（沿用 notion.sh 同一把 ALD_NOTION_TOKEN，不新增 token 來源） | bash -n；實跑三個子命令對使用者新建頁面（大舞台(1)頁）清空 36 個舊區塊、改標題、附加 64 個新區塊，fetch-blocks 回讀確認 64 筆與 has_more=false
 
 - 2026-07-21 | .claude/doctrine→obsidian/doctrine（新 symlink）+ scripts/sync-mirrors.sh + CLAUDE.md | （使用者核准，紅區：symlink↔實體目錄互換）doctrine 實體目錄搬到 obsidian/doctrine，.claude/doctrine 改為 symlink，比照 commands/agents/skills/scripts 單一來源模式（backups、settings.local.json、scheduled_tasks.lock 維持本機狀態不搬，依第 6 節規範）；sync-mirrors.sh 加入 doctrine 健檢行；CLAUDE.md 新增 symlink 慣例說明＋換機重建指令（另一台電腦 clone obsidian 後需手動 ln -sf 重建） | sync-mirrors.sh 全綠（5 個 symlink SYMLINK_OK，CLAUDE.md SYNCED）；backups/20260721-doctrine-symlink/ 備份原目錄；grep 一致性檢查無殘留舊行為描述；CLAUDE.md 80 行（上限 120）
