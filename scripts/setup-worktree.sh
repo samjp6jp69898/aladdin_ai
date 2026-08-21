@@ -9,7 +9,10 @@
 #   affected_repo ∈ {agrabah, abu, lago, rajah}，可為空（全部 symlink，bootstrap 實質跑主 repo）
 #
 # 行為：
-#   1. affected repo → 真 git worktree（branch mr/<ticket>，base origin/dev）；其餘主 repo + 共用庫 → symlink
+#   1. affected repo → 真 git worktree（branch mr/<ticket>，base origin/main）；其餘主 repo + 共用庫 → symlink
+#      2026-08-21：base 由 origin/dev 改為 origin/main（main 遷移計畫進行中，使用者已確認接受
+#      「遷移完成前 main 落後 dev」的已知風險——見 .claude/doctrine/refs/change-log.md 該日條目）。
+#      mr-pusher push 前仍會 rebase 到最新 origin/dev（見 mr-pusher.md Step 0.5），提供部分緩衝。
 #   2. node_modules：掃描主 repo 實際存在位置逐一 symlink（涵蓋 abu 等多子專案結構；踩坑 2026-07-01）
 #   3. agrabah 為真 worktree 時補 .env.local symlink（踩坑 2026-07-02，缺它 migrate 硬中斷）
 #   4. 跑 bootstrap.sh；失敗時自動判別「DB 資料供給層卡點」vs「真正失敗」
@@ -88,10 +91,10 @@ for repo in "${AFFECTED[@]:-}"; do
   echo "== worktree: $repo =="
   ok=0
   for attempt in 1 2; do
-    run "git -C '$ROOT/$repo' fetch origin dev --quiet"
+    run "git -C '$ROOT/$repo' fetch origin main --quiet"
     run "git -C '$ROOT/$repo' worktree remove '$WT/$repo' --force 2>/dev/null || true"
     run "git -C '$ROOT/$repo' branch -D 'mr/$TICKET' 2>/dev/null || true"
-    if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' origin/dev"; then ok=1; break; fi
+    if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' origin/main"; then ok=1; break; fi
     echo "worktree add 失敗（attempt ${attempt} ），清殘留重試"
     run "git -C '$ROOT/$repo' worktree prune"
   done
