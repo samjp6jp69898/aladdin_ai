@@ -60,16 +60,58 @@ case "$1" in
         ;;
 
     fetch-blocks)
+        # 2026-08-23：原本固定 page_size=100、不追 next_cursor，超過 100 個
+        # block 的頁面會靜默丟掉後面的內容（見 tasks.json T31/T34 changelog
+        # 記錄的已知限制）。改成自動追完所有分頁再合併成單一 results 陣列，
+        # 呼叫端（spec-sufficiency-gate.ts 等）完全不需要改——回傳的頂層物件
+        # 形狀不變，只是 results 現在保證是完整清單、has_more 保證是 false。
         INPUT="$2"
         if [ -z "$INPUT" ]; then
             echo "Usage: notion.sh fetch-blocks <notion_url_or_page_id>"
             exit 1
         fi
         PAGE_ID=$(extract_page_id "$INPUT")
-        curl -s "${NOTION_API}/blocks/${PAGE_ID}/children?page_size=100" \
-            -H "Authorization: Bearer ${NOTION_TOKEN}" \
-            -H "Notion-Version: ${NOTION_VERSION}" \
-            -H "Content-Type: application/json"
+        python3 -c "
+import json, subprocess, sys
+
+page_id, token, api, version = sys.argv[1:5]
+all_results = []
+cursor = None
+# 上限只是防呆（避免任何未預期的 API 行為造成無窮迴圈），單一頁面正常不可能
+# 有 10 萬個以上的 block，撞到上限會如實印出當時累積的結果並保留 has_more，
+# 不假裝完整。
+for _ in range(1000):
+    url = f'{api}/blocks/{page_id}/children?page_size=100'
+    if cursor:
+        url += f'&start_cursor={cursor}'
+    proc = subprocess.run(
+        ['curl', '-s', url,
+         '-H', f'Authorization: Bearer {token}',
+         '-H', f'Notion-Version: {version}',
+         '-H', 'Content-Type: application/json'],
+        capture_output=True, text=True,
+    )
+    try:
+        page = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        print(proc.stdout)  # 非 JSON 回應（少見的網路層錯誤），原樣印出不假裝成功
+        sys.exit(0)
+    if 'results' not in page:
+        print(json.dumps(page))  # API 錯誤回應（權限/格式問題等），原樣印出讓呼叫端看到真正的錯誤
+        sys.exit(0)
+    all_results.extend(page['results'])
+    if not page.get('has_more'):
+        page['results'] = all_results
+        page['has_more'] = False
+        page['next_cursor'] = None
+        print(json.dumps(page))
+        sys.exit(0)
+    cursor = page.get('next_cursor')
+# 迴圈跑滿上限仍未見 has_more=false（理論上不會發生，見上方防呆說明）：如實
+# 印出目前已經拿到的合併結果並保留 has_more=true，不要讓呼叫端收到空字串去
+# JSON.parse 炸例外——這是防呆分支本身要兌現的承諾，不是無法到達的死碼。
+print(json.dumps({'object': 'list', 'results': all_results, 'has_more': True, 'next_cursor': cursor}))
+" "$PAGE_ID" "$NOTION_TOKEN" "$NOTION_API" "$NOTION_VERSION"
         ;;
 
     comments)
@@ -215,26 +257,61 @@ print(json.dumps({'properties': {sys.argv[1]: {'rich_text': [{'type': 'text', 't
         # 唯讀：查詢 data source（POST /v1/data_sources/<id>/query）
         # 用法：notion.sh query-datasource <data_source_id> ['<filter_json>']
         #   例：notion.sh query-datasource 21c87d78-618a-817f-ae71-000baa9ab11b '{"property":"單號","unique_id":{"equals":3843}}'
-        #   filter_json 省略時查全部（page_size 100，不分頁）
+        #   filter_json 省略時查全部
+        # 2026-08-23：原本固定 page_size=100、不分頁，超過 100 筆的查詢結果會
+        # 靜默丟掉後面的資料（見 tasks.json T31/T34 changelog 記錄的已知限
+        # 制）。改成自動追完所有分頁再合併成單一 results 陣列，呼叫端
+        # （candidate-tickets.ts／demand-pool-tickets.ts 等）完全不需要改——
+        # 回傳的頂層物件形狀不變，只是 results 現在保證是完整清單、has_more
+        # 保證是 false。
         DS_ID="$2"
         FILTER_JSON="$3"
         if [ -z "$DS_ID" ]; then
             echo "Usage: notion.sh query-datasource <data_source_id> ['<filter_json>']"
             exit 1
         fi
-        BODY=$(python3 -c "
-import json, sys
-filter_json = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
-body = {'page_size': 100}
-if filter_json:
-    body['filter'] = json.loads(filter_json)
-print(json.dumps(body))
-" "$FILTER_JSON")
-        curl -s -X POST "${NOTION_API}/data_sources/${DS_ID}/query" \
-            -H "Authorization: Bearer ${NOTION_TOKEN}" \
-            -H "Notion-Version: ${NOTION_VERSION}" \
-            -H "Content-Type: application/json" \
-            -d "$BODY"
+        python3 -c "
+import json, subprocess, sys
+
+ds_id, filter_json, token, api, version = sys.argv[1:6]
+filt = json.loads(filter_json) if filter_json else None
+all_results = []
+cursor = None
+for _ in range(1000):  # 防呆上限，理由同 fetch-blocks
+    body = {'page_size': 100}
+    if filt:
+        body['filter'] = filt
+    if cursor:
+        body['start_cursor'] = cursor
+    proc = subprocess.run(
+        ['curl', '-s', '-X', 'POST', f'{api}/data_sources/{ds_id}/query',
+         '-H', f'Authorization: Bearer {token}',
+         '-H', f'Notion-Version: {version}',
+         '-H', 'Content-Type: application/json',
+         '-d', json.dumps(body)],
+        capture_output=True, text=True,
+    )
+    try:
+        page = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        print(proc.stdout)
+        sys.exit(0)
+    if 'results' not in page:
+        print(json.dumps(page))
+        sys.exit(0)
+    all_results.extend(page['results'])
+    if not page.get('has_more'):
+        page['results'] = all_results
+        page['has_more'] = False
+        page['next_cursor'] = None
+        print(json.dumps(page))
+        sys.exit(0)
+    cursor = page.get('next_cursor')
+# 迴圈跑滿上限仍未見 has_more=false（理論上不會發生，見上方防呆說明）：如實
+# 印出目前已經拿到的合併結果並保留 has_more=true，不要讓呼叫端收到空字串去
+# JSON.parse 炸例外——這是防呆分支本身要兌現的承諾，不是無法到達的死碼。
+print(json.dumps({'object': 'list', 'results': all_results, 'has_more': True, 'next_cursor': cursor}))
+" "$DS_ID" "$FILTER_JSON" "$NOTION_TOKEN" "$NOTION_API" "$NOTION_VERSION"
         ;;
 
     upload-file)
