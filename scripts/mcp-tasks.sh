@@ -24,7 +24,7 @@ LOCKDIR="/tmp/mcp-tasks-locks"
 LOCK="$LOCKDIR/.tasks-set-lock"
 ACTION="${1:-}"
 
-[ -f "$TASKS" ] || { echo "ERROR: tasks.json 不存在：$TASKS（先跑 bun obsidian/scripts/mcp-tool-gap-scan.ts）"; exit 1; }
+[ -f "$TASKS" ] || { echo "ERROR: tasks.json 不存在: ${TASKS} (先跑 bun obsidian/scripts/mcp-tool-gap-scan.ts)"; exit 1; }
 command -v jq >/dev/null || { echo "ERROR: 需要 jq"; exit 1; }
 
 # 檔級自旋鎖：mkdir 的原子性保證同時只有一個 process 能進臨界區，跟 tracker.sh 同款做法。
@@ -100,7 +100,7 @@ case "$ACTION" in
     with_lock
     status=$(jq -r --arg id "$ID" '.tasks[] | select(.id == $id) | .status' "$TASKS")
     [ -z "$status" ] && { echo "NOT_FOUND: $ID"; exit 1; }
-    case "$status" in failed|needs_clarification) ;; *) echo "ERROR: 只有 failed/needs_clarification 可以 retry（目前是 $status）"; exit 1;; esac
+    case "$status" in failed|needs_clarification) ;; *) echo "ERROR: 只有 failed/needs_clarification 可以 retry (目前是 ${status})"; exit 1;; esac
     NOW="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     tmp=$(mktemp)
     jq --arg id "$ID" --arg now "$NOW" '

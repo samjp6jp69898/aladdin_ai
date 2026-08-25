@@ -23,8 +23,17 @@
 #   bash scripts/mcp-rajah-tasks.sh counts                        # 全部 101 檔彙總的各狀態統計（即時掃描，不吃快取）
 #   bash scripts/mcp-rajah-tasks.sh files                         # 每個 rajah 檔案各自的任務數/狀態統計
 #   bash scripts/mcp-rajah-tasks.sh reindex                       # 重建 mcps/rajah-inventory/_index.json（給人看全貌用，非操作必要）
+#
+# 多 session 協調（同一台機器開多個 Claude Code session、各自處理不同 rajah 檔案時用）：
+#   bash scripts/mcp-rajah-tasks.sh domain-claim <stem> <session_label>    # 宣告「這個 rajah 檔案我在處理」，已被別人宣告會擋下
+#   bash scripts/mcp-rajah-tasks.sh domain-release <stem> <session_label> # 這個檔案的任務全做完/要換人了，釋放宣告
+#   bash scripts/mcp-rajah-tasks.sh domain-status                        # 印目前所有宣告（誰在處理哪個檔案、何時宣告的）
+# 這只是「宣告」不是硬鎖——避免兩個 session 同時挑同一個 rajah 檔案、在 integrate 階段
+# 搶改同一個 MCP server 的 index.ts/README.md/const.ts。真正的任務認領仍是 claim（原子性、
+# 真的擋得住雙重認領），domain-claim 只是協調用的禮讓機制。
 set -u
 DIR="${RAJAH_TASKS_DIR:-/Users/user/aladdin/obsidian/mcps/rajah-inventory}"
+CLAIMS_FILE="$DIR/_domain-claims.json"
 LOCKROOT="/tmp/mcp-rajah-tasks-locks"
 ACTION="${1:-}"
 
@@ -140,7 +149,7 @@ case "$ACTION" in
     with_lock "$STEM"
     status=$(jq -r --arg id "$ID" '.tasks[] | select(.id == $id) | .status' "$F")
     [ -z "$status" ] && { echo "NOT_FOUND: $ID"; exit 1; }
-    case "$status" in failed|needs_clarification) ;; *) echo "ERROR: 只有 failed/needs_clarification 可以 retry（目前是 $status）"; exit 1;; esac
+    case "$status" in failed|needs_clarification) ;; *) echo "ERROR: 只有 failed/needs_clarification 可以 retry (目前是 ${status})"; exit 1;; esac
     NOW="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     tmp=$(mktemp)
     jq --arg id "$ID" --arg now "$NOW" '
@@ -163,7 +172,40 @@ case "$ACTION" in
   reindex)
     bun /Users/user/aladdin/obsidian/scripts/mcp-rajah-tasks-build-index.ts
     ;;
+  domain-claim)
+    STEM="${2:?用法: mcp-rajah-tasks.sh domain-claim <stem> <session_label>}"
+    LABEL="${3:?缺 session_label}"
+    [ -f "$DIR/$STEM.json" ] || { echo "ERROR: $DIR/$STEM.json 不存在（stem 打錯？）"; exit 1; }
+    with_lock "_domain-claims"
+    [ -f "$CLAIMS_FILE" ] || echo '{"claims":[]}' > "$CLAIMS_FILE"
+    holder=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .session_label' "$CLAIMS_FILE")
+    if [ -n "$holder" ] && [ "$holder" != "$LABEL" ]; then
+        echo "ALREADY_CLAIMED: $STEM 已被 $holder 宣告，先用 domain-status 看狀況或找對方協調"; exit 1
+    fi
+    NOW="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+    tmp=$(mktemp)
+    jq --arg s "$STEM" --arg label "$LABEL" --arg now "$NOW" '
+      .claims |= (map(select(.domain != $s)) + [{domain: $s, session_label: $label, claimed_at: $now}])
+    ' "$CLAIMS_FILE" > "$tmp" && mv "$tmp" "$CLAIMS_FILE"
+    echo "DOMAIN_CLAIMED: $STEM -> $LABEL"
+    ;;
+  domain-release)
+    STEM="${2:?用法: mcp-rajah-tasks.sh domain-release <stem> <session_label>}"
+    LABEL="${3:?缺 session_label}"
+    with_lock "_domain-claims"
+    [ -f "$CLAIMS_FILE" ] || { echo "NOT_CLAIMED: $STEM"; exit 0; }
+    holder=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .session_label' "$CLAIMS_FILE")
+    [ -z "$holder" ] && { echo "NOT_CLAIMED: $STEM"; exit 0; }
+    [ "$holder" != "$LABEL" ] && { echo "ERROR: ${STEM} 是 ${holder} 宣告的，不是你 (${LABEL})，不能代放"; exit 1; }
+    tmp=$(mktemp)
+    jq --arg s "$STEM" '.claims |= map(select(.domain != $s))' "$CLAIMS_FILE" > "$tmp" && mv "$tmp" "$CLAIMS_FILE"
+    echo "DOMAIN_RELEASED: $STEM"
+    ;;
+  domain-status)
+    [ -f "$CLAIMS_FILE" ] || { echo "（目前沒有任何 domain 宣告）"; exit 0; }
+    jq -r '.claims | sort_by(.domain)[] | "\(.domain)\t\(.session_label)\t\(.claimed_at)"' "$CLAIMS_FILE"
+    ;;
   *)
-    echo "用法：mcp-rajah-tasks.sh {next|claim|row|set|set-category|retry|counts|files|reindex} [args]（詳見檔頭註解）"; exit 1
+    echo "用法：mcp-rajah-tasks.sh {next|claim|row|set|set-category|retry|counts|files|reindex|domain-claim|domain-release|domain-status} [args]（詳見檔頭註解）"; exit 1
     ;;
 esac
