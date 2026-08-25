@@ -54,6 +54,11 @@ check_link "$ROOT/.claude/agents"   "$ROOT/obsidian/agents"
 check_link "$ROOT/.claude/skills"   "$ROOT/obsidian/skills"
 check_link "$ROOT/.claude/doctrine" "$ROOT/obsidian/doctrine"
 check_link "$ROOT/scripts"          "$ROOT/obsidian/scripts"
+# AGENTS.md（2026-08-25 新增，給 Codex CLI 等遵循 agents.md 標準的工具讀）：
+# 兩份都指向同目錄的 CLAUDE.md，不是「指到 obsidian/」的單一來源 symlink，
+# target 用相對路徑比對。
+check_link "$ROOT/AGENTS.md"          "CLAUDE.md"
+check_link "$ROOT/obsidian/AGENTS.md" "CLAUDE.md"
 
 echo "DONE ($MODE)"
 exit $FAIL
