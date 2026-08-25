@@ -31,34 +31,67 @@ cell_of(){ awk -F',' -v e="$1" 'NR>1 && $3==e{print $5}' "$CSV" | tr -d '[:space
 # ───────────────────────── --set ─────────────────────────
 echo "## --set"
 
-# 1) 寫空列 → SET_OK，CSV 該列被填
+# TG_RESTART_CMD 一律 stub 掉——測試絕不能真的打 launchctl 去重啟正式服務。
+# 1) 寫空列 → SET_OK，CSV 該列被填，且嘗試重啟（stub 成功 → RESTART_OK）
 mkcsv
-out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --set pkh_farus@photons.com.tw 111)"
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" bash "$SCRIPT" --set pkh_farus@photons.com.tw 111)"
 assert_has "set empty prints SET_OK" "$out" "SET_OK"
 assert_eq  "set empty fills cell"    "$(cell_of pkh_farus@photons.com.tw)" "111"
+assert_has "set empty triggers RESTART_OK (stub)" "$out" "RESTART_OK"
 
-# 2) 已填相同 → SET_NOOP
+# 1b) 重啟 stub 失敗 → SET_OK 仍算成功，但印 RESTART_WARN 不印 RESTART_OK
 mkcsv
-out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 777)"
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="false" bash "$SCRIPT" --set pkh_farus@photons.com.tw 111)"
+assert_has "set with failing restart still prints SET_OK" "$out" "SET_OK"
+assert_has "set with failing restart prints RESTART_WARN" "$out" "RESTART_WARN"
+assert_no  "set with failing restart does not print RESTART_OK" "$out" "RESTART_OK"
+
+# 2) 已填相同 → SET_NOOP（不觸發重啟）
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 777)"
 assert_has "set same prints SET_NOOP" "$out" "SET_NOOP"
 assert_eq  "set same keeps cell"      "$(cell_of pkh_mapped@photons.com.tw)" "777"
+assert_no  "set same does not restart" "$out" "RESTART"
 
-# 3) 已填不同 + 無 --force → SET_CONFLICT，CSV 不變
+# 3) 已填不同 + 無 --force → SET_CONFLICT，CSV 不變（不觸發重啟）
 mkcsv
-out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 888)"
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 888)"
 assert_has "set diff no-force prints SET_CONFLICT" "$out" "SET_CONFLICT"
 assert_eq  "set diff no-force keeps cell"          "$(cell_of pkh_mapped@photons.com.tw)" "777"
+assert_no  "set diff no-force does not restart" "$out" "RESTART"
 
-# 4) 已填不同 + --force → SET_OK 覆蓋
+# 4) 已填不同 + --force → SET_OK 覆蓋，且觸發重啟
 mkcsv
-out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 888 --force)"
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" bash "$SCRIPT" --set pkh_mapped@photons.com.tw 888 --force)"
 assert_has "set force prints SET_OK"  "$out" "SET_OK"
 assert_eq  "set force overwrites cell" "$(cell_of pkh_mapped@photons.com.tw)" "888"
+assert_has "set force triggers RESTART_OK (stub)" "$out" "RESTART_OK"
 
-# 5) email 不存在 → SET_ERR_NO_EMAIL
+# 5) email 不存在 → SET_ERR_NO_EMAIL（不觸發重啟）
 mkcsv
-out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --set nobody@photons.com.tw 999)"
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" bash "$SCRIPT" --set nobody@photons.com.tw 999)"
 assert_has "set unknown email prints SET_ERR_NO_EMAIL" "$out" "SET_ERR_NO_EMAIL"
+assert_no  "set unknown email does not restart" "$out" "RESTART"
+
+# ───────────────────────── --unset ─────────────────────────
+echo "## --unset"
+
+# 1) 已有 chat_id → UNSET_OK，欄位清空（不刪除整列）
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --unset pkh_mapped@photons.com.tw)"
+assert_has "unset existing prints UNSET_OK" "$out" "UNSET_OK"
+assert_eq  "unset existing clears cell"     "$(cell_of pkh_mapped@photons.com.tw)" ""
+assert_eq  "unset 不刪列，其他欄位還在"      "$(awk -F',' -v e=pkh_mapped@photons.com.tw 'NR>1 && $3==e{print $1}' "$CSV")" "Mapped Guy"
+
+# 2) 本來就沒有 chat_id → UNSET_NOOP
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --unset pkh_farus@photons.com.tw)"
+assert_has "unset empty prints UNSET_NOOP" "$out" "UNSET_NOOP"
+
+# 3) email 不存在 → UNSET_ERR_NO_EMAIL
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --unset nobody@photons.com.tw)"
+assert_has "unset unknown email prints UNSET_ERR_NO_EMAIL" "$out" "UNSET_ERR_NO_EMAIL"
 
 # ───────────────────────── --list ─────────────────────────
 echo "## --list"
@@ -79,7 +112,8 @@ STUBEOF
 chmod +x "$TMP/upd.sh"
 
 mkcsv
-OUT="$(TG_NOTIFY_CSV="$CSV" TG_GETUPDATES_CMD="$TMP/upd.sh" bash "$SCRIPT" --list)"
+# TG_UNKNOWN_SENDERS_LOG 指到不存在的檔案：隔離測試，不誤讀真實 production log
+OUT="$(TG_NOTIFY_CSV="$CSV" TG_GETUPDATES_CMD="$TMP/upd.sh" TG_UNKNOWN_SENDERS_LOG="$TMP/no-such.jsonl" bash "$SCRIPT" --list)"
 
 line_of(){ printf '%s\n' "$OUT" | awk -F'\t' -v id="$1" '$1==id'; }
 field(){ printf '%s' "$1" | awk -F'\t' -v n="$2" '{print $n}'; }
@@ -104,6 +138,36 @@ assert_no "mapped 777 skipped"       "$OUT" "777"
 
 # 非私聊（group -1009）→ 被忽略，不出現在輸出
 assert_no "group chat ignored"       "$OUT" "1009"
+
+# ── webhook-log 來源（telegram-dispatcher 的未知 sender log）──
+echo "## --list（webhook-log 來源）"
+
+# getUpdates 409 stub：模擬 webhook 掛著時的正常故障（不應中止，只警告）
+cat > "$TMP/upd409.sh" <<'STUBEOF'
+#!/usr/bin/env bash
+echo "HTTP Error 409: Conflict" >&2
+exit 1
+STUBEOF
+chmod +x "$TMP/upd409.sh"
+
+cat > "$TMP/unknown-senders.jsonl" <<'JSONL'
+{"ts":"2026-08-21T01:00:00.000Z","chat_id":"444","first_name":"洋蔥","last_name":"","username":"farus422"}
+{"ts":"2026-08-21T01:05:00.000Z","chat_id":"555","first_name":"Zzz","last_name":"","username":"zzz999"}
+JSONL
+
+mkcsv
+OUT2="$(TG_NOTIFY_CSV="$CSV" TG_GETUPDATES_CMD="$TMP/upd409.sh" TG_UNKNOWN_SENDERS_LOG="$TMP/unknown-senders.jsonl" bash "$SCRIPT" --list)"
+line2_of(){ printf '%s\n' "$OUT2" | awk -F'\t' -v id="$1" '$1==id'; }
+
+# getUpdates 409（webhook 掛著時的正常情況）：不中止，仍能從 webhook-log 拿到結果
+L444="$(line2_of 444)"
+assert_has "getUpdates 409 不中止，仍有 webhook-log 結果" "$OUT2" "444"
+assert_eq  "444 source webhook-log"  "$(field "$L444" 2)" "webhook-log"
+assert_eq  "444 confidence HIGH"     "$(field "$L444" 5)" "HIGH"
+assert_eq  "444 candidate_email"     "$(field "$L444" 6)" "pkh_farus@photons.com.tw"
+
+L555="$(line2_of 555)"
+assert_eq  "555 confidence ASK"      "$(field "$L555" 5)" "ASK"
 
 # ───────────────────────── summary ─────────────────────────
 echo "-----"
