@@ -21,7 +21,7 @@ argument-hint: "<ticket_id>"
 
 ## 參數
 
-`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（`/create-mrs` 已自行挑好單號、telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。
+`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（`/create-mrs` 已自行挑好單號、telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（2026-08-26 起，tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
 
 ## Manager 鐵律
 
@@ -79,6 +79,19 @@ bash /Users/user/aladdin/scripts/tg-map-chatids.sh --list
 3. `bash /Users/user/aladdin/scripts/bug-lock.sh claim {ticket_id}` → `LOCKED` → 輸出 `SKIPPED: already locked` 後結束。
 4. `bash /Users/user/aladdin/scripts/tracker.sh set {ticket_id} in_progress`
 5. **此後任何退出路徑都必須執行 Step 8**（解鎖 + tracker 終態 + 完成報告）。
+
+## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 第二參數為 `resume`；2026-08-26 紅區變更，使用者核准續跑語意）
+
+```bash
+bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id}
+```
+唯讀腳本，行首 grep 取 `RESUME_POINT:` 與各產物/結論行（契約見腳本檔頭）。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。
+
+- `step1` → 照常從 Step 1 全跑。
+- `step2` → 跳過 Step 1（沿用既有 analytics/spec）；Step 2 只派 `GROUNDING:` / `ANALYSIS_NOTES:` 為 missing 的那位（另一位的既有文件直接沿用），2c 照常。
+- `step4` / `step5` / `step6` / `step7` → 跳過 Step 1 與 2a/2b 派工，但 **2c 的分支判定照常做**（用既有的定向抽取補救取得 AFFECTED_REPOS 等值；命中 needs_qa / already_fixed / i18n_only 出口時走出口，忽略 RESUME_POINT）：
+  - `step4` → 照常 Step 4（重置分支）→ Step 5。
+  - `step5` / `step6` / `step7` → Step 4 的指令改為 `bash /Users/user/aladdin/scripts/setup-worktree.sh --keep-branch {ticket_id} {affected_repos}`（沿用 `mr/{ticket_id}` 分支與其上 fixer commit，輸出契約與失敗處理同 Step 4），然後：`step5` → Step 5（把 `REVIEW_A/B/C: FAILED` 對應的報告路徑當否決回饋，`fixer_attempt` 記為 1）；`step6` → 直接 Step 6；`step7` → `pipeline_status=success`，直接 Step 7。
 
 ## Step 0.5：Reviewer 推導（tech 名單複核）
 
@@ -260,9 +273,9 @@ REVIEW_RESULT: <PASSED|FAILED>
 | already_fixed | ✅ | — | ✅ | — |
 | i18n_manual_handoff | ✅ | — | ✅ | — |
 | needs_qa_clarification | ✅（傳 grounding/analysis） | — | ✅ | ✅ |
-| failed | **不跑** | — | ✅ | — |
+| failed | ✅（上傳既有分析+審查文件，2026-08-26 起） | — | ✅ | ✅ |
 
-### 7a：Drive Uploader MR（failed 不跑）
+### 7a：Drive Uploader MR（所有出口路徑都跑；failed 於 2026-08-26 起納入——上傳既有分析與審查文件供人工接手，文件全缺時 uploader 回 `DRIVE_LINK: N/A` 不報錯）
 
 派工 `subagent_type: drive-uploader-mr`：
 ```
@@ -339,13 +352,20 @@ AI 發現 bug 單與 CQA 實況可能有出入，需你確認：
 分析文件：{drive_link}
 Notion：{notion_url}"
 ```
-**failed**（無 drive link）：
+**failed**（2026-08-26 起附分析文件連結＋發 TG；drive_link 為 N/A 時留言省略「分析與審查文件」該行、TG 省略該行）：
 ```bash
 bash /Users/user/aladdin/scripts/notion.sh comment-text {page_id} "AI 分析失敗，需人工介入。
 失敗原因：{failure_reason}
-Tracer 嘗試：{tracer_attempt} 次，Fixer 嘗試：{fixer_attempt} 次（總 {total_attempt}）"
+Tracer 嘗試：{tracer_attempt} 次，Fixer 嘗試：{fixer_attempt} 次（總 {total_attempt}）
+分析與審查文件（含各 reviewer 否決理由，供人工接手）：" "{drive_link}"
 bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析失敗"
+bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "🔴 [分析失敗] {ticket_id}
+失敗原因：{failure_reason}
+嘗試：tracer {tracer_attempt} / fixer {fixer_attempt}（總 {total_attempt}）
+分析與審查文件：{drive_link}
+Notion：{notion_url}"
 ```
+（`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）沒有收件人，跳過 TG 該行，其餘照發；tg-notify 失敗照慣例不阻斷，記入 `tg_notify_result`。）
 
 ## Step 8：解鎖 + tracker 終態 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
 
@@ -380,8 +400,8 @@ bash /Users/user/aladdin/scripts/bug-lock.sh release {ticket_id}
 
 任一步驟超過重試上限、或 SETUP_FAIL 二連敗、或 resolve-reviewer 二連 ERROR：
 1. `pipeline_status=failed`，`failure_reason` 寫清楚「死在哪一步 + 最後一個錯誤訊息的第一行」。
-2. 跳過 7a/7b，走 7c 的 failed 分支。
+2. 跑 7a（上傳既有分析/審查文件，2026-08-26 起）→ 7c 的 failed 分支（留言附 drive_link + TG 通知）。跳過 7b。
 3. **必跑 Step 8**（解鎖 + `failed` + `log-fail` + 完成報告）。
-4. failed 不上傳 Drive、不開 MR、不留成功留言。
+4. failed 不開 MR、不留成功留言；Drive 只放「既有文件」，solution.md 僅在有 fixer diff 時由 uploader 編譯並標注「審查未全數通過」。
 
 **needs_qa_clarification 不是 failed**：它是正常暫停等 QA，走自己的出口（7a+7c+TG+tracker `needs_qa`）。

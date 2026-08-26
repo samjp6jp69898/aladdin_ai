@@ -27,7 +27,9 @@ Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed`
 | `already_fixed` | **跳過** | `{id}-analysis-notes.md` | **跳過**（由 manager 統一處理） |
 | `i18n_manual_handoff` | **跳過** | `{id}-analysis-notes.md` + `{id}-i18n-keys-to-import.md` | **跳過**（由 manager 統一處理） |
 | `needs_qa_clarification` | **跳過** | `{id}-grounding.md`（必有）+ `{id}-analysis-notes.md`（存在才傳） | **跳過**（由 manager 統一處理） |
-| `failed` | **跳過** | **完全跳過所有 Drive 動作** | **跳過**（由 manager 統一處理） |
+| `failed` | worktree 有 fixer diff 才編譯（檔頭標注「⚠ 審查未全數通過，僅供人工接手參考」） | `{id}-solution.md`（若有編）+ analytics / spec / grounding / analysis-notes + 三份 review 報告（**只上傳存在的，缺則略過不報錯**） | **跳過**（由 manager 統一處理） |
+
+`failed` 於 2026-08-26 由「完全跳過所有 Drive 動作」改為上傳分析與審查文件（使用者當日指示：failed 留言缺 solution 與相關文件、無從人工接手）。失敗可能死在任何一步，文件清單一律「存在才傳」；死於 Step 1 之前可能一份都沒有，此時如實回報 `DRIVE_LINK: N/A` 即可，不報錯。
 
 本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / needs_qa_clarification / failed 路徑）處理。
 
@@ -89,7 +91,9 @@ Content-Type: application/json
 
 ### Step 0: Aggregate solution.md
 
-**若 `pipeline_status ∈ {failed, already_fixed, i18n_manual_handoff, needs_qa_clarification}`，跳過本步驟（無 fixer 改動或完全跳過 Drive），直接進入 Step 1。**
+**若 `pipeline_status ∈ {already_fixed, i18n_manual_handoff, needs_qa_clarification}`，跳過本步驟（無 fixer 改動），直接進入 Step 1。**
+
+**`pipeline_status == failed` 時**：先確認 `{worktree_path}` 是否存在且有 fixer diff（`git -C {worktree_path}/<repo> diff origin/main...HEAD --stat` 非空，或分支有領先 commit）——有才編譯 solution.md，且文件**開頭第一行必須是**「⚠ 本票 pipeline 以 failed 收場（審查未全數通過），以下內容僅供人工接手參考，勿直接視為已驗證的解法」；worktree 已清或無 diff 則跳過本步驟，直接進 Step 1。
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
@@ -167,8 +171,6 @@ metadata: v2
 
 ### Step 1: Confirm Documents Exist
 
-**`pipeline_status == failed` 時跳過本步驟，直接進入 Step 5（不上傳、不建立資料夾）。**
-
 ```bash
 ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 ```
@@ -185,11 +187,14 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-grounding.md` (CQA 實證 grounding 佐證 — 本路徑最重要文件，grounding 早停路徑必有)
 - `{id}-analysis-notes.md` (若 tracer 有跑出待釐清結論則存在；grounding 早停路徑可能不存在)
 
+**`pipeline_status == failed` 時文件清單（全部「存在才傳」，缺則略過不報錯；一份都沒有 → 直接進 Step 5 回報 `DRIVE_LINK: N/A`）：**
+- `{id}-solution.md`（Step 0 有編才有）
+- `{id}-analytics.md` / `{id}-spec.md` / `{id}-grounding.md` / `{id}-analysis-notes.md`
+- `{id}-reviewer-report.md` / `{id}-adversarial-review.md` / `{id}-tdd-fidelity-review.md`（審查報告——failed 的關鍵佐證，人工要看否決理由）
+
 ### Step 2: Create Google Drive Subfolder
 
-**`pipeline_status == failed` 時跳過本步驟（完全不上傳）。**
-
-`pipeline_status == already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` 時仍需建立資料夾以放置要上傳的少量文件（analysis-notes.md / i18n-keys-to-import.md / grounding.md）。
+`pipeline_status == already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed` 時仍需建立資料夾以放置要上傳的文件（failed 時放 Step 1 清單裡實際存在的那些）。
 
 ```bash
 bash /Users/user/.claude/gdrive.sh mkdir "{ticket_id}" "1mDJGrClVuPW_mc_1w6uLYA_t1MI8incd"
@@ -199,7 +204,7 @@ Extract FOLDER_ID and URL.
 
 ### Step 3: Upload Files
 
-**`pipeline_status == failed` 時跳過本步驟（完全不上傳任何文件）。**
+**`pipeline_status == failed` 時，逐一上傳 Step 1 failed 清單中實際存在的文件（同一個 upload 指令、換檔名即可）。**
 
 `pipeline_status == success` 時，上傳下列三份文件：
 
@@ -231,9 +236,9 @@ bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{i
 
 ### Step 4: Get Folder Link
 
-**`pipeline_status == failed` 時跳過本步驟（沒有資料夾可取連結）。**
+**`pipeline_status == failed` 且一份文件都沒上傳（Step 1 清單全缺）時跳過本步驟。**
 
-`pipeline_status ∈ {success, already_fixed, i18n_manual_handoff, needs_qa_clarification}` 四條路徑都要拿到 Drive folder link 傳回 manager。
+其餘情況（含有上傳文件的 failed）都要拿到 Drive folder link 傳回 manager。
 
 ```bash
 bash /Users/user/.claude/gdrive.sh link "{FOLDER_ID}"
@@ -252,7 +257,7 @@ Report:
 DRIVE_LINK: <url>
 ```
 
-或（failed / 無法取得時）：
+或（無文件可上傳 / 無法取得時）：
 
 ```
 DRIVE_LINK: N/A

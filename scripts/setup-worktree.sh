@@ -1,8 +1,12 @@
 #!/bin/bash
 # setup-worktree.sh — /create-mr Step 4：建立 per-ticket 隔離環境（固化歷次踩坑修法）
 #
-# 用法：bash scripts/setup-worktree.sh [--dry-run] <ticket_id> [affected_repo ...]
+# 用法：bash scripts/setup-worktree.sh [--dry-run] [--keep-branch] <ticket_id> [affected_repo ...]
 #   例：bash scripts/setup-worktree.sh FAQ-3710 agrabah rajah
+#   --keep-branch（2026-08-26，/create-mr resume 模式用）：既有 mr/<ticket> 分支
+#   不砍不重建，worktree 直接掛回該分支（fixer 上一輪的 commit 都在分支上，
+#   cleanup-worktree.ts 清 worktree 時刻意保留分支就是為了這條路）。分支不存在
+#   的 repo 自動回退為原本的 -b origin/main 新建行為。
 #   ticket_id 格式：FAQ-數字（Bug List）或 ALDREQ-數字（需求池，2026-08-17
 #   telegram-dispatcher T36 為需求 pipeline 擴充，使用者確認後放行，屬紅區
 #   語意變更非單純 bug 修復，見 .claude/doctrine/refs/change-log.md）
@@ -40,7 +44,14 @@ MAIN_REPOS=(agrabah abu lago rajah)
 SHARED=(jasmine genie jafar)
 
 DRY=0
-if [ "${1:-}" = "--dry-run" ]; then DRY=1; shift; fi
+KEEP_BRANCH=0
+while :; do
+  case "${1:-}" in
+    --dry-run) DRY=1; shift;;
+    --keep-branch) KEEP_BRANCH=1; shift;;
+    *) break;;
+  esac
+done
 TICKET="${1:-}"; shift || true
 AFFECTED=("$@")
 
@@ -93,8 +104,14 @@ for repo in "${AFFECTED[@]:-}"; do
   for attempt in 1 2; do
     run "git -C '$ROOT/$repo' fetch origin main --quiet"
     run "git -C '$ROOT/$repo' worktree remove '$WT/$repo' --force 2>/dev/null || true"
-    run "git -C '$ROOT/$repo' branch -D 'mr/$TICKET' 2>/dev/null || true"
-    if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' origin/main"; then ok=1; break; fi
+    if [ "$KEEP_BRANCH" = 1 ] && git -C "$ROOT/$repo" show-ref --verify --quiet "refs/heads/mr/$TICKET"; then
+      # resume：分支已存在（上一輪 fixer 的 commit 在上面），掛回既有分支，不砍不重建
+      echo "keep-branch: $repo 沿用既有 mr/$TICKET"
+      if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' 'mr/$TICKET'"; then ok=1; break; fi
+    else
+      run "git -C '$ROOT/$repo' branch -D 'mr/$TICKET' 2>/dev/null || true"
+      if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' origin/main"; then ok=1; break; fi
+    fi
     echo "worktree add 失敗（attempt ${attempt} ），清殘留重試"
     run "git -C '$ROOT/$repo' worktree prune"
   done
