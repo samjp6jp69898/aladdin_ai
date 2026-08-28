@@ -48,3 +48,10 @@ bootstrap.sh 卡住的位置在 `migrate ControlCenter` / `sync-configurations` 
 判別法：看 bootstrap.log 是否含 `migrate [X] error(N)` 或 `script "sync-all" exited`；若程式碼生成階段（generate-*）已完成、失敗只落在 migrate/sync-*，即屬此坑而非真環境失敗。人工復核：在主 repo 跑同指令，同錯 = 本機既有問題，與 worktree 無關。
 修法：已固化進 `setup-worktree.sh`——分類器樣式加入 `migrate \[[A-Za-z]+\] error\(` 與 `script "(sync-all|sync-configurations)" exited`，改判 `SETUP_OK BOOTSTRAP_PARTIAL:db-seed` 續行（本 pipeline 只跑 L0 測試不連 DB）。真正未知錯誤仍判 SETUP_FAIL。
 影響範圍：`scripts/setup-worktree.sh`、/create-mr Step 4、/create-mrs 整批、/analyze-bugs 系列共用同一腳本。
+
+## 兩個 session 取到同一個 session_label，互相搶走／放掉 domain 宣告（2026-08-28）
+症狀：`mcp-rajah-tasks.sh domain-claim <stem> <label>` 回 `ALREADY_CLAIMED ... 已被 <別的 label> 宣告` 並 exit 1（照理不寫檔），但事後 `_domain-claims.json` 裡該 domain 的持有者卻變成自己的 label；或是自己明明沒宣告過某個 domain，`domain-release` 卻成功放掉了它。實際後果：一個正在進行中的 domain 被第三個 session 認領，同一批 tool 差點被做兩次。
+根因：`session_label` 是各 session 自行取的短代號，**沒有任何唯一性保證**，而 claim 的「同 label 視為本人」分支（原 :182）與 release 的持有者檢查（原 :199）都只比對 label 字串。兩個 session 撞名時，這兩道防線同時失效：撞名方既能覆蓋對方的 claim、也能放掉對方的登記。2026-08-28 有兩個 session 都取名 `rajah-worker-dune`（另有兩個都用過 `rajah-worker-mirage`）——大家都從同一組阿拉丁詞彙挑短字串，撞名機率遠比直覺高。**與 race 無關**：`with_lock` 的 mkdir mutex、三個 domain 操作共用同一把鎖都經查證正常，claim 失敗路徑也確實沒寫檔。
+判別法：`domain-status` 看到某個 domain 的持有者 label 與自己相同、但自己沒印象宣告過它，就要當成撞名而非自己的殘留登記。交叉證據：`git worktree list` / `git branch --list 'mcp-rajah/*'` 若該 label 的分支已存在且有 commit，代表本尊是別人。
+修法（已固化進 `scripts/mcp-rajah-tasks.sh`）：`domain-claim` 成功時發一個隨機 `claim_token` 寫進登記並印給呼叫者；`domain-release` 與「同 label 的再次 claim」都要求 token 相符，不符回 `LABEL_COLLISION` 並拒絕。舊格式（無 token）登記照舊放行以維持相容，claim 時自動補發。**這只防呆不防惡意**（claims 檔人人可讀）。行為面另加一條：取代號前先跑 `domain-status` 與 `git branch --list 'mcp-rajah/*'` 確認沒人用過。
+影響範圍：`scripts/mcp-rajah-tasks.sh` 的 domain-claim/domain-release/domain-status；所有多 session 併行的 rajah MCP tool 補齊工作。

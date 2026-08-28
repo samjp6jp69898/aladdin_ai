@@ -25,9 +25,19 @@
 #   bash scripts/mcp-rajah-tasks.sh reindex                       # 重建 mcps/rajah-inventory/_index.json（給人看全貌用，非操作必要）
 #
 # 多 session 協調（同一台機器開多個 Claude Code session、各自處理不同 rajah 檔案時用）：
-#   bash scripts/mcp-rajah-tasks.sh domain-claim <stem> <session_label>    # 宣告「這個 rajah 檔案我在處理」，已被別人宣告會擋下
-#   bash scripts/mcp-rajah-tasks.sh domain-release <stem> <session_label> # 這個檔案的任務全做完/要換人了，釋放宣告
-#   bash scripts/mcp-rajah-tasks.sh domain-status                        # 印目前所有宣告（誰在處理哪個檔案、何時宣告的）
+#   bash scripts/mcp-rajah-tasks.sh domain-claim <stem> <session_label> [claim_token]   # 宣告「這個 rajah 檔案我在處理」，已被別人宣告會擋下；成功時會印出 CLAIM_TOKEN
+#   bash scripts/mcp-rajah-tasks.sh domain-release <stem> <session_label> [claim_token] # 這個檔案的任務全做完/要換人了，釋放宣告（要帶 claim 時拿到的 token）
+#   bash scripts/mcp-rajah-tasks.sh domain-status                                        # 印目前所有宣告（誰在處理哪個檔案、何時宣告的、有沒有 token）
+#
+# 為什麼 claim/release 要帶 claim_token（2026-08-28 事故後新增）：
+#   session_label 是各 session 自己取的短代號，沒有任何唯一性保證。實際發生過兩個 session 都取名
+#   rajah-worker-dune，結果 (a) claim 的「同 label 視為本人」分支讓後來者直接蓋掉前一個的 claimed_at、
+#   (b) release 的持有者檢查（只比對 label 字串）讓其中一個把另一個正在進行中的登記放掉，
+#   該 domain 因此被第三個 session 認領，一份工作差點被做兩次。
+#   修法：claim 成功時發一個隨機 claim_token 寫進登記並印給呼叫者，release 與「同 label 的再次 claim」
+#   都要求 token 相符。**這只防呆、不防惡意**——_domain-claims.json 本來就人人可讀，token 也在裡面；
+#   它擋的是「我以為那筆是我的」這種誤判，不是刻意的搶占。
+#   向後相容：既有的舊格式登記沒有 claim_token，claim/release 一律照舊放行（並在 claim 時補發 token）。
 # 這只是「宣告」不是硬鎖——避免兩個 session 同時挑同一個 rajah 檔案、在 integrate 階段
 # 搶改同一個 MCP server 的 index.ts/README.md/const.ts。真正的任務認領仍是 claim（原子性、
 # 真的擋得住雙重認領），domain-claim 只是協調用的禮讓機制。
@@ -173,37 +183,66 @@ case "$ACTION" in
     bun /Users/user/aladdin/obsidian/scripts/mcp-rajah-tasks-build-index.ts
     ;;
   domain-claim)
-    STEM="${2:?用法: mcp-rajah-tasks.sh domain-claim <stem> <session_label>}"
+    STEM="${2:?用法: mcp-rajah-tasks.sh domain-claim <stem> <session_label> [claim_token]}"
     LABEL="${3:?缺 session_label}"
+    TOKEN="${4:-}"
     [ -f "$DIR/$STEM.json" ] || { echo "ERROR: $DIR/$STEM.json 不存在（stem 打錯？）"; exit 1; }
     with_lock "_domain-claims"
     [ -f "$CLAIMS_FILE" ] || echo '{"claims":[]}' > "$CLAIMS_FILE"
     holder=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .session_label' "$CLAIMS_FILE")
+    holder_token=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .claim_token // ""' "$CLAIMS_FILE")
     if [ -n "$holder" ] && [ "$holder" != "$LABEL" ]; then
         echo "ALREADY_CLAIMED: $STEM 已被 $holder 宣告，先用 domain-status 看狀況或找對方協調"; exit 1
     fi
+    # 同 label 的情形要再分辨「是本人重新宣告」還是「兩個 session 剛好取了同一個代號」，
+    # 見檔頭「為什麼 claim/release 要帶 claim_token」。舊格式（沒有 claim_token 的既有登記）
+    # 一律放行並補發 token，維持向後相容。
+    if [ -n "$holder" ] && [ -n "$holder_token" ] && [ "$TOKEN" != "$holder_token" ]; then
+        echo "LABEL_COLLISION: ${STEM} 目前的持有者代號跟你一樣是 ${LABEL}，但 claim_token 對不上。"
+        echo "  這代表你們是兩個不同的 session 剛好取了同一個代號（不是你自己重新宣告）。"
+        echo "  → 若這個 domain 真的是你先前宣告的，把當初 domain-claim 印出來的 token 當第 4 個參數帶上。"
+        echo "  → 若不是，請改用一個沒人用過的代號（先跑 domain-status 與 git branch --list 'mcp-rajah/*' 確認）。"
+        exit 1
+    fi
+    NEW_TOKEN="$holder_token"
+    [ -z "$NEW_TOKEN" ] && NEW_TOKEN="$(od -An -N6 -tx1 /dev/urandom | tr -d ' \n')"
     NOW="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
     tmp=$(mktemp)
-    jq --arg s "$STEM" --arg label "$LABEL" --arg now "$NOW" '
-      .claims |= (map(select(.domain != $s)) + [{domain: $s, session_label: $label, claimed_at: $now}])
+    jq --arg s "$STEM" --arg label "$LABEL" --arg now "$NOW" --arg tok "$NEW_TOKEN" '
+      .claims |= (map(select(.domain != $s)) + [{domain: $s, session_label: $label, claimed_at: $now, claim_token: $tok}])
     ' "$CLAIMS_FILE" > "$tmp" && mv "$tmp" "$CLAIMS_FILE"
     echo "DOMAIN_CLAIMED: $STEM -> $LABEL"
+    if [ -n "$holder" ] && [ -z "$holder_token" ]; then
+        echo "（這筆是舊格式登記、原本沒有 claim_token，已補發）"
+    fi
+    echo "CLAIM_TOKEN: $NEW_TOKEN    ← 記住它，domain-release 時要帶上（第 4 個參數）"
     ;;
   domain-release)
-    STEM="${2:?用法: mcp-rajah-tasks.sh domain-release <stem> <session_label>}"
+    STEM="${2:?用法: mcp-rajah-tasks.sh domain-release <stem> <session_label> [claim_token]}"
     LABEL="${3:?缺 session_label}"
+    TOKEN="${4:-}"
     with_lock "_domain-claims"
     [ -f "$CLAIMS_FILE" ] || { echo "NOT_CLAIMED: $STEM"; exit 0; }
     holder=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .session_label' "$CLAIMS_FILE")
+    holder_token=$(jq -r --arg s "$STEM" '.claims[] | select(.domain == $s) | .claim_token // ""' "$CLAIMS_FILE")
     [ -z "$holder" ] && { echo "NOT_CLAIMED: $STEM"; exit 0; }
     [ "$holder" != "$LABEL" ] && { echo "ERROR: ${STEM} 是 ${holder} 宣告的，不是你 (${LABEL})，不能代放"; exit 1; }
+    if [ -n "$holder_token" ] && [ "$TOKEN" != "$holder_token" ]; then
+        echo "LABEL_COLLISION: ${STEM} 的持有者代號雖然跟你一樣是 ${LABEL}，但 claim_token 對不上，拒絕釋放。"
+        echo "  代號相同不代表是同一個 session——2026-08-28 真的發生過：兩個 session 同時叫 rajah-worker-dune，"
+        echo "  其中一個把另一個正在進行中的 domain 登記放掉了（這道檢查就是為了那次事故加的）。"
+        echo "  → 真的是你宣告的，就帶上當初 domain-claim 印出的 token（第 4 個參數）。"
+        exit 1
+    fi
     tmp=$(mktemp)
     jq --arg s "$STEM" '.claims |= map(select(.domain != $s))' "$CLAIMS_FILE" > "$tmp" && mv "$tmp" "$CLAIMS_FILE"
     echo "DOMAIN_RELEASED: $STEM"
+    [ -z "$holder_token" ] && echo "（這筆是舊格式登記、沒有 claim_token，僅比對代號就放行；新的 domain-claim 會自動帶 token）"
     ;;
   domain-status)
     [ -f "$CLAIMS_FILE" ] || { echo "（目前沒有任何 domain 宣告）"; exit 0; }
-    jq -r '.claims | sort_by(.domain)[] | "\(.domain)\t\(.session_label)\t\(.claimed_at)"' "$CLAIMS_FILE"
+    # 刻意不印出 claim_token 本身，只印有沒有——印出來就等於誰都能複製貼上，那道防線就白做了。
+    jq -r '.claims | sort_by(.domain)[] | "\(.domain)\t\(.session_label)\t\(.claimed_at)\ttoken=\(if (.claim_token // "") == "" then "no(舊格式)" else "yes" end)"' "$CLAIMS_FILE"
     ;;
   *)
     echo "用法：mcp-rajah-tasks.sh {next|claim|row|set|set-category|retry|counts|files|reindex|domain-claim|domain-release|domain-status} [args]（詳見檔頭註解）"; exit 1
