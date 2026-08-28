@@ -7,7 +7,7 @@
 
 - `.claude/commands`、`.claude/agents`、`.claude/skills`、`.claude/doctrine`、根目錄 `scripts` **全是 symlink**，指向 `obsidian/` 下的同名目錄——改一處即改全部，**不存在**「兩份 commands 要分別改」這回事。（`.claude/doctrine` 於 2026-07-21 由實體目錄轉為 symlink，內容原封不動搬到 `obsidian/doctrine`，經使用者確認後執行。）
 - 唯一的真雙實體：`/Users/user/aladdin/CLAUDE.md`（canonical）↔ `obsidian/CLAUDE.md`（唯讀鏡像，**勿直接編輯**）。只改 canonical，改完必跑 `bash /Users/user/aladdin/scripts/sync-mirrors.sh`（腳本會拒絕覆蓋比 canonical 新的鏡像並要求人工合併）。2026-08-25 踩過一次：mirror 曾被直接編輯過（含一條使用者已核准的硬規則異動），canonical 停留在舊版整整一個月沒人發現，靠 `sync-mirrors.sh --check` 才揪出來——**改 CLAUDE.md 前先跑一次 `--check`**，看到 `DRIFT` 或 `CONFLICT` 要先手動合併回 canonical，不能假設 canonical 一定是最新的。
-- `AGENTS.md`（`/Users/user/aladdin/AGENTS.md`、`obsidian/AGENTS.md` 各一份，皆為 `AGENTS.md -> CLAUDE.md` 的 symlink，2026-08-25 新增）：給 Codex CLI 等遵循 agents.md 標準的工具讀同一份內容，改 `CLAUDE.md` 即同時生效，不需要另外維護。`sync-mirrors.sh --check` 的 symlink 健檢已涵蓋這兩個。
+- `AGENTS.md`（`/Users/user/aladdin/AGENTS.md`、`obsidian/AGENTS.md` 各一份，皆為 `AGENTS.md -> CLAUDE.md` 的 symlink，2026-08-25 新增）：給 Codex CLI 等遵循 agents.md 標準的工具讀同一份內容，改 `CLAUDE.md` 即同時生效，不需要另外維護。`sync-mirrors.sh --check` 的 symlink 健檢已涵蓋這兩個。⚠️ **環境事實更新（2026-08-28 實測）**：`obsidian/AGENTS.md` 正常，但 `/Users/user/aladdin/AGENTS.md` **目前不存在**，`--check` 會固定報一行 `SYMLINK_MISSING`。使用者當日裁定不修復，所以這行不是新故障、也不要自行重建；判斷 `--check` 是否全綠時把這行排除。
 - 陷阱：`find` 對「本身是 symlink 的目錄」作為路徑參數會**靜默回空**。要遍歷請用實體路徑（`obsidian/...`）或先 `cd` 進去。引用路徑前先 `ls -ld` 確認身分。
 - bash 3.2 陷阱：`"$VAR全形字"` 中變數後直接接全形字元會把變數名解析壞（unbound variable）。變數與 CJK 之間留空格或用 `${VAR}`。
 
