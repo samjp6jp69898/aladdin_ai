@@ -1,18 +1,29 @@
 #!/bin/bash
 # Usage: ./db-dev-dump.sh <database> <table>
 # Example: ./db-dev-dump.sh my_db my_table
-# Connection info is read from /Users/user/aladdin/.env (DEV_DB_*). NOT hardcoded.
+# Connection info is read from aladdin_ai/.env.dev (DEV_DB_*). NOT hardcoded.
+# 刻意「不」整檔 source .env：其他環境的 .env.* 檔含反引號等 shell metacharacter
+# （見 .env.cqa 的 CQA_ARCHERY_PASS），整份 source 遇到那種值會被 shell 當語法
+# 解析而炸掉，只精準抓取需要的四個 key 比較安全。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
+ENV_FILE="/Users/user/aladdin/aladdin_ai/.env.dev"
 if [ ! -f "$ENV_FILE" ]; then
   echo "Error: $ENV_FILE not found (dev connection comes from there)."
   exit 1
 fi
-set -a
-. "$ENV_FILE"
-set +a
+get_env() {
+  grep -E "^(export[[:space:]]+)?$1=" "$ENV_FILE" \
+    | tail -1 \
+    | sed -E "s/^(export[[:space:]]+)?$1=//" \
+    | tr -d '\r' \
+    | sed -E "s/^'(.*)'\$/\1/; s/^\"(.*)\"\$/\1/"
+}
+DEV_DB_HOST=$(get_env DEV_DB_HOST)
+DEV_DB_PORT=$(get_env DEV_DB_PORT)
+DEV_DB_USER=$(get_env DEV_DB_USER)
+DEV_DB_PASS=$(get_env DEV_DB_PASS)
 
 OUTPUT_DIR="$(dirname "$0")"
 

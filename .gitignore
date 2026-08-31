@@ -2,3 +2,14 @@
 node_modules/
 __pycache__/
 *.pyc
+
+# 含真實帳密/token 的本機 env 檔，絕不可進 git；*.env.example 範本檔仍需追蹤。
+.env
+.env.local
+.env.cqa
+.env.dev
+.env.evi
+.env.uat
+.env.prod
+skills/*/.env
+skills/*/*/.env

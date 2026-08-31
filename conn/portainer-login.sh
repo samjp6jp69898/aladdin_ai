@@ -3,12 +3,12 @@
 #
 # Portainer 連線確認（唯讀）：登入拿 JWT，列出可見的 endpoints（環境）與名稱/狀態。
 # 不列容器、不拉 log 內容——要看特定容器/log 內容時再擴充（先確認連線方式堪用）。
-# 帳密一律從 /Users/user/aladdin/.env 讀取，不寫死、不印出。
+# 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取，不寫死、不印出。
 # 純 REST API（Portainer 2.x /api/auth /api/endpoints），不需要 Playwright。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
+ENV_FILES=("/Users/user/aladdin/aladdin_ai/.env.cqa" "/Users/user/aladdin/aladdin_ai/.env.dev")
 TARGET="$1"
 
 case "$TARGET" in
@@ -19,15 +19,19 @@ case "$TARGET" in
     ;;
 esac
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: $ENV_FILE not found (帳密來源)."
+EXISTING_ENV_FILES=()
+for f in "${ENV_FILES[@]}"; do
+  [ -f "$f" ] && EXISTING_ENV_FILES+=("$f")
+done
+if [ "${#EXISTING_ENV_FILES[@]}" -eq 0 ]; then
+  echo "Error: 找不到 ${ENV_FILES[*]} 任何一份（帳密來源）。"
   exit 1
 fi
 
 # 只挑出需要的 key，不 `source` 整份 .env（見 conn/README.md 的 .env source 陷阱說明）。
 get_env() {
   local val
-  val=$(sed -n "s/^[[:space:]]*$1[[:space:]]*=//p" "$ENV_FILE" | head -1)
+  val=$(sed -n "s/^[[:space:]]*$1[[:space:]]*=//p" "${EXISTING_ENV_FILES[@]}" | head -1)
   val="${val%$'\r'}"
   val="${val%\"}"; val="${val#\"}"
   val="${val%\'}"; val="${val#\'}"

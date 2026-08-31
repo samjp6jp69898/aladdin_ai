@@ -1,10 +1,27 @@
 # conn — 連線腳本統一入口
 
 本目錄集中**所有連線腳本**（DB / Redis / CQA 測試站登入），**扁平不分子目錄**，方便查找。
-連線資訊一律在執行期從 `/Users/user/aladdin/.env` 讀取，**不寫死、不印出**。
+連線資訊一律在執行期讀取，**不寫死、不印出**。
 
 > 2026-08-06 整併：原本散在 `tmp-sql/`、`conn/redis/`、`cqa-e2e/conn/`、`cqa-e2e/verify/`
 > 四處的 9 支連線腳本全部搬到本目錄，撞名者加類別前綴（`db-` / `redis-`）。
+>
+> 2026-08-31：連線資訊來源從單一根目錄 `/Users/user/aladdin/.env` 拆成 6 份依「後台
+> 環境」分開的檔案，全部在 `aladdin_ai/` 底下、都不進 git：
+>
+> | 檔案 | 內容 |
+> |------|------|
+> | `.env.local` | 跟後台環境無關的本機值（Notion token、Telegram bot token、本機 platform 帳密…） |
+> | `.env.cqa` | CQA 測試站（`*.ald777.com`，企劃口中的「pre」） |
+> | `.env.dev` | DEV 環境（`*.alddev.com`） |
+> | `.env.evi` | EVI 環境（`*.godev2.com`） |
+> | `.env.uat` | UAT 環境（jxpre） |
+> | `.env.prod` | 正式環境監控/後台帳密（⚠️ 目前沒有任何腳本讀這份，CQA grounding 嚴禁 production） |
+>
+> 各檔案裡的 KEY 名稱維持拆分前的前綴（`CQA_ADMIN_URL`、`DEV_ADMIN_URL` 這種），只是物理位置
+> 依環境分開，腳本邏輯不需要因此改變 KEY 名稱。走 `cqa-e2e/lib/env.cjs` 的腳本（`admin-login.sh`／
+> `platform-login.sh`／`archery-login.sh`／`archery-evi-login.sh`）由 `loadEnv()` 自動合併讀取全部
+> 6 份；其餘腳本各自列出自己需要的 1～2 份（見下表與各節）。
 
 ## 工具列表
 
@@ -61,10 +78,13 @@ bash /Users/user/aladdin/conn/db-dev-dump.sh payment deposit_orders
 bash /Users/user/aladdin/tmp-sql/local-import.sh /Users/user/aladdin/conn/payment__deposit_orders.sql payment
 ```
 
-### 連線資訊讀取方式（沿用舊慣例）
+### 連線資訊讀取方式
 
-DB 四支維持**整檔 `source .env`** 的既有慣例（`set -a; . "$ENV_FILE"; set +a`），本次整併未改動其邏輯。
-留意這代表 `.env` 任何一行有 shell 語法錯誤時，這四支會一起失效（見下節）。
+2026-08-31 前 DB 四支是**整檔 `source .env`**（`set -a; . "$ENV_FILE"; set +a`）。拆檔當天實測
+`db-cqa-query.sh` source `.env.cqa` 直接因 `CQA_ARCHERY_PASS` 含反引號而語法錯誤（`unexpected EOF`）
+——這正是下方「CQA 登入四支」那段警告過的地雷，只是 DB 四支當時還沒踩到。四支已全部改成跟
+`redis-dev-query.sh` 一樣的精準 `get_env()` 抓取（不整檔 source），`db-cqa-query.sh` 讀 `.env.cqa`，
+其餘三支讀 `.env.dev`，各自只抓自己要的四個 key，不受同檔其他行語法問題影響。
 
 ---
 
@@ -106,15 +126,17 @@ KEYS SCAN STRLEN DBSIZE INFO PING GETRANGE
 
 ## CQA 測試站登入四支
 
-帳密一律在執行期從 `.env` **精準取出所需的幾個 key**，不寫死、不印出。
+帳密一律在執行期從 `.env.cqa` / `.env.dev` **精準取出所需的幾個 key**，不寫死、不印出。
 底層 Playwright 實作仍在 `/Users/user/aladdin/cqa-e2e/verify/` 與 `lib/`（絕對路徑引用，未搬動）。
 
-> ⚠️ `.env` **不能整份 `source`**：檔內含 backtick 等字元，`. "$ENV_FILE"` 會被 shell
-> 當語法解析而炸掉（`line 106: unexpected EOF while looking for matching \``），而且等同執行
-> `.env` 裡的 command substitution。**實例：2026-08-06 的 `CQA_ARCHERY_PASS`**。
-> 這四支都**不整份 source**：`platform-login.sh` / `admin-login.sh` / `archery-login.sh` 走
-> `cqa-e2e/lib/env.cjs` 的 `loadEnv()`，`app-login.sh` 用 `sed` 挑 key 再 export。
-> （DB 四支仍是舊慣例的整檔 source，不適用此節。）
+> ⚠️ `.env.*` 各檔**不能整份 `source`**：檔內含 backtick 等字元（如 `.env.cqa` 的
+> `CQA_ARCHERY_PASS`），`. "$ENV_FILE"` 會被 shell 當語法解析而炸掉
+> （`unexpected EOF while looking for matching \``），而且等同執行檔案裡的 command substitution。
+> **實例：2026-08-06 的 `CQA_ARCHERY_PASS`；2026-08-31 拆檔當天 `db-cqa-query.sh` 又踩了一次同一顆雷。**
+> 這四支都**不整份 source**：`platform-login.sh` / `admin-login.sh` / `archery-login.sh` /
+> `archery-evi-login.sh` 走 `cqa-e2e/lib/env.cjs` 的 `loadEnv()`（合併讀取全部 6 份 `.env.*`），
+> `app-login.sh` 用 `sed` 挑 key 再 export。DB 四支自 2026-08-31 起也改用同一套精準抓取，
+> 全目錄已無任何腳本整份 source `.env.*`。
 
 ### `platform-login.sh`
 
@@ -262,7 +284,7 @@ K8s pod `app` label 結構跟 CQA 幾乎一樣（95 個 application），登入�
 - `app-login.sh pk --env dev` 只操作 `pk.alddev.com`（dev 測試環境，非 production），同樣是精準網域比對，非白名單組合一律擋下
 - Portainer 兩支同樣網域白名單：`cqa` 限 `*.ald777.com`、`dev` 限 `*.alddev.com`，非白名單組合擋下
 - 唯讀取證：只登入、導頁、截圖，不送出任何會改資料的表單
-- 連線資訊只從 `/Users/user/aladdin/.env` 讀；任何檔案與輸出都不得出現密碼明文
+- 連線資訊只從 `aladdin_ai/.env.local` / `.env.cqa` / `.env.dev` / `.env.evi` / `.env.uat` / `.env.prod` 讀（皆不進 git）；任何檔案與輸出都不得出現密碼明文
 - 唯二有寫入能力的是 `db-dev-write.sh`（僅 dev DB，緊急用）；Redis 與 CQA 一律唯讀
 
 ## 相關

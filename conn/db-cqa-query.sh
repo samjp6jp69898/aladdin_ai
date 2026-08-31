@@ -2,18 +2,29 @@
 # Usage: ./db-cqa-query.sh <database> "<SQL>"
 # Example: ./db-cqa-query.sh payment "SELECT * FROM deposit_orders LIMIT 5"
 # READ-ONLY: Only SELECT, SHOW, DESCRIBE, EXPLAIN are allowed.
-# Connection info is read from /Users/user/aladdin/.env (CQA_DB_*). NOT hardcoded.
+# Connection info is read from aladdin_ai/.env.cqa (CQA_DB_*). NOT hardcoded.
+# 刻意「不」整檔 source .env：.env.cqa 內含反引號等 shell metacharacter（見
+# CQA_ARCHERY_PASS），整份 source 會被 shell 當語法解析而炸掉（unexpected EOF）。
+# 只精準抓取需要的四個 key，比照 conn/redis-dev-query.sh 的做法。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
+ENV_FILE="/Users/user/aladdin/aladdin_ai/.env.cqa"
 if [ ! -f "$ENV_FILE" ]; then
   echo "Error: $ENV_FILE not found (CQA connection comes from there)."
   exit 1
 fi
-set -a
-. "$ENV_FILE"
-set +a
+get_env() {
+  grep -E "^(export[[:space:]]+)?$1=" "$ENV_FILE" \
+    | tail -1 \
+    | sed -E "s/^(export[[:space:]]+)?$1=//" \
+    | tr -d '\r' \
+    | sed -E "s/^'(.*)'\$/\1/; s/^\"(.*)\"\$/\1/"
+}
+CQA_DB_HOST=$(get_env CQA_DB_HOST)
+CQA_DB_PORT=$(get_env CQA_DB_PORT)
+CQA_DB_USER=$(get_env CQA_DB_USER)
+CQA_DB_PASS=$(get_env CQA_DB_PASS)
 
 DB="$1"
 SQL="$2"

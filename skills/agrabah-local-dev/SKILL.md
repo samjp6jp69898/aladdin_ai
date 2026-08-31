@@ -82,7 +82,7 @@ bun run dev
 
 本機 DB 已有帳號資料（不需要、也不能用 `create-default-admin-user`，那個工具只在 `admin.users` 全空時能用），密碼是雜湊過的查不到明碼。
 
-**本機 platform 後台（platform 1 / localhost:8002）的測試帳密存在 `/Users/user/aladdin/.env`**（2026-08-11 使用者授權寫入）：`LOCAL_PLATFORM_USER` / `LOCAL_PLATFORM_PASS`。腳本用 `bun --env-file=/Users/user/aladdin/.env <script.ts>` 載入後讀 `process.env`，**不要**把明碼寫死進任何會留存的檔案。（`.env` 對 agent 是直接讀取 deny 的，走 `--env-file` 由腳本 process 載入即可。）其他帳號的密碼仍需向使用者確認，不要自己猜或重設密碼（重設密碼是會動到既有帳號狀態的操作，需先問過）。
+**本機 platform 後台（platform 1 / localhost:8002）的測試帳密存在 `/Users/user/aladdin/aladdin_ai/.env.local`**（2026-08-11 使用者授權寫入）：`LOCAL_PLATFORM_USER` / `LOCAL_PLATFORM_PASS`。腳本用 `bun --env-file=/Users/user/aladdin/aladdin_ai/.env.local <script.ts>` 載入後讀 `process.env`，**不要**把明碼寫死進任何會留存的檔案。（`.env` 對 agent 是直接讀取 deny 的，走 `--env-file` 由腳本 process 載入即可。）其他帳號的密碼仍需向使用者確認，不要自己猜或重設密碼（重設密碼是會動到既有帳號狀態的操作，需先問過）。
 
 ## 3. game record DB：MySQL ↔ StarRocks 切換（其他 DB 連線同理）
 
@@ -192,7 +192,7 @@ loginToken = r.data.loginToken;
 // 之後就可以呼叫任何 remote.<group>.<service>.<Method>(...) 驗證邏輯
 ```
 
-帳密（USER/PASS）從 `/Users/user/aladdin/.env` 的 `LOCAL_PLATFORM_USER` / `LOCAL_PLATFORM_PASS` 讀（跑法：`bun --env-file=/Users/user/aladdin/.env <script.ts>`），不要寫死進任何會留存的檔案。
+帳密（USER/PASS）從 `/Users/user/aladdin/aladdin_ai/.env.local` 的 `LOCAL_PLATFORM_USER` / `LOCAL_PLATFORM_PASS` 讀（跑法：`bun --env-file=/Users/user/aladdin/aladdin_ai/.env.local <script.ts>`），不要寫死進任何會留存的檔案。
 
 ## 5. 瀏覽器 E2E（Playwright）已知限制
 

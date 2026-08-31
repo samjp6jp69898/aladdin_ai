@@ -5,12 +5,12 @@
 #   notion-page-write.sh append-blocks <page_id_or_url> <blocks_json_file>     - 從檔案讀 blocks JSON 陣列，分批（每批<=100）附加到頁面內文尾端
 #   notion-page-write.sh clear-children <page_id_or_url>                      - 移除頁面目前所有直屬子區塊（Notion 端會進垃圾桶，非永久刪除）
 
-# token 單一來源：/Users/user/aladdin/.env 的 ALD_NOTION_TOKEN（或已 export 的同名環境變數）。
+# token 單一來源：/Users/user/aladdin/aladdin_ai/.env.local 的 ALD_NOTION_TOKEN（或已 export 的同名環境變數）。
 # 禁止把明文 token 寫回本檔或任何 prompt/文件——輪替 token 時只需改 .env 一處。
-NOTION_TOKEN="${ALD_NOTION_TOKEN:-$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
+NOTION_TOKEN="${ALD_NOTION_TOKEN:-$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/.env.local 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
 case "$NOTION_TOKEN" in
     ntn_*) ;;
-    *) echo "ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加一行 ALD_NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
+    *) echo "ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/aladdin_ai/.env.local 加一行 ALD_NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
 esac
 NOTION_API="https://api.notion.com/v1"
 NOTION_VERSION="2025-09-03"

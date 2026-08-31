@@ -5,7 +5,7 @@
 # 依 application（K8s pod 的 `app` label，跟 conn/portainer-logs.sh 同一套）快速切換看 log，
 # 資料來源是 Kibana 後面的 Elasticsearch（走 Kibana 的 /api/console/proxy 轉發 _search）。
 # 唯讀：只列 index-pattern、只 _search 拉文件，不寫入/不刪除任何資料。
-# 帳密一律從 /Users/user/aladdin/.env 讀取，不寫死、不印出。
+# 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取，不寫死、不印出。
 # USER/PASS 是可選的：dev 環境目前完全不需要登入即可查（已實測 /api/saved_objects、_search 都直接 200），
 # 若某環境的 Kibana 需要 Basic Auth，補上 {ENV}_KIBANA_USER/PASS 即可自動帶上。
 #
@@ -15,7 +15,7 @@
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
+ENV_FILES=("/Users/user/aladdin/aladdin_ai/.env.cqa" "/Users/user/aladdin/aladdin_ai/.env.dev")
 
 usage() {
   echo "Usage: $0 <cqa|dev> list   |   $0 <cqa|dev> <application> [--tail N]"
@@ -41,15 +41,19 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: $ENV_FILE not found (帳密來源)."
+EXISTING_ENV_FILES=()
+for f in "${ENV_FILES[@]}"; do
+  [ -f "$f" ] && EXISTING_ENV_FILES+=("$f")
+done
+if [ "${#EXISTING_ENV_FILES[@]}" -eq 0 ]; then
+  echo "Error: 找不到 ${ENV_FILES[*]} 任何一份（帳密來源）。"
   exit 1
 fi
 
 # 只挑出需要的 key，不 `source` 整份 .env（見 conn/README.md 的 .env source 陷阱說明）。
 get_env() {
   local val
-  val=$(sed -n "s/^[[:space:]]*$1[[:space:]]*=//p" "$ENV_FILE" | head -1)
+  val=$(sed -n "s/^[[:space:]]*$1[[:space:]]*=//p" "${EXISTING_ENV_FILES[@]}" | head -1)
   val="${val%$'\r'}"
   val="${val%\"}"; val="${val#\"}"
   val="${val%\'}"; val="${val#\'}"

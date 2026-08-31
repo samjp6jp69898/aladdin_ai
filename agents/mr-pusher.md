@@ -58,7 +58,7 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 **Token（單一來源 .env，禁止寫死明文）：** 每個要打 Notion API 的 shell 先執行下行，之後 curl 的 `Bearer $ALD_NOTION_TOKEN` 才有值：
 ```bash
-ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/.env.local | cut -d= -f2-)
 ```
 **Headers:**
 ```

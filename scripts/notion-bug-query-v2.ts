@@ -30,17 +30,17 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
-// token 單一來源：環境變數 > /Users/user/aladdin/.env（bun 從專案根執行時會自動載入 .env）
+// token 單一來源：環境變數 > /Users/user/aladdin/aladdin_ai/.env.local（bun 從專案根執行時會自動載入 .env）
 const ALD_NOTION_TOKEN = (() => {
   let t = process.env.ALD_NOTION_TOKEN ?? '';
   if (!t) {
     try {
-      const env = require('fs').readFileSync('/Users/user/aladdin/.env', 'utf8');
+      const env = require('fs').readFileSync('/Users/user/aladdin/aladdin_ai/.env.local', 'utf8');
       t = env.match(/^ALD_NOTION_TOKEN=(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, '') ?? '';
     } catch {}
   }
   if (!t.startsWith('ntn_')) {
-    console.error('ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加 ALD_NOTION_TOKEN=ntn_xxx');
+    console.error('ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/aladdin_ai/.env.local 加 ALD_NOTION_TOKEN=ntn_xxx');
     process.exit(1);
   }
   return t;

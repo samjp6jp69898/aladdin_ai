@@ -6,7 +6,7 @@
 #
 # 環境變數（皆可覆寫，預設對齊 tg-notify.sh）：
 #   TG_NOTIFY_CSV       tech-users.csv 路徑（與 tg-notify.sh 同一變數）
-#   TG_ENV_FILE         讀 TELEGRAM_BOT_TOKEN 的 .env（getUpdates 用；預設 /Users/user/aladdin/.env，與 tg-notify.sh 同一支 bot）
+#   TG_ENV_FILE         讀 TELEGRAM_BOT_TOKEN 的 .env（getUpdates 用；預設 /Users/user/aladdin/aladdin_ai/.env.local，與 tg-notify.sh 同一支 bot）
 #   TG_API_BASE         Telegram API base（預設 https://api.telegram.org）
 #   TG_GETUPDATES_CMD   覆寫 getUpdates 取得方式（測試用 stub）：被呼叫為 `$TG_GETUPDATES_CMD`（不帶參數），
 #                       須印出 getUpdates 風格 JSON `{"ok":true,"result":[{"message":{"chat":{...}}}, ...]}`
@@ -125,7 +125,7 @@ do_list(){
 import sys, os, re, json, subprocess
 
 csv_path        = os.environ["TG_NOTIFY_CSV"]
-env_file        = os.environ.get("TG_ENV_FILE", "/Users/user/aladdin/.env")
+env_file        = os.environ.get("TG_ENV_FILE", "/Users/user/aladdin/aladdin_ai/.env.local")
 api_base        = os.environ.get("TG_API_BASE", "https://api.telegram.org")
 getupdates_cmd  = os.environ.get("TG_GETUPDATES_CMD", "").strip()
 unknown_log     = os.environ.get("TG_UNKNOWN_SENDERS_LOG",

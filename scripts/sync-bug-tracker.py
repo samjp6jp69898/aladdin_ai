@@ -42,11 +42,11 @@ TRACKER_PATH = Path(
 )
 DEBUG_DIR = Path("/Users/user/aladdin/obsidian/Debug")
 def _load_notion_token() -> str:
-    # token 單一來源：環境變數 > /Users/user/aladdin/.env（禁止把明文寫回程式碼）
+    # token 單一來源：環境變數 > aladdin_ai/.env.local（禁止把明文寫回程式碼）
     tok = os.environ.get("ALD_NOTION_TOKEN", "")
     if not tok:
         try:
-            with open("/Users/user/aladdin/.env") as _f:
+            with open("/Users/user/aladdin/aladdin_ai/.env.local") as _f:
                 for _line in _f:
                     if _line.startswith("ALD_NOTION_TOKEN="):
                         tok = _line.split("=", 1)[1].strip().strip("\"'")
@@ -54,7 +54,7 @@ def _load_notion_token() -> str:
         except OSError:
             pass
     if not tok.startswith("ntn_"):
-        raise SystemExit("ERROR: ALD_NOTION_TOKEN 未設定（請在 /Users/user/aladdin/.env 加 ALD_NOTION_TOKEN=ntn_xxx）")
+        raise SystemExit("ERROR: ALD_NOTION_TOKEN 未設定（請在 aladdin_ai/.env.local 加 ALD_NOTION_TOKEN=ntn_xxx）")
     return tok
 
 

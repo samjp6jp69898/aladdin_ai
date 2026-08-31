@@ -2,21 +2,15 @@
 # Usage: bash archery-evi-login.sh
 # EVI Archery（SQL 審核平台，https://archery.godev2.com）登入探測：
 # 登入 + 截圖 + 讀取 /sqlquery/ 頁面結構（select/textarea/button），不送出任何 SQL、不建立工單。
-# 帳密一律從 /Users/user/aladdin/.env 讀取，不寫死、不印出。
+# 帳密一律從 aladdin_ai/.env.evi 讀取（見 lib/env.cjs），不寫死、不印出。
 # 僅限 *.godev2.com（EVI 環境），嚴禁 production。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
 E2E_DIR="/Users/user/aladdin/cqa-e2e"
 VERIFY_DIR="$E2E_DIR/verify"
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: $ENV_FILE not found (帳密來源)."
-  exit 1
-fi
-
-# 用 lib/env.cjs 的 loadEnv() 解析 .env，不用 source（見 archery-login.sh 的理由，同樣適用）。
+# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，不用 source（見 archery-login.sh 的理由，同樣適用）。
 read_env_key() {
   node -e '
     const { loadEnv } = require("/Users/user/aladdin/cqa-e2e/lib/env.cjs");

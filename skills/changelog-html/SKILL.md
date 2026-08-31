@@ -73,7 +73,7 @@ bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh query-datasource \
   '{"property":"單號","unique_id":{"equals":<編號數字>}}'
 ```
 
-token 由 `notion.sh` 內部從 `/Users/user/aladdin/.env` 的 `ALD_NOTION_TOKEN` 讀取，不需要（也不應該）在此手動帶入。
+token 由 `notion.sh` 內部從 `/Users/user/aladdin/aladdin_ai/.env.local` 的 `ALD_NOTION_TOKEN` 讀取，不需要（也不應該）在此手動帶入。
 
 取回的 `results[0].url` 填入 change 的 `ticketUrls` map（`{"FAQ-XXXX":"https://www.notion.so/..."}`）；tags 統一正規化為 `FAQ-XXXX`（純數字補前綴）。template.html 的 FAQ tag 會自動渲染為可點連結（開新分頁 ↗）。
 
@@ -454,7 +454,7 @@ Notion 頁面：`https://app.notion.com/p/2df87d78618a80de997cf73896b6bd5b`（�
 - database 的 data source id：`37d87d78-618a-80a1-9aad-000b02c4f2cf`
 - schema：`標題`（title，填版本號如 `0714`）、`更新日期`（date，填 `YYYY-MM-DD`）、`html檔案`（files，附件實體上傳，不是外部連結）、`備註`（rich_text，選填）
 
-**Token 來源**：`ALD_NOTION_TOKEN`（見 `/Users/user/aladdin/.env`），一律透過 `notion.sh` 存取，**禁止**在指令或 prompt 內手寫含 token 的 curl。
+**Token 來源**：`ALD_NOTION_TOKEN`（見 `/Users/user/aladdin/aladdin_ai/.env.local`），一律透過 `notion.sh` 存取，**禁止**在指令或 prompt 內手寫含 token 的 curl。
 
 ### 執行步驟
 

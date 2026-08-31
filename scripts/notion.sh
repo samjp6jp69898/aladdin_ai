@@ -11,12 +11,12 @@
 #   notion.sh upload-file <filepath> [content_type]       - 上傳檔案（<20MB），回傳 file_upload id
 #   notion.sh create-page <data_source_id> '<properties_json>' - 在 database 建立新頁面
 
-# token 單一來源：/Users/user/aladdin/.env 的 ALD_NOTION_TOKEN（或已 export 的同名環境變數）。
+# token 單一來源：/Users/user/aladdin/aladdin_ai/.env.local 的 ALD_NOTION_TOKEN（或已 export 的同名環境變數）。
 # 禁止把明文 token 寫回本檔或任何 prompt/文件——輪替 token 時只需改 .env 一處。
-NOTION_TOKEN="${ALD_NOTION_TOKEN:-$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
+NOTION_TOKEN="${ALD_NOTION_TOKEN:-$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/.env.local 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")}"
 case "$NOTION_TOKEN" in
     ntn_*) ;;
-    *) echo "ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/.env 加一行 ALD_NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
+    *) echo "ERROR: ALD_NOTION_TOKEN 未設定——請在 /Users/user/aladdin/aladdin_ai/.env.local 加一行 ALD_NOTION_TOKEN=ntn_xxx（或 export 環境變數）" >&2; exit 1;;
 esac
 NOTION_API="https://api.notion.com/v1"
 NOTION_VERSION="2025-09-03"

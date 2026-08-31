@@ -2,13 +2,13 @@
 # Usage: ./redis-dev-query.sh "<REDIS_COMMAND>"
 # Example: ./redis-dev-query.sh "GET some_key"
 # READ-ONLY: Only whitelisted read commands are allowed (see READ_ONLY_CMDS below).
-# Connection info is read from /Users/user/aladdin/.env (DEV_REDIS_*). NOT hardcoded.
+# Connection info is read from aladdin_ai/.env.dev (DEV_REDIS_*). NOT hardcoded.
 # 刻意「不」整檔 source .env：只精準抓取需要的三個 key，
 # 這樣 .env 其他行有語法錯誤（如未跳脫的反引號）也不會連坐弄掛這支腳本。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
+ENV_FILE="/Users/user/aladdin/aladdin_ai/.env.dev"
 
 CMD="$1"
 

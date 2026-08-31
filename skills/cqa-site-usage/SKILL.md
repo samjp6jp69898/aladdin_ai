@@ -5,7 +5,7 @@ description: CQA 測試站（PK/6T app、admin、PK/6T platform）的 Playwright
 
 # CQA 站台使用方式
 
-供 `cqa-grounder`（及授權的 tracer）對 CQA 測試站做**唯讀登入取證**。所有連線資訊來自 `/Users/user/aladdin/.env`，**禁止寫死**。僅對 `*.ald777.com` CQA 測試站，**嚴禁 production**。
+供 `cqa-grounder`（及授權的 tracer）對 CQA 測試站做**唯讀登入取證**。所有連線資訊來自 `aladdin_ai/.env.cqa`（2026-08-31 前為根目錄 `/Users/user/aladdin/.env`），**禁止寫死**。僅對 `*.ald777.com` CQA 測試站，**嚴禁 production**。
 
 ## 共通事實
 - Playwright：`/Users/user/aladdin/cqa-e2e/node_modules/playwright`（chromium 已裝）

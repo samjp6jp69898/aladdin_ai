@@ -61,7 +61,7 @@ description: Use when 需要把 DM 過 Telegram bot 的 chat_id 對映回填 tec
 - **冪等**：`--list` 跳過已對映 chat_id，可重複執行。
 - **不覆蓋**：`--set` 遇既有不同 chat_id 拒絕，除非使用者明確要求 `--force`。
 - **出站訊息只對「本次新寫入」者發**，不對既有對映重發。
-- token 從 `/Users/user/aladdin/.env` 的 `TELEGRAM_BOT_TOKEN` 讀（與 tg-notify.sh 同一支 bot），不硬編。
+- token 從 `/Users/user/aladdin/aladdin_ai/.env.local` 的 `TELEGRAM_BOT_TOKEN` 讀（與 tg-notify.sh 同一支 bot），不硬編。
 
 ## Common Mistakes
 

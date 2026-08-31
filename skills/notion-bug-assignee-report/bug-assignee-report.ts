@@ -12,13 +12,16 @@
  *       「影響端口」為空或僅勾「未分配」歸未分類。三組各自輸出一份 CSV。
  *
  * 用法：
- *   bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>]
+ *   bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>] [--no-push]
  *
  * 選項：
  *   --out <path>   CSV 基準路徑，實際會拆成三份（預設基準：/Users/user/aladdin/tmp/bug-status-by-assignee.csv）：
  *                  bug-status-by-assignee-FF.csv / -巨星.csv / -未分類.csv
+ *   --no-push      跳過 Telegram 推送，只產出 CSV（供本機除錯/測試用；預設一律推送）
  *
- * 輸出：三份 CSV 依序印到 stdout，並各自寫入對應路徑。
+ * 輸出：三份 CSV 依序印到 stdout，並各自寫入對應路徑；預設同時把三份 CSV 當文件推送到 Telegram
+ *       （token 讀 /Users/user/aladdin/aladdin_ai/.env.local 的 TELEGRAM_BOT_TOKEN，固定 chat_id 為 Landon）。
+ *       任一品牌推送失敗會另發一則 ⚠️ 文字通知，不會靜默；最終若有失敗則以非 0 結束碼結束。
  * 欄位：當前指派人員,類別,<各嚴重性等級…>,小計
  *       每份檔案末尾附跨人員彙總「技術人員小計 / 非技術人員小計 / 未指派小計 / 總計」（各欄亦為等級分布）。
  *
@@ -33,8 +36,11 @@ const NOTION_TOKEN = '***REMOVED-NOTION-TOKEN***';
 const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const WANTED_STATUSES = ['仍有問題', '待處理'] as const;
-const TECH_USERS_CSV = '/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv';
+const TECH_USERS_CSV = '/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv';
 const DEFAULT_OUT = '/Users/user/aladdin/tmp/bug-status-by-assignee.csv';
+const ENV_FILE = '/Users/user/aladdin/aladdin_ai/.env.local';
+const TG_CHAT_ID = '5022865804'; // Landon
+const TG_TIMEOUT_MS = 60_000; // 曾發生睡眠喚醒後連線卡住不回應，避免卡死整支腳本
 
 // ── 參數 ──
 function parseOut(): string {
@@ -42,6 +48,46 @@ function parseOut(): string {
     const i = args.indexOf('--out');
     if (i >= 0 && args[i + 1]) return args[i + 1];
     return DEFAULT_OUT;
+}
+const shouldPush = !process.argv.slice(2).includes('--no-push');
+
+// ── Telegram：token 只從 .env 讀，不寫死 ──
+function loadTelegramToken(): string {
+    const content = readFileSync(ENV_FILE, 'utf-8');
+    const line = content.split('\n').find(l => l.startsWith('TELEGRAM_BOT_TOKEN='));
+    const token = line?.slice('TELEGRAM_BOT_TOKEN='.length).trim();
+    if (!token) throw new Error(`無法從 ${ENV_FILE} 讀取 TELEGRAM_BOT_TOKEN`);
+    return token;
+}
+
+async function tgSendDocument(token: string, brand: Brand, csv: string): Promise<void> {
+    const date = new Date().toISOString().slice(0, 10);
+    const form = new FormData();
+    form.append('chat_id', TG_CHAT_ID);
+    form.append('document', new Blob([csv], { type: 'text/csv' }), `${brand} ${date}.csv`);
+    form.append('caption', `Bug 指派人員統計 - ${brand}（${date}）`);
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+        method: 'POST',
+        body: form,
+        signal: AbortSignal.timeout(TG_TIMEOUT_MS),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data?.ok) {
+        throw new Error(`Telegram 推送失敗: ${JSON.stringify(data)}`);
+    }
+}
+
+async function tgNotifyFail(token: string, message: string): Promise<void> {
+    try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: `⚠️ Bug 報表排程失敗：${message}` }),
+            signal: AbortSignal.timeout(TG_TIMEOUT_MS),
+        });
+    } catch {
+        // 失敗通知本身失敗就不再重試，留給 stderr 紀錄
+    }
 }
 
 // ── 依基準路徑推導各品牌的輸出路徑（在副檔名前插入品牌後綴）──
@@ -101,6 +147,15 @@ function classifyBrand(ports: string[], title: string): Brand {
 }
 
 const outBase = parseOut();
+let tgToken: string | undefined;
+if (shouldPush) {
+    try {
+        tgToken = loadTelegramToken();
+    } catch (e) {
+        console.error(e instanceof Error ? e.message : String(e));
+        process.exit(1);
+    }
+}
 const techIds = loadTechIds();
 const filter = { or: WANTED_STATUSES.map(s => ({ property: '狀態', select: { equals: s } })) };
 const pages = await queryAll(filter);
@@ -196,6 +251,7 @@ function buildCsv(brandPages: any[]): { csv: string; summary: string } {
 }
 
 console.error(`技術名單載入: ${techIds.size} 人`);
+let hadFailure = false;
 for (const brand of BRANDS) {
     const path = brandOutPath(outBase, brand);
     const { csv, summary } = buildCsv(pagesByBrand[brand]);
@@ -203,4 +259,17 @@ for (const brand of BRANDS) {
     console.error(`[${brand}] ${summary}`);
     console.error(`已寫入: ${path}`);
     console.log(csv);
+
+    if (tgToken) {
+        try {
+            await tgSendDocument(tgToken, brand, csv);
+            console.error(`[${brand}] 已推送 Telegram`);
+        } catch (e) {
+            hadFailure = true;
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[${brand}] Telegram 推送失敗: ${message}`);
+            await tgNotifyFail(tgToken, `[${brand}] ${message}`);
+        }
+    }
 }
+if (hadFailure) process.exit(1);

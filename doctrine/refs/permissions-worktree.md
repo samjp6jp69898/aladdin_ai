@@ -38,5 +38,5 @@
 界定：
 - **僅唯讀**：DB 只能 SELECT/SHOW/DESC/EXPLAIN；瀏覽器只做登入 + 導頁 + 截圖 + 讀 console/network，禁止任何寫入/送出表單以外的破壞性操作
 - **僅限 CQA 測試環境**：只能對 `*.ald777.com` 的 CQA 測試站與 `landon_ai` 唯讀 DB；**嚴禁對 production**
-- 連線資訊一律從 `/Users/user/aladdin/.env` 讀，不得寫死於腳本或 prompt
+- 連線資訊一律從 `aladdin_ai/.env.cqa`（2026-08-31 前為根目錄 `/Users/user/aladdin/.env`）讀，不得寫死於腳本或 prompt
 - 此放行適用於主工作目錄（grounder 跑在 worktree 建立之前），與 Worktree 放行條款分屬不同層級

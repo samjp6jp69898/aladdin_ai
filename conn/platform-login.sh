@@ -1,12 +1,11 @@
 #!/bin/bash
 # Usage: ./platform-login.sh <pk|6t> [--env cqa|dev]
 # platform 後台登入（唯讀取證：只登入、截圖、存 storageState）。
-# 帳密一律從 /Users/user/aladdin/.env 讀取，不寫死、不印出。
-# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env 有 DEV_{PK,6T}_PLATFORM_*。嚴禁 production。
+# 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取（見 lib/env.cjs），不寫死、不印出。
+# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env.dev 有 DEV_{PK,6T}_PLATFORM_*。嚴禁 production。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
 E2E_DIR="/Users/user/aladdin/cqa-e2e"
 OUT_DIR="$E2E_DIR/conn/artifacts"
 
@@ -30,11 +29,6 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: $ENV_FILE not found (帳密來源)."
-  exit 1
-fi
-
 case "$TARGET" in
   pk) SITE_KEY="pk-platform"; BASE="PK_PLATFORM" ;;
   6t) SITE_KEY="6t-platform"; BASE="6T_PLATFORM" ;;
@@ -49,7 +43,7 @@ case "$ENV_NAME" in
     ;;
 esac
 
-# 用 lib/env.cjs 的 loadEnv() 解析 .env，只取這三個 key。
+# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，只取這三個 key。
 # 刻意不用 `source`：.env 的值可能含反引號 / 引號等 shell metacharacter，
 # source 會因語法錯誤中止（實例：2026-08-06 的 CQA_ARCHERY_PASS），
 # 而且等同執行 .env 裡的 command substitution。

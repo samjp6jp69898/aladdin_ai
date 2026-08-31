@@ -16,7 +16,7 @@ INPUT="${1:?用法: resolve-reviewer.sh <notion_page_url_或_page_id>}"
 [ -f "$CSV" ] || { echo "ERROR:tech-users.csv 不存在 $CSV"; exit 1; }
 command -v jq >/dev/null 2>&1 || { echo "ERROR:jq 未安裝（缺它會把有指派誤判成 NOT_TECH，故直接報錯）"; exit 1; }
 
-# token 單一來源：環境變數 > /Users/user/aladdin/.env 的 ALD_NOTION_TOKEN（與 notion.sh 同源）
+# token 單一來源：環境變數 > /Users/user/aladdin/aladdin_ai/.env.local 的 ALD_NOTION_TOKEN（與 notion.sh 同源）
 TOKEN="${ALD_NOTION_TOKEN:-}"
 [ -z "$TOKEN" ] && TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' "$ROOT/.env" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")
 case "$TOKEN" in ntn_*) ;; *) echo "ERROR:讀不到有效 ALD_NOTION_TOKEN（.env 缺 ALD_NOTION_TOKEN= 行？）"; exit 1;; esac

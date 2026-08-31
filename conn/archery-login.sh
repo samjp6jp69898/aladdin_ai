@@ -2,21 +2,15 @@
 # Usage: bash archery-login.sh
 # CQA 測試站 Archery（SQL 審核平台）登入探測：只登入、截圖、存 storageState。
 # 不建立/送出任何 SQL 查詢工單。
-# 帳密一律從 /Users/user/aladdin/.env 讀取，不寫死、不印出。
-# 僅限 *.ald777.com 測試站，嚴禁 production（.env 另有 ARCHERY_PROD_*，本腳本不碰）。
+# 帳密一律從 aladdin_ai/.env.cqa 讀取（見 lib/env.cjs），不寫死、不印出。
+# 僅限 *.ald777.com 測試站，嚴禁 production（.env.prod 另有 ARCHERY_PROD_*，本腳本不碰）。
 
 set -e
 
-ENV_FILE="/Users/user/aladdin/.env"
 E2E_DIR="/Users/user/aladdin/cqa-e2e"
 VERIFY_DIR="$E2E_DIR/verify"
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: $ENV_FILE not found (帳密來源)."
-  exit 1
-fi
-
-# 用 lib/env.cjs 的 loadEnv() 解析 .env，只取這三個 key。
+# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，只取這三個 key。
 # 刻意不用 `source`：.env 的值可能含反引號 / 引號等 shell metacharacter，
 # source 會因語法錯誤中止或靜默改寫值，而且等同執行 .env 裡的 command substitution。
 read_env_key() {

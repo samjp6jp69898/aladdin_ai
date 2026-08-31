@@ -6,11 +6,11 @@
 #   tg-notify.sh --chat-id "<chat_id>"             --text "<msg>" [--dry-run]   # 直送，繞過 CSV，供獨立測試
 #   加 --file "<path>" 改發檔案（sendDocument）：--text 選填，帶了就當 caption（上限 1024 字，超過由 Telegram 回錯）
 # 紀律：一律 exit 0、永不阻斷 pipeline；結果印一行供呼叫端記 log。
-# Bot token 來源：根目錄 /Users/user/aladdin/.env 的 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN（檔內先出現者勝）；查無即 TG_FAIL，不再後備讀 channel .env
+# Bot token 來源：根目錄 /Users/user/aladdin/aladdin_ai/.env.local 的 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN（檔內先出現者勝）；查無即 TG_FAIL，不再後備讀 channel .env
 set -uo pipefail
 
 CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv}"
-ROOT_ENV_FILE="${TG_ROOT_ENV_FILE:-/Users/user/aladdin/.env}"   # 根目錄 .env，唯一 token 來源（鍵名 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN）
+ROOT_ENV_FILE="${TG_ROOT_ENV_FILE:-/Users/user/aladdin/aladdin_ai/.env.local}"   # 根目錄 .env，唯一 token 來源（鍵名 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN）
 API_BASE="${TG_API_BASE:-https://api.telegram.org}"
 
 EMAIL=""; IDS=""; TEXT=""; DRY=0; CHAT_DIRECT=""; FILE=""

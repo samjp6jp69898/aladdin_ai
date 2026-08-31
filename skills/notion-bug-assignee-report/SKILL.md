@@ -18,23 +18,20 @@ description: 從 Notion Bug List 查狀態為「仍有問題 / 待處理」的 t
 ## 使用方式
 
 ```bash
-bash /Users/user/aladdin/cron/bug-report-run.sh
+bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>] [--no-push]
 ```
 
-與本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是**同一支腳本**，只維護一份，行為完全一致：
+2026-08-31 起，**推送 Telegram 已內建在這支腳本裡、預設一律執行**，不需要再另外判斷「要不要推送」或改跑別的入口：
 
-1. 跑 `bug-assignee-report.ts` 產出 FF / 巨星 / 未分類三份 CSV 到 `/tmp/bug-status-by-assignee-<品牌>.csv`。
-2. 用 Telegram bot（token 讀 `/Users/user/aladdin/.env` 的 `TELEGRAM_BOT_TOKEN`）把三份 CSV 各自當文件推送到固定 `chat_id`（`5022865804`，Landon），caption 為「Bug 指派人員統計 - <品牌>（日期）」。
-3. 任一步驟失敗（報表腳本出錯、CSV 為空、Telegram 推送失敗）會先發一則 `⚠️ Bug 報表排程失敗：...` 文字通知，不會靜默。
+1. 產出 FF / 巨星 / 未分類三份 CSV，印到 stdout 並寫入 `--out` 指定的基準路徑（預設 `/Users/user/aladdin/tmp/bug-status-by-assignee.csv`，實際拆成 `-FF.csv` / `-巨星.csv` / `-未分類.csv`）。
+2. 用 Telegram bot（token 讀 `/Users/user/aladdin/aladdin_ai/.env.local` 的 `TELEGRAM_BOT_TOKEN`）把三份 CSV 各自當文件推送到固定 `chat_id`（`5022865804`，Landon），caption 為「Bug 指派人員統計 - <品牌>（日期）」。
+3. 任一品牌推送失敗會先發一則 `⚠️ Bug 報表排程失敗：...` 文字通知，不會靜默；腳本最終以非 0 結束碼結束。
 
-若只需要 CSV 內容本身、不需要發 Telegram（例如要在對話中直接分析數字），改跑底層報表腳本即可：
+只有本機除錯/測試、不想真的通知 Landon 時才加 `--no-push`（跳過步驟 2、3，只產出 CSV）——**正常使用一律不要加這個旗標**。
 
-```bash
-bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-report.ts [--out <path>]
-```
+本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是 `bash /Users/user/aladdin/cron/bug-report-run.sh`，內容只是呼叫上面這支 `.ts`（不帶 `--no-push`），不重複推送。
 
-- CSV 永遠印到 **stdout**，同時寫入 `--out` 指定路徑（預設 `/Users/user/aladdin/tmp/bug-status-by-assignee.csv`）。
-- 進度訊息（技術名單載入人數、等級欄、各等級張數、總計、寫入路徑）印到 **stderr**，不汙染 CSV。
+- 進度訊息（技術名單載入人數、等級欄、各等級張數、總計、寫入路徑、推送結果）印到 **stderr**，不汙染 CSV stdout。
 - 輸出用 `Bun.write`，`--out` 父目錄不存在會**自動建立**，不需先 mkdir。
 
 ## 前置條件與錯誤排查
@@ -42,8 +39,9 @@ bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-
 | 需求 | 說明 / 失敗徵兆 |
 |------|----------------|
 | 網路可達 Notion API | 無網路 → fetch 拋錯；無輸出 CSV |
-| 內嵌 token 有效 | token 失效 → `Notion API error 401`；需更新腳本內 `ALD_NOTION_TOKEN`（與 `obsidian/scripts/notion.sh` 同一把） |
+| 內嵌 token 有效 | token 失效 → `Notion API error 401`；需更新腳本內 `ALD_NOTION_TOKEN`（與 `aladdin_ai/scripts/notion.sh` 同一把） |
 | `tech-users.csv` 存在 | 路徑見下表；不存在 → `ENOENT`，全部會被歸成「非技術人員」之前就先 readFileSync 失敗 |
+| `/Users/user/aladdin/aladdin_ai/.env.local` 有 `TELEGRAM_BOT_TOKEN`（未加 `--no-push` 時） | 讀不到 → 腳本在查 Notion 之前就先印錯誤並以非 0 結束碼退出，不會空跑 |
 
 跑前不需手動檢查目錄；失敗時先看 stderr 的錯誤類別（網路 / 401 / ENOENT）對號入座。
 
@@ -55,7 +53,7 @@ bun /Users/user/aladdin/obsidian/skills/notion-bug-assignee-report/bug-assignee-
 | 篩選狀態 | `狀態` select = `仍有問題` **OR** `待處理` |
 | 列（row） | `當前指派`（people），以 **person id** 為主鍵；未指派獨立成「（未指派）」列 |
 | 欄（column） | `嚴重性`（select，值如 `P1重點` / `P2較高` / `P3一般` / `P4較低`；未填歸「（未分級）」）每等級一欄；依 `P` 後數字由小到大排序（P0 最優先），未分級殿後；末欄 `小計` = 該人跨等級總量 |
-| 技術名單 | `obsidian/commands/create-mr/references/tech-users.csv`，以 **`notion_user_id`** 比對 |
+| 技術名單 | `aladdin_ai/commands/create-mr/references/tech-users.csv`，以 **`notion_user_id`** 比對 |
 | 分類 | id 命中名單 → `技術人員`；否則 `非技術人員`；無指派 → `未指派` |
 | Notion 版本 | `2025-09-03`（data_sources API，需全量分頁） |
 
@@ -99,7 +97,7 @@ Tintin Liou KHH,非技術人員,3,14,11,5,33
 - **人次加總 = ticket 去重總數**：此 DB 每張單最多一位指派人，無多重指派重複計算；若未來改成可多指派，人次會大於 ticket 數，需在報告中註明。
 - **即時資料波動**：Notion 是即時資料，相隔數分鐘重跑，總數與各人數字可能微幅變動屬正常，非邏輯錯誤。
 - **「（無名稱）」列**：指派欄有 person 但 API 未回傳 name，因 id 不在名單，歸非技術人員。
-- token 與 data source id 寫死於腳本（沿用 `obsidian/scripts/notion-bug-query-v2.ts` 慣例）。
+- token 與 data source id 寫死於腳本（沿用 `aladdin_ai/scripts/notion-bug-query-v2.ts` 慣例）。
 
 ## 客製（調整篩選或維度）
 

@@ -25,9 +25,9 @@ NOTION_SH="/Users/user/aladdin/aladdin_ai/scripts/notion.sh"
 **Notion 總需求池資料庫（Planning Database）ID:** `21d87d78618a806ea8d7ea43d37e9f55`
 對應網址：`https://www.notion.so/21d87d78618a806ea8d7ea43d37e9f55`
 
-搜尋資料庫使用 curl（Token 從 `/Users/user/aladdin/.env` 讀取——單一來源，禁止寫死明文；API 版本固定用 `2022-06-28`）：
+搜尋資料庫使用 curl（Token 從 `/Users/user/aladdin/aladdin_ai/.env.local` 讀取——單一來源，禁止寫死明文；API 版本固定用 `2022-06-28`）：
 ```bash
-ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/.env | cut -d= -f2-)
+ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/.env.local | cut -d= -f2-)
 NOTION_API_VER="2022-06-28"
 ```
 
