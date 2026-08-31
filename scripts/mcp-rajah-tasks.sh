@@ -1,5 +1,5 @@
 #!/bin/bash
-# mcp-rajah-tasks.sh — obsidian/mcps/rajah-inventory/<rajah檔案 stem>.json（101 個檔案、跨全 rajah
+# mcp-rajah-tasks.sh — aladdin_mcps/rajah-inventory/<rajah檔案 stem>.json（101 個檔案、跨全 rajah
 # 表面的落差清單）的跨檔認領/操作工具，介面對齊 mcp-tasks.sh（單一 tool-gap-tasks.json 版），
 # 但這裡的資料分散在 101 個檔案裡，操作前要先從 id 反推出該去哪個檔案。
 #
@@ -42,12 +42,12 @@
 # 搶改同一個 MCP server 的 index.ts/README.md/const.ts。真正的任務認領仍是 claim（原子性、
 # 真的擋得住雙重認領），domain-claim 只是協調用的禮讓機制。
 set -u
-DIR="${RAJAH_TASKS_DIR:-/Users/user/aladdin/obsidian/mcps/rajah-inventory}"
+DIR="${RAJAH_TASKS_DIR:-/Users/user/aladdin/aladdin_mcps/rajah-inventory}"
 CLAIMS_FILE="$DIR/_domain-claims.json"
 LOCKROOT="/tmp/mcp-rajah-tasks-locks"
 ACTION="${1:-}"
 
-[ -d "$DIR" ] || { echo "ERROR: $DIR 不存在（先跑 bun obsidian/scripts/mcp-rajah-tasks-gen.ts）"; exit 1; }
+[ -d "$DIR" ] || { echo "ERROR: $DIR 不存在（先跑 bun aladdin_ai/scripts/mcp-rajah-tasks-gen.ts）"; exit 1; }
 command -v jq >/dev/null || { echo "ERROR: 需要 jq"; exit 1; }
 
 # 從 id 反推 stem（第一個 `__` 之前），回傳對應的檔案路徑；檔案不存在就直接報錯，
@@ -180,7 +180,7 @@ case "$ACTION" in
     done
     ;;
   reindex)
-    bun /Users/user/aladdin/obsidian/scripts/mcp-rajah-tasks-build-index.ts
+    bun /Users/user/aladdin/aladdin_ai/scripts/mcp-rajah-tasks-build-index.ts
     ;;
   domain-claim)
     STEM="${2:?用法: mcp-rajah-tasks.sh domain-claim <stem> <session_label> [claim_token]}"

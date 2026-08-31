@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * mcp-rajah-tasks-gen.ts — 把全 rajah 表面（101 檔、2398 支真實 method）拆成「一個 rajah 檔案
- * 對應一個 JSON」的任務清單，寫進 obsidian/mcps/rajah-inventory/<rajah檔案 stem>.json，
+ * 對應一個 JSON」的任務清單，寫進 aladdin_mcps/rajah-inventory/<rajah檔案 stem>.json，
  * 再由 mcp-rajah-tasks-build-index.ts 彙總成 _index.json（main json）。
  *
  * 拆分單位是 rajah 檔案，不是 server / service：
@@ -12,7 +12,7 @@
  *   249 個檔案、大多數 server 欄位是 null 的破碎狀態。
  *
  * 冪等 + 不遺失既有進度：
- * - 若 obsidian/mcps/tool-gap-tasks.json（舊的、只涵蓋 3 個 service 的落差清單）裡已經有對應
+ * - 若 aladdin_mcps/tool-gap-tasks.json（舊的、只涵蓋 3 個 service 的落差清單）裡已經有對應
  *   （用 service+method+rajah_ref 三者比對，不是用 id 比對，因為新舊 id 命名規則不同）的紀錄，
  *   直接把該筆的 status/server/notes/claimed_by/claimed_at/category 原樣搬過來，不會被重置成
  *   pending。舊檔本身不動、不刪，仍是目前 3 個 service pipeline（mcp-tasks.sh）的權威來源；
@@ -25,14 +25,14 @@
  *   加了内容（那種情況重跑本腳本會蓋掉，先跟人確認）。
  *
  * 用法：
- *   bun obsidian/scripts/mcp-rajah-tasks-gen.ts                 # 全部 101 個檔案
- *   bun obsidian/scripts/mcp-rajah-tasks-gen.ts --files=a.rajah,b.rajah   # 只處理指定檔案（給分批 agent 用）
+ *   bun aladdin_ai/scripts/mcp-rajah-tasks-gen.ts                 # 全部 101 個檔案
+ *   bun aladdin_ai/scripts/mcp-rajah-tasks-gen.ts --files=a.rajah,b.rajah   # 只處理指定檔案（給分批 agent 用）
  */
 
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 
 const RAJAH_DIR = '/Users/user/aladdin/rajah/services';
-const MCPS_DIR = '/Users/user/aladdin/obsidian/mcps';
+const MCPS_DIR = '/Users/user/aladdin/aladdin_mcps';
 const OUT_DIR = `${ MCPS_DIR }/rajah-inventory`;
 const LEGACY_TASKS_FILE = `${ MCPS_DIR }/tool-gap-tasks.json`;
 

@@ -3,12 +3,12 @@
 > 任何 session（不論模型強弱）要修改 CLAUDE.md / commands / agents / scripts / doctrine 之前，先讀完本檔。
 > 本協議的目的：讓制度能被安全地演化，而不是被好心地弄壞。
 
-## 0. 環境事實（改檔前必知，2026-07-21 實測）
+## 0. 環境事實（改檔前必知，2026-07-21 實測；2026-08-31 更新）
 
-- `.claude/commands`、`.claude/agents`、`.claude/skills`、`.claude/doctrine`、根目錄 `scripts` **全是 symlink**，指向 `obsidian/` 下的同名目錄——改一處即改全部，**不存在**「兩份 commands 要分別改」這回事。（`.claude/doctrine` 於 2026-07-21 由實體目錄轉為 symlink，內容原封不動搬到 `obsidian/doctrine`，經使用者確認後執行。）
+- `.claude/commands`、`.claude/agents`、`.claude/skills`、`.claude/doctrine`、根目錄 `scripts`、`conn` **全是 symlink**，指向 `aladdin_ai/` 下的同名目錄——改一處即改全部，**不存在**「兩份 commands 要分別改」這回事。（`.claude/doctrine` 於 2026-07-21 由實體目錄轉為 symlink，內容原封不動搬到當時的 `obsidian/doctrine`，經使用者確認後執行；2026-08-31 這整組 symlink 目標〔含新增進來的 `conn`、`notion-users-tech-check.csv`〕連同完整 git 歷史經 `git filter-repo` 整批從 `obsidian` repo 遷到獨立的 `aladdin_ai` repo，`obsidian` 停止追蹤這些路徑、只保留純知識庫內容 Codebase/Projects/Rules/backTesting/Debug；同批 `mcps/` 也用同樣手法遷到獨立的 `aladdin_mcps` repo，路徑攤平不再有 `mcps/` 前綴，兩個新 repo 目前皆尚未 push 到遠端。）
 - 唯一的真雙實體：`/Users/user/aladdin/CLAUDE.md`（canonical）↔ `obsidian/CLAUDE.md`（唯讀鏡像，**勿直接編輯**）。只改 canonical，改完必跑 `bash /Users/user/aladdin/scripts/sync-mirrors.sh`（腳本會拒絕覆蓋比 canonical 新的鏡像並要求人工合併）。2026-08-25 踩過一次：mirror 曾被直接編輯過（含一條使用者已核准的硬規則異動），canonical 停留在舊版整整一個月沒人發現，靠 `sync-mirrors.sh --check` 才揪出來——**改 CLAUDE.md 前先跑一次 `--check`**，看到 `DRIFT` 或 `CONFLICT` 要先手動合併回 canonical，不能假設 canonical 一定是最新的。
 - `AGENTS.md`（`/Users/user/aladdin/AGENTS.md`、`obsidian/AGENTS.md` 各一份，皆為 `AGENTS.md -> CLAUDE.md` 的 symlink，2026-08-25 新增）：給 Codex CLI 等遵循 agents.md 標準的工具讀同一份內容，改 `CLAUDE.md` 即同時生效，不需要另外維護。`sync-mirrors.sh --check` 的 symlink 健檢已涵蓋這兩個。⚠️ **環境事實更新（2026-08-28 實測）**：`obsidian/AGENTS.md` 正常，但 `/Users/user/aladdin/AGENTS.md` **目前不存在**，`--check` 會固定報一行 `SYMLINK_MISSING`。使用者當日裁定不修復，所以這行不是新故障、也不要自行重建；判斷 `--check` 是否全綠時把這行排除。
-- 陷阱：`find` 對「本身是 symlink 的目錄」作為路徑參數會**靜默回空**。要遍歷請用實體路徑（`obsidian/...`）或先 `cd` 進去。引用路徑前先 `ls -ld` 確認身分。
+- 陷阱：`find` 對「本身是 symlink 的目錄」作為路徑參數會**靜默回空**。要遍歷請用實體路徑（`aladdin_ai/...`，`mcps/` 相關則用 `aladdin_mcps/...`）或先 `cd` 進去。引用路徑前先 `ls -ld` 確認身分。
 - bash 3.2 陷阱：`"$VAR全形字"` 中變數後直接接全形字元會把變數名解析壞（unbound variable）。變數與 CJK 之間留空格或用 `${VAR}`。
 
 ## 1. 分區：什麼可以自改、什麼要先問使用者
@@ -35,7 +35,7 @@
 
 1. **備份**：`cp -p <檔> /Users/user/aladdin/.claude/backups/<YYYYMMDD 或 YYYYMMDD-標記>/<檔名>.<標記>`（目錄不存在先 mkdir -p；日期後可帶後綴，如既有的 `20260703-fable`）。
 2. **改**：surgical——只動要動的行。
-3. **一致性檢查**（絕對路徑，不依賴 cwd）：`grep -rn "<你改動涉及的關鍵字>" /Users/user/aladdin/obsidian/commands/ /Users/user/aladdin/obsidian/agents/ /Users/user/aladdin/obsidian/scripts/ /Users/user/aladdin/.claude/doctrine/ /Users/user/aladdin/CLAUDE.md` 確認沒有別處還在講舊行為；有 → 同場修掉或明列給使用者。
+3. **一致性檢查**（絕對路徑，不依賴 cwd）：`grep -rn "<你改動涉及的關鍵字>" /Users/user/aladdin/aladdin_ai/commands/ /Users/user/aladdin/aladdin_ai/agents/ /Users/user/aladdin/aladdin_ai/scripts/ /Users/user/aladdin/.claude/doctrine/ /Users/user/aladdin/CLAUDE.md` 確認沒有別處還在講舊行為；有 → 同場修掉或明列給使用者。
 4. **驗證**：scripts → `bash -n` + 實測；文件 → read-back 引用路徑逐一 `ls`；指令檔 → 通讀一次確認步驟編號與跳轉一致。
 5. **同步**：跑 `bash scripts/sync-mirrors.sh`（會自動同步 CLAUDE.md 配對並健檢 symlink）。
 6. **留痕**：一句話記錄「改了什麼、為何、驗了什麼」——追加到 `.claude/doctrine/refs/change-log.md`（沒有就建，格式：`- YYYY-MM-DD | 檔案 | 一句摘要 | 驗證方式`）。
@@ -87,6 +87,6 @@
 bash /Users/user/aladdin/scripts/sync-mirrors.sh --check          # CLAUDE.md 同步 + symlink 完好
 ls -ld /Users/user/aladdin/scripts /Users/user/aladdin/.claude/commands
 bash /Users/user/aladdin/scripts/tracker.sh counts                 # tracker 可讀且格式未變
-head -12 /Users/user/aladdin/obsidian/agents/bug-tracer-with-callgraph.md   # frontmatter model/effort 還在
+head -12 /Users/user/aladdin/aladdin_ai/agents/bug-tracer-with-callgraph.md   # frontmatter model/effort 還在
 ```
 再抽查 CLAUDE.md 路由表指向的檔案是否都存在（`ls .claude/doctrine/`）。發現漂移 → 按第 5 節裁決、按第 2 節儀式修。

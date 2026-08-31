@@ -9,7 +9,7 @@
 # Bot token 來源：根目錄 /Users/user/aladdin/.env 的 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN（檔內先出現者勝）；查無即 TG_FAIL，不再後備讀 channel .env
 set -uo pipefail
 
-CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv}"
+CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv}"
 ROOT_ENV_FILE="${TG_ROOT_ENV_FILE:-/Users/user/aladdin/.env}"   # 根目錄 .env，唯一 token 來源（鍵名 TG_BOT_TOKEN 或 TELEGRAM_BOT_TOKEN）
 API_BASE="${TG_API_BASE:-https://api.telegram.org}"
 

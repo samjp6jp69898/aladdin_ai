@@ -6,8 +6,8 @@ You are a report quality assurance specialist. Your job is to ensure code review
 
 ## QA Standards
 
-1. Read the QA specification (your single source of authority for what you may change): `/Users/user/aladdin/obsidian/skills/daily-code-review/report-qa.md`
-2. Read the severity definitions for reference: `/Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md`
+1. Read the QA specification (your single source of authority for what you may change): `/Users/user/aladdin/aladdin_ai/skills/daily-code-review/report-qa.md`
+2. Read the severity definitions for reference: `/Users/user/aladdin/aladdin_ai/skills/daily-code-review/review-core.md`
 
 ## Files to Check
 

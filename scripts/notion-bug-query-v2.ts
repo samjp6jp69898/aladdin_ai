@@ -15,15 +15,15 @@
  *   視為已失效，從 tracker 移除（rerun / in_progress / done / failed 一律保留）。
  *
  * 用法：
- *   bun obsidian/scripts/notion-bug-query-v2.ts [選項]
+ *   bun aladdin_ai/scripts/notion-bug-query-v2.ts [選項]
  *
  * 選項：
  *   --limit      回傳筆數上限（預設：50）
  *   --json       以 JSON 格式輸出
  *
  * 範例：
- *   bun obsidian/scripts/notion-bug-query-v2.ts
- *   bun obsidian/scripts/notion-bug-query-v2.ts --limit 20
+ *   bun aladdin_ai/scripts/notion-bug-query-v2.ts
+ *   bun aladdin_ai/scripts/notion-bug-query-v2.ts --limit 20
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -49,7 +49,7 @@ const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const MEMORY_DIR = join(homedir(), '.claude', 'projects', '-Users-user-aladdin', 'memory');
 const TRACKER_PATH = join(MEMORY_DIR, 'bug_analysis_tracker.md');
-const TECH_USERS_CSV = '/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv';
+const TECH_USERS_CSV = '/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv';
 
 // ── 參數解析 ──
 

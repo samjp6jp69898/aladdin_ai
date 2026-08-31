@@ -129,7 +129,7 @@ describe('merge engine bug fixes', () => {
 describe('loadProcessedActions parses pending-actions.json', () => {
     test('handles bare array format without throwing', async () => {
         // Save original pending-actions.json, write a minimal one, restore.
-        const ORIG_PATH = '/Users/user/aladdin/obsidian/scripts/codebase-index/pending-actions.json';
+        const ORIG_PATH = '/Users/user/aladdin/aladdin_ai/scripts/codebase-index/pending-actions.json';
         const BAK_PATH = ORIG_PATH + '.bak-test';
         const orig = await readFile(ORIG_PATH, 'utf-8');
         await writeFile(BAK_PATH, orig);

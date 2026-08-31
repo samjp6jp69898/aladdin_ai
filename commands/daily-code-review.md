@@ -45,13 +45,13 @@ cd /Users/user/aladdin && sh daily_bootstrap.sh
 ### Step 1: 掃描與派工計畫（腳本，一條指令）
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts $ARGUMENTS
+bun /Users/user/aladdin/aladdin_ai/skills/daily-code-review/scan-workload.ts $ARGUMENTS
 ```
 
 - stdout 第一行印 `[DONE] ...` → 窗口內無 commit（或 `--skip-existing` 下全部已完成）：把該行回報使用者，流程結束。
 - 否則 stdout 是派工摘要表；完整計畫已寫入 `review/{LABEL}/_dispatch/dispatch.json`（含每個 agent 的 `model`、`prompt_file`、每位 author 的 `report_file` / `critical_file`、`batches` 切分）。
 - **中斷後接續**：重跑同一指令並加 `--skip-existing`（**最新一代報告＋critical 檔配對俱全**的 author 才會被跳過；只有報告、缺 critical 者視為未完成會重新入列）。不加的話，既有報告不會被覆蓋，本輪報告自動改用 `_r2` / `_r3` 後綴（re-review 語意）。
-- 身份消歧（同人多 email、同名不同人防呆）由腳本按單一來源 `obsidian/skills/daily-code-review/author-identities.json` 處理。掃描摘要或報告中發現新的身份亂象時：先依該檔 `_comment` 的規則更新它，再重跑本步驟。
+- 身份消歧（同人多 email、同名不同人防呆）由腳本按單一來源 `aladdin_ai/skills/daily-code-review/author-identities.json` 處理。掃描摘要或報告中發現新的身份亂象時：先依該檔 `_comment` 的規則更新它，再重跑本步驟。
 - 腳本失敗（非 0 exit 且非 `[DONE]`）：把錯誤原文回報使用者並停止，不要自己用 git 指令替代腳本。
 
 ### Step 2: 批次派 Review Agents（你唯一的核心工作）
@@ -71,7 +71,7 @@ bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts $ARGU
 2. 該批全部回報後，跑**該批**的驗收（`--batch {B}` 必帶——不帶會連尚未派工的後續批次一起列成 MISSING，那不是缺檔）：
 
    ```bash
-   bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL} --check --batch {B}
+   bun /Users/user/aladdin/aladdin_ai/skills/daily-code-review/collect-critical.ts {LABEL} --check --batch {B}
    ```
 
 3. 有缺檔或 agent 回 `RESULT: PARTIAL` / `RESULT: BLOCKED` → 走 `.claude/doctrine/10-model-dispatch.md` 第 5 節升降級（同一子任務 sonnet 連錯 2 次升 opus 並附完整失敗軌跡；總計最多 3 次嘗試）。重派時 prompt 仍用同一個 `agent-{N}.md`，另加一行 `Only process author(s): <缺的名單>; other authors in the file are already done.`。3 次仍失敗 → 記下該 author，流程繼續，最後回報使用者。
@@ -93,7 +93,7 @@ bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts $ARGU
 全部批次（review + QA）完成後，先跑**全量**完成度閘門（不帶 `--batch`）：
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL} --check
+bun /Users/user/aladdin/aladdin_ai/skills/daily-code-review/collect-critical.ts {LABEL} --check
 ```
 
 - 有 MISSING → 回 Step 2.3 對缺的 author 補派（同樣的升降級與次數上限），補齊後重跑本閘門。**閘門不過，不准聚合**——否則缺的 critical 檔會被靜默略過、CSV 不完整卻無錯誤。
@@ -102,7 +102,7 @@ bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {L
 閘門通過（或已明確記錄殘缺名單）後聚合：
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {LABEL}
+bun /Users/user/aladdin/aladdin_ai/skills/daily-code-review/collect-critical.ts {LABEL}
 ```
 
 - 事實源是 `review/{LABEL}/_critical/*.critical.md`（review agent 落檔、QA agent 同步過 severity），**不是** agent 的對話回報。
@@ -120,12 +120,12 @@ bun /Users/user/aladdin/obsidian/skills/daily-code-review/collect-critical.ts {L
 
 1. **併發**：每批必須同一則訊息並行派出；批間依 Step 2.5 規則。
 2. **Re-run 語意**：同窗口重跑預設產生 `_r2` 報告（不覆蓋）；接續中斷才用 `--skip-existing`。
-3. **QA 的權限邊界**（downgrade/upgrade 規則、可改什麼）以 `obsidian/skills/daily-code-review/report-qa.md` 為唯一權威，本檔不重複。
-4. **Prompt 內容的唯一事實源**是 `obsidian/skills/daily-code-review/templates/*.tpl.md`（由腳本代入變數生成 `_dispatch/*.md`）。要改 review/QA 行為 → 改模板或 review-core.md / report-qa.md，**不要**改派工三行式、也不要在派工時往 prompt 塞額外指示（僅有的兩個例外：Step 2.3 的重派名單行、升級重派時按 doctrine/10 第 5 節必附的失敗軌跡）。
+3. **QA 的權限邊界**（downgrade/upgrade 規則、可改什麼）以 `aladdin_ai/skills/daily-code-review/report-qa.md` 為唯一權威，本檔不重複。
+4. **Prompt 內容的唯一事實源**是 `aladdin_ai/skills/daily-code-review/templates/*.tpl.md`（由腳本代入變數生成 `_dispatch/*.md`）。要改 review/QA 行為 → 改模板或 review-core.md / report-qa.md，**不要**改派工三行式、也不要在派工時往 prompt 塞額外指示（僅有的兩個例外：Step 2.3 的重派名單行、升級重派時按 doctrine/10 第 5 節必附的失敗軌跡）。
 5. **Bootstrap 每次必跑**、不設 flag 跳過（歷史決策，見 Step 0 理由）。
 6. **檔案結構**：`review/{LABEL}/` 下——報告 `*.md`、`CRITICAL_ISSUES_{LABEL}.csv`、`_dispatch/`（計畫與 prompt）、`_critical/`（結構化 issue，兼作 per-author 完成 marker）。
-7. **回歸測試**：修改 `scan-workload.ts` / `collect-critical.ts` / `templates/*.tpl.md` 後，**必跑** `bash /Users/user/aladdin/obsidian/skills/daily-code-review/test-dcr.sh` 且全綠才算完成（21 案，全沙盒執行、不碰真實 review/）。
-8. **覆蓋稽核（唯讀輔助，非 pipeline 主流程）**：`bun /Users/user/aladdin/obsidian/skills/daily-code-review/scan-workload.ts coverage-audit [起] [迄] [--no-fetch]` 列出「未被任何 review 目錄涵蓋、但當日 origin/dev 有 commit」的漏批日（純 stdout、不寫檔）。用於常態偵測排程漏批——例行跑 review 前後可掃一次，確認無日曆空洞。
+7. **回歸測試**：修改 `scan-workload.ts` / `collect-critical.ts` / `templates/*.tpl.md` 後，**必跑** `bash /Users/user/aladdin/aladdin_ai/skills/daily-code-review/test-dcr.sh` 且全綠才算完成（21 案，全沙盒執行、不碰真實 review/）。
+8. **覆蓋稽核（唯讀輔助，非 pipeline 主流程）**：`bun /Users/user/aladdin/aladdin_ai/skills/daily-code-review/scan-workload.ts coverage-audit [起] [迄] [--no-fetch]` 列出「未被任何 review 目錄涵蓋、但當日 origin/dev 有 commit」的漏批日（純 stdout、不寫檔）。用於常態偵測排程漏批——例行跑 review 前後可掃一次，確認無日曆空洞。
 
 ## v3 變更摘要（2026-07-03，供追溯）
 

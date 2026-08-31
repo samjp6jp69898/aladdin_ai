@@ -19,7 +19,7 @@ import { execSync } from 'child_process';
 import { join, relative, resolve } from 'path';
 
 // Resolve agrabah root robustly: works both from agrabah/.claude/skills/method-call-graph/
-// (SCRIPT_DIR/../../.. = agrabah) AND from obsidian/skills/method-call-graph/ where that
+// (SCRIPT_DIR/../../.. = agrabah) AND from aladdin_ai/skills/method-call-graph/ where that
 // relative path lands outside agrabah. Walk up looking for a directory that contains
 // `src/servers` and `rajah/`; fall back to absolute /Users/user/aladdin/agrabah.
 const SCRIPT_DIR = import.meta.dir;

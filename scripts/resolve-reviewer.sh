@@ -10,7 +10,7 @@
 # token 單一來源 = scripts/notion.sh（不要在本檔或任何 prompt 硬編 token）。
 set -u
 ROOT=/Users/user/aladdin
-CSV="$ROOT/obsidian/commands/create-mr/references/tech-users.csv"   # canonical：tg 腳本也讀寫這份
+CSV="$ROOT/aladdin_ai/commands/create-mr/references/tech-users.csv"   # canonical：tg 腳本也讀寫這份
 
 INPUT="${1:?用法: resolve-reviewer.sh <notion_page_url_或_page_id>}"
 [ -f "$CSV" ] || { echo "ERROR:tech-users.csv 不存在 $CSV"; exit 1; }

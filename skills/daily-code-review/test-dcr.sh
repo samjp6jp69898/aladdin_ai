@@ -5,12 +5,12 @@
 # 修改 scan-workload.ts / collect-critical.ts / templates/ 之後，必須跑本測試全綠才算完成
 # （對應 .claude/doctrine/40-maintenance-protocol.md 第 2 節的「scripts 需實測」）。
 #
-# 用法：bash /Users/user/aladdin/obsidian/skills/daily-code-review/test-dcr.sh
+# 用法：bash /Users/user/aladdin/aladdin_ai/skills/daily-code-review/test-dcr.sh
 #   - 全部在 mktemp 沙盒內進行（--no-fetch --out-root），不碰真實 review/、不寫 4 repo
 #   - git 依賴的案例會自動探測近 14 天內有 commit 的窗口；探測不到則 SKIP 該組（parser 組照跑）
 # 結果：每案 PASS/FAIL 一行，最後總結；任一 FAIL → exit 1
 set -u
-DCR=/Users/user/aladdin/obsidian/skills/daily-code-review
+DCR=/Users/user/aladdin/aladdin_ai/skills/daily-code-review
 SANDBOX="$(mktemp -d /tmp/dcr-test.XXXXXX)"
 PASS=0; FAIL=0; SKIP=0
 

@@ -111,7 +111,7 @@ FIXER_RESULT: NO_ACTIONABLE_COMMENTS
   - **不修改程式碼**，在報告中記為「未採納」並寫明原因。
 - **i18n 相關留言** — 若留言要求改文案，依專案規範你**不得修改 `localizations/*.json`**。程式碼端需要新文案時只寫 i18n key；純翻譯值的調整記為「未採納（i18n 由開發者從 Google Sheets 匯入）」。
 
-引用 enum / model 值請走 `bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts` 確認，不憑記憶。
+引用 enum / model 值請走 `bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts` 確認，不憑記憶。
 
 若改動了 rajah `.rajah` 檔，執行 `cd {worktree_path}/rajah && sh bootstrap.sh` 重生程式碼。
 

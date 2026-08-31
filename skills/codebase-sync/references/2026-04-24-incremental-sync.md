@@ -1501,7 +1501,7 @@ git commit -m "feat(codebase-sync): add sync-from-git.ts main entry CLI"
 - [ ] **Step 1: 跑 dry-run 測試同步範圍 2026-04-21 20:00 → now**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --dry-run --since="2026-04-21 20:00"
 ```
 
@@ -1652,7 +1652,7 @@ git commit -m "docs(codebase-sync): add incremental sync SOP specification"
 - [ ] **Step 1: 跑 Stage 1 收集 + 分類**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --since="2026-04-21 20:00"
 ```
 
@@ -1672,7 +1672,7 @@ cat pending-actions.json | bun -e "const d=JSON.parse(await Bun.stdin.text());co
 - [ ] **Step 4: Agent 全部完成後跑 finalize**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --finalize --since="2026-04-21 20:00"
 ```
 

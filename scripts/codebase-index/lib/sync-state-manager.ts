@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
-const SYNC_STATE_PATH = '/Users/user/aladdin/obsidian/scripts/codebase-index/sync-state.json';
+const SYNC_STATE_PATH = '/Users/user/aladdin/aladdin_ai/scripts/codebase-index/sync-state.json';
 const GC_MAX_AGE_DAYS = 30;
 
 export interface SyncState {

@@ -645,7 +645,7 @@ alternative_paths:
 - **來源錨定校驗**:凡貼出 source 片段,必須註明「讀自 `$ALADDIN_ROOT_AT_DATE/<repo>/<path>:N`」,使「片段來自報案時錨定版本」可稽核。
 - **執行可達性**:凡靠「某共用元件 / 框架有防禦或初始化邏輯」判某 angle NOT APPLICABLE,光有 file:line + 原文不夠,必須追加證明「該邏輯在本 ticket 重現路徑上**確實被觸發 / 執行到**」。
 
-若引用 enum / model / DB schema,必須走 skill(`bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts <subcommand>` / `bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand>`)並貼結果摘要;skill 查無此 enum / 此值 → 該段落判 `[NEEDS-VERIFICATION]`。
+若引用 enum / model / DB schema,必須走 skill(`bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts <subcommand>` / `bun /Users/user/aladdin/aladdin_ai/skills/db-schema-lookup/db-lookup.ts <subcommand>`)並貼結果摘要;skill 查無此 enum / 此值 → 該段落判 `[NEEDS-VERIFICATION]`。
 
 ### 反證線索閉環(收尾 gate)
 

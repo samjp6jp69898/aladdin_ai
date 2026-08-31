@@ -43,10 +43,10 @@ mkdir -p /Users/user/aladdin/obsidian/Debug/backtest-staging/temp-{first8chars}
 
 ### Step 1: Dispatch Stage 1 — Ticket Info Collector
 
-Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/backtest-ticket-collector.md`:
+Create a sub agent using the prompt at `/Users/user/aladdin/aladdin_ai/agents/backtest-ticket-collector.md`:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-ticket-collector.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-ticket-collector.md as your instructions.
 
 Parameters:
 - NotionURL: {NotionURL}
@@ -90,10 +90,10 @@ ls /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}/fix-authority
 
 ### Step 2: Dispatch Stage 2 — Commit Finder & Independent Analyzer
 
-Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md`:
+Create a sub agent using the prompt at `/Users/user/aladdin/aladdin_ai/agents/backtest-commit-analyzer.md`:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-commit-analyzer.md as your instructions.
 
 Parameters:
 - staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
@@ -115,10 +115,10 @@ Report: `✓ Stage 2 complete — {ticket_id} commit {FOUND/NOT_FOUND}`
 
 ### Step 3: Dispatch Stage 3 — Comparator & Note Writer
 
-Create a sub agent using the prompt at `/Users/user/aladdin/obsidian/agents/backtest-comparator.md`:
+Create a sub agent using the prompt at `/Users/user/aladdin/aladdin_ai/agents/backtest-comparator.md`:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-comparator.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-comparator.md as your instructions.
 
 Parameters:
 - staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}

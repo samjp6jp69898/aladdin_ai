@@ -151,12 +151,12 @@ Compute current timestamp for filename: `YYYYMMDD-HHmm`.
 
 Ensure directory exists:
 ```
-/Users/user/aladdin/obsidian/skills/back-testing-stats/temp/
+/Users/user/aladdin/aladdin_ai/skills/back-testing-stats/temp/
 ```
 
 Write to:
 ```
-/Users/user/aladdin/obsidian/skills/back-testing-stats/temp/back-testing-stats-{YYYYMMDD-HHmm}.html
+/Users/user/aladdin/aladdin_ai/skills/back-testing-stats/temp/back-testing-stats-{YYYYMMDD-HHmm}.html
 ```
 
 HTML structure:
@@ -197,7 +197,7 @@ All chart data is embedded inline as a JSON literal in a `<script>` tag — no e
 #### 4c. Open in browser
 
 ```bash
-open /Users/user/aladdin/obsidian/skills/back-testing-stats/temp/back-testing-stats-{YYYYMMDD-HHmm}.html
+open /Users/user/aladdin/aladdin_ai/skills/back-testing-stats/temp/back-testing-stats-{YYYYMMDD-HHmm}.html
 ```
 
 ---

@@ -58,9 +58,9 @@ Read（依序）：
 | # | 角度 | 怎麼查 |
 |---|---|---|
 | 1 | **症狀掩蓋 vs 真正修根因** | diff 是不是只是加了一層 try/catch 吞掉錯誤、加個 null 檢查繞過去、或用預設值蓋掉異常，而不是修正 tracer 指出的實際錯誤邏輯？對照 analysis-notes.md「根因定位」段的具體機制描述，逐行確認 diff 真的動到那個機制。 |
-| 2 | **迴歸風險（call graph 波及範圍）** | 用 `bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts` 查被改動 method 的所有 caller，逐一檢視這次改動是否可能改變這些 caller 原本依賴的行為（回傳值型別、null 語意、副作用時機）。tracer 的「呼叫鏈追蹤」段可作為起點但不能只信它，自己至少抽查 1-2 個 caller 的實際程式碼。 |
+| 2 | **迴歸風險（call graph 波及範圍）** | 用 `bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts` 查被改動 method 的所有 caller，逐一檢視這次改動是否可能改變這些 caller 原本依賴的行為（回傳值型別、null 語意、副作用時機）。tracer 的「呼叫鏈追蹤」段可作為起點但不能只信它，自己至少抽查 1-2 個 caller 的實際程式碼。 |
 | 3 | **併發 / 競態** | 若改動涉及共享狀態（DB 寫入、cache、記憶體變數），修法是否可能在併發呼叫下產生新的競態？（例如新增的判斷式跟寫入之間沒有原子性保證） |
-| 4 | **資料形狀假設** | diff 是否假設某欄位「一定存在」「一定非負」「一定是這個 enum 值」，但型別系統或 DB schema 並不保證？用 `bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts` 或 `rajah-lookup.ts` 核對欄位實際的 nullable / 型別定義，不要單憑程式碼片段的表面寫法猜測。 |
+| 4 | **資料形狀假設** | diff 是否假設某欄位「一定存在」「一定非負」「一定是這個 enum 值」，但型別系統或 DB schema 並不保證？用 `bun /Users/user/aladdin/aladdin_ai/skills/db-schema-lookup/db-lookup.ts` 或 `rajah-lookup.ts` 核對欄位實際的 nullable / 型別定義，不要單憑程式碼片段的表面寫法猜測。 |
 | 5 | **修復範圍過廣** | 這次改動影響的輸入範圍，是否比 bug 單描述的情境更廣（例如本來只該修「金額為 0」這個 case，卻連帶改變了「金額為負」的既有行為）？若是，原本正常運作的情境有沒有被連帶破壞的風險？ |
 | 6 | **新的例外路徑** | diff 有沒有引入一個新的、沒被任何測試覆蓋到的 throw / reject 路徑？ |
 | 7 | **邊界情況** | RED 測試涵蓋的情境之外，還有沒有明顯的邊界值（0、負數、極大值、空字串、空陣列）這次修法沒處理好？可以自己起草一個假想輸入在腦中/用 Read 追程式碼驗證邏輯是否還成立（**不寫測試、不執行新程式碼，只用閱讀推導**）。 |

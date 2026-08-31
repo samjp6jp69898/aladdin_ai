@@ -7,7 +7,7 @@ description: 分析指定 service method 的呼叫鏈，支援四種模式：完
 
 使用 Bun script 處理所有確定性操作（grep + 過濾 + BFS + 繼承鏈解析），agent 只負責審核 `needsVerification` 的 case 和最終格式化輸出。
 
-**Scanner script 位置**：`/Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts`
+**Scanner script 位置**：`/Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts`
 
 支援以下模式：
 
@@ -197,7 +197,7 @@ bun call-graph-scanner.ts table-bfs "<server>" '<bfsTargetsJsonArray>'
 ## Scanner 腳本位置
 
 ```
-/Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts
+/Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts
 ```
 
 （也可從 `/Users/user/aladdin/agrabah/.claude/skills/method-call-graph/call-graph-scanner.ts` 執行；兩處都會自動定位 agrabah 根目錄）
@@ -220,9 +220,9 @@ bun call-graph-scanner.ts table-bfs "<server>" '<bfsTargetsJsonArray>'
 
 **只查同 server caller**（最輕量，1 次 script）：
 ```bash
-bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts resolve-method "WalletService.methodGetWallets"
+bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts resolve-method "WalletService.methodGetWallets"
 # 取出輸出後接：
-bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts same-server-callers \
+bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts same-server-callers \
     "/Users/user/aladdin/agrabah/src/servers/wallet/services/wallet.ts" \
     "WalletService" "methodGetWallets" "wallet" \
     --base-class=WalletBaseService --base-method=methodGetWallets

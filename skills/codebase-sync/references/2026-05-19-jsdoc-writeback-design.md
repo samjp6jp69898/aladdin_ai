@@ -184,7 +184,7 @@ def merge_section(source_units, note_units):
 
 ## 輸出
 
-`obsidian/scripts/codebase-index/writeback-report.json`：
+`aladdin_ai/scripts/codebase-index/writeback-report.json`：
 
 ```json
 {
@@ -272,15 +272,15 @@ bun run writeback-jsdoc.ts             # 正式寫
 
 | 檔案 | 用途 |
 |------|------|
-| `obsidian/scripts/codebase-index/writeback-jsdoc.ts` | 主腳本 entry point，CLI 處理、orchestration |
-| `obsidian/scripts/codebase-index/lib/jsdoc-extractor.ts` | 從 source 抓 `/** */` 區塊；輸入：file path + line, 輸出：JSDoc 區塊起訖行 + 內容 |
-| `obsidian/scripts/codebase-index/lib/jsdoc-parser.ts` | 把 JSDoc 區塊切成 section + unit |
-| `obsidian/scripts/codebase-index/lib/note-section-parser.ts` | 把 obsidian 筆記切成 section + unit，含正規化 |
-| `obsidian/scripts/codebase-index/lib/section-merger.ts` | 對單一 section 跑聯集 merge |
-| `obsidian/scripts/codebase-index/lib/jsdoc-renderer.ts` | 把 merged section 渲染成 JSDoc 字串 |
-| `obsidian/scripts/codebase-index/writeback-report.json` | 執行報告（git-ignored） |
+| `aladdin_ai/scripts/codebase-index/writeback-jsdoc.ts` | 主腳本 entry point，CLI 處理、orchestration |
+| `aladdin_ai/scripts/codebase-index/lib/jsdoc-extractor.ts` | 從 source 抓 `/** */` 區塊；輸入：file path + line, 輸出：JSDoc 區塊起訖行 + 內容 |
+| `aladdin_ai/scripts/codebase-index/lib/jsdoc-parser.ts` | 把 JSDoc 區塊切成 section + unit |
+| `aladdin_ai/scripts/codebase-index/lib/note-section-parser.ts` | 把 obsidian 筆記切成 section + unit，含正規化 |
+| `aladdin_ai/scripts/codebase-index/lib/section-merger.ts` | 對單一 section 跑聯集 merge |
+| `aladdin_ai/scripts/codebase-index/lib/jsdoc-renderer.ts` | 把 merged section 渲染成 JSDoc 字串 |
+| `aladdin_ai/scripts/codebase-index/writeback-report.json` | 執行報告（git-ignored） |
 
-修改：`obsidian/scripts/codebase-index/sync-from-git.ts` 在 `runFinalize` 結尾呼叫 writeback-jsdoc，並加 `--skip-writeback` flag handling。
+修改：`aladdin_ai/scripts/codebase-index/sync-from-git.ts` 在 `runFinalize` 結尾呼叫 writeback-jsdoc，並加 `--skip-writeback` flag handling。
 
 ## 測試策略
 

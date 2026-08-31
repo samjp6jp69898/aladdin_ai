@@ -25,7 +25,7 @@ description: 透過 .rajah source 與 server_*.json 即時查 service / method /
 ## 使用方式
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts <subcommand> <args>
+bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts <subcommand> <args>
 ```
 
 輸出永遠是 JSON 到 stdout。每個結果都附 `file:line`，agent 必須直接讀 source 確認，不可只信腳本摘要。
@@ -126,7 +126,7 @@ context.remote.<camelCaseGroupKey>.<camelCaseServiceAlias>.<PascalCaseMethod>(..
 
 ## 給子代理的提示
 
-子代理無法呼叫 `Skill` tool，但可直接 `bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts <subcommand>`。父代理派遣子代理時，請複製此檔的 Subcommand 速查表給它。
+子代理無法呼叫 `Skill` tool，但可直接 `bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts <subcommand>`。父代理派遣子代理時，請複製此檔的 Subcommand 速查表給它。
 
 ## 找不到時怎麼辦
 

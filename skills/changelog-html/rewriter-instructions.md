@@ -67,22 +67,22 @@ i18n-lookup 是這份 skill 與其他 skill 共用的腳本，能從 7 個前端
 
 ```bash
 # 查整個 enum 的所有值
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts enum <EnumName>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts enum <EnumName>
 
 # 查 enum 某個值的中文
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts enum <EnumName> <value>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts enum <EnumName> <value>
 
 # 查 model 欄位
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts model <model-name>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts model <model-name>
 
 # 查 error code 文字
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts error <code>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts error <code>
 
 # 查 i18n key
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts key <key>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts key <key>
 
 # 列出所有支援的前端專案
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts list-projects
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts list-projects
 ```
 
 **典型使用情境：**

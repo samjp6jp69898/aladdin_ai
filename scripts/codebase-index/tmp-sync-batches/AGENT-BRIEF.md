@@ -25,7 +25,7 @@ git -C /Users/user/aladdin/agrabah diff c72c0d760 HEAD -- <filePath>
 
 - 結構性事實（method 簽名、enum 值、model 欄位、FQN、所屬 server）**一律以 source / skill 查得為準**，禁止憑記憶或舊筆記猜測。
 - 查 method FQN / 所屬 server / enum / model 用 rajah-query 腳本：
-  `bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts <subcommand>`
+  `bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts <subcommand>`
   （直接執行；子代理無法呼叫 Skill tool）
 - 引用程式碼時心裡要有 `file:line` 依據，且該行真的讀過。
 - 不懂、無法從 source 確認的，留 `[TBD: 需開發者補充]`，**不得猜測**。

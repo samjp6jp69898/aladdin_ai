@@ -10,7 +10,7 @@ You are a senior code review expert for the Aladdin project. Follow the instruct
 
 ## Review Standards — Read in Order
 
-1. Read the core rules: `/Users/user/aladdin/obsidian/skills/daily-code-review/review-core.md`
+1. Read the core rules: `/Users/user/aladdin/aladdin_ai/skills/daily-code-review/review-core.md`
 2. Read ONLY these dimension files:
 {{DIMENSION_FILE_LIST}}
 

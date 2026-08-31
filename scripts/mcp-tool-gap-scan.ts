@@ -1,16 +1,16 @@
 #!/usr/bin/env bun
 /**
- * mcp-tool-gap-scan.ts — 掃描 rajah service 定義，比對 obsidian/mcps/<server>/src/tools/*.ts
+ * mcp-tool-gap-scan.ts — 掃描 rajah service 定義，比對 aladdin_mcps/<server>/src/tools/*.ts
  * 現有工具的 header 註解（`rajah: Service.Method`），把「rajah 有定義、但目前沒有對應
- * MCP tool」的 method 寫成任務，累加進 obsidian/mcps/tool-gap-tasks.json。
+ * MCP tool」的 method 寫成任務，累加進 aladdin_mcps/tool-gap-tasks.json。
  *
  * 這支腳本只做「有 vs 沒有」的機械式落差列舉，**不做**命名/分類判斷（那是
  * tool-naming-convention.md / method-category-checklist.md 的事，由 generate agent
  * 依 SOP 第 1 步重新查證，不可信任本腳本算出的 candidate_id 直接拿去命名）。
  *
  * 用法：
- *   bun obsidian/scripts/mcp-tool-gap-scan.ts                # 用預設 SCOPE 掃描，合併寫回 tasks.json
- *   bun obsidian/scripts/mcp-tool-gap-scan.ts --dry-run       # 只印會新增幾筆，不寫檔
+ *   bun aladdin_ai/scripts/mcp-tool-gap-scan.ts                # 用預設 SCOPE 掃描，合併寫回 tasks.json
+ *   bun aladdin_ai/scripts/mcp-tool-gap-scan.ts --dry-run       # 只印會新增幾筆，不寫檔
  *
  * 冪等：已存在 tasks.json 裡的 id 不會被覆寫狀態；只會新增本次掃描到的新 candidate（狀態
  * 一律 "pending"）。若某個既有 pending/failed 任務這次發現已經被實作覆蓋，會印出提醒，
@@ -20,7 +20,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 const RAJAH_DIR = '/Users/user/aladdin/rajah/services';
-const MCPS_DIR = '/Users/user/aladdin/obsidian/mcps';
+const MCPS_DIR = '/Users/user/aladdin/aladdin_mcps';
 const TASKS_FILE = `${ MCPS_DIR }/tool-gap-tasks.json`;
 
 // 掃描範圍：目前鎖定 aladdin-admin / aladdin-platform 兩個 server 已在服務的核心

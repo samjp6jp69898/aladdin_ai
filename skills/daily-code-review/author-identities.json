@@ -1,5 +1,5 @@
 {
-  "_comment": "Author 身份消歧單一來源。scan-workload.ts 只讀 merge_emails（把多個 email 合併為同一人，第一個 email 為 canonical key）；其餘段落是給人與 LLM 看的防呆紀錄。修改本檔前先讀 obsidian/skills/daily-code-review/review-core.md 規則 13 與 .claude/doctrine/40-maintenance-protocol.md。歷史來源：daily-code-review.md Step 2.1 與 review-core.md 規則 13 的兩張表（2026-07-03 合併於此，舊表已改為指向本檔）。",
+  "_comment": "Author 身份消歧單一來源。scan-workload.ts 只讀 merge_emails（把多個 email 合併為同一人，第一個 email 為 canonical key）；其餘段落是給人與 LLM 看的防呆紀錄。修改本檔前先讀 aladdin_ai/skills/daily-code-review/review-core.md 規則 13 與 .claude/doctrine/40-maintenance-protocol.md。歷史來源：daily-code-review.md Step 2.1 與 review-core.md 規則 13 的兩張表（2026-07-03 合併於此，舊表已改為指向本檔）。",
   "rules": {
     "identity_key": "一律以完整 email（%ae，小寫比對）為身份鍵，絕不以 %an 或 email prefix 判定同人",
     "display_name": "同一身份鍵下取最近一次 commit 的 %an 作為報告顯示名與檔名",

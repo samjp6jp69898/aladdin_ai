@@ -148,7 +148,7 @@ If the code doesn't match the Tracer's description:
 
 **通用要求**：
 - 至少 1 個 test case 直接對應 tracer 識別的根因情境（RED 的主角），另外 1-4 個 test case（happy path + edge case + 必要時負面情境），一個 fix 通常 2-5 個 test case 足夠
-- 引用的 enum / model 值必須走 `bun /Users/user/aladdin/obsidian/skills/rajah-query/rajah-lookup.ts` 確認,不憑記憶
+- 引用的 enum / model 值必須走 `bun /Users/user/aladdin/aladdin_ai/skills/rajah-query/rajah-lookup.ts` 確認,不憑記憶
 - 每個 `it()` / `test()` 描述要直接對應 tracer 識別的具體場景,例如 `it('returns null when input balance is exactly 0n', ...)` 而非 `it('works correctly', ...)`
 
 **跑測試，確認真的 RED（且是為了對的原因失敗）：**

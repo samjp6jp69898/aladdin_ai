@@ -27,7 +27,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 const ROOT = "/Users/user/aladdin";
-const SKILL_DIR = `${ROOT}/obsidian/skills/daily-code-review`;
+const SKILL_DIR = `${ROOT}/aladdin_ai/skills/daily-code-review`;
 const REPOS = ["agrabah", "abu", "lago", "rajah"] as const;
 const DIM_DIR = `${SKILL_DIR}/dimensions`;
 const DIMENSIONS: Record<string, string[]> = {

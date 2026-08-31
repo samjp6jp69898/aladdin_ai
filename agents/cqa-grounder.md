@@ -15,9 +15,9 @@ permissionMode: bypassPermissions
 
 ## 連線與工具（依 `/Users/user/aladdin/.claude/doctrine/refs/permissions-worktree.md` 的「CQA 實證 Grounding 放行條款」）
 - CQA 唯讀 DB：`bash /Users/user/aladdin/conn/db-cqa-query.sh <db> "<SELECT ...>"`（連線來自 .env，唯讀；只能 SELECT/SHOW/DESC/EXPLAIN）
-- table 在哪個 db / 欄位定義：`bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand>`
+- table 在哪個 db / 欄位定義：`bun /Users/user/aladdin/aladdin_ai/skills/db-schema-lookup/db-lookup.ts <subcommand>`
 - 連線資訊**禁止寫死**，一律靠 cqa-query.sh。
-- Playwright 登入取證（**操作前先 Read `/Users/user/aladdin/obsidian/skills/cqa-site-usage/SKILL.md`**，按其精確選擇器/介面）：
+- Playwright 登入取證（**操作前先 Read `/Users/user/aladdin/aladdin_ai/skills/cqa-site-usage/SKILL.md`**，按其精確選擇器/介面）：
   - 後台：`node /Users/user/aladdin/cqa-e2e/lib/login-backend.cjs <admin|pk-platform|6t-platform>` → 再 `node /Users/user/aladdin/cqa-e2e/lib/capture.cjs <site> <route> <outPrefix>`
   - app（PK，視覺讀碼）：背景跑 `node /Users/user/aladdin/cqa-e2e/lib/login-app.cjs pk-app --phase=capture &`，用 Read 讀印出的 CAPTCHA_AT png 取數字，再 `... --phase=submit --captcha=<數字>`，最後 capture.cjs
   - app（6T，radar）：`node /Users/user/aladdin/cqa-e2e/lib/login-app.cjs 6t-app --phase=capture`（印 GEETEST_ESCALATED 則降級不硬刷）

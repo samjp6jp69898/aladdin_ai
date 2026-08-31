@@ -14,7 +14,7 @@
 
 ## File Structure
 
-**New files (all under `/Users/user/aladdin/obsidian/scripts/codebase-index/`):**
+**New files (all under `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/`):**
 
 | Path | Responsibility | LOC est. |
 |------|----------------|---------:|
@@ -38,8 +38,8 @@
 
 | Path | Change |
 |------|--------|
-| `obsidian/scripts/codebase-index/sync-from-git.ts` | `runFinalize` calls writeback at end + `--skip-writeback` flag |
-| `obsidian/scripts/codebase-index/.gitignore` (create if missing) | Add `writeback-report.json` |
+| `aladdin_ai/scripts/codebase-index/sync-from-git.ts` | `runFinalize` calls writeback at end + `--skip-writeback` flag |
+| `aladdin_ai/scripts/codebase-index/.gitignore` (create if missing) | Add `writeback-report.json` |
 | `.claude/skills/codebase-sync/SKILL.md` | 三階段 → 四階段; add Stage 4 section; add 絕對規則 #6 |
 
 ---
@@ -47,12 +47,12 @@
 ## Task 0: Bootstrap
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/.gitignore`
-- Modify: `/Users/user/aladdin/obsidian/scripts/codebase-index/package.json`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/.gitignore`
+- Modify: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/package.json`
 
 - [ ] **Step 1: Create `.gitignore` for codebase-index scripts**
 
-Write `/Users/user/aladdin/obsidian/scripts/codebase-index/.gitignore`:
+Write `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/.gitignore`:
 
 ```gitignore
 writeback-report.json
@@ -61,7 +61,7 @@ node_modules/
 
 - [ ] **Step 2: Add test script to package.json**
 
-Modify `scripts` section in `/Users/user/aladdin/obsidian/scripts/codebase-index/package.json` to add:
+Modify `scripts` section in `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/package.json` to add:
 
 ```json
 "test": "bun test",
@@ -92,7 +92,7 @@ Final `scripts` block:
 Run:
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test 2>&1 | head -5
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test 2>&1 | head -5
 ```
 
 Expected output: `bun test v1.2.x` + "0 tests" or "no test files matched" (no error). If error → fix before continuing.
@@ -100,7 +100,7 @@ Expected output: `bun test v1.2.x` + "0 tests" or "no test files matched" (no er
 - [ ] **Step 4: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add .gitignore package.json && git commit -m "chore(codebase-index): bootstrap writeback-jsdoc scripts"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add .gitignore package.json && git commit -m "chore(codebase-index): bootstrap writeback-jsdoc scripts"
 ```
 
 ---
@@ -108,8 +108,8 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add .gitignore pac
 ## Task 1: `jsdoc-extractor.ts` — Find `/** */` block in source
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-extractor.ts`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-extractor.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-extractor.ts`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-extractor.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -194,7 +194,7 @@ describe('extractJsdocAbove', () => {
 Run:
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-extractor.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-extractor.test.ts 2>&1 | tail -10
 ```
 
 Expected: all 5 tests fail with `Cannot find module './jsdoc-extractor.ts'`.
@@ -255,7 +255,7 @@ export function extractJsdocAbove(source: string, declarationLine: number): Jsdo
 Run:
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-extractor.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-extractor.test.ts 2>&1 | tail -10
 ```
 
 Expected: `5 pass`, `0 fail`.
@@ -263,7 +263,7 @@ Expected: `5 pass`, `0 fail`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-extractor.ts lib/jsdoc-extractor.test.ts && git commit -m "feat(codebase-index): add jsdoc-extractor for finding /** */ above declarations"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add lib/jsdoc-extractor.ts lib/jsdoc-extractor.test.ts && git commit -m "feat(codebase-index): add jsdoc-extractor for finding /** */ above declarations"
 ```
 
 ---
@@ -271,8 +271,8 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-extr
 ## Task 2: `jsdoc-parser.ts` — Parse JSDoc text into sections + units
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-parser.ts`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-parser.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-parser.ts`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-parser.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -369,7 +369,7 @@ describe('parseJsdoc', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-parser.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-parser.test.ts 2>&1 | tail -10
 ```
 
 Expected: all tests fail with module not found.
@@ -483,7 +483,7 @@ export function parseJsdoc(jsdoc: string): ParsedJsdoc {
 - [ ] **Step 4: Run tests to verify pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-parser.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-parser.test.ts 2>&1 | tail -10
 ```
 
 Expected: `5 pass`, `0 fail`.
@@ -491,7 +491,7 @@ Expected: `5 pass`, `0 fail`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-parser.ts lib/jsdoc-parser.test.ts && git commit -m "feat(codebase-index): add jsdoc-parser to split JSDoc into sections + units"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add lib/jsdoc-parser.ts lib/jsdoc-parser.test.ts && git commit -m "feat(codebase-index): add jsdoc-parser to split JSDoc into sections + units"
 ```
 
 ---
@@ -499,8 +499,8 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-pars
 ## Task 3: `note-section-parser.ts` — Parse obsidian note → same shape
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/note-section-parser.ts`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/note-section-parser.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/note-section-parser.ts`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/note-section-parser.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -609,7 +609,7 @@ describe('parseNote', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/note-section-parser.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/note-section-parser.test.ts 2>&1 | tail -10
 ```
 
 Expected: all fail with module not found.
@@ -757,7 +757,7 @@ export function parseNote(noteContent: string): ParsedJsdoc {
 - [ ] **Step 4: Run tests to verify pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/note-section-parser.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/note-section-parser.test.ts 2>&1 | tail -10
 ```
 
 Expected: `5 pass`, `0 fail`.
@@ -765,7 +765,7 @@ Expected: `5 pass`, `0 fail`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/note-section-parser.ts lib/note-section-parser.test.ts && git commit -m "feat(codebase-index): add note-section-parser with wikilink/backtick/bold normalization"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add lib/note-section-parser.ts lib/note-section-parser.test.ts && git commit -m "feat(codebase-index): add note-section-parser with wikilink/backtick/bold normalization"
 ```
 
 ---
@@ -773,8 +773,8 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/note-secti
 ## Task 4: `section-merger.ts` — Per-section union with source priority
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/section-merger.ts`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/section-merger.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/section-merger.ts`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/section-merger.test.ts`
 
 > **Refinement beyond spec (Task 4):** The spec specifies "bullet-level set union". For the `description` section, splitting by sentence creates a subtle bug in the trackEvent regression case: source's step 15 (with `送 trackEvent`) and note's step 15 (without) have different normalized keys → both would end up in the merged result, producing two "step 15" sentences. To match spec intent ("colleague annotations have higher weight, no regression"), the merger treats `description` as a **single unit** with this rule: if every source sentence (normalized) appears in note's normalized text → use note's description (note improvement, no loss); otherwise → use source's description (preserve colleague additions). Bullet sections (scenarios/rules/notes) use the spec'd set-union.
 
@@ -848,7 +848,7 @@ describe('mergeDescription', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/section-merger.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/section-merger.test.ts 2>&1 | tail -10
 ```
 
 Expected: all tests fail with module not found.
@@ -916,7 +916,7 @@ export function mergeDescription(sourceSentences: string[], noteSentences: strin
 - [ ] **Step 4: Run tests to verify pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/section-merger.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/section-merger.test.ts 2>&1 | tail -10
 ```
 
 Expected: `8 pass`, `0 fail`.
@@ -924,7 +924,7 @@ Expected: `8 pass`, `0 fail`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/section-merger.ts lib/section-merger.test.ts && git commit -m "feat(codebase-index): add section-merger with source-priority union (preserves trackEvent-style edits)"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add lib/section-merger.ts lib/section-merger.test.ts && git commit -m "feat(codebase-index): add section-merger with source-priority union (preserves trackEvent-style edits)"
 ```
 
 ---
@@ -932,8 +932,8 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/section-me
 ## Task 5: `jsdoc-renderer.ts` — Render merged sections back to JSDoc string
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-renderer.ts`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/jsdoc-renderer.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-renderer.ts`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/jsdoc-renderer.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1035,7 +1035,7 @@ describe('renderJsdoc', () => {
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-renderer.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-renderer.test.ts 2>&1 | tail -10
 ```
 
 Expected: all fail with module not found.
@@ -1094,7 +1094,7 @@ export function renderJsdoc(parsed: ParsedJsdoc, indent: string): string {
 - [ ] **Step 4: Run tests to verify pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test lib/jsdoc-renderer.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test lib/jsdoc-renderer.test.ts 2>&1 | tail -10
 ```
 
 Expected: `5 pass`, `0 fail`.
@@ -1102,7 +1102,7 @@ Expected: `5 pass`, `0 fail`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-renderer.ts lib/jsdoc-renderer.test.ts && git commit -m "feat(codebase-index): add jsdoc-renderer for writing sections back to /** */ format"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add lib/jsdoc-renderer.ts lib/jsdoc-renderer.test.ts && git commit -m "feat(codebase-index): add jsdoc-renderer for writing sections back to /** */ format"
 ```
 
 ---
@@ -1110,10 +1110,10 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add lib/jsdoc-rend
 ## Task 6: `writeback-jsdoc.ts` — Orchestrator
 
 **Files:**
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/writeback-jsdoc.ts`
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/test-fixtures/register-source-step15.ts.snippet`
-- Create: `/Users/user/aladdin/obsidian/scripts/codebase-index/lib/test-fixtures/register-note.md`
-- Test: `/Users/user/aladdin/obsidian/scripts/codebase-index/writeback-jsdoc.test.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/writeback-jsdoc.ts`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/test-fixtures/register-source-step15.ts.snippet`
+- Create: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/lib/test-fixtures/register-note.md`
+- Test: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/writeback-jsdoc.test.ts`
 
 - [ ] **Step 1: Create fixtures**
 
@@ -1240,7 +1240,7 @@ describe('runWriteback (trackEvent regression case)', () => {
 - [ ] **Step 3: Run integration test to verify it fails**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test writeback-jsdoc.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test writeback-jsdoc.test.ts 2>&1 | tail -10
 ```
 
 Expected: all 3 tests fail with module not found.
@@ -1459,7 +1459,7 @@ if (import.meta.path === Bun.main) {
 - [ ] **Step 5: Run integration test to verify pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test writeback-jsdoc.test.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test writeback-jsdoc.test.ts 2>&1 | tail -10
 ```
 
 Expected: `3 pass`, `0 fail`. If any test fails, debug before committing.
@@ -1467,7 +1467,7 @@ Expected: `3 pass`, `0 fail`. If any test fails, debug before committing.
 - [ ] **Step 6: Verify all tests still pass together**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test 2>&1 | tail -10
 ```
 
 Expected: 26 pass total (5+5+5+8+5+3), 0 fail.
@@ -1475,7 +1475,7 @@ Expected: 26 pass total (5+5+5+8+5+3), 0 fail.
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add writeback-jsdoc.ts writeback-jsdoc.test.ts lib/test-fixtures/ && git commit -m "feat(codebase-index): add writeback-jsdoc orchestrator for Stage 4 (source-priority merge, prevents trackEvent regression)"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add writeback-jsdoc.ts writeback-jsdoc.test.ts lib/test-fixtures/ && git commit -m "feat(codebase-index): add writeback-jsdoc orchestrator for Stage 4 (source-priority merge, prevents trackEvent regression)"
 ```
 
 ---
@@ -1483,12 +1483,12 @@ cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add writeback-jsdo
 ## Task 7: Integrate Stage 4 into `sync-from-git.ts --finalize`
 
 **Files:**
-- Modify: `/Users/user/aladdin/obsidian/scripts/codebase-index/sync-from-git.ts`
+- Modify: `/Users/user/aladdin/aladdin_ai/scripts/codebase-index/sync-from-git.ts`
 
 - [ ] **Step 1: Read current `runFinalize` to understand where to plug in**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && grep -n "runFinalize\|--finalize\|--skip-writeback" sync-from-git.ts | head -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && grep -n "runFinalize\|--finalize\|--skip-writeback" sync-from-git.ts | head -10
 ```
 
 Read the file around `runFinalize` to find the right insertion point (end of the function, before any state-saving step or after if it makes sense to write report alongside other state files).
@@ -1552,7 +1552,7 @@ export async function loadProcessedActions(): Promise<WritebackAction[]> {
 - [ ] **Step 5: Run sync-from-git with --dry-run and --finalize on empty state to smoke test**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun run sync-from-git.ts --finalize 2>&1 | tail -20
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun run sync-from-git.ts --finalize 2>&1 | tail -20
 ```
 
 Expected: existing finalize steps run, then `--- Stage 4 ---` appears with summary (likely `0 files modified` if no actions are status=processed currently). No error.
@@ -1560,7 +1560,7 @@ Expected: existing finalize steps run, then `--- Stage 4 ---` appears with summa
 - [ ] **Step 6: Verify --skip-writeback works**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun run sync-from-git.ts --finalize --skip-writeback 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun run sync-from-git.ts --finalize --skip-writeback 2>&1 | tail -10
 ```
 
 Expected: see `--- Stage 4: SKIPPED (--skip-writeback) ---`.
@@ -1568,7 +1568,7 @@ Expected: see `--- Stage 4: SKIPPED (--skip-writeback) ---`.
 - [ ] **Step 7: Verify lib tests still pass**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun test 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun test 2>&1 | tail -10
 ```
 
 Expected: 26 pass, 0 fail.
@@ -1576,7 +1576,7 @@ Expected: 26 pass, 0 fail.
 - [ ] **Step 8: Commit**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && git add sync-from-git.ts writeback-jsdoc.ts && git commit -m "feat(codebase-index): auto-run Stage 4 writeback at end of --finalize (--skip-writeback opts out)"
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && git add sync-from-git.ts writeback-jsdoc.ts && git commit -m "feat(codebase-index): auto-run Stage 4 writeback at end of --finalize (--skip-writeback opts out)"
 ```
 
 ---
@@ -1656,7 +1656,7 @@ bun run writeback-jsdoc.ts             # 正式寫回
 - 跳過率 > 30% → 印 warning（但仍寫出已處理的部分）
 - 冪等：對相同 working tree 連跑兩次，第二次應全部 `unchanged`
 
-**輸出**：`obsidian/scripts/codebase-index/writeback-report.json`（git-ignored），包含 modified / unchanged / skipped 三個清單。
+**輸出**：`aladdin_ai/scripts/codebase-index/writeback-report.json`（git-ignored），包含 modified / unchanged / skipped 三個清單。
 ```
 
 Replacement 4 — add 絕對規則 #6:
@@ -1702,7 +1702,7 @@ Expected: grep returns one match in the `methodRegister` JSDoc (`送 trackEvent(
 Save current `pending-actions.json` aside, then write a minimal one:
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && cp pending-actions.json pending-actions.json.bak 2>/dev/null || true
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && cp pending-actions.json pending-actions.json.bak 2>/dev/null || true
 ```
 
 Write `pending-actions.json` (replace existing) with:
@@ -1728,7 +1728,7 @@ Write `pending-actions.json` (replace existing) with:
 - [ ] **Step 3: Dry-run Stage 4**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun run writeback-jsdoc.ts --dry-run 2>&1 | tail -20
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun run writeback-jsdoc.ts --dry-run 2>&1 | tail -20
 ```
 
 Expected:
@@ -1740,7 +1740,7 @@ Expected:
 - [ ] **Step 4: Live run + verify `送 trackEvent` survives**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun run writeback-jsdoc.ts 2>&1 | tail -10
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun run writeback-jsdoc.ts 2>&1 | tail -10
 ```
 
 Then:
@@ -1762,7 +1762,7 @@ Inspect manually: any diff should be **additions from note** (Stage 2 improvemen
 - [ ] **Step 6: Idempotence check — re-run Stage 4**
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && bun run writeback-jsdoc.ts 2>&1 | tail -5
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && bun run writeback-jsdoc.ts 2>&1 | tail -5
 ```
 
 Expected: `0 files modified`, `1 unchanged`.
@@ -1772,7 +1772,7 @@ Expected: `0 files modified`, `1 unchanged`.
 Restore the original `pending-actions.json` if backed up:
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index && [ -f pending-actions.json.bak ] && mv pending-actions.json.bak pending-actions.json || rm -f pending-actions.json
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index && [ -f pending-actions.json.bak ] && mv pending-actions.json.bak pending-actions.json || rm -f pending-actions.json
 ```
 
 Discard any test changes in agrabah (the test was just verification, real merge will happen on next sync):

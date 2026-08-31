@@ -120,7 +120,7 @@
     - (a) **先用 email 查 git**，確認 commits 實際屬於該人；
     - (b) 再用 email 確認既有 `<%an>_YYYYMMDD.md` 檔案的身份（讀檔內既有 agrabah/abu/lago/rajah 段的 commit hash，反查 `%ae`）；
     - (c) 若既有檔案的 `%ae` 與目前要補的 commits 的 `%ae` 不一致，**絕對不可 append，必須另開新檔**。
-    已知混淆對（同人多 email、同名不同人）的**單一事實源**：`obsidian/skills/daily-code-review/author-identities.json`（發現新亂象請更新該檔，不要在本檔或 command 檔另立清單）。`pkh_<name>` 形式的 email prefix **不保證** 等於 git `%an`；永遠以 `%ae` 為準。
+    已知混淆對（同人多 email、同名不同人）的**單一事實源**：`aladdin_ai/skills/daily-code-review/author-identities.json`（發現新亂象請更新該檔，不要在本檔或 command 檔另立清單）。`pkh_<name>` 形式的 email prefix **不保證** 等於 git `%an`；永遠以 `%ae` 為準。
 14. **每位 author 的報告寫完後，必須立刻寫對應的 critical-issues 檔**（路徑與格式見派工 prompt 的 Authors & Output Files 表與 Execution Steps 第 6 步）：只收錄該報告 Issue List 中的 P0/P1；無則寫 `none`。此檔兼作該 author 的完成 marker，之後由 `collect-critical.ts` 聚合成 CSV — **不寫此檔＝該 author 視同未完成**。
 
 ---

@@ -7,14 +7,14 @@
  * 覆蓋」的一次性盤點報告，給人看全貌、決定要不要擴大 mcp-tool-gap-scan.ts 的 SCOPE，
  * 不會自動產生任務、不會判斷分類/命名（那些交給 generate agent 逐案處理）。
  *
- * 用法：bun obsidian/scripts/mcp-rajah-inventory-scan.ts [--out=<path>]
+ * 用法：bun aladdin_ai/scripts/mcp-rajah-inventory-scan.ts [--out=<path>]
  *   預設輸出到 stdout；--out 可指定另外寫一份 markdown 檔案。
  */
 
 import { readFileSync, readdirSync } from 'fs';
 
 const RAJAH_DIR = '/Users/user/aladdin/rajah/services';
-const MCPS_DIR = '/Users/user/aladdin/obsidian/mcps';
+const MCPS_DIR = '/Users/user/aladdin/aladdin_mcps';
 
 type Method = { name: string; line: number; isPlaceholder: boolean };
 type ServiceBlock = { file: string; service: string; methods: Method[] };

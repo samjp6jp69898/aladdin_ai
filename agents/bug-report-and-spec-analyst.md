@@ -178,7 +178,7 @@ Phase A 的 analytics.md 已經寫入磁碟。現在你是規格檢索專家：�
 使用專案內的 `notion.sh` 腳本存取 Notion API（Token 已內建於腳本中）：
 
 ```bash
-NOTION_SH="/Users/user/aladdin/obsidian/scripts/notion.sh"
+NOTION_SH="/Users/user/aladdin/aladdin_ai/scripts/notion.sh"
 ```
 
 **Notion 總需求池資料庫（Planning Database）ID:** `21d87d78618a806ea8d7ea43d37e9f55`
@@ -229,7 +229,7 @@ NOTION_API_VER="2022-06-28"
 > Search API 會搜尋整個 workspace 且**無法可靠地定位到總需求池資料庫內的頁面**（實測搜「OTP」8 筆結果全部落在 Bug List DB、planning DB 一筆都沒有）。因此禁用 Search API，全面改用 Database Query 對「標題」欄位做 `contains` 查詢。
 
 ```bash
-NOTION_SH="/Users/user/aladdin/obsidian/scripts/notion.sh"
+NOTION_SH="/Users/user/aladdin/aladdin_ai/scripts/notion.sh"
 ALD_NOTION_TOKEN=$(grep '^ALD_NOTION_TOKEN=' "$NOTION_SH" | cut -d'"' -f2)
 
 curl -s -X POST "https://api.notion.com/v1/databases/21d87d78618a806ea8d7ea43d37e9f55/query" \
@@ -257,7 +257,7 @@ curl -s -X POST "https://api.notion.com/v1/databases/21d87d78618a806ea8d7ea43d37
 對每個候選頁面，用 notion.sh 讀取 blocks：
 
 ```bash
-bash /Users/user/aladdin/obsidian/scripts/notion.sh fetch-blocks {page_id}
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh fetch-blocks {page_id}
 ```
 
 #### 判斷頁面類型
@@ -286,7 +286,7 @@ bash /Users/user/aladdin/obsidian/scripts/notion.sh fetch-blocks {page_id}
 
 ```bash
 # 展開某個 child_page（block id 即為子頁面 page_id）
-bash /Users/user/aladdin/obsidian/scripts/notion.sh fetch-blocks {child_page_id}
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh fetch-blocks {child_page_id}
 ```
 
 從容器頁面與展開後的子頁面中，擷取所有 `heading_*`、`paragraph`、`bulleted_list_item`、`numbered_list_item`、`to_do`、`table`（含 `table_row`）、`toggle`、`quote`、`callout` 類型 block 的 `rich_text` 純文字內容。

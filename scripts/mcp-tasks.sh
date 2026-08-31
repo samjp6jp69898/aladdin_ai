@@ -19,12 +19,12 @@
 #   bash scripts/mcp-tasks.sh retry <id>                  # failed/needs_clarification -> pending（人工決定重跑）
 #   bash scripts/mcp-tasks.sh counts                      # 各狀態統計
 set -u
-TASKS="${TASKS_FILE:-/Users/user/aladdin/obsidian/mcps/tool-gap-tasks.json}"
+TASKS="${TASKS_FILE:-/Users/user/aladdin/aladdin_mcps/tool-gap-tasks.json}"
 LOCKDIR="/tmp/mcp-tasks-locks"
 LOCK="$LOCKDIR/.tasks-set-lock"
 ACTION="${1:-}"
 
-[ -f "$TASKS" ] || { echo "ERROR: tasks.json 不存在: ${TASKS} (先跑 bun obsidian/scripts/mcp-tool-gap-scan.ts)"; exit 1; }
+[ -f "$TASKS" ] || { echo "ERROR: tasks.json 不存在: ${TASKS} (先跑 bun aladdin_ai/scripts/mcp-tool-gap-scan.ts)"; exit 1; }
 command -v jq >/dev/null || { echo "ERROR: 需要 jq"; exit 1; }
 
 # 檔級自旋鎖：mkdir 的原子性保證同時只有一個 process 能進臨界區，跟 tracker.sh 同款做法。

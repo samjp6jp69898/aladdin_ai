@@ -102,16 +102,16 @@ for change in input-<VER>.json:
 - 從 diff 找出**本 commit 修改**的 service class + method（這部分**不寫進 impact**，是「自己」）
 - 跑 method-call-graph 找**非本 commit 修改**的 caller：
   ```
-  bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts local <ServiceClass>.<method>
+  bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts local <ServiceClass>.<method>
   ```
   output 中**移除**本次 commit 內變動過的檔案，剩下的才是真正「連帶影響」對象。
 - 若該 method 是 RPC handler，加跑：
   ```
-  bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts cross <ServiceClass>.<method>
+  bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts cross <ServiceClass>.<method>
   ```
 - 若該 commit 動了 DB table 結構 / enum / 共用 schema，跑：
   ```
-  bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts table <table_name>
+  bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts table <table_name>
   ```
   特別注意「**讀**這張表 / 用這個 enum 的其他 service」← 這些就是「下游消費者」
 - 解析輸出：列出**真正屬於「其他人」** 的 caller / consumer / table reader
@@ -121,7 +121,7 @@ for change in input-<VER>.json:
 - 從 diff 找出修改的 `.rajah` service + method / enum / model
 - 跑：
   ```
-  bun /Users/user/aladdin/obsidian/skills/method-call-graph/call-graph-scanner.ts cross <ServiceClass>.<method>
+  bun /Users/user/aladdin/aladdin_ai/skills/method-call-graph/call-graph-scanner.ts cross <ServiceClass>.<method>
   ```
 - 列出：
   - 哪些後端 server 透過 gRPC client 呼叫這個 method（**這些 client 端如果沒在本次 commit 內被更新就會壞掉**）

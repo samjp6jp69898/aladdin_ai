@@ -47,7 +47,7 @@ JSON 是 flat 結構（除少數例外），top-level section 通常包含：
 ## 使用方式
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts <subcommand> <args>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts <subcommand> <args>
 ```
 
 輸出永遠是 JSON 到 stdout，包含 `{ project, locale, value, file, jqPath }`。
@@ -124,7 +124,7 @@ bun i18n-lookup.ts key permission.activity
 
 子代理可直接執行：
 ```bash
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts <subcommand>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts <subcommand>
 ```
 不需要 Skill tool。
 

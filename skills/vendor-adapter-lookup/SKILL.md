@@ -43,7 +43,7 @@ description: 從 source 即時查 3rd-party vendor adapter 位置、entry points
 ## 使用方式
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/vendor-adapter-lookup/vendor-lookup.ts <subcommand> <args>
+bun /Users/user/aladdin/aladdin_ai/skills/vendor-adapter-lookup/vendor-lookup.ts <subcommand> <args>
 ```
 
 輸出永遠是 JSON 到 stdout。
@@ -111,7 +111,7 @@ bun vendor-lookup.ts locate ab
 
 子代理可直接執行：
 ```bash
-bun /Users/user/aladdin/obsidian/skills/vendor-adapter-lookup/vendor-lookup.ts <subcommand>
+bun /Users/user/aladdin/aladdin_ai/skills/vendor-adapter-lookup/vendor-lookup.ts <subcommand>
 ```
 不需要 Skill tool。
 

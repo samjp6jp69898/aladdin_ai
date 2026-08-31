@@ -43,7 +43,7 @@ description: 從 migrations SQL 與 src/database_types ORM class 即時查 DB ta
 ## 使用方式
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand> <args>
+bun /Users/user/aladdin/aladdin_ai/skills/db-schema-lookup/db-lookup.ts <subcommand> <args>
 ```
 
 輸出永遠是 JSON 到 stdout。每個結果都附 `file:line`，agent 必須直接讀 source 確認，不要只信摘要。
@@ -103,7 +103,7 @@ bun db-lookup.ts find-table user_wallet
 
 子代理可直接執行：
 ```bash
-bun /Users/user/aladdin/obsidian/skills/db-schema-lookup/db-lookup.ts <subcommand>
+bun /Users/user/aladdin/aladdin_ai/skills/db-schema-lookup/db-lookup.ts <subcommand>
 ```
 不需要 Skill tool。
 

@@ -10,7 +10,7 @@ description: "根據 git 歷史紀錄增量更新 Obsidian Codebase 知識庫筆
 ## 前置條件
 
 - `obsidian/Codebase/` 目錄已存在（由初始建構 pipeline 產生）
-- `obsidian/scripts/codebase-index/` 下的腳本已安裝依賴（`bun install`）
+- `aladdin_ai/scripts/codebase-index/` 下的腳本已安裝依賴（`bun install`）
 - **agrabah、rajah 兩個 repo 都必須 checkout 在 `dev` 分支**：`sync-from-git.ts`（`--finalize` 以外的模式）執行前會自動檢查，若非 `dev` 會直接中止並印出 `git checkout dev` 提示，不會自動切換分支。這是為了避免把 `feature/*` 等尚未合併進 `dev` 的 commit 內容當成「當前事實」寫進知識庫（2026-07-01 踩坑：agrabah 誤留在 `uat` 分支，同步把尚未上 dev 的 commit 也寫進了筆記）。
 
 ## 快速參考
@@ -25,7 +25,7 @@ description: "根據 git 歷史紀錄增量更新 Obsidian Codebase 知識庫筆
 | `bun run sync-from-git.ts --since="2026-04-24" --until="2026-04-25"` | 指定時間範圍 |
 | `bun run sync-from-git.ts --commits=abc1234,def5678` | 指定特定 commit |
 
-所有指令的工作目錄：`obsidian/scripts/codebase-index/`
+所有指令的工作目錄：`aladdin_ai/scripts/codebase-index/`
 
 ## 完整工作流程（四階段）
 
@@ -44,7 +44,7 @@ Stage 1: sync-from-git.ts          Stage 2: AI Agent 處理          Stage 3: --
 ### Stage 1：收集變更並分類
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --dry-run  # 先預覽
 bun run sync-from-git.ts            # 正式執行
 ```
@@ -134,7 +134,7 @@ bun run writeback-jsdoc.ts             # 正式寫回
 - 跳過率 > 30% → 印 warning（但仍寫出已處理的部分）
 - 冪等：對相同 working tree 連跑兩次，第二次應全部 `unchanged`
 
-**輸出**：`obsidian/scripts/codebase-index/writeback-report.json`（git-ignored），包含 modified / unchanged / skipped 三個清單。
+**輸出**：`aladdin_ai/scripts/codebase-index/writeback-report.json`（git-ignored），包含 modified / unchanged / skipped 三個清單。
 
 ## 關鍵檔案
 
@@ -216,7 +216,7 @@ Stage 2 處理時只處理 `status === "pending"` 的 action，處理完逐條�
 ### 場景 1：每日例行同步
 
 ```bash
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --dry-run   # 看有多少變更
 bun run sync-from-git.ts             # 產生 pending-actions.json
 # → AI 處理 pending actions（Stage 2）

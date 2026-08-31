@@ -16,7 +16,7 @@
 
 import { readFile, writeFile } from 'node:fs/promises';
 
-const PROGRESS_PATH = '/Users/user/aladdin/obsidian/scripts/codebase-index/scan-progress.json';
+const PROGRESS_PATH = '/Users/user/aladdin/aladdin_ai/scripts/codebase-index/scan-progress.json';
 
 async function load(): Promise<any> {
     return JSON.parse(await readFile(PROGRESS_PATH, 'utf-8'));

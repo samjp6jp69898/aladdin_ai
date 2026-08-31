@@ -98,7 +98,7 @@ mkdir -p /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
 Dispatch ONE agent:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-ticket-collector.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-ticket-collector.md as your instructions.
 
 Parameters:
 - NotionURL: {url from tracker}
@@ -114,7 +114,7 @@ Wait for completion. Verify `/Users/user/aladdin/obsidian/Debug/backtest-staging
 Dispatch ONE agent:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-commit-analyzer.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-commit-analyzer.md as your instructions.
 
 Parameters:
 - staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}
@@ -129,7 +129,7 @@ Wait for completion. Verify `/Users/user/aladdin/obsidian/Debug/backtest-staging
 Dispatch ONE agent:
 
 ```
-Read all text in /Users/user/aladdin/obsidian/agents/backtest-comparator.md as your instructions.
+Read all text in /Users/user/aladdin/aladdin_ai/agents/backtest-comparator.md as your instructions.
 
 Parameters:
 - staging_dir: /Users/user/aladdin/obsidian/Debug/backtest-staging/{ticket_id}

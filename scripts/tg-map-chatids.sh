@@ -33,7 +33,7 @@
 #     （移除白名單只是延後生效到下次重啟，非新增授權，風險方向不同，故未比照處理）。
 set -uo pipefail
 
-CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/obsidian/commands/create-mr/references/tech-users.csv}"
+CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv}"
 
 usage(){
   cat >&2 <<'U'

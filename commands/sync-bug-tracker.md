@@ -25,13 +25,13 @@ user-invocable: true
 
 ```bash
 # 預設：只檢查本地 obsidian/Debug/FAQ-* 有資料夾的 ticket（省 API 配額）
-python3 /Users/user/aladdin/obsidian/scripts/sync-bug-tracker.py --only-local
+python3 /Users/user/aladdin/aladdin_ai/scripts/sync-bug-tracker.py --only-local
 
 # 全量掃描：對 tracker 中所有非 done 的 ticket 都打 Notion API（慢，但最完整）
-python3 /Users/user/aladdin/obsidian/scripts/sync-bug-tracker.py
+python3 /Users/user/aladdin/aladdin_ai/scripts/sync-bug-tracker.py
 
 # 預檢：只列差異不寫入
-python3 /Users/user/aladdin/obsidian/scripts/sync-bug-tracker.py --dry-run --only-local
+python3 /Users/user/aladdin/aladdin_ai/scripts/sync-bug-tracker.py --dry-run --only-local
 ```
 
 預設以 `--only-local` 執行即可（跨機同步情境下 obsidian repo 已將分析資料夾
@@ -50,4 +50,4 @@ python3 /Users/user/aladdin/obsidian/scripts/sync-bug-tracker.py --dry-run --onl
 
 - Tracker：`/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md`
 - 分析產物：`/Users/user/aladdin/obsidian/Debug/FAQ-{id}/`
-- 腳本實作：`/Users/user/aladdin/obsidian/scripts/sync-bug-tracker.py`
+- 腳本實作：`/Users/user/aladdin/aladdin_ai/scripts/sync-bug-tracker.py`

@@ -10,7 +10,7 @@ description: CQA 測試站（PK/6T app、admin、PK/6T platform）的 Playwright
 ## 共通事實
 - Playwright：`/Users/user/aladdin/cqa-e2e/node_modules/playwright`（chromium 已裝）
 - lib：`/Users/user/aladdin/cqa-e2e/lib/{env,login-backend,login-app,capture}.cjs`
-- **只需驗證登入、不接續截圖取證**：優先走統一入口 `/Users/user/aladdin/conn/{admin,platform,app,archery}-login.sh`（用法見 `/Users/user/aladdin/obsidian/conn/README.md`）
+- **只需驗證登入、不接續截圖取證**：優先走統一入口 `/Users/user/aladdin/conn/{admin,platform,app,archery}-login.sh`（用法見 `/Users/user/aladdin/aladdin_ai/conn/README.md`）
 - **登入後要接續 `capture.cjs` 導頁截圖**：仍用本節「lib 介面」的 `cqa-e2e/lib/{login-backend,login-app}.cjs`，因為 `capture.cjs` 讀的 storageState 路徑是 `cqa-e2e/sessions/<site>-state.json`，與 `conn/*.sh` 產出的路徑（`cqa-e2e/conn/artifacts/` 或 `cqa-e2e/verify/`）不同——此為 `conn/README.md`「相關」一節記載的既有設計取捨，非疏漏，**兩邊產出的 state.json 不可互用**
 - 登入態 storageState：`/Users/user/aladdin/cqa-e2e/sessions/<site>-state.json`（可被 capture 重用）
 - **登入態判定一律看 localStorage key `lt`（JWT）非空**（不是 cookie；abu `common/api/auth.ts` 的 LOGIN_TOKEN_KEY='lt'）
@@ -31,7 +31,7 @@ description: CQA 測試站（PK/6T app、admin、PK/6T platform）的 Playwright
 
 > 以下是「登入 + 接續 `capture.cjs` 導頁截圖」的完整流程。若只是要一次性確認站台能不能登入、不需要後續截圖，
 > 改用統一入口 `/Users/user/aladdin/conn/admin-login.sh` / `platform-login.sh` / `app-login.sh` / `archery-login.sh`
-> （見 `/Users/user/aladdin/obsidian/conn/README.md`）；它們產出的 state.json 路徑與這裡不同，**不相容於 `capture.cjs`**。
+> （見 `/Users/user/aladdin/aladdin_ai/conn/README.md`）；它們產出的 state.json 路徑與這裡不同，**不相容於 `capture.cjs`**。
 
 ### 後台站（無驗證碼，純腳本）
 ```bash

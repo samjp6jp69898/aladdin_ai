@@ -68,7 +68,7 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 **FAQ-[XXXX] → Notion bug ticket 連結（強制）**：當 commit / change 帶 `FAQ-[XXXX]` 工單號時，**必須**附上對應的 Notion bug ticket 連結。Notion bug 資料庫的「單號」屬性（`unique_id`）即 FAQ 編號，一律透過 `notion.sh`（禁止手寫含 token 的 curl）查 url：
 
 ```bash
-bash /Users/user/aladdin/obsidian/scripts/notion.sh query-datasource \
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh query-datasource \
   21c87d78-618a-817f-ae71-000baa9ab11b \
   '{"property":"單號","unique_id":{"equals":<編號數字>}}'
 ```
@@ -110,7 +110,7 @@ token 由 `notion.sh` 內部從 `/Users/user/aladdin/.env` 的 `ALD_NOTION_TOKEN
 2. 看 `git diff --stat` 的檔案路徑分群
 3. 挑代表檔讀 JSDoc / Vue script setup comment
 4. 補 obsidian/Projects/_index.md 業務脈絡
-5. i18n key 反查：`bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts key <key>`
+5. i18n key 反查：`bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts key <key>`
 6. 禁止讀 localizations/*.json、禁止改任何程式碼
 
 客戶可讀標準：
@@ -332,15 +332,15 @@ node /Users/user/aladdin/.claude/skills/changelog-html/merge-impact.js \
 
 ```bash
 # 查整個 enum 的所有值
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts enum <EnumName>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts enum <EnumName>
 # 查 enum 某個值
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts enum <EnumName> <value>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts enum <EnumName> <value>
 # 查 model 欄位
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts model <model-name>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts model <model-name>
 # 查 error code
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts error <code>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts error <code>
 # 查 i18n key
-bun /Users/user/aladdin/obsidian/skills/i18n-lookup/i18n-lookup.ts key <key>
+bun /Users/user/aladdin/aladdin_ai/skills/i18n-lookup/i18n-lookup.ts key <key>
 ```
 
 範例：worker 寫 `EventCategoryEnum` 三組大幅縮減重整  
@@ -460,13 +460,13 @@ Notion 頁面：`https://app.notion.com/p/2df87d78618a80de997cf73896b6bd5b`（�
 
 ```bash
 # 1. 上傳檔案，取得 file_upload id（單一 HTML 檔遠小於 20MB，用 single_part 即可）
-bash /Users/user/aladdin/obsidian/scripts/notion.sh upload-file \
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh upload-file \
   "/Users/user/aladdin/obsidian/Projects/changelog/Release Changelog <YYYY-MMDD>.html" \
   "text/html"
 # 回傳 JSON 裡的 "id" 欄位即 <upload_id>，同時確認 "status":"uploaded"
 
 # 2. 用 upload_id 建立 database 新頁面
-bash /Users/user/aladdin/obsidian/scripts/notion.sh create-page \
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh create-page \
   37d87d78-618a-80a1-9aad-000b02c4f2cf \
   '{"標題":{"title":[{"text":{"content":"<版本號，如 0714>"}}]},"更新日期":{"date":{"start":"<YYYY-MM-DD>"}},"html檔案":{"files":[{"type":"file_upload","file_upload":{"id":"<upload_id>"},"name":"Release Changelog <YYYY-MMDD>.html"}]}}'
 ```
@@ -474,7 +474,7 @@ bash /Users/user/aladdin/obsidian/scripts/notion.sh create-page \
 完成後跑一次 `query-datasource` 用標題過濾確認新列存在且檔案已附上：
 
 ```bash
-bash /Users/user/aladdin/obsidian/scripts/notion.sh query-datasource \
+bash /Users/user/aladdin/aladdin_ai/scripts/notion.sh query-datasource \
   37d87d78-618a-80a1-9aad-000b02c4f2cf \
   '{"property":"標題","title":{"equals":"<版本號>"}}'
 ```

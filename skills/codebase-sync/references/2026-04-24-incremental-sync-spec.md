@@ -192,7 +192,7 @@ message 含 low_signal_keywords?
 
 ```bash
 # 1. 跑 Stage 1（收集 + 分類）
-cd /Users/user/aladdin/obsidian/scripts/codebase-index
+cd /Users/user/aladdin/aladdin_ai/scripts/codebase-index
 bun run sync-from-git.ts --since=yesterday
 
 # 2. 讀取 pending-actions.json，用 Claude Code 派 agent 處理

@@ -68,7 +68,7 @@ ls -t /Users/user/aladdin/worktrees/.create-mrs-run-*.md | head -1   # 找到本
 
 ## Notes
 
-1. 單源紀律：只讀 tracker（經 `tracker.sh`），不直接查 Notion。要補新單先跑 `bun obsidian/scripts/notion-bug-query-v2.ts`。
+1. 單源紀律：只讀 tracker（經 `tracker.sh`），不直接查 Notion。要補新單先跑 `bun aladdin_ai/scripts/notion-bug-query-v2.ts`。
 2. 鎖目錄 `/tmp/bug-analysis-locks/` 與 `/analyze-bugs` 共用；`rerun` 單兩邊都可領，靠原子鎖去重，`/create-mr` 內部已處理。
 3. 序列執行：一次一張，等 `/create-mr` 完全結束才進下一張（每張 20–40 分鐘）。
 4. 舊版行為差異（2026-07-03 v2）：本指令**不再**預先 claim / 標 in_progress——舊做法會讓 `/create-mr` Step 0.1 看到「已被鎖、狀態不對」而自我 SKIP，屬邏輯矛盾，勿回退。
