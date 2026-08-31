@@ -104,10 +104,16 @@ if [ "$ACTION" = "create" ]; then
 
   for repo in $REPOS; do
     echo "== worktree: $repo =="
-    git -C "$ROOT/$repo" fetch origin dev --quiet 2>/dev/null || echo "  警告：fetch origin dev 失敗，改用本地既有 ref"
+    # 基準一律 origin/main：Step 1 掃描讀的是 ROOT/<repo>（主 repo 目前 checkout 的內容，
+    # 2026-08-31 實測四個主 repo 皆與 origin/main 同一個 commit），實測環境必須跟掃描到的
+    # 是同一份狀態，baseline→after 的比對才有意義。過去曾用 origin/dev 當基準，但 dev 常態
+    # 領先 main（已合併尚未 cherry-pick 回 main 的修補），會導致「升版前基準線」其實已經是
+    # 修好的版本，測不出真正待修的狀態（2026-08-31 踩過：lago 的 dompurify 在 dev 已升級，
+    # main 仍是待修版本，用 dev 建 worktree 完全測不出這個漏洞）。
+    git -C "$ROOT/$repo" fetch origin main --quiet 2>/dev/null || echo "  警告：fetch origin main 失敗，改用本地既有 ref"
     git -C "$ROOT/$repo" worktree remove "$BASE/$repo" --force 2>/dev/null
     git -C "$ROOT/$repo" worktree prune 2>/dev/null
-    BASEREF=origin/dev
+    BASEREF=origin/main
     git -C "$ROOT/$repo" rev-parse --verify --quiet "$BASEREF" >/dev/null || BASEREF=HEAD
     # --detach：不建分支，實測環境不可能被 push
     if ! git -C "$ROOT/$repo" worktree add --detach "$BASE/$repo" "$BASEREF" >/dev/null 2>&1; then

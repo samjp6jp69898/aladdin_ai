@@ -130,7 +130,7 @@ function card(f: any) {
       <tr><th>升版幅度</th><td>${esc(rec.bumpType ?? "—")}${rec.crossMajor ? ' <span class="badge b-warn">跨 major</span>' : ""}</td></tr>
       <tr><th>同 major 內可解</th><td>${rec.sameMajorFix ? `<span class="badge b-ok">是 → ${esc(rec.sameMajorFix)}</span>` : '<span class="badge b-warn">否，必須跨 major</span>'}</td></tr>
       <tr><th>registry 最新版</th><td class="mono">${esc(rec.latest ?? "—")}</td></tr>
-      <tr><th>engines</th><td class="mono">${c.engines ? esc(JSON.stringify(c.engines)) : "未宣告"} ${c.engineNodeOk === false ? '<span class="badge b-bad">本機 Node 不符</span>' : c.engineNodeOk === true ? '<span class="badge b-ok">本機 Node 相符</span>' : ""}</td></tr>
+      <tr><th>engines</th><td class="mono">${c.engines ? esc(JSON.stringify(c.engines)) : "未宣告"} ${c.engineNodeOk === false ? '<span class="badge b-bad">Node 版本不符</span>' : c.engineNodeOk === true ? '<span class="badge b-ok">Node 版本相符</span>' : ""}</td></tr>
       <tr><th>目標版 peerDependencies</th><td class="mono">${c.peerDependencies ? esc(JSON.stringify(c.peerDependencies)) : "無"}</td></tr>
       <tr><th>已棄用</th><td>${c.deprecated ? `<span class="badge b-bad">${esc(c.deprecated)}</span>` : "否"}</td></tr>
       <tr><th>反向 peer 阻擋</th><td>${blocking.length
@@ -163,7 +163,7 @@ function card(f: any) {
       </div>
       ${run.codeChangesNeeded?.length ? `<h6>升版需連帶修改的程式碼</h6><ul>${run.codeChangesNeeded.map((x: string) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     </div>`).join("")
-    : `<p class="empty"><b>未在 worktree 實測</b>——本項的「相容」目前僅為文件與 metadata 推論，沒有實跑證據。</p>`;
+    : `<p class="empty"><b>未實測</b>——本項的「相容」目前僅為文件與 metadata 推論，沒有實跑證據。</p>`;
 
   return `
   <article class="card" data-sev="${esc(f.maxSeverity)}" data-prio="${esc(f._prio)}"
@@ -387,10 +387,10 @@ ${groups.map((g) => `<h4 class="group">${esc(PRIO_LABEL[g.p])}（${g.items.lengt
 </ul>
 ${(!research || !verify || research?.notResearched?.length || verify?.notVerified?.length) ? `
 <h5 style="margin-top:16px">怎麼補齊標示「未研究 / 未實測」的項目</h5>
-<p>在 Claude Code 用<b>同一個批次標籤</b>重跑，既有結果會保留、只補未做的項目（掃描走本機快取，很快）：</p>
+<p>在 Claude Code 用<b>同一個批次標籤</b>重跑，既有結果會保留、只補未做的項目（掃描結果有快取，很快）：</p>
 <pre style="background:var(--plane);border:1px solid var(--axis);border-radius:6px;padding:10px;overflow-x:auto;font-size:12px;margin:6px 0"><code>/dep-audit ${esc(label)} --scope P2                       # 補做 P2 以上全部項目
 /dep-audit ${esc(label)} --only <span class="sub">套件@版本</span>              # 只補特定項目，例：--only handlebars@4.7.8
-/dep-audit ${esc(label)} --only <span class="sub">套件@版本</span> --skip-verify # 只補研究，不做 worktree 實測</code></pre>
+/dep-audit ${esc(label)} --only <span class="sub">套件@版本</span> --skip-verify # 只補研究，不做實際安裝測試</code></pre>
 <p class="sub">重跑會覆蓋本 HTML 檔（同標籤）。想保留這一版就先另存，或換一個標籤重跑。</p>` : ""}
 </div>
 

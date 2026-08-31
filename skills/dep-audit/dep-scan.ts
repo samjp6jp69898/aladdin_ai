@@ -3,7 +3,10 @@
  * dep-scan.ts — /dep-audit 的確定性掃描核心。
  *
  * 做四件事，全部不靠模型推理：
- *   1. 盤點 projects.json 內每個專案「實際安裝」的套件版本（node_modules 優先，缺則讀 lockfile）
+ *   1. 盤點 projects.json 內每個專案「實際會被安裝」的套件版本（lockfile 優先：bun.lock / package-lock.json，
+ *      因為只有這些會被 commit、推到遠端，任何人 clone 後 install 出來的都是同一份；node_modules 只在專案
+ *      完全沒有 lockfile 時當最後備援，且會在盤點摘要標註「無 lockfile，讀本機 node_modules」提醒此結果
+ *      僅反映本機安裝狀態，不代表遠端/CI/正式環境的真實狀態）
  *   2. 對每個 (name, version) 查 OSV.dev 漏洞（GitHub Advisory / CVE 的公開聚合來源）
  *   3. 對有漏洞的組合查 npm registry，算出「能清掉全部漏洞的最小版本」與「同 major 內是否有解」
  *   4. 對建議目標版本做靜態相容性預檢（engines / peerDependencies / 反向 peer / deprecated）
@@ -52,7 +55,7 @@ type Occurrence = {
   direct: boolean;          // 該專案 package.json 有宣告，且此版本落在宣告範圍內
   depKind: "prod" | "dev" | "transitive";
   range: string | null;
-  source: string;           // node_modules | bun.lock | package-lock.json
+  source: string;           // bun.lock | package-lock.json | node_modules（無 lockfile 時的備援，僅本機狀態）
 };
 type Vuln = {
   id: string; aliases: string[]; severity: string; cvss: string | null;
@@ -109,7 +112,13 @@ async function http(url: string, init?: RequestInit, tries = 3): Promise<any> {
 }
 
 // ---------------------------------------------------------------- 盤點
-/** node_modules 遞迴走訪：保留同名套件的「所有」版本，另收 deps/peers 供反查 */
+/** node_modules 遞迴走訪：保留同名套件的「所有」版本，另收 deps/peers 供反查。
+ *  僅在專案沒有 lockfile 時當備援來源——node_modules 是 gitignored 的本機安裝產物，
+ *  可能因為安裝順序、手動操作、或殘留的舊版巢狀安裝而與 lockfile 記載的版本不一致
+ *  （2026-08-31 實例：agrabah 的 node_modules/jasmine/node_modules/handlebars 停留在
+ *  4.7.8，但 package.json / bun.lock 與 jasmine 自己的 bun.lock 都已一致宣告 4.7.9；
+ *  這種 drift 只存在於本機磁碟，不會被 commit，用它來判定漏洞會產生不會發生在其他人
+ *  機器上、也不會出現在 CI/正式環境的假警報）。 */
 function walkNodeModules(nmDir: string) {
   const found = new Map<string, Set<string>>();
   const nodes: Node[] = [];
@@ -148,12 +157,19 @@ function walkNodeModules(nmDir: string) {
   return { found, nodes };
 }
 
-/** bun.lock 是 JSONC：容忍註解與尾逗號 */
-function parseBunLock(file: string): Map<string, Set<string>> {
+/** bun.lock 是 JSONC：容忍註解與尾逗號。
+ *  「packages」是扁平 map，key 可能是套件名（頂層/可 hoist）或路徑式（如
+ *  "protobufjs-cli/espree" 代表巢狀、無法 hoist 的獨立版本）；名稱與版本一律從
+ *  value[0]（"name@version"）解析，不依賴 key 本身，兩種 key 風格都能正確歸戶。
+ *  同時取出每筆條目內嵌的 dependencies/peerDependencies，組成與 walkNodeModules
+ *  相同形狀的 nodes[]，讓 lockfile 路徑也能做 dependents/reversePeers 分析，
+ *  不因為改用 lockfile 當主要來源而喪失「誰依賴它」的精度。 */
+function parseBunLock(file: string): { installed: Map<string, Set<string>>; nodes: Node[] } {
   const raw = readFileSync(file, "utf8")
     .replace(/^\s*\/\/.*$/gm, "")
     .replace(/,(\s*[}\]])/g, "$1");
-  const out = new Map<string, Set<string>>();
+  const installed = new Map<string, Set<string>>();
+  const nodes: Node[] = [];
   const d = JSON.parse(raw);
   for (const val of Object.values<any>(d.packages ?? {})) {
     const spec = Array.isArray(val) ? val[0] : null;
@@ -162,23 +178,38 @@ function parseBunLock(file: string): Map<string, Set<string>> {
     if (at <= 0) continue;
     const name = spec.slice(0, at), version = spec.slice(at + 1);
     if (!semver.valid(version)) continue;           // 過濾 ../genie 這類本地路徑依賴
-    if (!out.has(name)) out.set(name, new Set());
-    out.get(name)!.add(version);
+    if (!installed.has(name)) installed.set(name, new Set());
+    installed.get(name)!.add(version);
+    const meta = Array.isArray(val) ? val.find((x: any) => x && typeof x === "object" && !Array.isArray(x)) : null;
+    nodes.push({
+      name, version,
+      peers: meta?.peerDependencies ?? {},
+      deps: { ...(meta?.dependencies ?? {}), ...(meta?.optionalDependencies ?? {}) },
+    });
   }
-  return out;
+  return { installed, nodes };
 }
 
-function parseNpmLock(file: string): Map<string, Set<string>> {
+/** package-lock.json（npm v3+）：「packages」以 node_modules 路徑為 key，
+ *  同一套件出現在多個路徑即代表巢狀多版本；同樣連帶取出 dependencies/peerDependencies
+ *  組成 nodes[]，理由同 parseBunLock。 */
+function parseNpmLock(file: string): { installed: Map<string, Set<string>>; nodes: Node[] } {
   const d = JSON.parse(readFileSync(file, "utf8"));
-  const out = new Map<string, Set<string>>();
+  const installed = new Map<string, Set<string>>();
+  const nodes: Node[] = [];
   for (const [k, v] of Object.entries<any>(d.packages ?? {})) {
     if (!k.startsWith("node_modules/")) continue;
     const name = k.slice(k.lastIndexOf("node_modules/") + "node_modules/".length);
     if (!v?.version || !semver.valid(v.version)) continue;
-    if (!out.has(name)) out.set(name, new Set());
-    out.get(name)!.add(v.version);
+    if (!installed.has(name)) installed.set(name, new Set());
+    installed.get(name)!.add(v.version);
+    nodes.push({
+      name, version: v.version,
+      peers: v.peerDependencies ?? {},
+      deps: { ...(v.dependencies ?? {}), ...(v.optionalDependencies ?? {}) },
+    });
   }
-  return out;
+  return { installed, nodes };
 }
 
 function inventory(proj: any) {
@@ -187,16 +218,22 @@ function inventory(proj: any) {
   const prod = pkg.dependencies ?? {}, dev = pkg.devDependencies ?? {};
   const nm = join(dir, "node_modules");
 
+  // lockfile 優先：bun.lock / package-lock.json 才是會被 commit、任何人 clone 後
+  // bun install / npm install 都會重現的「真實會安裝版本」。node_modules 是 gitignored
+  // 的本機安裝產物，可能因巢狀殘留、安裝順序等原因與 lockfile 記載的版本不一致
+  // （drift 只存在於本機，不代表遠端/CI/正式環境），只在完全沒有 lockfile 時才當備援。
   let installed = new Map<string, Set<string>>();
   let nodes: Node[] = [];
   let source = "NONE";
-  if (existsSync(nm) && readdirSync(nm).length > 0) {
-    const w = walkNodeModules(nm);
-    installed = w.found; nodes = w.nodes; source = "node_modules";
-  } else if (existsSync(join(dir, "bun.lock"))) {
-    installed = parseBunLock(join(dir, "bun.lock")); source = "bun.lock";
+  if (existsSync(join(dir, "bun.lock"))) {
+    const w = parseBunLock(join(dir, "bun.lock"));
+    installed = w.installed; nodes = w.nodes; source = "bun.lock";
   } else if (existsSync(join(dir, "package-lock.json"))) {
-    installed = parseNpmLock(join(dir, "package-lock.json")); source = "package-lock.json";
+    const w = parseNpmLock(join(dir, "package-lock.json"));
+    installed = w.installed; nodes = w.nodes; source = "package-lock.json";
+  } else if (existsSync(nm) && readdirSync(nm).length > 0) {
+    const w = walkNodeModules(nm);
+    installed = w.found; nodes = w.nodes; source = "node_modules（無 lockfile，僅反映本機安裝狀態）";
   }
   return { pkg, prod, dev, installed, nodes, source };
 }

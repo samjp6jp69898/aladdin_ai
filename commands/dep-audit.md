@@ -17,7 +17,7 @@ user-invocable: true
 - 全量 lint / build 必帶 `NODE_OPTIONS=--max-old-space-size=8192`；`exit 137` / `SIGKILL` / `heap out of memory` 是 OOM 不是升版失敗（見 `.claude/doctrine/refs/build-oom.md`）。
 - 本流程為自主 pipeline：除本檔明寫的回報時機外，全程不停下來等使用者。
 
-掃描範圍與各專案的驗證指令，唯一事實源是 `obsidian/skills/dep-audit/projects.json`。要增減專案或改驗證指令 → 改該檔，不要在本檔或 prompt 內硬寫。
+掃描範圍與各專案的驗證指令，唯一事實源是 `aladdin_ai/skills/dep-audit/projects.json`。要增減專案或改驗證指令 → 改該檔，不要在本檔或 prompt 內硬寫。
 
 ## Parameters
 
@@ -53,13 +53,15 @@ cd /Users/user/aladdin && git status --porcelain | head -20
 ## Step 1：掃描（腳本，一條指令）
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/dep-audit/dep-scan.ts scan --label <label> [--project <id>]... [--no-cache]
+bun /Users/user/aladdin/aladdin_ai/skills/dep-audit/dep-scan.ts scan --label <label> [--project <id>]... [--no-cache]
 ```
 
 - stdout 最後印 `SCAN_OK <path>` 與一張摘要表；完整結果在 `audit-reports/dep-audit-<label>/scan.json`。
-- 分析單位是 **(套件, 版本)** 不是套件：同一套件在同專案可能同時裝了多個版本（實例：agrabah 直接宣告 `protobufjs` 8.0.2，另有 `protobufjs-cli` 以 peerDependency 拉進來的 7.x），兩者漏洞集合與修補路徑完全不同。**不要在後續步驟把它們合併討論。**
+- 分析單位是 **(套件, 版本)** 不是套件：同一套件在同專案可能同時裝了多個版本（實例：lago-promo-page 的 `picomatch` 同時有 `4.0.3` 與 `2.3.1`，分別被不同的建置工具鏈拉入），兩者漏洞集合與修補路徑完全不同。**不要在後續步驟把它們合併討論。**
 - 腳本非 0 結束 → 把錯誤原文回報使用者並停止。**不要**改用 `npm audit` / `bun outdated` 替代（前者需要 package-lock 且解的是宣告範圍而非實裝版本，後者不含漏洞資料）。
 - `scan.json` 很大（數百 KB），**不要整檔 Read**。用 `python3 -c` 或 `bun -e` 取需要的欄位。
+- **盤點來源：lockfile 優先（bun.lock / package-lock.json），node_modules 只在完全沒有 lockfile 時當備援**（2026-08-31 起；`scan.json` 每個專案的 `projects[].source` 會標明實際來源）。理由：lockfile 才是會被 commit、任何人 clone 後 `bun install` 都會重現的「真實會安裝版本」；`node_modules` 是 gitignored 的本機安裝產物，可能因巢狀殘留、安裝順序等原因與 lockfile 記載的版本不一致（2026-08-31 實測：agrabah 的 `node_modules/jasmine/node_modules/handlebars` 停留在 4.7.8，但 package.json / bun.lock 早已宣告 4.7.9；改用 lockfile 掃描後，55 個「有漏洞組合」裡有超過 20 個是這類純本機 drift 造成的假警報，CRITICAL 從 5 降到 0）。**因此跑 Step 1 前不需要先在各專案重新 `bun install`**——掃描讀的是已 commit 的 lockfile，不是本機 node_modules 現況；只有專案完全沒有 lockfile 時才會退回讀 node_modules，此時摘要會標「無 lockfile，僅反映本機安裝狀態」提醒此結果不可靠。
+- **掃描結果反映的是主 repo 當下 checkout 的分支/commit**，不是固定的 `dev` 或 `main`。要掃哪個分支的依賴狀態，先把該 repo checkout 到那個分支再跑 Step 1；`git status --porcelain`（Step 0）只檢查有無未提交變更，不會提醒你目前在哪個分支。
 
 ## Step 2：分級（你的判斷，非腳本）
 
@@ -93,7 +95,7 @@ bun /Users/user/aladdin/obsidian/skills/dep-audit/dep-scan.ts scan --label <labe
 4. **該版本發布後的回歸回報** — 搜 `<套件> <目標版> issue` / `regression` / `broken`。發布未滿一個月的版本要特別查。
 5. **周邊生態是否跟上**（僅跨 major）— 我們用的 plugin / preset 是否已支援目標 major。`scan.json` 的 `compat.reversePeers` 已列出所有宣告 peer 的套件與判定結果，先讀它再決定要查哪些。
 
-寫入 `audit-reports/dep-audit-<label>/research.json`，格式與欄位語意見 `obsidian/skills/dep-audit/examples/research.example.json`（**必讀**）。要點：
+寫入 `audit-reports/dep-audit-<label>/research.json`，格式與欄位語意見 `aladdin_ai/skills/dep-audit/examples/research.example.json`（**必讀**）。要點：
 
 - `key` 必須逐字等於 `package + "@" + version`，否則報告 join 不到、會顯示成「未做網路研究」。
 - `sources` 只放真的讀過的網址。查不到就留空陣列，不要放搜尋結果頁充數。
@@ -119,8 +121,8 @@ grep -rn "from ['\"]<套件名>" --include=*.ts --include=*.vue /Users/user/alad
 ### 5.1 建環境
 
 ```bash
-bash /Users/user/aladdin/obsidian/skills/dep-audit/dep-worktree.sh create <label> <repo...>
-bash /Users/user/aladdin/obsidian/skills/dep-audit/dep-worktree.sh install <label>
+bash /Users/user/aladdin/aladdin_ai/skills/dep-audit/dep-worktree.sh create <label> <repo...>
+bash /Users/user/aladdin/aladdin_ai/skills/dep-audit/dep-worktree.sh install <label>
 ```
 
 `repo ∈ agrabah|abu|lago|rajah`，只帶本次要驗的。腳本會建 detached worktree、symlink `genie/jafar/jasmine`（相對路徑依賴少了會 install 失敗）、鏡像 `.env*`（缺了 vite build 會用另一組設定編譯，結果不可信）。最後一行 `WORKTREE_OK` / `INSTALL_OK n/n` 才算成功；`INSTALL_PARTIAL` → 讀 `<worktree>/.install-<proj>.log` 判斷，裝不起來的專案整個放進 `notVerified`，不要硬驗。
@@ -131,7 +133,7 @@ install 慢屬正常（agrabah + abu + lago 全裝可能十幾分鐘），畫面
 
 **先在未升版狀態跑一次** `projects.json` 內該專案的 `verify` 指令，逐項記錄 PASS/FAIL 與耗時。
 
-沒有基準線就無法區分「升版打壞的」和「本來就壞的」。兩個實測到的例子：`rajah` 的 `bun run build` 指向不存在的 `build.ts`，在 `origin/dev` 上就是紅的；`agrabah` 的 `tsc --noEmit` 在主 repo 就有 753 個既有型別錯誤（2026-07-29 實測）。把這些當成升版回歸會得出完全錯誤的結論。
+沒有基準線就無法區分「升版打壞的」和「本來就壞的」。兩個實測到的例子：`rajah` 的 `bun run build` 指向不存在的 `build.ts`，在 `origin/main` 上就是紅的；`agrabah` 的 `tsc --noEmit` 在主 repo 就有 753 個既有型別錯誤（2026-07-29 實測）。把這些當成升版回歸會得出完全錯誤的結論。
 
 **基準線是紅的時候，比對必須逐行做**：把 baseline 與 after 的錯誤行各自排序後 `diff`，只有「零新增行」才算非回歸。只比錯誤總數會漏掉「舊錯誤消失、新錯誤出現」的等量替換。
 
@@ -171,18 +173,19 @@ diff /tmp/b.txt /tmp/a.txt          # 有 ">" 行＝升版新增的錯誤＝回�
 | `BLOCKED` | 升版後仍紅且無法在合理成本內解決 |
 | `NOT_VERIFIED` | 沒實測（含 install 失敗） |
 
-寫入 `audit-reports/dep-audit-<label>/verify.json`，格式見 `obsidian/skills/dep-audit/examples/verify.example.json`（**必讀**）。檔案已存在（續跑）→ 先讀進來合併，規則同 Step 3。
+寫入 `audit-reports/dep-audit-<label>/verify.json`，格式見 `aladdin_ai/skills/dep-audit/examples/verify.example.json`（**必讀**）。檔案已存在（續跑）→ 先讀進來合併，規則同 Step 3。
 
-### 5.5b 實測環境的三個已知限制（判定前必看）
+### 5.5b 實測環境的四個已知限制（判定前必看）
 
-1. **`genie` / `jafar` / `jasmine` 在 worktree 內是主 repo 的 symlink**，改它們的 `package.json` 等同改主 repo，鐵律禁止。因此「共用庫自己的依賴升版」（例：genie 釘死 `protobufjs: 8.0.0`）**無法在本流程中實測**——一律放進 `notVerified` 並寫明此原因。替代的間接證據：在下游專案（agrabah）用 `overrides` 強制同一版本後驗證，可證明該版本在此 runtime 下可編譯，但不等於驗過共用庫本身。
+1. **`genie` / `jafar` / `jasmine` 在 worktree 內是主 repo 的 symlink**，改它們的 `package.json` 等同改主 repo，鐵律禁止。因此「共用庫自己的依賴升版」（例：genie 宣告 `protobufjs: 8.0.2`）**無法在本流程中實測**——一律放進 `notVerified` 並寫明此原因。替代的間接證據：在下游專案（agrabah、abu、lago 各子專案）用 `overrides` 強制同一版本後驗證，可證明該版本在此 runtime 下可編譯，但不等於驗過共用庫本身。
 2. **agrabah 的 `bun run lint` 會改檔**（`eslint --fix "**/*"`）。基準線那一跑就已經把可自動修的問題修掉了，所以基準線必須在任何升版動作**之前**跑完；順序顛倒會讓兩次比較失去意義。
 3. **agrabah 全量 lint 在 `--max-old-space-size=8192` 下會 OOM**（2026-07-29 實測：8076 MB 撞頂、SIGABRT + `<--- Last few GCs --->`）。已依 `.claude/doctrine/refs/build-oom.md` 把 `projects.json` 調到 16384。若換機器仍 OOM，照該 doctrine 處理，**不要縮小 lint 範圍或關掉 type-aware rules**。基準線與升版後必須用**同一個** heap 上限跑，否則不可比。
+4. **`dep-worktree.sh create` 一律以 `origin/main` 為基準（detach 該 ref）**（2026-08-31 起；此前誤用 `origin/dev`，與 Step 1 掃描讀的 `ROOT/<repo>` 狀態不一致——`dev` 常態領先 `main`，若某套件在 `dev` 已經升版但還沒 cherry-pick 回 `main`，用 `dev` 建的環境會把「升版前基準線」誤跑成已經修好的版本，完全測不出 `main` 上真正待修的狀態，實測踩過：lago 的 `dompurify` 即是一例）。判定 SAFE/BLOCKED 前，仍建議養成習慣：先確認 worktree 內該套件的「升版前」版本真的等於 `scan.json` 記錄的受影響版本，不相等就代表基準線已經偏離掃描目標，該筆驗證結果不能直接引用，需要在 `verdictNote` 誠實記錄，不能靜默當作已驗證。
 
 ### 5.6 收工
 
 ```bash
-bash /Users/user/aladdin/obsidian/skills/dep-audit/dep-worktree.sh remove <label>
+bash /Users/user/aladdin/aladdin_ai/skills/dep-audit/dep-worktree.sh remove <label>
 ```
 
 **確認報告已產出後才移除**（Step 6 之後）。移除前若使用者可能想自己看，先問。
@@ -190,7 +193,7 @@ bash /Users/user/aladdin/obsidian/skills/dep-audit/dep-worktree.sh remove <label
 ## Step 6：產出 HTML 報告
 
 ```bash
-bun /Users/user/aladdin/obsidian/skills/dep-audit/build-report.ts <label>
+bun /Users/user/aladdin/aladdin_ai/skills/dep-audit/build-report.ts <label>
 ```
 
 - 輸出 `audit-reports/dep-audit-<label>/dependency-audit-<label>.html`（單檔、無外部資源、可直接寄給主管）。
