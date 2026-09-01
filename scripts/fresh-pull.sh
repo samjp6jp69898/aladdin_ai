@@ -36,7 +36,7 @@ until mkdir "$LOCK" 2>/dev/null; do
 done
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 
-LOG=$(mktemp /tmp/fresh-pull.XXXXXX.log)
+LOG=$(mktemp /tmp/fresh-pull.XXXXXX)   # BSD mktemp 要求 X 在結尾；加 .log 後綴會被當字面檔名而 File exists
 if (cd /Users/user/aladdin/rajah && bash update.sh) >"$LOG" 2>&1; then
   echo "FRESH_PULL_OK"
 else

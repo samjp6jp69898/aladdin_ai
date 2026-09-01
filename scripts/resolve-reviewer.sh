@@ -18,8 +18,8 @@ command -v jq >/dev/null 2>&1 || { echo "ERROR:jq 未安裝（缺它會把有指
 
 # token 單一來源：環境變數 > /Users/user/aladdin/aladdin_ai/.env.local 的 ALD_NOTION_TOKEN（與 notion.sh 同源）
 TOKEN="${ALD_NOTION_TOKEN:-}"
-[ -z "$TOKEN" ] && TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' "$ROOT/.env" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")
-case "$TOKEN" in ntn_*) ;; *) echo "ERROR:讀不到有效 ALD_NOTION_TOKEN（.env 缺 ALD_NOTION_TOKEN= 行？）"; exit 1;; esac
+[ -z "$TOKEN" ] && TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' "$ROOT/aladdin_ai/.env.local" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'")
+case "$TOKEN" in ntn_*) ;; *) echo "ERROR:讀不到有效 ALD_NOTION_TOKEN（aladdin_ai/.env.local 缺 ALD_NOTION_TOKEN= 行？）"; exit 1;; esac
 
 # page_id 正規化（與 notion.sh extract_page_id 同邏輯）
 if echo "$INPUT" | grep -qE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
