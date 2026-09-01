@@ -1,8 +1,12 @@
 #!/bin/bash
 # setup-worktree.sh — /create-mr Step 4：建立 per-ticket 隔離環境（固化歷次踩坑修法）
 #
-# 用法：bash scripts/setup-worktree.sh [--dry-run] [--keep-branch] <ticket_id> [affected_repo ...]
+# 用法：bash scripts/setup-worktree.sh [--dry-run] [--keep-branch] [--base <branch>] <ticket_id> [affected_repo ...]
 #   例：bash scripts/setup-worktree.sh FAQ-3710 agrabah rajah
+#   例：bash scripts/setup-worktree.sh --base feature/20260815 FAQ-3710 agrabah
+#   --base <branch>（2026-09-01，使用者指示）：worktree 分支點，預設 main。技術人員在 Notion
+#   工單留言明確指定要從哪個分支開 MR（feature/YYYYMMDD、hotfix/*）時由 manager 傳入。
+#   指定分支在 origin 不存在 → SETUP_FAIL（不偷偷退回 main，否則 MR 會開到錯的目標分支）。
 #   --keep-branch（2026-08-26，/create-mr resume 模式用）：既有 mr/<ticket> 分支
 #   不砍不重建，worktree 直接掛回該分支（fixer 上一輪的 commit 都在分支上，
 #   cleanup-worktree.ts 清 worktree 時刻意保留分支就是為了這條路）。分支不存在
@@ -13,10 +17,10 @@
 #   affected_repo ∈ {agrabah, abu, lago, rajah}，可為空（全部 symlink，bootstrap 實質跑主 repo）
 #
 # 行為：
-#   1. affected repo → 真 git worktree（branch mr/<ticket>，base origin/main）；其餘主 repo + 共用庫 → symlink
-#      2026-08-21：base 由 origin/dev 改為 origin/main（main 遷移計畫進行中，使用者已確認接受
-#      「遷移完成前 main 落後 dev」的已知風險——見 .claude/doctrine/refs/change-log.md 該日條目）。
-#      mr-pusher push 前仍會 rebase 到最新 origin/dev（見 mr-pusher.md Step 0.5），提供部分緩衝。
+#   1. affected repo → 真 git worktree（branch mr/<ticket>，base origin/<--base，預設 main>）；其餘主 repo + 共用庫 → symlink
+#      2026-08-21：base 由 origin/dev 改為 origin/main（見 .claude/doctrine/refs/change-log.md 該日條目）。
+#      2026-09-01：mr-pusher 的推前 rebase 與 MR target 亦改為 origin/main／main（原為 origin/dev／dev），
+#      整條 /create-mr 基準統一為 main；需求單 pipeline（demand-plan-pipeline.ts）同日同步改為 origin/main。
 #   2. node_modules：掃描主 repo 實際存在位置逐一 symlink（涵蓋 abu 等多子專案結構；踩坑 2026-07-01）
 #   3. agrabah 為真 worktree 時補 .env.local symlink（踩坑 2026-07-02，缺它 migrate 硬中斷）
 #   4. 跑 bootstrap.sh；失敗時自動判別「DB 資料供給層卡點」vs「真正失敗」
@@ -45,10 +49,12 @@ SHARED=(jasmine genie jafar)
 
 DRY=0
 KEEP_BRANCH=0
+BASE=main
 while :; do
   case "${1:-}" in
     --dry-run) DRY=1; shift;;
     --keep-branch) KEEP_BRANCH=1; shift;;
+    --base) BASE="${2:-}"; shift 2 || { echo "SETUP_FAIL:--base 缺少分支名"; exit 1; };;
     *) break;;
   esac
 done
@@ -85,6 +91,9 @@ for r in "${AFFECTED[@]:-}"; do
   [ -z "$r" ] && continue
   case "$r" in agrabah|abu|lago|rajah) ;; *) echo "SETUP_FAIL:非法 repo ${r} （允許 agrabah/abu/lago/rajah）"; exit 1;; esac
 done
+# --base 只接受合法 git 分支名字元（防 eval 注入；不含空白、`..`、開頭 `-`）
+echo "$BASE" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._/-]*$' && ! echo "$BASE" | grep -q '\.\.' \
+  || { echo "SETUP_FAIL:--base 分支名不合法（收到 ${BASE} ）"; exit 1; }
 WT=$WT_BASE/$TICKET
 
 run() { # dry-run 包裝：只用於「會改變狀態」的指令
@@ -99,10 +108,14 @@ SETUP_START_TS=$(date +%s)
 run "mkdir -p '$WT'"
 for repo in "${AFFECTED[@]:-}"; do
   [ -z "$repo" ] && continue
-  echo "== worktree: $repo =="
+  echo "== worktree: $repo (base origin/$BASE) =="
   ok=0
   for attempt in 1 2; do
-    run "git -C '$ROOT/$repo' fetch origin main --quiet"
+    run "git -C '$ROOT/$repo' fetch origin '$BASE' --quiet"
+    # 指定分支必須真的存在於 origin；fetch 失敗或 ref 不存在一律 SETUP_FAIL，不退回 main
+    if [ "$DRY" = 0 ] && ! git -C "$ROOT/$repo" rev-parse --verify --quiet "origin/$BASE" >/dev/null; then
+      echo "SETUP_FAIL:base 分支 origin/${BASE} 在 ${repo} 不存在或 fetch 失敗（技術人員指定的分支請先確認已推到 origin）"; exit 1
+    fi
     run "git -C '$ROOT/$repo' worktree remove '$WT/$repo' --force 2>/dev/null || true"
     if [ "$KEEP_BRANCH" = 1 ] && git -C "$ROOT/$repo" show-ref --verify --quiet "refs/heads/mr/$TICKET"; then
       # resume：分支已存在（上一輪 fixer 的 commit 在上面），掛回既有分支，不砍不重建
@@ -110,7 +123,7 @@ for repo in "${AFFECTED[@]:-}"; do
       if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' 'mr/$TICKET'"; then ok=1; break; fi
     else
       run "git -C '$ROOT/$repo' branch -D 'mr/$TICKET' 2>/dev/null || true"
-      if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' origin/main"; then ok=1; break; fi
+      if run "git -C '$ROOT/$repo' worktree add '$WT/$repo' -b 'mr/$TICKET' 'origin/$BASE'"; then ok=1; break; fi
     fi
     echo "worktree add 失敗（attempt ${attempt} ），清殘留重試"
     run "git -C '$ROOT/$repo' worktree prune"

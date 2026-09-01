@@ -1,5 +1,5 @@
 ---
-description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one pending/rerun ticket from bug_analysis_tracker.md（ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN）+ L0 tests in an isolated worktree, 三重平行審查, then MR against dev with Notion writeback.
+description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one pending/rerun ticket from bug_analysis_tracker.md（ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN）+ L0 tests in an isolated worktree, 三重平行審查, then MR against main with Notion writeback.
 argument-hint: "<ticket_id>"
 ---
 
@@ -14,7 +14,8 @@ argument-hint: "<ticket_id>"
 - Step 0.1 `ticket_id` 改為必填，移除無參數自動挑單
 - 舊 Step 1（bug-report-analyst）+ 舊 Step 2（spec-fetcher）合併為一個 agent（`bug-report-and-spec-analyst`）
 - 舊 Step 2.5（CQA Grounder）+ 舊 Step 3（Bug Tracer）改成並行派工（本文不再使用「Step 3」這個編號）
-- Step 4 worktree 建立基準由 `origin/dev` 改為 `origin/main`（main 遷移計畫進行中，已知風險：遷移完成前 main 落後 dev，見 `setup-worktree.sh` 檔頭）
+- Step 4 worktree 建立基準由 `origin/dev` 改為 `origin/main`（2026-09-01 起 mr-pusher 的推前 rebase 與 MR target 也一併改為 `origin/main`／`main`，整條 pipeline 基準統一；見 `setup-worktree.sh` 檔頭）
+- **`base_branch` 覆寫（2026-09-01，使用者指示）**：技術人員在 Notion 工單留言明確指定分支（如 `feature/20260815`、`hotfix/*`）時，Step 1 analyst 以 `TARGET_BRANCH:` 回報，manager 存進 `base_branch`，之後 worktree 分支點、三位 reviewer 的 diff 基準、drive-uploader 的 diff 基準、mr-pusher 的推前 rebase 與 MR target **全部**用該分支；未指定則 `main`。指定分支在 origin 不存在 → Step 4 `SETUP_FAIL`，走 failed 出口，不偷偷退回 main。
 - Step 5 fixer 改走 TDD（先 RED 後 GREEN），mock data 一律取自 CQA grounding 實證資料
 - Step 6 由 1 位 reviewer 改成 3 位平行 reviewer（品質 / 對抗性 / TDD 情境符合度），三位皆 PASSED 才放行
 - 舊 Step 8（解鎖+tracker）+ 舊 Step 9（完成報告）合併
@@ -36,6 +37,7 @@ argument-hint: "<ticket_id>"
 ```
 ticket_id, notion_url, page_id            # page_id = URL 尾 32hex 轉 UUID(8-4-4-4-12)
 reviewer_email                            # Step 0.5 推導
+base_branch = main                        # Step 1 由 analyst TARGET_BRANCH 覆寫（resume 時 Step 0.2 從 analytics.md 抽）；一路傳給 Step 4/6/7a/7b
 grounding_result, qa_question             # Step 2a
 affected_repos = []                       # Step 2b 契約尾行
 bootstrap_partial = false                 # Step 4（true 時所有出口留言/報告須披露）
@@ -82,8 +84,13 @@ bash /Users/user/aladdin/scripts/tg-map-chatids.sh --list
 
 ## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 第二參數為 `resume`；2026-08-26 紅區變更，使用者核准續跑語意）
 
+先從既有 analytics.md 抽 `base_branch`（resume 會跳過 Step 1，這是唯一的來源；檔案不存在或欄位為 `(Not provided)` → 維持 `main`）：
 ```bash
-bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id}
+grep -m1 '^Target Branch:' /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
+```
+再跑盤點（第二參數就是 `base_branch`，讓 BRANCH_COMMITS 的計數基準跟 worktree 分支點一致）：
+```bash
+bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id} {base_branch}
 ```
 唯讀腳本，行首 grep 取 `RESUME_POINT:` 與各產物/結論行（契約見腳本檔頭）。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。
 
@@ -91,7 +98,7 @@ bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id}
 - `step2` → 跳過 Step 1（沿用既有 analytics/spec）；Step 2 只派 `GROUNDING:` / `ANALYSIS_NOTES:` 為 missing 的那位（另一位的既有文件直接沿用），2c 照常。
 - `step4` / `step5` / `step6` / `step7` → 跳過 Step 1 與 2a/2b 派工，但 **2c 的分支判定照常做**（用既有的定向抽取補救取得 AFFECTED_REPOS 等值；命中 needs_qa / already_fixed / i18n_only 出口時走出口，忽略 RESUME_POINT）：
   - `step4` → 照常 Step 4（重置分支）→ Step 5。
-  - `step5` / `step6` / `step7` → Step 4 的指令改為 `bash /Users/user/aladdin/scripts/setup-worktree.sh --keep-branch {ticket_id} {affected_repos}`（沿用 `mr/{ticket_id}` 分支與其上 fixer commit，輸出契約與失敗處理同 Step 4），然後：`step5` → Step 5（把 `REVIEW_A/B/C: FAILED` 對應的報告路徑當否決回饋，`fixer_attempt` 記為 1）；`step6` → 直接 Step 6；`step7` → `pipeline_status=success`，直接 Step 7。
+  - `step5` / `step6` / `step7` → Step 4 的指令改為 `bash /Users/user/aladdin/scripts/setup-worktree.sh --keep-branch --base {base_branch} {ticket_id} {affected_repos}`（沿用 `mr/{ticket_id}` 分支與其上 fixer commit，輸出契約與失敗處理同 Step 4），然後：`step5` → Step 5（把 `REVIEW_A/B/C: FAILED` 對應的報告路徑當否決回饋，`fixer_attempt` 記為 1）；`step6` → 直接 Step 6；`step7` → `pipeline_status=success`，直接 Step 7。
 
 ## Step 0.5：Reviewer 推導（tech 名單複核）
 
@@ -109,11 +116,14 @@ bash /Users/user/aladdin/scripts/resolve-reviewer.sh {page_id}
 分析這張 Notion bug 工單，並依序找出對應的企劃規格書。
 Notion URL: {notion_url}
 ticket_id: {ticket_id}
-回報格式（最後兩行，manager 各自 grep 行首抓取，不假設順序）：
+回報格式（最後三行，manager 各自 grep 行首抓取，不假設順序）：
 SCREENSHOT_STATUS: <OK|SKIPPED|PARTIAL_FAIL|ALL_FAILED>（可附括號說明）
 SPEC_RESULT: <found|not_found> PATH: <spec.md 路徑或 N/A>
+TARGET_BRANCH: <技術人員在留言明確指定的分支名|N/A>
 ```
 等待完成。文件落點：`{ticket_id}-analytics.md`、`{ticket_id}-spec.md`（後者 `not_found` 時仍會產出檔案，內容是「未找到相關規格書」——優雅降級，不擋流程）。
+
+**`base_branch` 決定**：`TARGET_BRANCH:` 不是 `N/A` → `base_branch` = 該值（只接受 `^[A-Za-z0-9][A-Za-z0-9._/-]*$` 且不含 `..` 的字串，否則視同 N/A 並在 Step 8 報告註記）；`N/A` 或該行缺失 → 補救 `grep -m1 '^Target Branch:' <analytics.md>`，仍為 `(Not provided)`／缺 → 維持 `main`。**manager 不得憑 ticket 內容自行猜分支**，只認 analyst 抽出的明確指定。
 
 尾行缺失時：`ls` 該 analytics.md——存在 → 視為完成續行（spec_result 缺失時保守視為 not_found，不影響後續）；analytics.md 不存在 → 重派 1 次；仍無 → analytics 是全流程根基，走 failed 出口（`failure_reason="Step 1 無法產出 analytics.md"`）。
 
@@ -183,12 +193,13 @@ ALREADY_FIXED: <no|yes commit=<hash>>   （你在 Already-Fixed Verification 判
 ## Step 4：Worktree 環境（一律走腳本，不要內嵌 bash）
 
 ```bash
-bash /Users/user/aladdin/scripts/setup-worktree.sh {ticket_id} {affected_repos 以空格分隔}
+bash /Users/user/aladdin/scripts/setup-worktree.sh --base {base_branch} {ticket_id} {affected_repos 以空格分隔}
 ```
-分支點是 `origin/main`（2026-08-21 起，見腳本檔頭；main 遷移計畫進行中，已知風險已由使用者核准接受）。看**最後一行**：
+分支點是 `origin/{base_branch}`（預設 `main`；技術人員在留言指定時為該分支，見 Step 1）。看**最後一行**：
 - `SETUP_OK` → 續 Step 5。
 - `SETUP_OK BOOTSTRAP_PARTIAL:db-seed` → `bootstrap_partial=true`，續 Step 5。（含義：程式碼生成已完成、只有 DB 資料供給步驟失敗——本 pipeline 只做 L0 測試不連 DB，可以續行；但 Step 7 的留言與 Step 8 報告**必須披露**這件事。log 在 `{worktree_path}/bootstrap.log`。）
-- `SETUP_FAIL:*` → 再跑一次；仍失敗 → failed 出口（`failure_reason` = 該行；若 Step 0-a 也曾 `FRESH_PULL_FAIL`，一併寫入）。
+- `SETUP_FAIL:base 分支 origin/* 在 * 不存在*` → **不重試、不改回 main**，直接 failed 出口（`failure_reason` = 該行；留言會讓技術人員看到是指定的分支不存在於 origin）。
+- 其他 `SETUP_FAIL:*` → 再跑一次；仍失敗 → failed 出口（`failure_reason` = 該行；若 Step 0-a 也曾 `FRESH_PULL_FAIL`，一併寫入）。
 
 ## Step 5：Bug Fixer With Tests（TDD：先 RED 後 GREEN）
 
@@ -222,6 +233,7 @@ COMMIT: <hash|N/A>
 ticket_id: {ticket_id}
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
+base_branch: {base_branch}
 analysis_notes: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
 report 落點: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report.md
 回報格式（最後兩行）：
@@ -235,6 +247,7 @@ REVIEW_RESULT: <PASSED|FAILED>
 ticket_id: {ticket_id}
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
+base_branch: {base_branch}
 analysis_notes: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
 report 落點: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-adversarial-review.md
 回報格式（最後兩行）：
@@ -248,6 +261,7 @@ REVIEW_RESULT: <PASSED|FAILED>
 ticket_id: {ticket_id}
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
+base_branch: {base_branch}
 report 落點: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-tdd-fidelity-review.md
 回報格式（最後兩行）：
 FAIL_KIND: <implementation|analysis|N/A>
@@ -284,6 +298,7 @@ ticket_id: {ticket_id}
 Notion URL: {notion_url}
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
+base_branch: {base_branch}
 pipeline_status: {pipeline_status}
 i18n_keys: {依情境填——I18N_ONLY: yes：貼上 Step 2c 留存的 primary_fix_paths 段 + i18n 待匯入清單段原文；mixed：/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-i18n-keys-to-import.md；其他：N/A}
 回報格式（最後一行）：DRIVE_LINK: <url|N/A>
@@ -293,11 +308,12 @@ i18n_keys: {依情境填——I18N_ONLY: yes：貼上 Step 2c 留存的 primary_
 
 派工 `subagent_type: mr-pusher`（bug_summary 不由 manager 抽，pusher 自己讀檔合成）：
 ```
-推 worktree 分支、開 MR（target=dev、reviewer 由 email localpart 推導）、Notion 留言（Drive+MR 連結）、AI分析=分析成功。
+推 worktree 分支、開 MR（target={base_branch}、reviewer 由 email localpart 推導）、Notion 留言（Drive+MR 連結）、AI分析=分析成功。
 ticket_id: {ticket_id}
 page_id: {page_id}
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
+base_branch: {base_branch}
 drive_link: {drive_link}
 bug_summary: 請自行讀 /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md，用其中 Affected Module 與 Actual Result 欄位合成一句 ≤60 字的 MR 標題摘要
 solution_md: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-solution.md
@@ -306,7 +322,7 @@ reviewer_email: {reviewer_email}
 ```
 回報契約＝mr-pusher 定義檔的原生五行（MR_LINKS 為 JSON 陣列、DRIVE_LINK、REVIEWER、NOTION_COMMENT、`NOTION_AI_FIELD: ok|failed`）。manager 從最終訊息**grep 行首**抓 `MR_LINKS:` 與 `NOTION_AI_FIELD:` 兩行即可，**不要假設它們是最後兩行**。`NOTION_AI_FIELD: failed*` → manager 補打一次（成功路徑的值寫死）：`bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析成功"`，仍失敗記入 Step 8 報告。
 
-mr-pusher 的 worktree 分支點是 `origin/main`，但它 push 前仍會 rebase 到最新 `origin/dev`（見 mr-pusher.md Step 0.5，本次未改動）——main 若落後 dev 較多，這步會實際扛住大部分落差；rebase 衝突時 mr-pusher 有既有的 abort-and-flag 後備路徑，不會因此讓整條 pipeline 卡死，但 MR diff 可能顯得比預期大，需人工留意。
+mr-pusher 的 worktree 分支點、推前 rebase 基準、MR target 三者皆為 `{base_branch}`（預設 `main`；2026-09-01 起統一，見 mr-pusher.md Step 0.5）；rebase 衝突時 mr-pusher 有既有的 abort-and-flag 後備路徑，不會因此讓整條 pipeline 卡死。
 
 #### 7b.1：TG 通知（success）
 
@@ -314,7 +330,7 @@ mr-pusher 的 worktree 分支點是 `origin/main`，但它 push 前仍會 rebase
 TG_SH=/Users/user/aladdin/scripts/tg-notify.sh
 if ls "$TG_SH" >/dev/null 2>&1; then
   bash "$TG_SH" --email "{reviewer_email}" --text "✅ [已開 MR] {ticket_id}
-AI 已完成修復並開出 MR，待你 review：
+AI 已完成修復並開出 MR（目標分支：{base_branch}），待你 review：
 {每個 repo 一行 '{repo}: {mr_url}'}
 分析文件：{drive_link}
 Notion：{notion_url}"
@@ -385,6 +401,7 @@ bash /Users/user/aladdin/scripts/bug-lock.sh release {ticket_id}
 ## {ticket_id} /create-mr Pipeline Complete
 - Pipeline status: {pipeline_status}
 - Reviewer: {reviewer_email}
+- Base branch: {base_branch}{非 main 時加 "（技術人員於 Notion 留言指定）"；TARGET_BRANCH 格式不合法被忽略時加 "（analyst 回報 <原值> 不合法，已忽略）"}
 - Attempts: tracer {tracer_attempt} / fixer {fixer_attempt} / total {total_attempt}
 - Review（Step 6 三位）：A(品質)={PASSED|FAILED} / B(對抗性)={PASSED|FAILED} / C(TDD情境)={PASSED|FAILED}
 - Bootstrap: {ok | PARTIAL(db-seed)——已於 Notion 留言披露}

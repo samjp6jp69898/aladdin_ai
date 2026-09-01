@@ -80,6 +80,7 @@ Environment:
 Version Number:
 Backend Path:
 APP Page:
+Target Branch:
 
 Test Steps:
 1.
@@ -133,6 +134,10 @@ done
 - Auxiliary document links include screenshots, videos, attachments, and all other relevant links. **Image URLs must retain the full query string signature parameters** (including X-Amz-Algorithm, X-Amz-Credential, X-Amz-Signature, etc.) and must not be truncated.
 - Strictly follow the original text of the bug report; do not add any speculation or judgment.
 - **All Comments / Ticket Status History / Related FAQ IDs** 三個 pass-through section 是 Tracer 後續判斷業務脈絡的關鍵 signal，禁止省略；若資料缺，明確寫「(無)」。
+- **Target Branch**（2026-09-01 新增，決定整條 pipeline 的 worktree 分支點與 MR 目標分支）：掃描 Step 3 的頁面內文與 Step 4 的**全部 comments**，找技術人員**明確指定**要從哪個分支開 MR 的敘述（例：「請從 feature/20260815 開 MR」「這張走 hotfix/20260830-payment」「base 用 feature/20260815」）。規則：
+  - 只接受**原文逐字出現、長得像 git 分支名**的字串（`feature/YYYYMMDD`、`hotfix/...`、其他含 `/` 或 `-` 的分支名），原樣照抄、不翻譯、不補全、不猜測；沒有人明確指定 → 寫「(Not provided)」，**絕不自行填 main 或 dev**。
+  - 多則留言指定不同分支 → 取**時間最晚**的一則，並在 All Comments 之外不另加註解（原留言本來就會 dump 在 All Comments）。
+  - 留言只提到「dev」「main」這種不是要求換分支的泛稱、或只是討論而非指示（「不知道要不要走 feature」）→ 一律「(Not provided)」。
 
 ## Phase A-2：截圖下載與分析
 
@@ -346,9 +351,10 @@ The pipeline will continue — a missing spec does not block analysis.
 
 # 最終回報格式
 
-兩個 phase 都做完後，最後兩行（manager 各自 grep 行首抓取，不假設順序或位置）：
+兩個 phase 都做完後，最後三行（manager 各自 grep 行首抓取，不假設順序或位置）：
 
 ```
 SCREENSHOT_STATUS: <OK|SKIPPED|PARTIAL_FAIL|ALL_FAILED>（可附括號說明，Phase A 的結果）
 SPEC_RESULT: <found|not_found> PATH: <spec.md 路徑或 N/A>（Phase B 的結果；found 對應 SPEC_COMPLETE，not_found 對應 SPEC_INCOMPLETE，理由已寫在 spec.md 內）
+TARGET_BRANCH: <分支名|N/A>（與 analytics.md 的 Target Branch 欄位一致；「(Not provided)」時填 N/A）
 ```

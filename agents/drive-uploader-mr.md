@@ -54,6 +54,7 @@ Dispatch prompt 會傳入 `i18n_keys` 清單（從 Tracer 的 primary_fix_paths 
 
 **Worktree path:** `{worktree_path}` (provided in dispatch prompt) — per-ticket 根目錄，底下含 4 個主 repo 目錄：`agrabah`、`abu`、`lago`、`rajah`。其中 `affected_repos` 是真正的 git worktree 在 `mr/{ticket_id}` 分支，其餘是 symlink 指回主工作區。git diff 指令只對 `affected_repos` 中的 repo 執行（symlink 的 repo 沒有獨立的 git history）。
 **Affected repos:** `{affected_repos}` (provided in dispatch prompt) — 只有這些是真正的 git worktree。
+**Base branch:** `{base_branch}` (provided in dispatch prompt；預設 `main`，技術人員於 Notion 留言指定時為該分支) — 下文所有 `git diff origin/{base_branch}...HEAD` / `git log origin/{base_branch}..HEAD` 的比較基準，必須跟 worktree 的分支點一致，否則 diff 會混入該分支與 main 的落差。
 **Debug folder:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
 
 ## Tools
@@ -93,7 +94,7 @@ Content-Type: application/json
 
 **若 `pipeline_status ∈ {already_fixed, i18n_manual_handoff, needs_qa_clarification}`，跳過本步驟（無 fixer 改動），直接進入 Step 1。**
 
-**`pipeline_status == failed` 時**：先確認 `{worktree_path}` 是否存在且有 fixer diff（`git -C {worktree_path}/<repo> diff origin/main...HEAD --stat` 非空，或分支有領先 commit）——有才編譯 solution.md，且文件**開頭第一行必須是**「⚠ 本票 pipeline 以 failed 收場（審查未全數通過），以下內容僅供人工接手參考，勿直接視為已驗證的解法」；worktree 已清或無 diff 則跳過本步驟，直接進 Step 1。
+**`pipeline_status == failed` 時**：先確認 `{worktree_path}` 是否存在且有 fixer diff（`git -C {worktree_path}/<repo> diff origin/{base_branch}...HEAD --stat` 非空，或分支有領先 commit）——有才編譯 solution.md，且文件**開頭第一行必須是**「⚠ 本票 pipeline 以 failed 收場（審查未全數通過），以下內容僅供人工接手參考，勿直接視為已驗證的解法」；worktree 已清或無 diff 則跳過本步驟，直接進 Step 1。
 
 This is the NEW step. Compile the final solution document from all pipeline outputs.
 
@@ -103,10 +104,10 @@ This is the NEW step. Compile the final solution document from all pipeline outp
    for repo in {affected_repos}; do
      echo "=== $repo (code) ==="
      case $repo in
-       agrabah) git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!tests/' ;;
-       abu)     git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!*/test/' ;;
-       lago)    git -C {worktree_path}/$repo diff origin/dev...HEAD -- . ':!*/test/' ;;
-       rajah)   git -C {worktree_path}/$repo diff origin/dev...HEAD ;;
+       agrabah) git -C {worktree_path}/$repo diff origin/{base_branch}...HEAD -- . ':!tests/' ;;
+       abu)     git -C {worktree_path}/$repo diff origin/{base_branch}...HEAD -- . ':!*/test/' ;;
+       lago)    git -C {worktree_path}/$repo diff origin/{base_branch}...HEAD -- . ':!*/test/' ;;
+       rajah)   git -C {worktree_path}/$repo diff origin/{base_branch}...HEAD ;;
      esac
    done
    ```
@@ -115,9 +116,9 @@ This is the NEW step. Compile the final solution document from all pipeline outp
    # 只對 affected_repos 中存在的 repo 執行
    for repo in {affected_repos}; do
      case $repo in
-       agrabah) git -C {worktree_path}/agrabah diff origin/dev...HEAD -- tests/ ;;
-       abu)     git -C {worktree_path}/abu diff origin/dev...HEAD -- '*/test/' ;;
-       lago)    git -C {worktree_path}/lago diff origin/dev...HEAD -- '*/test/' ;;
+       agrabah) git -C {worktree_path}/agrabah diff origin/{base_branch}...HEAD -- tests/ ;;
+       abu)     git -C {worktree_path}/abu diff origin/{base_branch}...HEAD -- '*/test/' ;;
+       lago)    git -C {worktree_path}/lago diff origin/{base_branch}...HEAD -- '*/test/' ;;
      esac
    done
    ```
@@ -127,7 +128,7 @@ This is the NEW step. Compile the final solution document from all pipeline outp
    ```bash
    for repo in {affected_repos}; do
      echo "=== $repo ==="
-     git -C {worktree_path}/$repo log --oneline origin/dev..HEAD
+     git -C {worktree_path}/$repo log --oneline origin/{base_branch}..HEAD
    done
    ```
 
@@ -147,7 +148,7 @@ metadata: v2
 （來自 analysis-notes.md 的修復策略、修復紀錄、Fixer 備註）
 
 ### 修正代碼
-（git diff origin/dev...HEAD 的完整內容，排除測試檔案）
+（git diff origin/{base_branch}...HEAD 的完整內容，排除測試檔案）
 （每個改動標註目的說明）
 
 ### 測試檔案
@@ -166,7 +167,8 @@ metadata: v2
 
 ### Branch 資訊
 - Branch：mr/{id}
-- Commits：（git log --oneline origin/dev..HEAD 結果）
+- Base / MR target：{base_branch}
+- Commits：（git log --oneline origin/{base_branch}..HEAD 結果）
 ```
 
 ### Step 1: Confirm Documents Exist

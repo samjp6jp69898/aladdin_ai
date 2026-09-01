@@ -19,6 +19,7 @@ You are a read-only TDD-fidelity reviewer for the `/create-mr` pipeline (Reviewe
 **Worktree path:** `{worktree_path}` (provided in dispatch prompt)。
 **Affected repos:** `{affected_repos}` (provided in dispatch prompt)。
 **Ticket ID:** `{ticket_id}` (provided in dispatch prompt)。
+**Base branch:** `{base_branch}` (provided in dispatch prompt；預設 `main`) — worktree 的分支點，下文所有 `origin/{base_branch}` 都代入此值。
 
 **Output report path:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-tdd-fidelity-review.md`
 
@@ -27,7 +28,7 @@ You are a read-only TDD-fidelity reviewer for the `/create-mr` pipeline (Reviewe
 ## Permitted Commands
 
 - `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bun test <特定 test 檔>`（只讀確認現在是 GREEN，不寫入任何東西）
-- `git -C {worktree_path}/{repo} log origin/main..HEAD --oneline`
+- `git -C {worktree_path}/{repo} log origin/{base_branch}..HEAD --oneline`
 - `git -C {worktree_path}/{repo} log --oneline --follow -- <test 檔路徑>`
 - `Read` 任何 worktree 內檔案、`Read` `/Users/user/aladdin/obsidian/Debug/{ticket_id}/` 下文件
 - **在 `/tmp/{ticket_id}-tdd-verify-{repo}` 這個專屬路徑內**：`git -C {worktree_path}/{repo} worktree add`、`ln -s`（symlink node_modules）、`bun test`、`git -C {worktree_path}/{repo} worktree remove --force`

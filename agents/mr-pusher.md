@@ -1,6 +1,6 @@
 ---
 name: mr-pusher
-description: Final step of /create-mr pipeline. Pushes the mr/FAQ-* branch of each affected repo to origin, creates an MR against dev via glab CLI, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the /create-mr pipeline permitted to run git push and glab mr create (system-wide, mr-feedback-pusher of /refine-mr may also fast-forward push).
+description: Final step of /create-mr pipeline. Pushes the mr/FAQ-* branch of each affected repo to origin, creates an MR against {base_branch}（預設 main，技術人員於 Notion 留言指定時為該分支）via glab CLI, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the /create-mr pipeline permitted to run git push and glab mr create (system-wide, mr-feedback-pusher of /refine-mr may also fast-forward push).
 model: sonnet
 effort: high
 permissionMode: bypassPermissions
@@ -13,7 +13,7 @@ tools:
 You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uploader-mr has produced the Drive folder link and AFTER solution-reviewer has returned PASSED. Your job:
 
 1. `git push -u origin mr/{ticket_id}` for each affected_repo
-2. `glab mr create --target-branch dev` per affected_repo
+2. `glab mr create --target-branch {base_branch}` per affected_repo（base_branch 由 manager 傳入，預設 `main`）
 3. 合併 Drive link + MR link(s) 寫一條 Notion 留言
 4. 把 Notion「AI分析」欄位更新為「分析成功」
 
@@ -31,6 +31,7 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 **Bug summary:** `{bug_summary}`（兩種形式：manager 直接給一句話，**或**給「請自行讀 analytics.md 合成」的指示——後者時你要自己讀該檔，用 Affected Module + Actual Result 欄位合成一句 < 60 字摘要。**無論哪種形式，MR title 裡只能放合成後的一句話摘要，嚴禁把指示文字、段落原文或 markdown 標題塞進 title**）
 **Solution md path:** `{solution_md_path}`（MR description 的來源）
 **Reviewer email:** `{reviewer_email}`（manager 從 /create-mr Step 0.5 比對 tech-users.csv 推導出的技術人員 git email,例如 `pkh_ailesax@photons.com.tw`；用於 `glab mr create --reviewer`。空字串 → 跳過 reviewer 指派）
+**Base branch:** `{base_branch}`（manager 傳入；預設 `main`。技術人員在 Notion 工單留言明確指定分支（如 `feature/20260815`、`hotfix/xxx`）時為該分支——worktree 建立、推前 rebase、MR target 三者一律用同一個值，**不可自行改回 main**。下文所有 `origin/{base_branch}`、`git fetch origin {base_branch}`、`--target-branch {base_branch}` 都要代入這個值）
 
 ## GitLab CLI 前置條件
 
@@ -38,9 +39,9 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 ## Permitted Commands
 
-- `cd {worktree_path}/{repo} && git fetch origin dev && git rebase origin/dev`（Step 0.5 推前基準新鮮度校驗）
+- `cd {worktree_path}/{repo} && git fetch origin {base_branch} && git rebase origin/{base_branch}`（Step 0.5 推前基準新鮮度校驗）
 - `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id}`
-- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch dev --title <...> --description <...> --reviewer <username> --yes`
+- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch {base_branch} --title <...> --description <...> --reviewer <username> --yes`
 - `cd {worktree_path}/{repo} && glab mr view mr/{ticket_id} --output json`
 - `curl` 對 Notion API（POST comment, PATCH page）
 - `Read` 任何 worktree 或 Debug 文件
@@ -52,7 +53,7 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 - 裸 `git push --force` / `--no-verify`（`--force-with-lease` 僅允許用於 Step 0.5 rebase 後的 push）
 - 對 symlink 的 repo 執行 git 命令
 
-**例外允許**：Step 0.5 的 `git fetch origin dev` 與 `git rebase origin/dev`（推前基準新鮮度校驗，僅把分支 rebase 到最新 origin/dev，不改動任何 source / test）。
+**例外允許**：Step 0.5 的 `git fetch origin {base_branch}` 與 `git rebase origin/{base_branch}`（推前基準新鮮度校驗，僅把分支 rebase 到最新 origin/{base_branch}，不改動任何 source / test）。
 
 ## Notion API
 
@@ -86,24 +87,24 @@ done
 
 ### Step 0.5: 分支基準新鮮度校驗（推前 rebase）
 
-`/create-mr` 從 tracer 到 reviewer 可能歷時數十分鐘,期間 `origin/dev` 可能已有新 commit。push 前對每個 affected repo 確認分支仍基於最新 `origin/dev`,落後則 rebase：
+`/create-mr` 從 tracer 到 reviewer 可能歷時數十分鐘,期間 `origin/{base_branch}` 可能已有新 commit。push 前對每個 affected repo 確認分支仍基於最新 `origin/{base_branch}`,落後則 rebase：
 
 ```bash
 cd {worktree_path}/{repo}
-git fetch origin dev --quiet
+git fetch origin {base_branch} --quiet
 
 # 工作區必須乾淨（fixer 已 commit 完畢），否則無法安全 rebase
 if [ -n "$(git status --porcelain)" ]; then
   echo "DIRTY_WORKTREE: $repo 有未 commit 變更,跳過 rebase"
 else
-  BEHIND=$(git rev-list --count HEAD..origin/dev)
+  BEHIND=$(git rev-list --count HEAD..origin/{base_branch})
   if [ "$BEHIND" -gt 0 ]; then
-    echo "BEHIND_DEV: $repo 落後 origin/dev $BEHIND 個 commit,執行 rebase"
-    if git rebase origin/dev; then
+    echo "BEHIND_BASE: $repo 落後 origin/{base_branch} $BEHIND 個 commit,執行 rebase"
+    if git rebase origin/{base_branch}; then
       echo "REBASED: $repo"
     else
       git rebase --abort
-      echo "REBASE_CONFLICT: $repo 與 origin/dev 衝突,rebase 已 abort,將直接 push 原分支"
+      echo "REBASE_CONFLICT: $repo 與 origin/{base_branch} 衝突,rebase 已 abort,將直接 push 原分支"
     fi
   else
     echo "UP_TO_DATE: $repo"
@@ -111,8 +112,8 @@ else
 fi
 ```
 
-- **rebase 成功 / 已是最新** → 分支基於最新 `origin/dev`,繼續 Step 1。
-- **rebase 衝突** → 已 `git rebase --abort` 還原,**不中止流程**：仍照 Step 1 push 原分支並開 MR,但須在 Step 3 Notion 留言與 Step 5 報告標示「分支落後 origin/dev 且自動 rebase 衝突,需人工 rebase」。
+- **rebase 成功 / 已是最新** → 分支基於最新 `origin/{base_branch}`,繼續 Step 1。
+- **rebase 衝突** → 已 `git rebase --abort` 還原,**不中止流程**：仍照 Step 1 push 原分支並開 MR,但須在 Step 3 Notion 留言與 Step 5 報告標示「分支落後 origin/{base_branch} 且自動 rebase 衝突,需人工 rebase」。
 - **工作區不乾淨**（理論上不該發生,fixer 應已 commit 完畢）→ 同上,跳過 rebase、照常 push,並在報告標示。
 
 rebase 會改寫 commit hash,故 Step 1 的 push 一律用 `--force-with-lease`（見下）。
@@ -124,8 +125,8 @@ rebase 會改寫 commit hash,故 Step 1 的 push 一律用 `--force-with-lease`�
 ```bash
 cd {worktree_path}/{repo}
 
-# 確認與 origin/dev 有差異
-if [ -z "$(git log origin/dev..HEAD --oneline)" ]; then
+# 確認與 origin/{base_branch} 有差異
+if [ -z "$(git log origin/{base_branch}..HEAD --oneline)" ]; then
   echo "NO_COMMITS: $repo"
   continue
 fi
@@ -156,7 +157,7 @@ fi
 # 若該 ticket 在此 repo 已存在 MR（重跑 case）,glab mr create 會 fail
 MR_URL=$(glab mr create \
   --source-branch mr/{ticket_id} \
-  --target-branch dev \
+  --target-branch {base_branch} \
   --title "fix: [{ticket_id}] {bug_summary}" \
   --description "$(cat {solution_md_path})" \
   $REVIEWER_FLAG \
@@ -173,7 +174,7 @@ if echo "$MR_URL" | grep -qiE "reviewer.*not.*found|invalid.*reviewer|user.*not.
   echo "WARN: reviewer $REVIEWER_USERNAME 無法解析,改不指定 reviewer 重試"
   MR_URL=$(glab mr create \
     --source-branch mr/{ticket_id} \
-    --target-branch dev \
+    --target-branch {base_branch} \
     --title "fix: [{ticket_id}] {bug_summary}" \
     --description "$(cat {solution_md_path})" \
     --yes 2>&1)

@@ -96,7 +96,7 @@ done
 
 ### Step 2: 為有 MR 的 repo 建立 worktree（base = origin/mr/{ticket_id}）
 
-只為 `mr_targets` 中的 repo 建立真正的 git worktree，**base 是既有的 `origin/mr/{ticket_id}` 分支**（沿用既有 MR 分支，不是 `origin/dev`）；其餘主 repo 與共用庫用 symlink 補齊，確保 `bootstrap.sh` / `generate-*` 內的相對路徑可解析。
+只為 `mr_targets` 中的 repo 建立真正的 git worktree，**base 是既有的 `origin/mr/{ticket_id}` 分支**（沿用既有 MR 分支，不是 `origin/main`）；其餘主 repo 與共用庫用 symlink 補齊，確保 `bootstrap.sh` / `generate-*` 內的相對路徑可解析。
 
 ```bash
 mkdir -p /Users/user/aladdin/worktrees/{ticket_id}

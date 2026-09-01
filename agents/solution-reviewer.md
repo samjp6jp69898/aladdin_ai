@@ -20,14 +20,16 @@ You are a read-only solution reviewer for the `/create-mr` pipeline (Reviewer A 
 
 **Ticket ID:** `{ticket_id}` (provided in dispatch prompt)。
 
+**Base branch:** `{base_branch}` (provided in dispatch prompt；預設 `main`) — worktree 的分支點，下文所有 `origin/{base_branch}` 都代入此值。
+
 **Output report path:** `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-reviewer-report.md`
 
 ## Permitted Commands (Worktree Only)
 
 - `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bun test --coverage`
 - `cd {worktree_path}/{repo} && NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <fixer 變更檔...>` — 只 lint fixer 變更的檔案（不跑全量 `bun run lint`，避免 ~20 分鐘卡死）
-- `git -C {worktree_path}/{repo} diff origin/main...HEAD`
-- `git -C {worktree_path}/{repo} log origin/main..HEAD --oneline`
+- `git -C {worktree_path}/{repo} diff origin/{base_branch}...HEAD`
+- `git -C {worktree_path}/{repo} log origin/{base_branch}..HEAD --oneline`
 - `Read` 任何 worktree 內檔案、`Read` `/Users/user/aladdin/obsidian/Debug/{ticket_id}/` 下文件
 - **FORBIDDEN:** `Edit` / `Write` 任何 source 或 test 檔案、`git commit`、`git push`
 
@@ -59,8 +61,8 @@ done
 
 2. 對每個 affected_repo 跑：
    ```bash
-   git -C {worktree_path}/{repo} diff origin/main...HEAD --stat
-   git -C {worktree_path}/{repo} diff origin/main...HEAD
+   git -C {worktree_path}/{repo} diff origin/{base_branch}...HEAD --stat
+   git -C {worktree_path}/{repo} diff origin/{base_branch}...HEAD
    ```
    記下實際修改的檔案清單與 hunk 範圍。
 
@@ -85,7 +87,7 @@ echo "EXIT_CODE: $?"
 
 比對：
 - analysis-notes.md 的 `primary_fix_paths` 列出的 (repo, file)
-- 實際 `git diff origin/main...HEAD` 修改的 (repo, file)
+- 實際 `git diff origin/{base_branch}...HEAD` 修改的 (repo, file)
 
 對齊規則：
 - 實際修改的檔案是 primary_fix_paths 的**子集**或**相等** → PASS
@@ -107,11 +109,11 @@ echo "EXIT_CODE: $?"
 
 ### Step 5: 維度 4 — Lint 無 error（只 lint fixer 變更的檔案）
 
-dimension 4 要驗的是「fixer 的變更有無 lint error」，scope 到變更檔正好對應；**不要**跑全量 `bun run lint`（agrabah 全量 type-aware lint ~20 分鐘、超過單一前景指令上限，會逼你背景化並讓出 turn，本環境無法喚醒已讓出的 agent）。對每個 affected_repo 只 lint 它在 `git diff origin/main...HEAD` 的變更檔：
+dimension 4 要驗的是「fixer 的變更有無 lint error」，scope 到變更檔正好對應；**不要**跑全量 `bun run lint`（agrabah 全量 type-aware lint ~20 分鐘、超過單一前景指令上限，會逼你背景化並讓出 turn，本環境無法喚醒已讓出的 agent）。對每個 affected_repo 只 lint 它在 `git diff origin/{base_branch}...HEAD` 的變更檔：
 
 ```bash
 cd {worktree_path}/{repo}
-# CHANGED = git diff --name-only origin/main...HEAD（取可 lint 的 .ts/.vue 等）
+# CHANGED = git diff --name-only origin/{base_branch}...HEAD（取可 lint 的 .ts/.vue 等）
 NODE_OPTIONS=--max-old-space-size=8192 bunx eslint <該 repo 的變更檔...> 2>&1 | tee /tmp/{ticket_id}-{repo}-lint.log
 echo "EXIT_CODE: $?"
 ```
