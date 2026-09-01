@@ -32,7 +32,6 @@
 
 import { readFileSync } from 'fs';
 
-const NOTION_TOKEN = '***REMOVED-NOTION-TOKEN***';
 const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const WANTED_STATUSES = ['仍有問題', '待處理'] as const;
@@ -50,6 +49,15 @@ function parseOut(): string {
     return DEFAULT_OUT;
 }
 const shouldPush = !process.argv.slice(2).includes('--no-push');
+
+// ── Notion：token 只從 .env 讀，不寫死（與 notion.sh / notion-bug-query-v2.ts 同一把 ALD_NOTION_TOKEN）──
+function loadNotionToken(): string {
+    const content = readFileSync(ENV_FILE, 'utf-8');
+    const line = content.split('\n').find(l => l.startsWith('ALD_NOTION_TOKEN='));
+    const token = line?.slice('ALD_NOTION_TOKEN='.length).trim();
+    if (!token) throw new Error(`無法從 ${ENV_FILE} 讀取 ALD_NOTION_TOKEN`);
+    return token;
+}
 
 // ── Telegram：token 只從 .env 讀，不寫死 ──
 function loadTelegramToken(): string {
@@ -110,7 +118,7 @@ function loadTechIds(): Set<string> {
     return ids;
 }
 
-async function queryAll(filter: object) {
+async function queryAll(filter: object, notionToken: string) {
     const all: any[] = [];
     let startCursor: string | undefined;
     let hasMore = true;
@@ -120,7 +128,7 @@ async function queryAll(filter: object) {
         const res = await fetch(`${NOTION_API}/data_sources/${DATA_SOURCE_ID}/query`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${NOTION_TOKEN}`,
+                'Authorization': `Bearer ${notionToken}`,
                 'Notion-Version': '2025-09-03',
                 'Content-Type': 'application/json',
             },
@@ -156,9 +164,16 @@ if (shouldPush) {
         process.exit(1);
     }
 }
+let notionToken: string;
+try {
+    notionToken = loadNotionToken();
+} catch (e) {
+    console.error(e instanceof Error ? e.message : String(e));
+    process.exit(1);
+}
 const techIds = loadTechIds();
 const filter = { or: WANTED_STATUSES.map(s => ({ property: '狀態', select: { equals: s } })) };
-const pages = await queryAll(filter);
+const pages = await queryAll(filter, notionToken);
 
 type Cat = '技術人員' | '非技術人員' | '未指派';
 interface Stat { name: string; cat: Cat; bySev: Map<string, number>; total: number }

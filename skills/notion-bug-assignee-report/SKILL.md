@@ -29,7 +29,7 @@ bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assigne
 
 只有本機除錯/測試、不想真的通知 Landon 時才加 `--no-push`（跳過步驟 2、3，只產出 CSV）——**正常使用一律不要加這個旗標**。
 
-本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是 `bash /Users/user/aladdin/cron/bug-report-run.sh`，內容只是呼叫上面這支 `.ts`（不帶 `--no-push`），不重複推送。
+本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是 `zsh /Users/user/aladdin/telegram-dispatcher/cron/bug-report-run.sh`，經 `cron/bug-report-send.ts` → `lib/webhook-server/run-bug-assignee-report.ts` 以 `execFileSync` 呼叫上面這支 `.ts`（不帶 `--no-push`）。**注意：這代表會推播兩次**——本腳本內建推給 Landon（固定 chat_id，見上）一次，`bug-report-send.ts` 另外再推給 `TG_BUG_REPORT_ADMIN_CHAT_ID` 一次，兩邊互不知情、不是同一份邏輯去重（2026-09-01 排查時發現，尚未收斂成單一推送路徑）。
 
 - 進度訊息（技術名單載入人數、等級欄、各等級張數、總計、寫入路徑、推送結果）印到 **stderr**，不汙染 CSV stdout。
 - 輸出用 `Bun.write`，`--out` 父目錄不存在會**自動建立**，不需先 mkdir。
@@ -97,7 +97,7 @@ Tintin Liou KHH,非技術人員,3,14,11,5,33
 - **人次加總 = ticket 去重總數**：此 DB 每張單最多一位指派人，無多重指派重複計算；若未來改成可多指派，人次會大於 ticket 數，需在報告中註明。
 - **即時資料波動**：Notion 是即時資料，相隔數分鐘重跑，總數與各人數字可能微幅變動屬正常，非邏輯錯誤。
 - **「（無名稱）」列**：指派欄有 person 但 API 未回傳 name，因 id 不在名單，歸非技術人員。
-- token 與 data source id 寫死於腳本（沿用 `aladdin_ai/scripts/notion-bug-query-v2.ts` 慣例）。
+- data source id 寫死於腳本；Notion token 動態讀取 `aladdin_ai/.env.local` 的 `ALD_NOTION_TOKEN`（與 `aladdin_ai/scripts/notion.sh` / `notion-bug-query-v2.ts` 同一把，token 輪替只需改 `.env.local` 一處，見 2026-09-01 修復紀錄）。
 
 ## 客製（調整篩選或維度）
 
