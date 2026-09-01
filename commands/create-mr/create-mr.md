@@ -27,7 +27,7 @@ argument-hint: "<ticket_id>"
 ## Manager 鐵律
 
 1. tracker 只用 `bash /Users/user/aladdin/scripts/tracker.sh` 操作（`next`/`row`/`set`/`counts`/`log-fail`）。**禁止 cat 整個 tracker、禁止用 Edit tool 直改**（檔案 166KB）。
-2. Notion 寫回只用 `bash /Users/user/aladdin/scripts/notion.sh`（`comment-text`/`update-prop`）。**禁止手寫含 token 的 curl。**
+2. Notion 寫回只用 `bash /Users/user/aladdin/scripts/notion.sh`（`comment-text`/`update-prop`）或包裝它的 `scripts/create-mr-exit-comment.sh`（Step 7c 四種非 success 出口的留言模板都在該腳本內）。**禁止手寫含 token 的 curl。**
 3. 派工一律用 Agent tool 的 `subagent_type` 直接引用註冊 agent（如 `subagent_type: bug-tracer-with-callgraph`）。**prompt 裡禁止出現「Use all text in {agent .md 路徑} as the prompt」**——定義檔本來就是該 agent 的 system prompt，叫它再讀一次 = 每次多燒 1 萬+ token。prompt 只放：本單變數、文件路徑、回報格式。並行派工的兩三個 agent，一律在同一輪訊息內各自獨立呼叫 Agent tool（不要序列等前一個回來才發下一個）。
 4. 每步派工都用同步等待（`run_in_background: false`）。agent 若中途讓出（未給出契約尾行就結束）→ 視為該次嘗試失敗重派接手（worktree 內既有變更由接手者延續）。tracer/fixer 的重派計入其 attempt 上限；**其他步驟（1/2a-grounder/6-任一 reviewer/7a/7b）的契約缺失重派以 1 次為限**，再缺失依該步的降級或失敗分支處理，不得無限重派。
 5. 模型分級已寫死在各 agent 定義檔 frontmatter（tracer/grounder=opus、fixer/reviewer 等=sonnet），派工時**不要**另指定 `model` 覆蓋，除非走到「升級路徑」（`10-model-dispatch.md` 第 5 節）。
@@ -340,48 +340,17 @@ fi
 ```
 輸出存 `tg_notify_result`（TG_SENT / TG_SKIP_* / TG_FAIL 皆不阻斷）。
 
-### 7c：Manager Notion 寫回（非 success 路徑；全部走 notion.sh，兩行搞定）
+### 7c：Manager Notion 寫回（非 success 路徑；一律走腳本，留言模板在腳本內，不要內嵌）
 
-`bootstrap_partial=true` 時，下列每種留言文字尾端都加一行：`（注：隔離環境 bootstrap 的 DB 資料供給步驟未完成，不影響本次 L0 分析結論）`
-
-**already_fixed**：
 ```bash
-bash /Users/user/aladdin/scripts/notion.sh comment-text {page_id} "AI 分析完成。Tracer 確認此 bug 已於 commit {fixed_commit} 修復，無需再發 PR。
-分析報告：" "{drive_link}"
-bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析成功"
+bash /Users/user/aladdin/scripts/create-mr-exit-comment.sh {pipeline_status} {page_id} \
+  --ticket {ticket_id} --drive-link {drive_link} --notion-url {notion_url} \
+  {already_fixed：--fixed-commit {fixed_commit}} \
+  {needs_qa_clarification：--qa-question "{qa_question}" --reviewer-email "{reviewer_email}"} \
+  {failed：--failure-reason "{failure_reason}" --attempts {tracer_attempt} {fixer_attempt} {total_attempt} --reviewer-email "{reviewer_email}"} \
+  {bootstrap_partial=true 時加：--bootstrap-partial}
 ```
-**i18n_manual_handoff**：
-```bash
-bash /Users/user/aladdin/scripts/notion.sh comment-text {page_id} "AI 分析完成。主因為 i18n 翻譯缺失/錯誤，依專案規範 AI 不主動修 localizations JSON。已在分析文件附上建議匯入的 key/value 草稿：
-請開發者參考 i18n keys 清單從 Google Sheets 匯入：" "{drive_link}"
-bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析成功"
-```
-**needs_qa_clarification**（另發 TG）：
-```bash
-bash /Users/user/aladdin/scripts/notion.sh comment-text {page_id} "AI 在實證 grounding 階段發現 bug 單描述與 CQA 實際狀況可能有出入，需 QA 確認後才繼續分析：
-{qa_question}
-（完整佐證見分析文件）" "{drive_link}"
-bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "待釐清"
-bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "🟡 [待釐清] {ticket_id}
-AI 發現 bug 單與 CQA 實況可能有出入，需你確認：
-{qa_question}
-分析文件：{drive_link}
-Notion：{notion_url}"
-```
-**failed**（2026-08-26 起附分析文件連結＋發 TG；drive_link 為 N/A 時留言省略「分析與審查文件」該行、TG 省略該行）：
-```bash
-bash /Users/user/aladdin/scripts/notion.sh comment-text {page_id} "AI 分析失敗，需人工介入。
-失敗原因：{failure_reason}
-Tracer 嘗試：{tracer_attempt} 次，Fixer 嘗試：{fixer_attempt} 次（總 {total_attempt}）
-分析與審查文件（含各 reviewer 否決理由，供人工接手）：" "{drive_link}"
-bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析失敗"
-bash /Users/user/aladdin/scripts/tg-notify.sh --email "{reviewer_email}" --text "🔴 [分析失敗] {ticket_id}
-失敗原因：{failure_reason}
-嘗試：tracer {tracer_attempt} / fixer {fixer_attempt}（總 {total_attempt}）
-分析與審查文件：{drive_link}
-Notion：{notion_url}"
-```
-（`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）沒有收件人，跳過 TG 該行，其餘照發；tg-notify 失敗照慣例不阻斷，記入 `tg_notify_result`。）
+腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
 
 ## Step 8：解鎖 + tracker 終態 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
 
