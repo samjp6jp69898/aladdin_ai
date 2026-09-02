@@ -31,9 +31,21 @@
 #   - --set 成功寫入後一律嘗試重啟 telegram-dispatcher（見 TG_RESTART_CMD），失敗只警告
 #     不中止（CSV 已經寫成功，不能因為重啟失敗就回報整體失敗）。--unset 目前不重啟
 #     （移除白名單只是延後生效到下次重啟，非新增授權，風險方向不同，故未比照處理）。
+#
+# 2026-09-02（Phase 5 監控 DB 化）：--set/--unset 的寫入邏輯收斂到
+# telegram-dispatcher/lib/registry/tech-users-sync.ts（單一寫入者）。
+# MON_DB_ENABLED=1 時 CLI 走「寫 DB → 欄位級重生 CSV」；旗標關時 CLI 內部走
+# 等價的只改 CSV 路徑（行為鏡射本檔舊 awk 實作，CSV 結果 byte 相同）。
+# 本檔不再直改 CSV；CLI 呼叫本身失敗（bun 不在、腳本炸掉）一律 fail-loud
+# exit 1，不回退舊 awk 路徑（與 aladdin_mcps 委派層同一裁定：silent fallback
+# 會讓 DB 與檔案靜默分岔）。輸出契約不變：呼叫端（tg-chatid-sync skill、
+# tg-auto-sync.sh、tg-monitor lib/tg-users.ts）全部只做 SET_OK/UNSET_OK 等
+# prefix 比對；SET_OK 後的 dispatcher 重啟仍收斂在本檔（唯一出口，見 do_set）。
+#   TG_REGISTRY_CLI   覆寫 registry CLI 呼叫方式（測試用 stub）
 set -uo pipefail
 
 CSV="${TG_NOTIFY_CSV:-/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv}"
+REGISTRY_CLI="${TG_REGISTRY_CLI:-bun /Users/user/aladdin/telegram-dispatcher/lib/registry/tech-users-sync.ts}"
 
 usage(){
   cat >&2 <<'U'
@@ -44,38 +56,24 @@ usage:
 U
 }
 
-# ───────────────────────── --set（純 bash，header-aware 單格編輯）─────────────────────────
+# ───────────────────────── --set（委派 registry CLI；見檔頭 2026-09-02 註記）─────────────────────────
 do_set(){
   local email="${1:-}" chat="${2:-}" force=0
   case "${3:-}" in --force) force=1;; esac
   [ -z "$email" ] || [ -z "$chat" ] && { echo "SET_ERR_ARGS: need <email> <chat_id>"; return 0; }
-  [ ! -f "$CSV" ] && { echo "SET_ERR_NO_CSV: $CSV"; return 0; }
 
-  # header-aware 欄位索引（1-based，給 awk 用）；本 CSV 純逗號切分，欄位值不得含逗號
-  local header ecol ccol
-  header="$(head -n1 "$CSV" | tr -d '\r')"
-  ecol="$(awk -F',' -v want=email     'NR==1{for(i=1;i<=NF;i++)if($i==want){print i;exit}}' "$CSV")"
-  ccol="$(awk -F',' -v want=tg_chat_id 'NR==1{for(i=1;i<=NF;i++)if($i==want){print i;exit}}' "$CSV")"
-  [ -z "$ecol" ] || [ -z "$ccol" ] && { echo "SET_ERR_NO_COL: email/tg_chat_id 欄缺失"; return 0; }
-
-  # 找該 email 列的現值；找不到 → exit 3
-  local cur rc
-  cur="$(awk -F',' -v e="$email" -v ec="$ecol" -v cc="$ccol" \
-        'NR>1 && $ec==e{gsub(/[ \t\r]/,"",$cc); print $cc; f=1} END{if(!f)exit 3}' "$CSV")"
-  rc=$?
-  [ "$rc" -eq 3 ] && { echo "SET_ERR_NO_EMAIL: $email"; return 0; }
-
-  if [ "$cur" = "$chat" ]; then
-    echo "SET_NOOP: $email $chat"; return 0
+  local out rc
+  if [ "$force" -eq 1 ]; then
+    out="$($REGISTRY_CLI --csv "$CSV" --set "$email" "$chat" --force 2>&1)"; rc=$?
+  else
+    out="$($REGISTRY_CLI --csv "$CSV" --set "$email" "$chat" 2>&1)"; rc=$?
   fi
-  if [ -n "$cur" ] && [ "$force" -ne 1 ]; then
-    echo "SET_CONFLICT: $email has $cur (want $chat); use --force"; return 0
+  [ -n "$out" ] && printf '%s\n' "$out"
+  if [ "$rc" -ne 0 ]; then
+    echo "SET_ERR_REGISTRY: tech-users-sync.ts exit ${rc}（fail-loud，未回退舊路徑）" >&2
+    exit 1
   fi
-
-  local tmp; tmp="$(mktemp)"
-  awk -F',' -v OFS=',' -v e="$email" -v ec="$ecol" -v cc="$ccol" -v v="$chat" \
-    'NR>1 && $ec==e{$cc=v} {print}' "$CSV" > "$tmp" && mv "$tmp" "$CSV"
-  echo "SET_OK: $email $chat"
+  case "$out" in *SET_OK*) ;; *) return 0;; esac
 
   # 2026-08-25（使用者要求）：telegram-dispatcher 的白名單快取是 process 存活期間
   # 只讀一次（見 lib/user-resolution/tech-user.ts），--set 寫入 CSV 後若不重啟，
@@ -92,31 +90,19 @@ do_set(){
   fi
 }
 
-# ───────────────────────── --unset（取消連接：清空 tg_chat_id，不刪除整列）─────────────────────────
+# ───────────────────────── --unset（委派 registry CLI；清空 tg_chat_id，不刪除整列）─────────────────────────
 do_unset(){
   local email="${1:-}"
   [ -z "$email" ] && { echo "UNSET_ERR_ARGS: need <email>"; return 0; }
-  [ ! -f "$CSV" ] && { echo "UNSET_ERR_NO_CSV: $CSV"; return 0; }
 
-  local ecol ccol
-  ecol="$(awk -F',' -v want=email     'NR==1{for(i=1;i<=NF;i++)if($i==want){print i;exit}}' "$CSV")"
-  ccol="$(awk -F',' -v want=tg_chat_id 'NR==1{for(i=1;i<=NF;i++)if($i==want){print i;exit}}' "$CSV")"
-  [ -z "$ecol" ] || [ -z "$ccol" ] && { echo "UNSET_ERR_NO_COL: email/tg_chat_id 欄缺失"; return 0; }
-
-  local cur rc
-  cur="$(awk -F',' -v e="$email" -v ec="$ecol" -v cc="$ccol" \
-        'NR>1 && $ec==e{gsub(/[ \t\r]/,"",$cc); print $cc; f=1} END{if(!f)exit 3}' "$CSV")"
-  rc=$?
-  [ "$rc" -eq 3 ] && { echo "UNSET_ERR_NO_EMAIL: $email"; return 0; }
-
-  if [ -z "$cur" ]; then
-    echo "UNSET_NOOP: $email (已經沒有 chat_id)"; return 0
+  local out rc
+  out="$($REGISTRY_CLI --csv "$CSV" --unset "$email" 2>&1)"; rc=$?
+  [ -n "$out" ] && printf '%s\n' "$out"
+  if [ "$rc" -ne 0 ]; then
+    echo "UNSET_ERR_REGISTRY: tech-users-sync.ts exit ${rc}（fail-loud，未回退舊路徑）" >&2
+    exit 1
   fi
-
-  local tmp; tmp="$(mktemp)"
-  awk -F',' -v OFS=',' -v e="$email" -v ec="$ecol" -v cc="$ccol" \
-    'NR>1 && $ec==e{$cc=""} {print}' "$CSV" > "$tmp" && mv "$tmp" "$CSV"
-  echo "UNSET_OK: $email (was $cur)"
+  return 0
 }
 
 # ───────────────────────── --list（python：webhook-log + getUpdates + 比對信心）─────────────────────────

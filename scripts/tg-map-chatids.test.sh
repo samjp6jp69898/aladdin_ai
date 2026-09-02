@@ -93,6 +93,23 @@ mkcsv
 out="$(TG_NOTIFY_CSV="$CSV" bash "$SCRIPT" --unset nobody@photons.com.tw)"
 assert_has "unset unknown email prints UNSET_ERR_NO_EMAIL" "$out" "UNSET_ERR_NO_EMAIL"
 
+# ───────────────────────── registry CLI fail-loud（2026-09-02 委派後新增）─────────────────────────
+echo "## registry CLI fail-loud"
+
+# CLI 呼叫本身失敗（bun 不在／腳本炸掉）→ exit 1、印 *_ERR_REGISTRY、CSV 不變、不重啟、不回退舊 awk 路徑
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" TG_RESTART_CMD="true" TG_REGISTRY_CLI="/usr/bin/false" bash "$SCRIPT" --set pkh_farus@photons.com.tw 111 2>&1)"; rc=$?
+assert_eq  "set with broken CLI exits 1" "$rc" "1"
+assert_has "set with broken CLI prints SET_ERR_REGISTRY" "$out" "SET_ERR_REGISTRY"
+assert_eq  "set with broken CLI leaves cell untouched" "$(cell_of pkh_farus@photons.com.tw)" ""
+assert_no  "set with broken CLI does not restart" "$out" "RESTART"
+
+mkcsv
+out="$(TG_NOTIFY_CSV="$CSV" TG_REGISTRY_CLI="/usr/bin/false" bash "$SCRIPT" --unset pkh_mapped@photons.com.tw 2>&1)"; rc=$?
+assert_eq  "unset with broken CLI exits 1" "$rc" "1"
+assert_has "unset with broken CLI prints UNSET_ERR_REGISTRY" "$out" "UNSET_ERR_REGISTRY"
+assert_eq  "unset with broken CLI keeps cell" "$(cell_of pkh_mapped@photons.com.tw)" "777"
+
 # ───────────────────────── --list ─────────────────────────
 echo "## --list"
 
