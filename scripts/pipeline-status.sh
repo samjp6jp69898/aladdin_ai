@@ -73,7 +73,7 @@ for t in $TICKETS; do
   # worktree / MR 線索
   if [ -d "$WT_DIR/$t" ]; then
     brs=$(ls "$WT_DIR/$t" 2>/dev/null | tr '\n' ' ')
-    echo "  worktree: 已建立（$brs）→ 已進 Step4+ "
+    echo "  worktree: 已建立（${brs}）→ 已進 Step4+ "
   else
     echo "  worktree: 未建立（tracer 完成後才會建）"
   fi
