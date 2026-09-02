@@ -7,7 +7,7 @@
 
 - `.claude/commands`、`.claude/agents`、`.claude/skills`、`.claude/doctrine`、根目錄 `scripts`、`conn` **全是 symlink**，指向 `aladdin_ai/` 下的同名目錄——改一處即改全部，**不存在**「兩份 commands 要分別改」這回事。換機器 clone/pull `aladdin_ai` 後跑 `bash aladdin_ai/scripts/setup-symlinks.sh` 一鍵重建這組 symlink（歷史：`.claude/doctrine` 2026-07-21 由實體目錄轉 symlink；2026-08-31 這整組連同 `conn` 帶完整 git 歷史遷到獨立 `aladdin_ai` repo，同批 `mcps/` 遷到獨立 `aladdin_mcps` repo 且路徑攤平）。
 - `/Users/user/aladdin/CLAUDE.md` **是 symlink**，指向唯一實體檔 `obsidian/CLAUDE.md`（2026-09-01 由「雙實體 + sync-mirrors.sh 手動同步」改成單一來源 symlink，實測 `readlink` 確認；舊版需要跑 sync 才會反映改動的行為已不存在）。**一律改 `obsidian/CLAUDE.md`**，根目錄那份自動反映。
-- `AGENTS.md`（`/Users/user/aladdin/AGENTS.md`、`obsidian/AGENTS.md` 各一份，皆為 `AGENTS.md -> CLAUDE.md` 的 symlink，2026-08-25 新增）：給 Codex CLI 等遵循 agents.md 標準的工具讀同一份內容，改 `CLAUDE.md` 即同時生效，不需要另外維護。`sync-mirrors.sh --check` 的 symlink 健檢已涵蓋這兩個。⚠️ **環境事實更新（2026-08-28 實測）**：`obsidian/AGENTS.md` 正常，但 `/Users/user/aladdin/AGENTS.md` **目前不存在**，`--check` 會固定報一行 `SYMLINK_MISSING`。使用者當日裁定不修復，所以這行不是新故障、也不要自行重建；判斷 `--check` 是否全綠時把這行排除。
+- `AGENTS.md`（`/Users/user/aladdin/AGENTS.md`、`obsidian/AGENTS.md` 各一份，皆為 `AGENTS.md -> CLAUDE.md` 的 symlink，2026-08-25 新增）：給 Codex CLI 等遵循 agents.md 標準的工具讀同一份內容，改 `CLAUDE.md` 即同時生效，不需要另外維護。`sync-mirrors.sh --check` 的 symlink 健檢已涵蓋這兩個。**環境事實更新（2026-09-02 實測）**：兩份皆 `SYMLINK_OK`（先前 2026-08-25~2026-09-02 間專案根那份一度缺失、使用者裁定當時不修復，已於 2026-09-02 補回，本段落記錄留供對照）。
 - 陷阱：`find` 對「本身是 symlink 的目錄」作為路徑參數會**靜默回空**。要遍歷請用實體路徑（`aladdin_ai/...`，`mcps/` 相關則用 `aladdin_mcps/...`）或先 `cd` 進去。引用路徑前先 `ls -ld` 確認身分。
 - bash 3.2 陷阱：`"$VAR全形字"` 中變數後直接接全形字元會把變數名解析壞（unbound variable）。變數與 CJK 之間留空格或用 `${VAR}`。
 

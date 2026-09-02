@@ -32,11 +32,16 @@
 
 `/create-mr` 的 `cqa-grounder` agent（及被授權執行 grounding 的 tracer）允許在**主工作目錄**執行：
 - `bash /Users/user/aladdin/conn/db-cqa-query.sh <db> "<SELECT/SHOW/DESC/EXPLAIN>"`（唯讀查 CQA DB）
-- `/Users/user/aladdin/cqa-e2e/` 下的 Playwright（node）登入與截圖
+- `/Users/user/aladdin/cqa-e2e/` 下的 Playwright（node）登入、**依 ticket 重現步驟實際操作**（app 與後台皆可）與截圖
+- `bash /Users/user/aladdin/conn/portainer-login.sh cqa`、`bash /Users/user/aladdin/conn/portainer-logs.sh cqa <application> [--tail N]`（唯讀查 K8s pod log）
+- `bash /Users/user/aladdin/conn/kibana-logs.sh cqa <application> [--tail N]`（唯讀查 Elasticsearch log）
 - `Read` 截圖檔（含 app 端驗證碼視覺讀碼）
 
-界定：
-- **僅唯讀**：DB 只能 SELECT/SHOW/DESC/EXPLAIN；瀏覽器只做登入 + 導頁 + 截圖 + 讀 console/network，禁止任何寫入/送出表單以外的破壞性操作
-- **僅限 CQA 測試環境**：只能對 `*.ald777.com` 的 CQA 測試站與 `landon_ai` 唯讀 DB；**嚴禁對 production**
+界定（2026-09-02 使用者核准擴大重現操作範圍）：
+- **DB 僅唯讀**：只能 SELECT/SHOW/DESC/EXPLAIN，不因本次擴權而放寬
+- **瀏覽器可重現操作**：允許依 ticket 描述的步驟實際操作（含表單送出、按鈕點擊、寫入、不可逆/破壞性操作），目的是取得比對 ticket 症狀的第一手證據；操作前後建議截圖存證。因本 pipeline 全自動無人工中斷點，agent 不需為此類操作停下詢問使用者
+- **log 查詢僅唯讀**：Portainer/Kibana 只用來查已有 log，不做任何設定變更、不重啟服務、不刪除資料
+- 一邊操作重現一邊查對應服務的 log（Portainer/Kibana），佐證症狀與後端行為的關聯
+- **僅限 CQA 測試環境**：只能對 `*.ald777.com` 的 CQA 測試站、`landon_ai` 唯讀 DB、CQA 的 Portainer/Kibana；**嚴禁對 production**
 - 連線資訊一律從 `aladdin_ai/.env.cqa`（2026-08-31 前為根目錄 `/Users/user/aladdin/.env`）讀，不得寫死於腳本或 prompt
 - 此放行適用於主工作目錄（grounder 跑在 worktree 建立之前），與 Worktree 放行條款分屬不同層級
