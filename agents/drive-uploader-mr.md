@@ -23,13 +23,13 @@ Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed`
 
 | pipeline_status | solution.md | Drive 上傳檔案清單 | Notion 留言 / AI分析 |
 |---|---|---|---|
-| `success` | 執行 Step 0 編譯 | `{id}-solution.md` + `{id}-analysis-notes.md` + `{id}-reviewer-report.md` | **跳過**（由 mr-pusher 統一處理） |
+| `success` | 執行 Step 0 編譯 | `{id}-solution.md` + `{id}-analysis-notes.md` + `{id}-reviewer-report.md` + UI 視覺證據（`{id}-ui-before*` / `{id}-ui-after*`，**只上傳存在的，缺則略過不報錯**——只有純 UI/UX fix 才會有這些檔案） | **跳過**（由 mr-pusher 統一處理） |
 | `already_fixed` | **跳過** | `{id}-analysis-notes.md` | **跳過**（由 manager 統一處理） |
 | `i18n_manual_handoff` | **跳過** | `{id}-analysis-notes.md` + `{id}-i18n-keys-to-import.md` | **跳過**（由 manager 統一處理） |
 | `needs_qa_clarification` | **跳過** | `{id}-grounding.md`（必有）+ `{id}-analysis-notes.md`（存在才傳） | **跳過**（由 manager 統一處理） |
-| `failed` | worktree 有 fixer diff 才編譯（檔頭標注「⚠ 審查未全數通過，僅供人工接手參考」） | `{id}-solution.md`（若有編）+ analytics / spec / grounding / analysis-notes + 三份 review 報告（**只上傳存在的，缺則略過不報錯**） | **跳過**（由 manager 統一處理） |
+| `failed` | worktree 有 fixer diff 才編譯（檔頭標注「⚠ 審查未全數通過，僅供人工接手參考」） | `{id}-solution.md`（若有編）+ analytics / spec / grounding / analysis-notes + 三份 review 報告 + UI 視覺證據（**只上傳存在的，缺則略過不報錯**） | **跳過**（由 manager 統一處理） |
 
-`failed` 於 2026-08-26 由「完全跳過所有 Drive 動作」改為上傳分析與審查文件（使用者當日指示：failed 留言缺 solution 與相關文件、無從人工接手）。失敗可能死在任何一步，文件清單一律「存在才傳」；死於 Step 1 之前可能一份都沒有，此時如實回報 `DRIVE_LINK: N/A` 即可，不報錯。
+`failed` 狀態也要上傳既有的分析與審查文件（供人工接手參考，缺了這些文件人工無從接手）。失敗可能死在任何一步，文件清單一律「存在才傳」；死於 Step 1 之前可能一份都沒有，此時如實回報 `DRIVE_LINK: N/A` 即可，不報錯。
 
 本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / needs_qa_clarification / failed 路徑）處理。
 
@@ -181,6 +181,10 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-solution.md` (compiled in Step 0)
 - `{id}-analysis-notes.md` (Bug Tracer analysis + Bug Fixer repair record)
 
+**`pipeline_status == success` 時選配文件（只有純 UI/UX fix 才會存在，存在才傳，缺則略過不報錯）：**
+- `{id}-ui-before.png` / `{id}-ui-before-detail.png` / `{id}-ui-before.mp4`
+- `{id}-ui-after.png` / `{id}-ui-after-detail.png` / `{id}-ui-after.mp4`
+
 **`pipeline_status == i18n_manual_handoff` 時必要文件：**
 - `{id}-analysis-notes.md` (Bug Tracer analysis only)
 - `{id}-i18n-keys-to-import.md` (產自上方 i18n_manual_handoff 額外步驟)
@@ -192,7 +196,8 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 **`pipeline_status == failed` 時文件清單（全部「存在才傳」，缺則略過不報錯；一份都沒有 → 直接進 Step 5 回報 `DRIVE_LINK: N/A`）：**
 - `{id}-solution.md`（Step 0 有編才有）
 - `{id}-analytics.md` / `{id}-spec.md` / `{id}-grounding.md` / `{id}-analysis-notes.md`
-- `{id}-reviewer-report.md` / `{id}-adversarial-review.md` / `{id}-tdd-fidelity-review.md`（審查報告——failed 的關鍵佐證，人工要看否決理由）
+- `{id}-reviewer-report.md` / `{id}-adversarial-review.md` / `{id}-tdd-fidelity-review.md` / `{id}-final-adversarial-review.md`（審查報告——failed 的關鍵佐證，人工要看否決理由）
+- `{id}-ui-before*` / `{id}-ui-after*`（若曾走過 UI 視覺證據流程）
 
 ### Step 2: Create Google Drive Subfolder
 
@@ -208,12 +213,15 @@ Extract FOLDER_ID and URL.
 
 **`pipeline_status == failed` 時，逐一上傳 Step 1 failed 清單中實際存在的文件（同一個 upload 指令、換檔名即可）。**
 
-`pipeline_status == success` 時，上傳下列三份文件：
+`pipeline_status == success` 時，上傳下列三份必要文件，並附帶檢查 UI 視覺證據（存在才傳，缺則略過不報錯）：
 
 ```bash
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-reviewer-report.md" "{FOLDER_ID}"
+for f in "{id}-ui-before.png" "{id}-ui-before-detail.png" "{id}-ui-before.mp4" "{id}-ui-after.png" "{id}-ui-after-detail.png" "{id}-ui-after.mp4"; do
+  [ -f "/Users/user/aladdin/obsidian/Debug/{id}/$f" ] && bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/$f" "{FOLDER_ID}"
+done
 ```
 
 `pipeline_status == already_fixed` 時，僅上傳一份文件：
@@ -274,7 +282,7 @@ manager 會解析這行,把連結傳給 mr-pusher 或寫入 Notion 留言。
 - Token expired (401) → Prompt user to re-authorize
 
 ## Important Restrictions
-- Only upload `*-solution.md`, `*-analysis-notes.md`, `*-reviewer-report.md`, `*-i18n-keys-to-import.md`, `*-grounding.md`
+- Only upload `*-solution.md`, `*-analysis-notes.md`, `*-reviewer-report.md`, `*-adversarial-review.md`, `*-tdd-fidelity-review.md`, `*-final-adversarial-review.md`, `*-i18n-keys-to-import.md`, `*-grounding.md`, `*-analytics.md`, `*-spec.md`, `*-ui-before*.png`, `*-ui-before*.mp4`, `*-ui-after*.png`, `*-ui-after*.mp4`
 - Do not modify source code
 - Do not delete any files
 - Do not git push

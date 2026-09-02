@@ -45,7 +45,7 @@ SessionStart hook 每個 session 注入約 1.2k token 的「任何動作前必�
 **優化停損準則（below 這些事，做了大概率是浪費——除非先有數據推翻）：**
 - ❌ 不要憑直覺動 58KB 的 tracer 定義檔做「prompt 手術」——分析品質的改善路徑是回測飛輪（量化 → 蒸餾 → 閉環），不是重寫 prompt。動它前先問：回測數據指出了哪個具體失效模式？
 - ❌ 不要為假想情境加 pipeline 分支（「如果哪天…」）——等真的發生、進了 pipeline-failures.md 再說（退化模式 5：例外堆疊）。
-- ❌ 不要整批調整 agent 的 model 分級——現行分級（tracer/grounder=opus、其餘=sonnet）沒有成本或品質數據支持變更前不動。
+- ❌ 不要再自行整批調整 agent 的 model 分級——沒有成本或品質數據支持變更前不動（2026-09-02 更新：使用者已明確核准將 Step 5 fixer + Step 6 三位 reviewer 由 sonnet 調升為 opus，此為使用者本人決定的例外，非 session 自行判斷；見 change-log 同日條目）。
 - ❌ 不要建 token 成本儀表板之類的「監測基建」——現階段 /cost + change-log 足夠，痛了再建。
 - ✅ 值得做（任何 session、照 doctrine 即可）：refine-mr.md 的完整 v2 化（比照 create-mr：契約尾行、腳本化、出口表——已有 worked example 可抄）；首跑 canary 發現的任何實際坑。
 

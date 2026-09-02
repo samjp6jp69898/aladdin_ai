@@ -6,7 +6,7 @@
 ## 0. 環境事實（已驗證，不要憑印象改）
 
 - **Agent tool 每次派工可指定 `model`**：`haiku` / `sonnet` / `opus`（`fable` 僅特殊開通 session 可用，日常不要指定它，指定了會退回或報錯）。不指定 = 繼承 agent 定義檔的 `model:` frontmatter；再無則繼承主對話模型。
-- **`.claude/agents/*.md` frontmatter** 支援 `model:`（haiku/sonnet/opus/inherit/完整 model id）與 `effort:`（low/medium/high/xhigh/max）。本專案 21 個 agent 已全部設好 `model:`（tracer 類 = opus，fixer/reviewer/pusher 類 = sonnet）。
+- **`.claude/agents/*.md` frontmatter** 支援 `model:`（haiku/sonnet/opus/inherit/完整 model id）與 `effort:`（low/medium/high/xhigh/max）。本專案 25 個 agent（2026-09-02 實測 `ls aladdin_ai/agents/*.md | wc -l`）已全部設好 `model:`（tracer/grounder 類 = opus；create-mr Step 5 fixer + Step 6 三位 reviewer + Step 6.5 final-adversarial-reviewer = opus，2026-09-02 使用者核准調升/新增；mr-pusher/drive-uploader-mr 等其餘類 = sonnet）。
 - **Agent tool 沒有 per-call effort 參數**：要調 effort 只能改 agent 定義檔的 frontmatter。
 - **每個 subagent 都會載入專案 CLAUDE.md**：所以 CLAUDE.md 越肥，每派一個 agent 就多付一次。
 - **成本級距**（每百萬 input/output token）：Haiku $1/$5、Sonnet $2/$10、Opus $5/$25。Opus ≈ 5×Haiku。
@@ -49,8 +49,8 @@
 | 級別 | 用於 | 本專案實例 |
 |---|---|---|
 | **haiku** | 機械性、格式固定、判斷含量低：檔案搬運、格式轉換、單檔 read-back 驗證、固定腳本執行與結果轉錄 | 文件上傳類、tracker 轉錄、read-back 驗收 |
-| **sonnet**（預設） | 一般工程勞動：實作已規劃好的修改、寫測試、review 對照、搜尋彙整、研究筆記 | bug-fixer-with-tests、solution-reviewer、mr-pusher、drive-uploader-mr（現況即 sonnet） |
-| **opus** | 判斷密集、開放式、錯了很貴：root cause 分析、跨系統影響評估、對抗審查、規格矛盾判定 | bug-tracer-with-callgraph（opus/max）、cqa-grounder（opus） |
+| **sonnet**（預設） | 一般工程勞動：實作已規劃好的修改、review 對照、搜尋彙整、研究筆記 | mr-pusher、drive-uploader-mr、bug-report-and-spec-analyst（現況即 sonnet） |
+| **opus** | 判斷密集、開放式、錯了很貴：root cause 分析、跨系統影響評估、對抗審查、規格矛盾判定 | bug-tracer-with-callgraph（opus/max）、cqa-grounder（opus/max）、bug-fixer-with-tests（opus/high，2026-09-02 起）、solution-reviewer/adversarial-solution-reviewer/tdd-fidelity-reviewer（opus/high，2026-09-02 起）、final-adversarial-reviewer（opus/high，2026-09-02 新增，create-mr Step 6.5） |
 
 原則：
 - **先想「這步錯了的代價」**：錯了會白燒後面整條 pipeline（如 tracer 錯 → fixer/reviewer 全白跑）→ 用 opus。錯了重跑一次就好 → sonnet/haiku。

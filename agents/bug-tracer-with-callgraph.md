@@ -86,9 +86,9 @@ If you catch yourself thinking any of these, STOP:
 
 3. **後續所有 skill 腳本呼叫**必須在當前 shell session 內(已 `export` env),腳本會自動讀 `ALADDIN_ROOT_AT_DATE` 指向 worktree。**直接 Read source file 時也要從 `$WT_ROOT/<repo>/...` 路徑讀**,而非 `/Users/user/aladdin/<repo>/...`。
 
-4. **強制錨定鏈（不可 SKIP）—— 刪除舊「標 SKIPPED 仍續跑」逃生口**:
+4. **強制錨定鏈（不可 SKIP）**:
 
-   - **ticketDate 必得**:analytics 日期 → 否則取 `{ticket}/` 資料夾檔案最早 mtime。此鏈必出一個日期 ——「ticketDate 抓不到」不再是 SKIP 觸發條件。
+   - **ticketDate 必得**:analytics 日期 → 否則取 `{ticket}/` 資料夾檔案最早 mtime。此鏈必出一個日期,ticketDate 抓不到不得作為跳過本步驟的理由。
    - **每 repo worktree 強制建立 + 自我修復重試**:沿用上方 point 2 的 `git worktree add -d`(detached,不另建 branch);建立失敗時依下方範本重試,重試上限 3 次以吸收暫態 lock / 殘留路徑。**fallback `rm -rf` 必須使用 `${VAR:?}` 語法防呆**(空變數時 fail 而非展開成 `rm -rf /`,亦可避開 Bash tool 的 dangerous-rm 靜態檢查):
 
      ```bash
@@ -140,7 +140,7 @@ If you catch yourself thinking any of these, STOP:
 **目的**:在進五角度前先判定問題性質。五角度框架天生假設「症狀=某層有缺陷」,對「業務需求未實作」「by-design」兩種 not-a-bug 形態沒有出口,一旦進五角度就回不了頭。
 
 1. **讀 ticket 狀態**:從 analytics / spec 取 ticket 狀態。若為 `WON'T FIX` / 已知設計 / 需求調整類 → analysis-notes 開頭強制標 `⚠️ 疑似非 bug:ticket 狀態為 <X>`,且必須先附證據證偽「非 bug」假設,才能進五角度。
-2. **問題性質三分強制決策**(取代舊「bug vs 安全約束」二分):
+2. **問題性質三分強制決策**:
    - **(a) bug**:既有功能曾正常運作,後因改動 / 邏輯缺陷而壞掉。
    - **(b) 業務需求未實作**:規格新增 / 變更了某類型 / 欄位 / 流程,code 從未實作對應分支。硬訊號 —— fix commit message 含「根據規格書 / 依需求 / 新增 X 類型」;症狀對象是規格新增的列舉值**且從未被任何分支涵蓋過**(用 `git blame` 確認該守衛 / 分支是否曾涵蓋過該值:曾涵蓋後破壞=(a),從未涵蓋=(b))。
    - **(c) by-design**:症狀即規格定義的正確行為,正解為「不修 / 依規格移除該功能或該顯示」。
@@ -470,7 +470,7 @@ git log --since="$TICKET_DATE" --until="$(date -v+30d -j -f '%Y-%m-%d' "$TICKET_
 - abu worktree commit:<hash>(<commit date>)
 - lago worktree commit:<hash>(<commit date>)
 - rajah worktree commit:<hash>(<commit date>)
-- 若任一 repo 報案前無歷史:寫明「repo <X> 錨至首 commit <hash>」(非 SKIP — Step -1 已無 SKIP 逃生口;真正錨定失敗為 [ANCHOR-FAILED] 硬中止,不產出本 notes)
+- 若任一 repo 報案前無歷史:寫明「repo <X> 錨至首 commit <hash>」(非 SKIP;真正錨定失敗為 [ANCHOR-FAILED] 硬中止,不產出本 notes)
 
 ### Git log 雙路徑候選表
 
@@ -590,7 +590,7 @@ primary_fix_paths:
     reason: <one line>
 ```
 
-**特殊狀況 —— i18n 兩種情境須分流判定**(取代舊「全 i18n 必補 alternative_paths」無條件規則):
+**特殊狀況 —— i18n 兩種情境須分流判定**:
 
 - **情境 (a):i18n value 本身錯誤**(錯字 / 語意錯 / 缺 key)。判定依據 = 因果鏈顯示「UI 直接 `ui.t(key)` 取值、不經任何可改的 code 節點」。此時唯一正解就是改 JSON:`alternative_paths` **留空**並標 `[I18N-DATA-ONLY:無 code-level 等效方案,須人工 Google Sheets 匯入]`,歸屬方直接標「前端」。**禁止**為了湊一個可交付路徑去改 rajah 註解 / 後端 formatter 等**不在 UI 呼叫路徑上**的檔案。
 - **情境 (b):i18n 只是某條 code 路徑的顯示產物**(該 enum 可換、該文案可由後端決定)→ 才依下列格式列 `alternative_paths`(換 API / 換 enum / 架構繞道):

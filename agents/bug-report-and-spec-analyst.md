@@ -1,6 +1,6 @@
 ---
 name: bug-report-and-spec-analyst
-description: /create-mr 專用的合併 agent（2026-08-21 起取代 create-mr 舊 Step 1 + Step 2 的兩次派工）。先把 Notion bug 工單整理成標準格式的 analytics.md，再用其中的關鍵字搜尋企劃規格庫、產出 spec.md。單一 agent、單一 turn 內依序完成兩個階段。其他 pipeline（如 /analyze-bugs 的 V6）仍各自獨立派工 bug-report-analyst / spec-fetcher，不受本檔影響。
+description: /create-mr 專用的合併 agent。先把 Notion bug 工單整理成標準格式的 analytics.md，再用其中的關鍵字搜尋企劃規格庫、產出 spec.md。單一 agent、單一 turn 內依序完成兩個階段。其他 pipeline（如 /analyze-bugs 的 V6）仍各自獨立派工 bug-report-analyst / spec-fetcher，不受本檔影響。
 tools:
   - Bash
   - Read
@@ -134,7 +134,7 @@ done
 - Auxiliary document links include screenshots, videos, attachments, and all other relevant links. **Image URLs must retain the full query string signature parameters** (including X-Amz-Algorithm, X-Amz-Credential, X-Amz-Signature, etc.) and must not be truncated.
 - Strictly follow the original text of the bug report; do not add any speculation or judgment.
 - **All Comments / Ticket Status History / Related FAQ IDs** 三個 pass-through section 是 Tracer 後續判斷業務脈絡的關鍵 signal，禁止省略；若資料缺，明確寫「(無)」。
-- **Target Branch**（2026-09-01 新增，決定整條 pipeline 的 worktree 分支點與 MR 目標分支）：掃描 Step 3 的頁面內文與 Step 4 的**全部 comments**，找技術人員**明確指定**要從哪個分支開 MR 的敘述（例：「請從 feature/20260815 開 MR」「這張走 hotfix/20260830-payment」「base 用 feature/20260815」）。規則：
+- **Target Branch**（決定整條 pipeline 的 worktree 分支點與 MR 目標分支）：掃描 Step 3 的頁面內文與 Step 4 的**全部 comments**，找技術人員**明確指定**要從哪個分支開 MR 的敘述（例：「請從 feature/20260815 開 MR」「這張走 hotfix/20260830-payment」「base 用 feature/20260815」）。規則：
   - 只接受**原文逐字出現、長得像 git 分支名**的字串（`feature/YYYYMMDD`、`hotfix/...`、其他含 `/` 或 `-` 的分支名），原樣照抄、不翻譯、不補全、不猜測；沒有人明確指定 → 寫「(Not provided)」，**絕不自行填 main 或 dev**。
   - 多則留言指定不同分支 → 取**時間最晚**的一則，並在 All Comments 之外不另加註解（原留言本來就會 dump 在 All Comments）。
   - 留言只提到「dev」「main」這種不是要求換分支的泛稱、或只是討論而非指示（「不知道要不要走 feature」）→ 一律「(Not provided)」。

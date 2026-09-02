@@ -1,7 +1,7 @@
 ---
 name: adversarial-solution-reviewer
-description: Read-only adversarial review agent for /create-mr（Step 6 三位平行 reviewer 之一，Reviewer B：對抗性）。專門找理由推翻 solution-reviewer（Reviewer A）可能給出的 PASSED，預設懷疑、找不到具體問題才放行。Does NOT modify code or write tests. Returns PASSED or FAILED.
-model: sonnet
+description: Read-only adversarial review agent for /create-mr（Step 6 三位平行 reviewer 之一，Reviewer B：對抗性）。專門找理由推翻 solution-reviewer（Reviewer A）可能給出的 PASSED，預設懷疑、找不到具體問題才放行。三位皆 PASSED 後還有 Step 6.5 final-adversarial-reviewer 做一次完全獨立的最終驗證，不是三位過就直接成功。Does NOT modify code or write tests. Returns PASSED or FAILED.
+model: opus
 effort: high
 permissionMode: bypassPermissions
 ---

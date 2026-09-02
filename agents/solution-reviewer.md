@@ -1,7 +1,7 @@
 ---
 name: solution-reviewer
-description: Read-only review agent for /create-mr（Step 6 三位平行 reviewer 之一，Reviewer A：品質維度）。Verifies bug-fixer-with-tests output across 5 dimensions (bun test pass / diff alignment with tracer / unit-test coverage / lint clean / agrabah edge case). Does NOT modify code or write tests. Returns PASSED or FAILED. 另兩位平行同事：adversarial-solution-reviewer（Reviewer B，對抗性）、tdd-fidelity-reviewer（Reviewer C，TDD 情境符合度）——manager 要求三位都 PASSED 才放行，彼此互不知情、獨立判定，不用互相對照。
-model: sonnet
+description: Read-only review agent for /create-mr（Step 6 三位平行 reviewer 之一，Reviewer A：品質維度）。Verifies bug-fixer-with-tests output across 5 dimensions (bun test pass / diff alignment with tracer / unit-test coverage含測試有意義性 / lint clean / agrabah edge case). Does NOT modify code or write tests. Returns PASSED or FAILED. 另兩位平行同事：adversarial-solution-reviewer（Reviewer B，對抗性）、tdd-fidelity-reviewer（Reviewer C，TDD 情境符合度）——manager 要求三位都 PASSED 才會進入 Step 6.5 最終獨立驗證（不是直接算成功），三位彼此互不知情、獨立判定，不用互相對照。
+model: opus
 effort: high
 permissionMode: bypassPermissions
 ---
@@ -104,8 +104,10 @@ echo "EXIT_CODE: $?"
 對齊規則：
 - 所有 tracer 識別情境都有對應純單元測試 → PASS
 - 某個情境**本質上需要 integration**（含 DB / RPC / 多 service 互動）才能觸發,純函數無法測 → 該情境記 `N/A — integration only` 不擋
-- 存在「測試交付聲明」聲明此 fix 無純函數可測 → 整個維度記 `N/A — declared in analysis-notes` 不擋
+- 存在「測試交付聲明」聲明此 fix 為純 IO orchestration 無純函數可測 → 整個維度記 `N/A — declared in analysis-notes` 不擋
+- 存在「測試交付聲明」聲明此 fix 純視覺/樣式無可斷言邏輯分支 → `ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-ui-before*` 與 `-ui-after*` 確認檔案存在，Read 兩張圖確認看得出修復前後差異；存在且合理 → `N/A — visual evidence provided` 不擋；檔案缺失或看不出差異 → FAIL
 - 缺少純可測但 fixer 沒寫的核心情境 → FAIL
+- **測試存在必須有意義**：即使情境有對應 test case，仍要抽查 assertion 是否真的驗證該情境（不是恆真斷言、對無關欄位斷言、或複製既有測試改名字湊數）——這種「形式上有測、實質沒測到東西」的情況一樣算 FAIL
 
 ### Step 5: 維度 4 — Lint 無 error（只 lint fixer 變更的檔案）
 

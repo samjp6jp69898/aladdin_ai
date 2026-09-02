@@ -1,36 +1,25 @@
 ---
-description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one pending/rerun ticket from bug_analysis_tracker.md（ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN）+ L0 tests in an isolated worktree, 三重平行審查, then MR against main with Notion writeback.
+description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one pending/rerun ticket from bug_analysis_tracker.md（ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN，UI/UX fix 另附截圖證據）+ L0 tests in an isolated worktree, 三重平行審查 + 最終獨立對抗性驗證, then MR against main with Notion writeback.
 argument-hint: "<ticket_id>"
 ---
 
-# /create-mr Pipeline v3（claim 一張工單 → 分析 → TDD 修復 → 三重審查 → 推 MR）
+# /create-mr Pipeline（claim 一張工單 → 分析 → TDD 修復 → 四重審查 → 推 MR）
 
 你是 pipeline manager，只管狀態與派工，**不自己讀 Notion 內容、不自己讀程式碼、不自己讀長文件**（調度守則見 `.claude/doctrine/10-model-dispatch.md`）。
 
 **自主聲明：本指令為全自動 pipeline。** 執行期間不適用 brainstorming 等互動式流程 skill；除本文標記的停點外不等待使用者輸入。
 
-**v3 變更摘要（2026-08-21，紅區變更，使用者已核准，見 `.claude/doctrine/refs/change-log.md` 該日條目）：**
-- Step 0 新增 fresh-pull（拉新全部主 repo）
-- Step 0.1 `ticket_id` 改為必填，移除無參數自動挑單
-- 舊 Step 1（bug-report-analyst）+ 舊 Step 2（spec-fetcher）合併為一個 agent（`bug-report-and-spec-analyst`）
-- 舊 Step 2.5（CQA Grounder）+ 舊 Step 3（Bug Tracer）改成並行派工（本文不再使用「Step 3」這個編號）
-- Step 4 worktree 建立基準由 `origin/dev` 改為 `origin/main`（2026-09-01 起 mr-pusher 的推前 rebase 與 MR target 也一併改為 `origin/main`／`main`，整條 pipeline 基準統一；見 `setup-worktree.sh` 檔頭）
-- **`base_branch` 覆寫（2026-09-01，使用者指示）**：技術人員在 Notion 工單留言明確指定分支（如 `feature/20260815`、`hotfix/*`）時，Step 1 analyst 以 `TARGET_BRANCH:` 回報，manager 存進 `base_branch`，之後 worktree 分支點、三位 reviewer 的 diff 基準、drive-uploader 的 diff 基準、mr-pusher 的推前 rebase 與 MR target **全部**用該分支；未指定則 `main`。指定分支在 origin 不存在 → Step 4 `SETUP_FAIL`，走 failed 出口，不偷偷退回 main。
-- Step 5 fixer 改走 TDD（先 RED 後 GREEN），mock data 一律取自 CQA grounding 實證資料
-- Step 6 由 1 位 reviewer 改成 3 位平行 reviewer（品質 / 對抗性 / TDD 情境符合度），三位皆 PASSED 才放行
-- 舊 Step 8（解鎖+tracker）+ 舊 Step 9（完成報告）合併
-
 ## 參數
 
-`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（`/create-mrs` 已自行挑好單號、telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（2026-08-26 起，tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
+`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（`/create-mrs` 已自行挑好單號、telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
 
 ## Manager 鐵律
 
 1. tracker 只用 `bash /Users/user/aladdin/scripts/tracker.sh` 操作（`next`/`row`/`set`/`counts`/`log-fail`）。**禁止 cat 整個 tracker、禁止用 Edit tool 直改**（檔案 166KB）。
 2. Notion 寫回只用 `bash /Users/user/aladdin/scripts/notion.sh`（`comment-text`/`update-prop`）或包裝它的 `scripts/create-mr-exit-comment.sh`（Step 7c 四種非 success 出口的留言模板都在該腳本內）。**禁止手寫含 token 的 curl。**
 3. 派工一律用 Agent tool 的 `subagent_type` 直接引用註冊 agent（如 `subagent_type: bug-tracer-with-callgraph`）。**prompt 裡禁止出現「Use all text in {agent .md 路徑} as the prompt」**——定義檔本來就是該 agent 的 system prompt，叫它再讀一次 = 每次多燒 1 萬+ token。prompt 只放：本單變數、文件路徑、回報格式。並行派工的兩三個 agent，一律在同一輪訊息內各自獨立呼叫 Agent tool（不要序列等前一個回來才發下一個）。
-4. 每步派工都用同步等待（`run_in_background: false`）。agent 若中途讓出（未給出契約尾行就結束）→ 視為該次嘗試失敗重派接手（worktree 內既有變更由接手者延續）。tracer/fixer 的重派計入其 attempt 上限；**其他步驟（1/2a-grounder/6-任一 reviewer/7a/7b）的契約缺失重派以 1 次為限**，再缺失依該步的降級或失敗分支處理，不得無限重派。
-5. 模型分級已寫死在各 agent 定義檔 frontmatter（tracer/grounder=opus、fixer/reviewer 等=sonnet），派工時**不要**另指定 `model` 覆蓋，除非走到「升級路徑」（`10-model-dispatch.md` 第 5 節）。
+4. 每步派工都用同步等待（`run_in_background: false`）。agent 若中途讓出（未給出契約尾行就結束）→ 視為該次嘗試失敗重派接手（worktree 內既有變更由接手者延續）。tracer/fixer 的重派計入其 attempt 上限；**其他步驟（1/2a-grounder/6-任一 reviewer/6.5/7a/7b）的契約缺失重派以 1 次為限**，再缺失依該步的降級或失敗分支處理，不得無限重派。
+5. 模型分級已寫死在各 agent 定義檔 frontmatter（tracer/grounder=opus、Step 5 fixer + Step 6 三位 reviewer + Step 6.5 final-adversarial-reviewer=opus、mr-pusher/drive-uploader-mr/bug-report-and-spec-analyst 等=sonnet），派工時**不要**另指定 `model` 覆蓋，除非走到「升級路徑」（`10-model-dispatch.md` 第 5 節）。
 
 ## State Variables
 
@@ -43,13 +32,14 @@ affected_repos = []                       # Step 2b 契約尾行
 bootstrap_partial = false                 # Step 4（true 時所有出口留言/報告須披露）
 tracer_attempt / fixer_attempt / total_attempt = 0
 review_result_a / review_result_b / review_result_c   # Step 6 三位 reviewer 各自 PASSED/FAILED
+review_result_d                                       # Step 6.5 最終對抗性驗證（僅三位皆 PASSED 才會有值）
 pipeline_status            # success | already_fixed | i18n_manual_handoff | needs_qa_clarification | failed
 fixed_commit, drive_link, mr_links, failure_reason
 tg_notify_result, tg_chatid_sync_result
 worktree_path = /Users/user/aladdin/worktrees/{ticket_id}
 ```
 
-**重試上限（全流程統一）**：`tracer_attempt ≤ 2`、`fixer_attempt ≤ 3`、`total_attempt ≤ 5`（tracer+fixer 派工合計）。任一超限 → 走 failed 出口。狀態存對話裡即可，但**每次派工前先把目前計數寫在該步的狀態行**（context 壓縮後以最近的狀態行為準）。
+**重試上限（全流程統一）**：`tracer_attempt ≤ 2`、`fixer_attempt ≤ 5`、`total_attempt ≤ 7`（= tracer 上限 2 + fixer 上限 5，tracer+fixer 派工合計）。任一超限 → 走 failed 出口。狀態存對話裡即可，但**每次派工前先把目前計數寫在該步的狀態行**（context 壓縮後以最近的狀態行為準）。
 
 ## Step 0：拉新 code + TG chat_id 回填（皆 best-effort，任何錯誤不阻斷、不派 agent）
 
@@ -75,14 +65,15 @@ bash /Users/user/aladdin/scripts/tg-map-chatids.sh --list
 
 ## Step 0.1：Claim
 
-0. `$ARGUMENTS` 為空 → 輸出 `SKIPPED: ticket_id required（本版本不支援無參數自動挑單，呼叫端須先用 tracker.sh next 決定單號)` 後結束。
-1. `bash /Users/user/aladdin/scripts/tracker.sh row {ticket_id}` → 沒有這一行、或狀態不是 `pending`/`rerun` → 輸出 `SKIPPED: {ticket_id} not claimable` 後結束。
-2. 從該行抽 `ticket_id`、`notion_url`，算 `page_id`。
-3. `bash /Users/user/aladdin/scripts/bug-lock.sh claim {ticket_id}` → `LOCKED` → 輸出 `SKIPPED: already locked` 後結束。
-4. `bash /Users/user/aladdin/scripts/tracker.sh set {ticket_id} in_progress`
-5. **此後任何退出路徑都必須執行 Step 8**（解鎖 + tracker 終態 + 完成報告）。
+```bash
+bash /Users/user/aladdin/scripts/claim-ticket.sh {ticket_id}
+```
+（腳本內含：tracker 狀態檢查 pending/rerun → bug-lock claim → tracker set in_progress，三步都通過才算認領成功）
+- 成功（3 行）：`CLAIMED: {ticket_id}` / `NOTION_URL: <url>` / `PAGE_ID: <uuid>` → 存 `notion_url`、`page_id`，續 Step 0.2/0.5。
+- `SKIPPED: ticket_id required（本版本不支援無參數自動挑單，呼叫端須先用 tracker.sh next 決定單號)` → 輸出後直接結束（尚未進入任何狀態，不需要走 Step 8）。
+- `SKIPPED: {ticket_id} not claimable` 或 `SKIPPED: already locked` → 輸出後結束，**仍要走 Step 8**（解鎖 + tracker 終態 + 完成報告）。
 
-## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 第二參數為 `resume`；2026-08-26 紅區變更，使用者核准續跑語意）
+## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 第二參數為 `resume`）
 
 先從既有 analytics.md 抽 `base_branch`（resume 會跳過 Step 1，這是唯一的來源；檔案不存在或欄位為 `(Not provided)` → 維持 `main`）：
 ```bash
@@ -109,7 +100,7 @@ bash /Users/user/aladdin/scripts/resolve-reviewer.sh {page_id}
 - `NOT_TECH` → 非技術人員的單不歸本流程（**不是失敗**，不留言、不動 AI分析）：輸出 `SKIPPED: 當前指派不在 tech 名單`，直接走 Step 8 的 NOT_TECH 行（釋鎖 + 還原 pending）後結束。
 - `ERROR:*` → 重跑一次；仍 ERROR → `pipeline_status=failed`（`failure_reason`=該錯誤），跳 Step 7c。
 
-## Step 1：Bug Report + Spec Analyst（合併，取代 v2 的 Step 1 + Step 2 兩次派工）
+## Step 1：Bug Report + Spec Analyst（合併為一次派工）
 
 派工 `subagent_type: bug-report-and-spec-analyst`：
 ```
@@ -123,13 +114,17 @@ TARGET_BRANCH: <技術人員在留言明確指定的分支名|N/A>
 ```
 等待完成。文件落點：`{ticket_id}-analytics.md`、`{ticket_id}-spec.md`（後者 `not_found` 時仍會產出檔案，內容是「未找到相關規格書」——優雅降級，不擋流程）。
 
-**`base_branch` 決定**：`TARGET_BRANCH:` 不是 `N/A` → `base_branch` = 該值（只接受 `^[A-Za-z0-9][A-Za-z0-9._/-]*$` 且不含 `..` 的字串，否則視同 N/A 並在 Step 8 報告註記）；`N/A` 或該行缺失 → 補救 `grep -m1 '^Target Branch:' <analytics.md>`，仍為 `(Not provided)`／缺 → 維持 `main`。**manager 不得憑 ticket 內容自行猜分支**，只認 analyst 抽出的明確指定。
+**`base_branch` 決定**：
+```bash
+bash /Users/user/aladdin/scripts/resolve-base-branch.sh {ticket_id} {analyst 回報的 TARGET_BRANCH 值，缺失時傳 N/A}
+```
+輸出 3 行：`BASE_BRANCH:` 存 `base_branch`；`SOURCE:`（analyst｜analytics_fallback｜default，供 Step 8 判斷是否要加註「技術人員於 Notion 留言指定」）；`NOTE:` 非空時代表 analyst 回報的原值格式不合法已被忽略，原樣存入 Step 8 報告用的註記。**manager 不得憑 ticket 內容自行猜分支**，只認腳本判定結果。
 
 尾行缺失時：`ls` 該 analytics.md——存在 → 視為完成續行（spec_result 缺失時保守視為 not_found，不影響後續）；analytics.md 不存在 → 重派 1 次；仍無 → analytics 是全流程根基，走 failed 出口（`failure_reason="Step 1 無法產出 analytics.md"`）。
 
-## Step 2：CQA Grounder + Bug Tracer（並行派工，取代 v2 的 Step 2.5 + Step 3；本文不再使用「Step 3」這個編號，下一步直接是 Step 4）
+## Step 2：CQA Grounder + Bug Tracer（並行派工；下一步直接是 Step 4）
 
-**2a、2b 在同一輪訊息內各自獨立呼叫 Agent tool，同時派工、互不等待、互不知情對方結果。** 這是刻意取捨：tracer 不會像 v2 那樣拿到 grounding 路徑當輸入（grounder 那時還沒跑完），換取平均情況下更快出結果；代價是若 grounder 事後判定 `NEEDS_QA_CLARIFICATION`，這次 tracer 的分析會被整個丟棄（見 2c）。
+**2a、2b 在同一輪訊息內各自獨立呼叫 Agent tool，同時派工、互不等待、互不知情對方結果。** 這是刻意取捨：tracer 不會拿到 grounding 路徑當輸入（grounder 這時還沒跑完），換取平均情況下更快出結果；代價是若 grounder 事後判定 `NEEDS_QA_CLARIFICATION`，這次 tracer 的分析會被整個丟棄（見 2c）。
 
 ### 2a：CQA Grounder
 
@@ -148,7 +143,7 @@ QA_QUESTION: <需 QA 確認的具體問題，CONSISTENT 時填 N/A>
 
 ### 2b：Bug Tracer（with method-call-graph）
 
-`tracer_attempt += 1`、`total_attempt += 1`；超限（tracer>2 或 total>5）→ failed 出口。
+`tracer_attempt += 1`、`total_attempt += 1`；`bash /Users/user/aladdin/scripts/check-retry-limit.sh {tracer_attempt} {fixer_attempt} {total_attempt}` → `LIMIT_EXCEEDED:*` → failed 出口。
 
 派工 `subagent_type: bug-tracer-with-callgraph`：
 ```
@@ -170,17 +165,16 @@ ALREADY_FIXED: <no|yes commit=<hash>>   （你在 Already-Fixed Verification 判
 
 **先看 grounder**：
 - `GROUNDING_RESULT: NEEDS_QA_CLARIFICATION` → 不論 tracer 結果為何，**丟棄這次 tracer 的分析**（既定取捨，見本節開頭）；`pipeline_status=needs_qa_clarification`，`qa_question` 取自 grounder 回報 → 跳 Step 7（7a+7c）。
-- grounder 整個失敗/未產出 grounding.md → 當作 CONSISTENT，不影響 tracer 結果判定（同 v2 邏輯）。
+- grounder 整個失敗/未產出 grounding.md → 當作 CONSISTENT，不影響 tracer 結果判定。
 
 **grounder 是 CONSISTENT（或視同 CONSISTENT）時，才看 tracer**（**manager 依序做，全部是定向抽取，不整讀 analysis-notes**）：
 
 1. **契約檢查**：TRACER_RESULT 缺失或不在 {ROOT_CAUSE_FOUND, NEEDS_QA_CLARIFICATION} → 計入 tracer_attempt 重派一次；仍非法 → failed 出口。
-2. **附加行補救**（AFFECTED_REPOS / I18N_ONLY 缺失時）：
+2. **附加行補救**（AFFECTED_REPOS / I18N_ONLY / ALREADY_FIXED 任一缺失時）：
    ```bash
-   sed -n '/primary_fix_paths/,/```/p' /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
+   bash /Users/user/aladdin/scripts/extract-tracer-fields.sh {ticket_id}
    ```
-   從路徑前綴（agrabah/ abu/ lago/ rajah/）自行判定兩值。
-   `ALREADY_FIXED` 行缺失 → 保守視為 `no`（走正常路）。**嚴禁用 grep「已修復紀錄」之類的字樣自行判定 already-fixed**——該字樣是 tracer 模板的固定 section 標題，歷史文件 88.9% 都含它（常寫「（未修復）」結論），grep 判定會大面積假成功。
+   輸出 3 行 `AFFECTED_REPOS:` / `I18N_ONLY:` / `ALREADY_FIXED:`，只用來補上契約缺失的那幾行，其餘仍以 tracer 原始回報為準。`ALREADY_FIXED` 這個腳本固定回報 `no`（保守 fallback）。**嚴禁用 grep「已修復紀錄」之類的字樣自行判定 already-fixed**——該字樣是 tracer 模板的固定 section 標題，歷史文件 88.9% 都含它（常寫「（未修復）」結論），grep 判定會大面積假成功。
 
 分支（按序判定，第一個命中就走）：
 - `TRACER_RESULT: NEEDS_QA_CLARIFICATION` → `pipeline_status=needs_qa_clarification`；qa_question 定向抽取（`grep -m1 -A10 "qa_question" <analysis-notes 路徑>`）→ 跳 Step 7（7a+7c）。
@@ -203,11 +197,11 @@ bash /Users/user/aladdin/scripts/setup-worktree.sh --base {base_branch} {ticket_
 
 ## Step 5：Bug Fixer With Tests（TDD：先 RED 後 GREEN）
 
-`fixer_attempt += 1`、`total_attempt += 1`；超限（fixer>3 或 total>5）→ failed 出口。
+`fixer_attempt += 1`、`total_attempt += 1`；`bash /Users/user/aladdin/scripts/check-retry-limit.sh {tracer_attempt} {fixer_attempt} {total_attempt}` → `LIMIT_EXCEEDED:*` → failed 出口。
 
 派工 `subagent_type: bug-fixer-with-tests`：
 ```
-依 analysis-notes 在 worktree 實作修復，用 TDD 方式撰寫純 L0 單元測試（先寫 RED、修完再確認 GREEN），mock data 一律取自 grounding.md 的實證資料。
+依 analysis-notes 在 worktree 實作修復，用 TDD 方式撰寫純 L0 單元測試（先寫 RED、修完再確認 GREEN），mock data 優先取自 grounding.md 的實證資料（涵蓋不到的跨服務欄位可用 source-first 工具查證 schema 後合理建構，細節見你的定義檔）；測試不可為了做而做。若修復完成後判定只改動 abu/lago 的 template 層，依你的定義檔 Step 5.6 補視覺證據。
 ticket_id: {ticket_id}
 analysis notes: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md
 analytics: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
@@ -215,10 +209,11 @@ grounding: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-grounding.
 worktree_path: {worktree_path}
 affected_repos: {affected_repos}
 {mixed 時加 i18n 禁令，見 Step 2c}
-{重派時加：前次審查未過（Step 6 三位 reviewer 中 <A/B/C 挑出 FAILED 的那幾位>）。回饋報告：<對應的 {ticket_id}-reviewer-report.md / {ticket_id}-adversarial-review.md / {ticket_id}-tdd-fidelity-review.md 路徑>。請針對回饋修正，若問題出在測試本身要回到 RED 重寫，不要只改實作遷就舊測試。}
-回報格式（最後兩行）：
+{重派時加：前次審查未過（Step 6 三位 reviewer 或 Step 6.5 最終驗證中 <A/B/C/D 挑出 FAILED 的那幾位>）。回饋報告：<對應的 {ticket_id}-reviewer-report.md / {ticket_id}-adversarial-review.md / {ticket_id}-tdd-fidelity-review.md / {ticket_id}-final-adversarial-review.md 路徑>。請針對回饋修正，若問題出在測試本身要回到 RED 重寫，不要只改實作遷就舊測試。}
+回報格式（最後三行）：
 FIXER_RESULT: <DONE|BRANCH_ERROR|ANALYSIS_MISMATCH>
 COMMIT: <hash|N/A>
+UI_EVIDENCE: <yes(<before path>,<after path>)|no>
 ```
 - `BRANCH_ERROR` → 重跑 Step 4 的腳本（清殘留重建），再重派 fixer 一次；仍 BRANCH_ERROR → failed 出口。
 - `ANALYSIS_MISMATCH`（fixer 判定分析無法落地，例如指到的程式碼不存在）→ 回 Step 2b 重派 tracer（帶 fixer 的具體回饋）；tracer 已達上限 → failed 出口。
@@ -272,12 +267,40 @@ REVIEW_RESULT: <PASSED|FAILED>
 
 | 條件 | 動作 |
 |---|---|
-| 三位皆 PASSED | `pipeline_status=success` → Step 7 |
+| 三位皆 PASSED | 續 **Step 6.5**（不直接 success——多一道最終對抗性驗證） |
 | 有任一 FAILED，且至少一位 FAILED 的 FAIL_KIND=analysis，且 tracer_attempt<2 | 回 Step 2b 重派 tracer（帶所有 FAILED 報告的路徑作為否決回饋） |
-| 有任一 FAILED（其餘情況：全部 implementation，或 analysis 但 tracer 已達上限），且 fixer_attempt<3 且 total_attempt≤5 | 回 Step 5（帶所有 FAILED 報告的路徑） |
+| 有任一 FAILED（其餘情況：全部 implementation，或 analysis 但 tracer 已達上限），且 fixer_attempt<5 且 total_attempt≤7 | 回 Step 5（帶所有 FAILED 報告的路徑） |
 | 有任一 FAILED，重試次數都已達上限 | failed 出口 |
 
-**三位都要 PASSED 才放行**——這是刻意的嚴格合議，對抗性審查存在的意義就是要能擋下可疑結果。現有重試上限（fixer≤3、tracer≤2、total≤5）已足以防止無限迴圈，不因為現在有 3 位而放寬。
+**三位都要 PASSED 才放行進 Step 6.5**——這是刻意的嚴格合議，對抗性審查存在的意義就是要能擋下可疑結果。
+
+## Step 6.5：最終對抗性驗證（僅三位皆 PASSED 才派工，opus/high 獨立重驗）
+
+**只有 Step 6 三位（A/B/C）全部 PASSED 才派這一關**，且**不給它看 A/B/C 三份報告**——刻意保持獨立判定，避免「三位都對同一個盲點視而不見、這關又看他們的結論被同化」。
+
+派工 `subagent_type: final-adversarial-reviewer`：
+```
+三位 reviewer 都 PASSED 了，請你完全獨立、不看他們的報告，重新驗證這次修復的五件事：test 存在必要性、test 邏輯是否正確、mock data 來源是否合理、修法是否會衍生其他問題、是否真正解決 root cause。
+ticket_id: {ticket_id}
+worktree_path: {worktree_path}
+affected_repos: {affected_repos}
+base_branch: {base_branch}
+report 落點: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-final-adversarial-review.md
+回報格式（最後兩行）：
+FAIL_KIND: <implementation|analysis|N/A>
+REVIEW_RESULT: <PASSED|FAILED>
+```
+
+**判定**（缺契約尾行 → 重派 1 次，仍缺 → 視為 `FAILED`、`FAIL_KIND=implementation`）：
+
+| 條件 | 動作 |
+|---|---|
+| PASSED | `pipeline_status=success` → Step 7 |
+| FAILED，且 FAIL_KIND=analysis 且 tracer_attempt<2 | 回 Step 2b 重派 tracer（帶這份報告路徑作為否決回饋） |
+| FAILED（其餘情況），且 fixer_attempt<5 且 total_attempt≤7 | 回 Step 5（帶這份報告路徑）；修完後 **Step 6 三位要重新全部再跑一次**（code 變了，舊的三份 PASSED 不能沿用），三位若再度全 PASSED 才重新派一次全新的 Step 6.5（不沿用這次的舊結果） |
+| FAILED，重試次數已達上限 | failed 出口 |
+
+現有重試上限（fixer≤5、tracer≤2、total≤7）已涵蓋這一關的重派消耗，不再放寬。
 
 ## Step 7：出口動作（按 pipeline_status 查表）
 
@@ -287,9 +310,9 @@ REVIEW_RESULT: <PASSED|FAILED>
 | already_fixed | ✅ | — | ✅ | — |
 | i18n_manual_handoff | ✅ | — | ✅ | — |
 | needs_qa_clarification | ✅（傳 grounding/analysis） | — | ✅ | ✅ |
-| failed | ✅（上傳既有分析+審查文件，2026-08-26 起） | — | ✅ | ✅ |
+| failed | ✅（上傳既有分析+審查文件） | — | ✅ | ✅ |
 
-### 7a：Drive Uploader MR（所有出口路徑都跑；failed 於 2026-08-26 起納入——上傳既有分析與審查文件供人工接手，文件全缺時 uploader 回 `DRIVE_LINK: N/A` 不報錯）
+### 7a：Drive Uploader MR（所有出口路徑都跑，含 failed——上傳既有分析與審查文件供人工接手，文件全缺時 uploader 回 `DRIVE_LINK: N/A` 不報錯）
 
 派工 `subagent_type: drive-uploader-mr`：
 ```
@@ -322,21 +345,12 @@ reviewer_email: {reviewer_email}
 ```
 回報契約＝mr-pusher 定義檔的原生五行（MR_LINKS 為 JSON 陣列、DRIVE_LINK、REVIEWER、NOTION_COMMENT、`NOTION_AI_FIELD: ok|failed`）。manager 從最終訊息**grep 行首**抓 `MR_LINKS:` 與 `NOTION_AI_FIELD:` 兩行即可，**不要假設它們是最後兩行**。`NOTION_AI_FIELD: failed*` → manager 補打一次（成功路徑的值寫死）：`bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "分析成功"`，仍失敗記入 Step 8 報告。
 
-mr-pusher 的 worktree 分支點、推前 rebase 基準、MR target 三者皆為 `{base_branch}`（預設 `main`；2026-09-01 起統一，見 mr-pusher.md Step 0.5）；rebase 衝突時 mr-pusher 有既有的 abort-and-flag 後備路徑，不會因此讓整條 pipeline 卡死。
+mr-pusher 的 worktree 分支點、推前 rebase 基準、MR target 三者皆為 `{base_branch}`（預設 `main`，見 mr-pusher.md Step 0.5）；rebase 衝突時 mr-pusher 有既有的 abort-and-flag 後備路徑，不會因此讓整條 pipeline 卡死。
 
 #### 7b.1：TG 通知（success）
 
 ```bash
-TG_SH=/Users/user/aladdin/scripts/tg-notify.sh
-if ls "$TG_SH" >/dev/null 2>&1; then
-  bash "$TG_SH" --email "{reviewer_email}" --text "✅ [已開 MR] {ticket_id}
-AI 已完成修復並開出 MR（目標分支：{base_branch}），待你 review：
-{每個 repo 一行 '{repo}: {mr_url}'}
-分析文件：{drive_link}
-Notion：{notion_url}"
-else
-  echo "TG_FAIL: scripts/ 查無 tg-notify.sh（先 ls 實查，勿憑記憶跳過）"
-fi
+bash /Users/user/aladdin/scripts/create-mr-success-notify.sh "{reviewer_email}" "{ticket_id}" "{base_branch}" "{drive_link}" "{notion_url}" '{mr-pusher 回報的 MR_LINKS JSON 原文}'
 ```
 輸出存 `tg_notify_result`（TG_SENT / TG_SKIP_* / TG_FAIL 皆不阻斷）。
 
@@ -372,7 +386,8 @@ bash /Users/user/aladdin/scripts/bug-lock.sh release {ticket_id}
 - Reviewer: {reviewer_email}
 - Base branch: {base_branch}{非 main 時加 "（技術人員於 Notion 留言指定）"；TARGET_BRANCH 格式不合法被忽略時加 "（analyst 回報 <原值> 不合法，已忽略）"}
 - Attempts: tracer {tracer_attempt} / fixer {fixer_attempt} / total {total_attempt}
-- Review（Step 6 三位）：A(品質)={PASSED|FAILED} / B(對抗性)={PASSED|FAILED} / C(TDD情境)={PASSED|FAILED}
+- Review（Step 6 三位 + Step 6.5）：A(品質)={PASSED|FAILED} / B(對抗性)={PASSED|FAILED} / C(TDD情境)={PASSED|FAILED} / D(最終對抗性)={PASSED|FAILED|N/A——未進 Step 6.5}
+- UI 視覺證據：{yes（附 before/after 路徑）| no}
 - Bootstrap: {ok | PARTIAL(db-seed)——已於 Notion 留言披露}
 - Fresh pull（Step 0-a）: {FRESH_PULL_OK | FRESH_PULL_FAIL:<原因>}
 - Google Drive: {drive_link}
@@ -386,7 +401,7 @@ bash /Users/user/aladdin/scripts/bug-lock.sh release {ticket_id}
 
 任一步驟超過重試上限、或 SETUP_FAIL 二連敗、或 resolve-reviewer 二連 ERROR：
 1. `pipeline_status=failed`，`failure_reason` 寫清楚「死在哪一步 + 最後一個錯誤訊息的第一行」。
-2. 跑 7a（上傳既有分析/審查文件，2026-08-26 起）→ 7c 的 failed 分支（留言附 drive_link + TG 通知）。跳過 7b。
+2. 跑 7a（上傳既有分析/審查文件）→ 7c 的 failed 分支（留言附 drive_link + TG 通知）。跳過 7b。
 3. **必跑 Step 8**（解鎖 + `failed` + `log-fail` + 完成報告）。
 4. failed 不開 MR、不留成功留言；Drive 只放「既有文件」，solution.md 僅在有 fixer diff 時由 uploader 編譯並標注「審查未全數通過」。
 
