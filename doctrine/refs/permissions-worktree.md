@@ -15,7 +15,8 @@
 允許在 `mr/FAQ-*` 分支上執行：
 - `git fetch origin <base_branch>`、`git rebase origin/<base_branch>`（推前基準新鮮度校驗；`base_branch` 預設 `main`，技術人員在 Notion 工單留言明確指定分支（如 `feature/20260815`、`hotfix/*`）時為該分支——由 manager 傳入，mr-pusher 不得自行決定）
 - `git push origin mr/FAQ-*`（含 `--force-with-lease`，用於 rebase 後的 push）
-- `glab mr create --source-branch mr/FAQ-* --target-branch <base_branch> --reviewer <username>`（reviewer username 由 reviewer_email localpart 推導；target 與上列 rebase 基準必須是同一個值）
+- 上述 push 可**同時**帶 GitLab push options 建 MR：`-o merge_request.create -o merge_request.target=<base_branch> -o merge_request.title=<...> -o merge_request.description=<單行> [-o merge_request.assign=<username>]`（2026-09-03 起取代 `glab mr create`；走 SSH `~/.ssh/ald-ai`，不需要也不得使用 GitLab API token。assign username 由 reviewer_email localpart 推導；target 與上列 rebase 基準必須是同一個值）
+- `ssh -T -p 5252 git@gitlab.the777.pro`（唯讀驗證 SSH 身分，應回 `@pkh_thedoor`）
 
 其他 agent（bug-fixer-with-tests、solution-reviewer、drive-uploader-mr、bug-tracer-with-callgraph、所有 /analyze-single-bug agent）仍嚴禁推送至 remote 與發 MR。
 

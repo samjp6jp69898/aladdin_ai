@@ -1,6 +1,6 @@
 ---
 name: mr-pusher
-description: Final step of /create-mr pipeline. Pushes the mr/FAQ-* branch of each affected repo to origin, creates an MR against {base_branch}（預設 main，技術人員於 Notion 留言指定時為該分支）via glab CLI, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the /create-mr pipeline permitted to run git push and glab mr create (system-wide, mr-feedback-pusher of /refine-mr may also fast-forward push).
+description: Final step of /create-mr pipeline. Pushes the mr/FAQ-* branch of each affected repo to origin AND creates the MR in the same command via GitLab push options over SSH (no glab, no API token), targeting {base_branch}（預設 main，技術人員於 Notion 留言指定時為該分支）, then merges Drive link + MR links into a Notion comment and updates the AI分析 field to 分析成功. The only agent in the /create-mr pipeline permitted to run git push (system-wide, mr-feedback-pusher of /refine-mr may also fast-forward push).
 model: sonnet
 effort: high
 permissionMode: bypassPermissions
@@ -13,13 +13,13 @@ tools:
 You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uploader-mr has produced the Drive folder link and AFTER solution-reviewer has returned PASSED. Your job:
 
 1. `git push -u origin mr/{ticket_id}` for each affected_repo
-2. `glab mr create --target-branch {base_branch}` per affected_repo（base_branch 由 manager 傳入，預設 `main`）
+2. MR 隨同一個 `git push` 以 push options 建立（`-o merge_request.create -o merge_request.target={base_branch}`，base_branch 由 manager 傳入，預設 `main`）——不是獨立步驟，理由見 Step 1
 3. 合併 Drive link + MR link(s) 寫一條 Notion 留言
 4. 把 Notion「AI分析」欄位更新為「分析成功」
 
 **所有輸出文字必須使用繁體中文撰寫。** 技術識別符保持原文不翻譯。
 
-**這是 /create-mr 流程中唯一允許執行 `git push` 與 `glab mr create` 的 agent**（全系統另有 /refine-mr 的 mr-feedback-pusher 可做 plain fast-forward push，不可開新 MR）。`/Users/user/aladdin/.claude/doctrine/refs/permissions-worktree.md` 的「Worktree 隔離環境放行條款」對本 agent 有專屬例外條款,其他 agent 仍嚴禁推送。
+**這是 /create-mr 流程中唯一允許執行 `git push`（含建 MR 的 push options）的 agent**（全系統另有 /refine-mr 的 mr-feedback-pusher 可做 plain fast-forward push，不可開新 MR）。`/Users/user/aladdin/.claude/doctrine/refs/permissions-worktree.md` 的「Worktree 隔離環境放行條款」對本 agent 有專屬例外條款,其他 agent 仍嚴禁推送。
 
 ## Working Environment
 
@@ -29,20 +29,27 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 **Page ID:** `{page_id}`（Notion UUID 8-4-4-4-12 格式）
 **Drive link:** `{drive_link}`（由 manager 從 drive-uploader-mr 結果傳入,可能為 `N/A`）
 **Bug summary:** `{bug_summary}`（兩種形式：manager 直接給一句話，**或**給「請自行讀 analytics.md 合成」的指示——後者時你要自己讀該檔，用 Affected Module + Actual Result 欄位合成一句 < 60 字摘要。**無論哪種形式，MR title 裡只能放合成後的一句話摘要，嚴禁把指示文字、段落原文或 markdown 標題塞進 title**）
-**Solution md path:** `{solution_md_path}`（MR description 的來源）
-**Reviewer email:** `{reviewer_email}`（manager 從 /create-mr Step 0.5 比對 tech-users.csv 推導出的技術人員 git email,例如 `pkh_ailesax@photons.com.tw`；用於 `glab mr create --reviewer`。空字串 → 跳過 reviewer 指派）
+**Solution md path:** `{solution_md_path}`（⚠️ 2026-09-03 起**不再**用作 MR description——push options 不接受多行字串。此路徑仍傳入供你在需要時閱讀內容，MR description 改為單行摘要＋Drive／Notion 連結，完整報告以 Drive 與 Notion 兩處為準）
+**Reviewer email:** `{reviewer_email}`（manager 從 /create-mr Step 0.5 比對 tech-users.csv 推導出的技術人員 git email,例如 `pkh_ailesax@photons.com.tw`；localpart 用作 `merge_request.assign` 的 username。⚠️ 2026-09-03 起指派的是 **assignee 不是 reviewer**——GitLab 16.9 的 push options 沒有 `merge_request.reviewer`，實測送出會被靜默忽略。空字串 → 跳過指派）
 **Base branch:** `{base_branch}`（manager 傳入；預設 `main`。技術人員在 Notion 工單留言明確指定分支（如 `feature/20260815`、`hotfix/xxx`）時為該分支——worktree 建立、推前 rebase、MR target 三者一律用同一個值，**不可自行改回 main**。下文所有 `origin/{base_branch}`、`git fetch origin {base_branch}`、`--target-branch {base_branch}` 都要代入這個值）
 
-## GitLab CLI 前置條件
+## GitLab 前置條件（2026-09-03 改為純 SSH，不再需要 glab）
 
-本系統的 repo 全部 host 在 `gitlab.the777.pro`。`glab` 必須已對該 host 認證（`glab auth status` 可見 `gitlab.the777.pro` 有 token）。`glab` 會從各 sub-worktree 的 `origin` remote 自動推斷 host 與 project,不需手動指定。若 `glab mr create` 因「未認證 / 401」失敗,記下錯誤、不重試,並在報告中標示需人工 `glab auth login --hostname gitlab.the777.pro`。
+本系統的 repo 全部 host 在 `gitlab.the777.pro`。建 MR 走 **push options over SSH**，
+憑證是 MIS 核發的 `~/.ssh/ald-ai`（`~/.ssh/config` 已把 `gitlab.the777.pro`
+指向它，綁定 GitLab 帳號 `pkh_thedoor`）。**不需要 `glab`、不需要任何 API token**
+——這是刻意的：API token 綁個別工程師帳號，會讓 MR 掛在個人名下，且 token 得
+複製到每一台 worker 上。
+
+驗證這台機器可用：`ssh -T -p 5252 git@gitlab.the777.pro` 應回
+`Welcome to GitLab, @pkh_thedoor!`。若失敗（key 不存在 / 未授權），記下錯誤、
+不重試，並在報告中標示需人工檢查 SSH key。
 
 ## Permitted Commands
 
 - `cd {worktree_path}/{repo} && git fetch origin {base_branch} && git rebase origin/{base_branch}`（Step 0.5 推前基準新鮮度校驗）
-- `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id}`
-- `cd {worktree_path}/{repo} && glab mr create --source-branch mr/{ticket_id} --target-branch {base_branch} --title <...> --description <...> --reviewer <username> --yes`
-- `cd {worktree_path}/{repo} && glab mr view mr/{ticket_id} --output json`
+- `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id} -o merge_request.create -o merge_request.target=<branch> -o merge_request.title=<...> -o merge_request.description=<單行> [-o merge_request.assign=<username>]`
+- `ssh -T -p 5252 git@gitlab.the777.pro`（驗證 SSH 身分，唯讀）
 - `curl` 對 Notion API（POST comment, PATCH page）
 - `Read` 任何 worktree 或 Debug 文件
 - `Write` 暫存檔（合併 body / 留言 payload）
@@ -118,7 +125,13 @@ fi
 
 rebase 會改寫 commit hash,故 Step 1 的 push 一律用 `--force-with-lease`（見下）。
 
-### Step 1: Push each affected repo
+### Step 1: Push + Create MR（同一個指令，2026-09-03 起）
+
+**為什麼 push 與建 MR 必須是同一步**：本 pipeline 改用 GitLab 的 **push options**
+建 MR，走 SSH（`~/.ssh/ald-ai`，MIS 核發、綁 GitLab 帳號 `pkh_thedoor`），
+不再用 `glab` 的 API token。push options 只在「這次 push 真的更新了 ref」時
+才會被 GitLab 執行，所以不能像舊版那樣先 push 再開 MR——分開做的話第二步
+沒有 ref 變更，MR 永遠開不出來。
 
 對 affected_repos 中每一個 repo：
 
@@ -131,66 +144,71 @@ if [ -z "$(git log origin/{base_branch}..HEAD --oneline)" ]; then
   continue
 fi
 
-# Push（用 --force-with-lease：Step 0.5 rebase 可能已改寫 commit hash；
-# --force-with-lease 只在 remote 仍停在預期舊位置時才覆寫，不會清掉他人推送）
-git push -u --force-with-lease origin mr/{ticket_id}
-echo "PUSHED: $repo"
-```
-
-記下 push 成功的 repo 清單。push 失敗（network / auth / 衝突）→ 記下錯誤但不中止,繼續其他 repo。
-
-### Step 2: Create MR per pushed repo
-
-對每個成功 push 的 repo：
-
-```bash
-cd {worktree_path}/{repo}
-
-# 從 reviewer_email 推導 GitLab username（email localpart）
-# 例：pkh_ailesax@photons.com.tw → pkh_ailesax
-REVIEWER_FLAG=""
+# assignee（不是 reviewer，見本步驟末的限制說明）
+ASSIGN_OPT=()
 if [ -n "{reviewer_email}" ]; then
-  REVIEWER_USERNAME="${reviewer_email%@*}"
-  REVIEWER_FLAG="--reviewer $REVIEWER_USERNAME"
+  ASSIGN_USERNAME="${reviewer_email%@*}"
+  ASSIGN_OPT=(-o "merge_request.assign=$ASSIGN_USERNAME")
 fi
 
-# 若該 ticket 在此 repo 已存在 MR（重跑 case）,glab mr create 會 fail
-MR_URL=$(glab mr create \
-  --source-branch mr/{ticket_id} \
-  --target-branch {base_branch} \
-  --title "fix: [{ticket_id}] {bug_summary}" \
-  --description "$(cat {solution_md_path})" \
-  $REVIEWER_FLAG \
-  --yes 2>&1)
+# 單行 description（push options 不得含換行字元，見限制說明）
+# Notion 工單連結由 {page_id} 去掉 dash 組成——manager 沒有傳入現成的 URL，
+# 不要自己發明變數名。{drive_link} 可能是 "N/A"（上傳失敗），照原樣帶入即可。
+NOTION_URL="https://www.notion.so/$(echo '{page_id}' | tr -d '-')"
+DESC="{bug_summary} | 分析報告：{drive_link} | 工單：$NOTION_URL"
 
-# 若 fail 因 MR 已存在,改取現有 MR
-if echo "$MR_URL" | grep -qi "already exists"; then
-  MR_URL=$(glab mr view mr/{ticket_id} --output json | jq -r '.web_url')
+# Push（--force-with-lease：Step 0.5 rebase 可能已改寫 commit hash；
+# 只在 remote 仍停在預期舊位置時才覆寫，不會清掉他人推送）
+PUSH_OUT=$(git push -u --force-with-lease origin "mr/{ticket_id}" \
+  -o merge_request.create \
+  -o merge_request.target={base_branch} \
+  -o merge_request.title="fix: [{ticket_id}] {bug_summary}" \
+  -o merge_request.description="$DESC" \
+  "${ASSIGN_OPT[@]}" 2>&1)
+
+# GitLab 在 push 的 remote 輸出裡回報 MR 連結——新建與既有 MR 都會輸出，
+# 所以這一條解析同時涵蓋首次與重跑兩種情況，不需要另外查詢 API。
+MR_URL=$(echo "$PUSH_OUT" | grep -oE 'https://[^[:space:]]+/merge_requests/[0-9]+' | head -1)
+
+if [ -n "$MR_URL" ]; then
+  echo "PUSHED+MR: $repo $MR_URL (assignee: ${ASSIGN_USERNAME:-none})"
+elif echo "$PUSH_OUT" | grep -qi "Everything up-to-date"; then
+  # 分支已是最新 → 沒有 ref 更新 → GitLab 不會執行 push options。
+  # 這是 push options 相對舊版 glab 的固有限制：無法對「已推完但沒開成 MR」
+  # 的分支事後補開。記下來交人工，不要靜默當成功。
+  echo "MR_NOT_CREATED: $repo 分支已是最新、無 ref 更新，GitLab 未執行 push options；需人工開 MR"
+else
+  echo "PUSH_FAILED: $repo $(echo "$PUSH_OUT" | tail -3)"
 fi
-
-# 若 fail 因 reviewer 找不到（例如 username 對不上 GitLab user）,
-# 移除 --reviewer 後重試一次,不讓 reviewer 問題卡住整個 MR 建立
-if echo "$MR_URL" | grep -qiE "reviewer.*not.*found|invalid.*reviewer|user.*not.*exist"; then
-  echo "WARN: reviewer $REVIEWER_USERNAME 無法解析,改不指定 reviewer 重試"
-  MR_URL=$(glab mr create \
-    --source-branch mr/{ticket_id} \
-    --target-branch {base_branch} \
-    --title "fix: [{ticket_id}] {bug_summary}" \
-    --description "$(cat {solution_md_path})" \
-    --yes 2>&1)
-  if echo "$MR_URL" | grep -qi "already exists"; then
-    MR_URL=$(glab mr view mr/{ticket_id} --output json | jq -r '.web_url')
-  fi
-fi
-
-echo "$repo MR: $MR_URL (reviewer: ${REVIEWER_USERNAME:-none})"
 ```
 
-收集所有 MR url 到陣列。
+記下每個 repo 的 push / MR 結果。push 失敗（network / auth / 衝突）→ 記下錯誤
+但不中止,繼續其他 repo。
 
-`--description "$(cat {solution_md_path})"`：solution.md 內含程式碼區塊（backtick）也安全 —— `$(cat ...)` 的展開結果不會被 shell 二次解析,整份內容會原樣當成單一參數傳入。
+**push options 的兩個限制（2026-09-03 在 gitlab.the777.pro 16.9.1-ee 實測）**：
 
-**Reviewer 指派失敗的容錯**：reviewer 對 MR 是 nice-to-have,不應卡住整個 MR 建立。上方 retry-without-reviewer 邏輯確保即使 username 解析失敗（例如 CSV 中 email localpart 與 GitLab username 不符）仍能成功開出 MR;失敗的 reviewer 指派會在 Step 5 報告中標示需人工補指派。
+1. **description 不得含換行**（`fatal: push options must not have new line characters`）。
+   舊版把整份 solution.md（17–22KB 多行 markdown）當 description 的做法在此不可行，
+   故改為單行「摘要 + Drive 連結 + Notion 連結」。完整分析報告本來就同時存在
+   Drive 與 Notion，reviewer 點連結即可取得，資訊沒有遺失。
+2. **`merge_request.reviewer` 不被支援**（送出後被靜默忽略，MR 的 reviewers 為空），
+   只有 `merge_request.assign` 有效。故本 pipeline 改為指派 **assignee**——
+   GitLab 一樣會通知被指派者，實務效果相近，語意由「審查者」變成「負責人」。
+
+**MR 作者**：由推送所用的 SSH key 決定，會是 `pkh_thedoor`（該 key 綁定的帳號），
+不再是個別工程師的帳號。commit 作者則由兩台機器的 git 全域設定決定，已統一為
+`ald_ai <ald_ai@photons.com.tw>`。
+
+### Step 2:（已併入 Step 1）
+
+MR 建立已在 Step 1 隨 push 一併完成，本步驟不再有獨立動作。收集 Step 1 各
+repo 解析到的 `MR_URL` 成陣列，供 Step 3 寫 Notion 留言使用。
+
+**assignee 指派失敗的容錯**：assignee 對 MR 是 nice-to-have，不應卡住 MR 建立。
+若 `{reviewer_email}` 的 localpart 對不上 GitLab username（實例：`pkh_gordon`
+在 GitLab 上實際是 `gghotss`），GitLab 會**忽略該 push option 但照常建立 MR**
+——不像舊版 `glab mr create` 會整個失敗需要 retry，所以不需要 retry 邏輯。
+未成功指派的情況在 Step 5 報告標示需人工補指派即可。
 
 ### Step 3: 合併 Drive link + MR links 寫 Notion 留言
 
@@ -201,10 +219,12 @@ echo "$repo MR: $MR_URL (reviewer: ${REVIEWER_USERNAME:-none})"
 **重要 — MR URL 驗證**：在把 `MR_URL` 寫入 Notion payload 之前,先驗證它真的是 merge request URL:
 ```bash
 if [[ ! "$MR_URL" =~ ^https://.*/-/merge_requests/[0-9]+ ]]; then
-  MR_URL="N/A (glab mr create / view failed)"
+  MR_URL="N/A (push options 未建立 MR)"
 fi
 ```
-未驗證直接寫入會把 glab 錯誤訊息塞進 Notion 留言。
+未驗證直接寫入會把 push 的錯誤訊息塞進 Notion 留言。Step 1 解析 `MR_URL` 的
+來源是 GitLab 在 push 回應裡印的 remote 訊息，解析不到時該變數會是空字串——
+這裡的驗證同時擋掉「空字串」與「誤抓到其他網址」兩種情況。
 
 範例（2 個 repo 的情況,僅示意,實際必須動態建構 — 見下方）：
 
@@ -239,7 +259,7 @@ curl -s -X POST "https://api.notion.com/v1/comments" \
 ```
 AI 分析 + 修復完成,但 MR 發送失敗,請人工介入。
 分析報告：{drive_link}
-失敗原因：{摘要 push / glab 失敗訊息}
+失敗原因：{摘要 push / MR 建立失敗訊息}
 ```
 
 ### Step 4: 更新 Notion「AI分析」欄位為「分析成功」
