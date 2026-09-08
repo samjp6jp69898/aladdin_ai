@@ -8,6 +8,8 @@
 #   notion.sh get-user <user_id>                          - 查詢用戶資訊
 #   notion.sh list-users                                  - 列出工作區全體成員（唯讀）
 #   notion.sh query-datasource <data_source_id> ['<filter_json>'] - 查詢 data source（唯讀）
+#   notion.sh get-datasource <data_source_id>             - 讀 data source 定義含 select options（唯讀）
+#   notion.sh update-datasource <data_source_id> '<properties_json>' - 更新 property schema（select option 改名等）
 #   notion.sh upload-file <filepath> [content_type]       - 上傳檔案（<20MB），回傳 file_upload id
 #   notion.sh create-page <data_source_id> '<properties_json>' - 在 database 建立新頁面
 
@@ -251,6 +253,46 @@ print(json.dumps({'properties': {sys.argv[1]: {'rich_text': [{'type': 'text', 't
             -H "Authorization: Bearer ${NOTION_TOKEN}" \
             -H "Notion-Version: ${NOTION_VERSION}" \
             -H "Content-Type: application/json"
+        ;;
+
+    get-datasource)
+        # 唯讀：讀 data source 定義（GET /v1/data_sources/<id>），含各 property 的 schema
+        # （select 型會列出全部 options 的 id/name/color）。給 update-datasource 改名前先查 option id 用。
+        # 用法：notion.sh get-datasource <data_source_id>
+        DS_ID="$2"
+        if [ -z "$DS_ID" ]; then
+            echo "Usage: notion.sh get-datasource <data_source_id>"
+            exit 1
+        fi
+        curl -s "${NOTION_API}/data_sources/${DS_ID}" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -H "Content-Type: application/json"
+        ;;
+
+    update-datasource)
+        # 寫入：更新 data source 的 property schema（PATCH /v1/data_sources/<id>，body {"properties": <json>}）。
+        # 主要用途：select option **改名**——帶既有 option 的 id + 新 name，Notion 會保留 option 身分，
+        # 所有已選該值的頁面自動跟著顯示新名；不帶 id 的 option 視為新增。**省略既有 option 會把它刪掉**，
+        # 所以改名時必須把該 property 的全部 options 一併送回（先用 get-datasource 取完整清單）。
+        # 用法：notion.sh update-datasource <data_source_id> '<properties_json>'
+        #   例：notion.sh update-datasource <id> '{"AI分析":{"select":{"options":[{"id":"abc","name":"新名"},…]}}}'
+        DS_ID="$2"
+        PROPS_JSON="$3"
+        if [ -z "$DS_ID" ] || [ -z "$PROPS_JSON" ]; then
+            echo "Usage: notion.sh update-datasource <data_source_id> '<properties_json>'"
+            exit 1
+        fi
+        BODY=$(python3 -c "import json,sys; print(json.dumps({'properties': json.loads(sys.argv[1])}, ensure_ascii=False))" "$PROPS_JSON") || { echo "ERROR: properties_json 不是合法 JSON"; exit 1; }
+        RESULT=$(curl -s -X PATCH "${NOTION_API}/data_sources/${DS_ID}" \
+            -H "Authorization: Bearer ${NOTION_TOKEN}" \
+            -H "Notion-Version: ${NOTION_VERSION}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY")
+        [ -z "$RESULT" ] && { echo "ERROR: Notion API 空回應（網路失敗？）"; exit 1; }
+        echo "$RESULT"
+        ERROR=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('object',''))" 2>/dev/null)
+        [ "$ERROR" = "error" ] && exit 1
         ;;
 
     query-datasource)

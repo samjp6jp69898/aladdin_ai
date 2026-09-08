@@ -11,7 +11,10 @@ argument-hint: "<ticket_id>"
 
 ## 參數
 
-`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
+`$ARGUMENTS`：`<ticket_id> [mode] [resume]`，以空白分隔、順序固定。
+- `ticket_id` **必填**（如 `FAQ-1702`）。呼叫端（telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。
+- `mode` 可選，值域 `full | analysis | fix | reanalyze`，缺省 `full`（dispatcher 2026-09-08 起一律帶）。存入 state `mode`。**本版本 mode 只記錄、不分流**（非 full 的走向於 pipeline-modes 計畫 Phase 2 啟用；在那之前 Notion 不會出現對應的新值）。
+- `resume` 可選（tg-monitor 重試按鈕 / timeout 自動重試帶入，可與 mode 並存）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。判定方式：任一參數字面等於 `resume`。
 
 ## Manager 鐵律
 
@@ -24,7 +27,7 @@ argument-hint: "<ticket_id>"
 ## State Variables
 
 ```
-ticket_id, notion_url, page_id（Step 0.1；page_id = URL 尾 32hex 轉 UUID）; reviewer_email（Step 0.5）
+ticket_id, mode（參數；缺省 full）, notion_url, page_id（Step 0.1；page_id = URL 尾 32hex 轉 UUID）; reviewer_email（Step 0.5）
 base_branch = main（Step 1 由 analyst TARGET_BRANCH 覆寫；resume 時 Step 0.2 從 analytics.md 抽；傳給 Step 4/6/7a/7b）
 grounding_result, qa_question（2a）; affected_repos = []（2b）; bootstrap_partial = false（Step 4，true 時出口留言/報告須披露）
 tracer_attempt / fixer_attempt / total_attempt = 0
@@ -53,7 +56,7 @@ bash /Users/user/aladdin/scripts/claim-ticket.sh {ticket_id}
 - `SKIPPED: ticket_id required（本版本不支援無參數自動挑單，呼叫端須先用 tracker.sh next 決定單號)` → 輸出後直接結束（尚未進入任何狀態，不需要走 Step 8）。
 - `SKIPPED: {ticket_id} not claimable` 或 `SKIPPED: already locked` → 輸出後結束，**仍要走 Step 8**（finalize 以 `SKIPPED` 呼叫：只解鎖、不動 tracker，再印完成報告）。
 
-## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 第二參數為 `resume`）
+## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 含 `resume`）
 
 先從既有 analytics.md 抽 `base_branch`（resume 會跳過 Step 1，這是唯一的來源；檔案不存在或欄位為 `(Not provided)` → 維持 `main`）：
 ```bash
@@ -338,6 +341,7 @@ bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH
 ```
 ## {ticket_id} /create-mr Pipeline Complete
 - Pipeline status: {pipeline_status}
+- Mode: {mode}
 - Reviewer: {reviewer_email}
 - Base branch: {base_branch}{非 main 時加 "（技術人員於 Notion 留言指定）"；TARGET_BRANCH 格式不合法被忽略時加 "（analyst 回報 <原值> 不合法，已忽略）"}
 - Attempts: tracer {tracer_attempt} / fixer {fixer_attempt} / total {total_attempt}
