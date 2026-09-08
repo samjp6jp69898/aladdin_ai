@@ -63,11 +63,12 @@ bash /Users/user/aladdin/scripts/claim-ticket.sh {ticket_id}
 ```bash
 grep -m1 '^Target Branch:' /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analytics.md
 ```
-再跑盤點（第二參數就是 `base_branch`，讓 BRANCH_COMMITS 的計數基準跟 worktree 分支點一致）：
+再跑盤點（第二參數 `base_branch` 讓 BRANCH_COMMITS 的計數基準跟 worktree 分支點一致，第三參數帶 `mode`）：
 ```bash
-bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id} {base_branch}
+bash /Users/user/aladdin/scripts/resume-plan.sh {ticket_id} {base_branch} {mode}
 ```
-唯讀腳本，行首 grep 取 `RESUME_POINT:` 與各產物/結論行（契約見腳本檔頭）。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。`mode ∈ {analysis, reanalyze}` 時 RESUME_POINT 最深只認到 `step2`（這兩個模式不進 Step 4 之後，step4+ 一律降為 step2 處理）。
+唯讀腳本，輸出＝`resume-inventory.sh` 的全部行 ＋ 三行 `STAGE_SOURCE:`(db|files) / `ARTIFACT_HOST:`(<host>|local|unknown) / `PRIOR_ANALYSIS:`(yes|no)，契約見腳本檔頭。行首 grep 取需要的行。`mode ∈ {analysis, reanalyze}` 的 RESUME_POINT 上限（最深 `step2`）與「監控 DB 關閉/不可達時三行退回純檔案判定」都由腳本自己處理，這裡不必再判。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。
+- `PRIOR_ANALYSIS: yes` → Step 1 的 `prior_analysis` 直接設 true（不必再自己判 mode ＋ 檔案存在性）。`ARTIFACT_HOST` 非 `local` 代表既有產物在別台機器上：本階段**只**把它記進完成報告的 `- Artifact host:` 行，不改任何行為（跨機器取回產物不在本流程範圍），RESUME_POINT 一律以本機檔案為準。
 
 - `step1` → 照常從 Step 1 全跑。
 - `step2` → 跳過 Step 1（沿用既有 analytics/spec）；Step 2 只派 `GROUNDING:` / `ANALYSIS_NOTES:` 為 missing 的那位（另一位的既有文件直接沿用），2c 照常。
@@ -360,6 +361,7 @@ bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH
 - MR(s): {每 repo 一行；非 success 顯示 "(N/A - {pipeline_status})"}
 - Notion AI分析: {分析成功|分析失敗|待釐清|問題分析完成，待確認}
 - Prior analysis: {prior_analysis；fix 模式找不到既有產物時加 "（找不到既有分析產物，已從頭分析）"}
+- Artifact host: {resume 時 resume-plan.sh 的 ARTIFACT_HOST；未跑 resume 盤點時寫 local}
 - TG 通知: {tg_notify_result}；chat_id 同步: {tg_chatid_sync_result}
 - Finalize: {LOCK / TRACKER / FAIL_LOG 三行原文；全 ok 時寫 ok}
 - Worktree: {worktree_path}；文件: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
