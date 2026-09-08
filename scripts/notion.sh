@@ -292,7 +292,9 @@ print(json.dumps({'properties': {sys.argv[1]: {'rich_text': [{'type': 'text', 't
         [ -z "$RESULT" ] && { echo "ERROR: Notion API 空回應（網路失敗？）"; exit 1; }
         echo "$RESULT"
         ERROR=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('object',''))" 2>/dev/null)
-        [ "$ERROR" = "error" ] && exit 1
+        # 2026-09-08 修正：原寫法 `[ … ] && exit 1` 在成功時整段 case 的結束碼會是 test 的 1，
+        # 呼叫端（notion-ai-analysis-options.sh）誤判 PATCH 失敗而觸發重試。
+        if [ "$ERROR" = "error" ]; then exit 1; fi
         ;;
 
     query-datasource)
