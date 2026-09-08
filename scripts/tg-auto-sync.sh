@@ -5,7 +5,9 @@
 # （全程冪等）。
 #
 # 行為（複用 tg-map-chatids.sh --list 的信心判斷，不重新實作比對邏輯）：
-#   HIGH → 自動 --set，成功後發確認訊息給該同事（比照 /tg-chatid-sync 流程）。
+#   HIGH → 自動 --set，成功後發確認訊息給該同事（比照 /tg-chatid-sync 流程），
+#          同時也通知維運者（OPERATOR_CHAT_ID，即 Landon）已自動配對成功，
+#          讓「任何人連接」都有留痕、不會只有本人知道（2026-09-08 使用者要求）。
 #   ASK  → 不自行裁定候選（tg-chatid-sync SKILL.md 的硬紀律：「ASK 一定問使用
 #          者，不自行裁定」）。改發一則通知給維運者（OPERATOR_CHAT_ID，同
 #          health-monitor.ts 的告警對象），列出 chat_id / 名稱 / 候選 email，
@@ -71,6 +73,8 @@ while IFS= read -r tsvline; do
       SET_OK:*)
         notify="$(bash "$NOTIFY_SCRIPT" --email "$cemail" --text "${fn} 連結成功")"
         log "NOTIFY_CONFIRM $cemail : $notify"
+        opnotify="$(bash "$NOTIFY_SCRIPT" --chat-id "$OPERATOR_CHAT_ID" --text "自動配對成功：chat_id=${cid} first_name=${fn} username=${un} -> ${cemail}")"
+        log "NOTIFY_OPERATOR_AUTO $cemail : $opnotify"
         ;;
     esac
   elif [ "$conf" = "ASK" ]; then

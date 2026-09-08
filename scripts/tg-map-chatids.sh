@@ -228,17 +228,22 @@ with open(csv_path, newline="", encoding="utf-8") as f:
 mapped = {x["chat"] for x in rows if x["chat"]}
 
 # ── 比對工具 ──
-def norm(s): return re.sub(r"\s+", "", (s or "")).lower()
+# 2026-09-08（ting xuan / 天狼星 leon_chennnn 兩案例配對不上後優化）：CSV 名稱與
+# email localpart 常見用 -/_/./空白 混用當分隔符（如「Ting-xuan」vs TG 顯示名
+# 「Ting Xuan」、email「leon.chen」vs TG username「leon_chennnn」），原本只去空白
+# 會讓這些同義分隔符被當成不同字元、比對失敗。一併去除後再比對（已對整份 CSV
+# 跑過 collision 檢查，無人因此撞名）。
+def norm(s): return re.sub(r"[\s\-_./]+", "", (s or "")).lower()
 def localpart(email):
     lp = email.split("@")[0].lower()
     for pre in ("pkh_", "ptp_"):
         if lp.startswith(pre):
             lp = lp[len(pre):]
-    return lp
+    return norm(lp)
 
 def candidates(info):
     fn = norm(info.get("first_name")); ln = norm(info.get("last_name")); fnln = fn + ln
-    un = re.sub(r"\d+$", "", (info.get("username") or "")).lower()
+    un = norm(re.sub(r"\d+$", "", (info.get("username") or "")))
     out = []
     for row in rows:
         nm = norm(row["name"])

@@ -74,6 +74,8 @@ run_auto_sync
 assert_eq  "HIGH（111/洋蔥）自動寫入 CSV"        "$(cell_of pkh_farus@photons.com.tw)" "111"
 assert_has "HIGH 有發確認訊息給本人"              "$(cat "$TMP/notify-calls.txt")" "\-\-email pkh_farus@photons.com.tw"
 assert_has "確認訊息內容含『連結成功』"            "$(cat "$TMP/notify-calls.txt")" "連結成功"
+assert_has "HIGH 自動配對也通知維運者 Landon"      "$(cat "$TMP/notify-calls.txt")" "\-\-chat-id 999888 \-\-text 自動配對成功"
+assert_has "operator 自動配對通知含 chat_id=111"   "$(cat "$TMP/notify-calls.txt")" "chat_id=111"
 
 assert_has "ASK（222）有通知維運者"                "$(cat "$TMP/notify-calls.txt")" "\-\-chat-id 999888"
 assert_has "ASK（333）也有通知維運者"              "$(cat "$TMP/notify-calls.txt")" "chat_id=333"

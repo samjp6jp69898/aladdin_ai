@@ -186,6 +186,40 @@ assert_eq  "444 candidate_email"     "$(field "$L444" 6)" "pkh_farus@photons.com
 L555="$(line2_of 555)"
 assert_eq  "555 confidence ASK"      "$(field "$L555" 5)" "ASK"
 
+# ── 分隔符正規化迴歸測試（2026-09-08：ting xuan / 天狼星 leon_chennnn 配對不上）──
+echo "## --list（分隔符正規化迴歸測試）"
+
+CSV3="$TMP/users3.csv"
+cat > "$CSV3" <<'CSVEOF'
+notion_user_name,notion_user_id,email,pushed_repos,tg_chat_id
+Ting-xuan TPE,id5,ptp_ting-xuan@photons.com.tw,abu,
+leon chen,id6,pkh_leon.chen@photons.com.tw,agrabah,
+CSVEOF
+
+cat > "$TMP/upd3.sh" <<'STUBEOF'
+#!/usr/bin/env bash
+cat <<'JSON'
+{"ok":true,"result":[
+ {"update_id":1,"message":{"chat":{"id":666,"type":"private","first_name":"Ting Xuan","username":""}}},
+ {"update_id":2,"message":{"chat":{"id":888,"type":"private","first_name":"天狼星","username":"leon_chennnn"}}}
+]}
+JSON
+STUBEOF
+chmod +x "$TMP/upd3.sh"
+
+OUT3="$(TG_NOTIFY_CSV="$CSV3" TG_GETUPDATES_CMD="$TMP/upd3.sh" TG_UNKNOWN_SENDERS_LOG="$TMP/no-such2.jsonl" bash "$SCRIPT" --list)"
+line3_of(){ printf '%s\n' "$OUT3" | awk -F'\t' -v id="$1" '$1==id'; }
+
+# TG 顯示名「Ting Xuan」（空白分隔）比對 CSV「Ting-xuan TPE」（連字號分隔）→ 應為 HIGH
+L666="$(line3_of 666)"
+assert_eq "666（Ting Xuan vs Ting-xuan）confidence HIGH" "$(field "$L666" 5)" "HIGH"
+assert_eq "666 candidate_email"                          "$(field "$L666" 6)" "ptp_ting-xuan@photons.com.tw"
+
+# TG username「leon_chennnn」（底線+多餘字尾）比對 email「leon.chen」（句點分隔）→ 應為 HIGH
+L888="$(line3_of 888)"
+assert_eq "888（leon_chennnn vs leon.chen）confidence HIGH" "$(field "$L888" 5)" "HIGH"
+assert_eq "888 candidate_email"                             "$(field "$L888" 6)" "pkh_leon.chen@photons.com.tw"
+
 # ───────────────────────── summary ─────────────────────────
 echo "-----"
 echo "PASS=$PASS FAIL=$FAIL"

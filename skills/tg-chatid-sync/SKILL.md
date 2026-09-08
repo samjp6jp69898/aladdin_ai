@@ -73,7 +73,7 @@ description: Use when 需要把 DM 過 Telegram bot 的 chat_id 對映回填 tec
 
 ## 相關工具
 
-- `tg-auto-sync.sh`（同目錄）：白名單外的人 DM bot 時，telegram-dispatcher 會 fire-and-forget 自動觸發這支腳本，複用本腳本的 `--list`/`--set`——HIGH 自動寫入 + 發確認訊息，ASK 改為通知維運者（不自動猜）。
+- `tg-auto-sync.sh`（同目錄）：白名單外的人 DM bot 時，telegram-dispatcher 會 fire-and-forget 自動觸發這支腳本，複用本腳本的 `--list`/`--set`——HIGH 自動寫入 + 發確認訊息給本人，ASK 改為通知維運者（不自動猜）。**任一情況（HIGH 自動配對 / ASK 待處理）都會另外通知維運者 Landon**（2026-09-08 起），確保任何人連接都有留痕、不會只有本人知道。
 - `tg-monitor`（`/Users/user/aladdin/tg-monitor`，http://127.0.0.1:8799）：本機監控 UI，「TG 已連接」「TG 待處理」兩個頁籤可視化目前狀態；已連接頁籤可「取消連接」（複用 `--unset`）與「測試發送」（複用 tg-notify.sh），待處理頁籤可手動選技術人員「指定」（複用 `--set`）。UI 本身不重新實作任何比對/寫入邏輯，一律呼叫本目錄的腳本。
 
 ## 可調
