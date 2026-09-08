@@ -307,8 +307,8 @@ REVIEW_RESULT: <PASSED|FAILED>
 | pipeline_status | 7a Drive 上傳 | 7b MR+Notion | 7c Manager Notion 寫回 | TG 通知 |
 |---|---|---|---|---|
 | success | ✅ | ✅（含 Notion，7c 不跑） | — | ✅（7b.1） |
-| already_fixed | ✅ | — | ✅ | — |
-| i18n_manual_handoff | ✅ | — | ✅ | — |
+| already_fixed | ✅ | — | ✅ | ✅ |
+| i18n_manual_handoff | ✅ | — | ✅ | ✅ |
 | needs_qa_clarification | ✅（傳 grounding/analysis） | — | ✅ | ✅ |
 | failed | ✅（上傳既有分析+審查文件） | — | ✅ | ✅ |
 
@@ -364,7 +364,7 @@ bash /Users/user/aladdin/scripts/create-mr-exit-comment.sh {pipeline_status} {pa
   {failed：--failure-reason "{failure_reason}" --attempts {tracer_attempt} {fixer_attempt} {total_attempt} --reviewer-email "{reviewer_email}"} \
   {bootstrap_partial=true 時加：--bootstrap-partial}
 ```
-腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
+腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功 + TG；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
 
 ## Step 8：解鎖 + tracker 終態 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
 

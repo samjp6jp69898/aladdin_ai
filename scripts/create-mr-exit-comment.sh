@@ -6,14 +6,14 @@
 #   bash scripts/create-mr-exit-comment.sh <pipeline_status> <page_id> [選項]
 #   pipeline_status ∈ already_fixed | i18n_manual_handoff | needs_qa_clarification | failed
 #   選項：
-#     --ticket <FAQ-xxxx>               TG 標題用的單號（needs_qa / failed 發 TG 時建議必帶）
+#     --ticket <FAQ-xxxx>               TG 標題用的單號（四種狀態發 TG 時皆建議必帶）
 #     --drive-link <url|N/A>            分析文件連結（N/A 或省略 → 留言不附連結行、TG 省略該行）
 #     --fixed-commit <hash>             already_fixed 用（省略 → 留言寫「(未提供)」）
 #     --qa-question <text>              needs_qa_clarification 用
 #     --failure-reason <text>           failed 用
 #     --attempts <tracer> <fixer> <total>   failed 用（省略 → 0 0 0）
 #     --bootstrap-partial               留言尾端加「DB 資料供給未完成」披露句
-#     --reviewer-email <email>          needs_qa / failed 才發 TG；省略或空 → TG: SKIPPED
+#     --reviewer-email <email>          四種狀態皆發 TG；省略或空 → TG: SKIPPED
 #     --notion-url <url>                TG 內文的 Notion 連結
 #     --dry-run                         只印將送出的內容，不打 Notion / TG
 #
@@ -80,9 +80,15 @@ esac
 [ "$DRIVE" != "N/A" ] && { TEXT="$TEXT
 $INTRO"; LINK_URL="$DRIVE"; }
 
-# ---- TG 文字（僅 needs_qa / failed；drive N/A 時省略該行）----
+# ---- TG 文字（四種狀態皆發；drive N/A 時省略該行）----
 TG_TEXT=""
 case "$STATUS" in
+  already_fixed)
+    TG_TEXT="✅ [已修復無需MR] {ticket}
+AI 分析確認此 bug 已於 commit ${COMMIT:-(未提供)} 修復，無需再發 MR。";;
+  i18n_manual_handoff)
+    TG_TEXT="🌐 [待人工匯入i18n] {ticket}
+AI 分析完成，主因為 i18n 翻譯缺失/錯誤，依規範 AI 不主動修 localizations JSON，請從分析文件的建議 key/value 草稿匯入 Google Sheets。";;
   needs_qa_clarification)
     TG_TEXT="🟡 [待釐清] {ticket}
 AI 發現 bug 單與 CQA 實況可能有出入，需你確認：
