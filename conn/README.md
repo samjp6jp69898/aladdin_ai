@@ -32,12 +32,13 @@
 | `db-dev-dump.sh` | 從 Dev DB 匯出整張表為 SQL 檔 | `bash db-dev-dump.sh <database> <table>` → 輸出 `conn/<db>__<table>.sql` | `DEV_DB_HOST/PORT/USER/PASS` |
 | `db-cqa-query.sh` | 查詢 CQA DB（**唯讀**，僅 SELECT/SHOW/DESCRIBE/DESC/EXPLAIN） | `bash db-cqa-query.sh <database> "<SQL>"` | `CQA_DB_HOST/PORT/USER/PASS` |
 | `redis-dev-query.sh` | 查詢 Dev Redis（**唯讀**，白名單見下） | `bash redis-dev-query.sh "<REDIS_COMMAND>"` | `DEV_REDIS_HOST/PORT/PASS` |
-| `platform-login.sh` | platform 後台登入取證 | `bash platform-login.sh <pk\|6t> [--env cqa\|dev]` | `{CQA,DEV}_{PK,6T}_PLATFORM_URL/USER/PASS` |
-| `admin-login.sh` | abu 共用後台 admin 登入取證 | `bash admin-login.sh [cqa\|dev]` | `{CQA,DEV}_ADMIN_URL/USER/PASS` |
+| `platform-login.sh` | platform 後台登入取證 | `bash platform-login.sh <pk\|6t> [--env cqa\|dev]`；UAT：`bash platform-login.sh jx --env uat` | `{CQA,DEV}_{PK,6T}_PLATFORM_URL/USER/PASS`；UAT：`JX_PLATFORM_UAT_URL/USER/PASS` |
+| `admin-login.sh` | abu 共用後台 admin 登入取證 | `bash admin-login.sh [cqa\|dev\|uat]` | `{CQA,DEV,UAT}_ADMIN_URL/USER/PASS` |
 | `app-login.sh` | 前台 app 登入取證（CQA 含人機驗證；dev pk 無驗證碼） | `bash app-login.sh <pk\|6t> [--env cqa\|dev] [--account 2\|3\|4]` | `CQA_{PK,6T}_APP_URL/USER/PASS`、`DEV_PK_APP_URL/USER[2-4]/PASS` |
 | `archery-login.sh` | CQA Archery（SQL 審核平台）登入探測 | `bash archery-login.sh` | `CQA_ARCHERY_URL/USER/PASS` |
 | `portainer-login.sh` | Portainer 連線確認（**唯讀**，登入＋列 endpoints） | `bash portainer-login.sh <cqa\|dev>` | `{CQA,DEV}_PORTAINER_URL/USER/PASS` |
 | `portainer-logs.sh` | 依 application（K8s pod `app` label）快速切換看 log（**唯讀**） | `bash portainer-logs.sh <cqa\|dev> <application\|list> [--tail N]` | `{CQA,DEV}_PORTAINER_URL/USER/PASS` |
+| `kibana-logs.sh` | 依 application 快速切換看 log，走 Kibana/ES（**唯讀**） | `bash kibana-logs.sh <cqa\|dev\|uat> <application\|list> [--tail N]` | `{CQA,DEV,UAT}_KIBANA_URL[/USER/PASS]` |
 
 以下絕對路徑可直接複製使用：
 
@@ -145,13 +146,18 @@ bash /Users/user/aladdin/conn/platform-login.sh pk                # PK Platform�
 bash /Users/user/aladdin/conn/platform-login.sh 6t                # 6T Platform（CQA，預設）
 bash /Users/user/aladdin/conn/platform-login.sh pk --env dev      # PK Platform（dev）
 bash /Users/user/aladdin/conn/platform-login.sh 6t --env dev      # 6T Platform（dev）
+bash /Users/user/aladdin/conn/platform-login.sh jx --env uat      # jx-platform（UAT，唯一站台）
 ```
 
 - `--env` 預設 `cqa`，可選 `dev`（2026-08-06 補齊，`.env` 有 `DEV_{PK,6T}_PLATFORM_*` 後兩邊都測過 SUCCESS）
 - 讀 `{CQA,DEV}_PK_PLATFORM_URL/USER/PASS`、`{CQA,DEV}_6T_PLATFORM_URL/USER/PASS`
-- 底層呼叫 `cqa-e2e/verify/verify-login.cjs <siteKey> <url> <user> <pass>`，siteKey 為 `pk-platform` / `6t-platform`
+- 2026-09-03 補 UAT：target 固定打 `jx`（只能配 `--env uat`），因為 UAT 目前只有一組 platform 站台
+  （使用者範例網址 `jx-platform.jxpre.com`），不是 pk/6t 的第三種變體，所以不套用 `{ENV}_{PK,6T}_PLATFORM_*`
+  的前綴公式去湊一個不存在的 site key；讀的是既有、使用者已填值的 `JX_PLATFORM_UAT_URL/USER/PASS`
+  （前綴是 `JX_PLATFORM_UAT` 而非 `UAT_PLATFORM`，是歷史命名，不在這次改動範圍內）；已實測 SUCCESS
+- 底層呼叫 `cqa-e2e/verify/verify-login.cjs <siteKey> <url> <user> <pass>`，siteKey 為 `pk-platform` / `6t-platform` / `jx-platform`
   （URL/user/pass 用純參數傳入，這支底層腳本本來就跟網域無關，不用另外改）
-- 網域白名單依 `--env` 精準比對：`cqa` 限 `*.ald777.com`，`dev` 限 `*.alddev.com`
+- 網域白名單依 `--env` 精準比對：`cqa` 限 `*.ald777.com`，`dev` 限 `*.alddev.com`，`uat` 限 `*.jxpre.com`
 - 成功判定：URL 由 `/login` 導到 `/home/welcome`，且 `localStorage.lt`（JWT）非空
 - stdout 印 `RESULT` / `postLoginUrl` / `signal` 摘要；exit code 0 = SUCCESS
 - 產物在 `cqa-e2e/conn/artifacts/`：`<siteKey>-login.png`、`-after.png`、`-state.json`（可重用的 storageState）、`-debug.json`、`-run.log`
@@ -164,13 +170,15 @@ bash /Users/user/aladdin/conn/platform-login.sh 6t --env dev      # 6T Platform�
 bash /Users/user/aladdin/conn/admin-login.sh          # abu 共用後台（CQA，預設）
 bash /Users/user/aladdin/conn/admin-login.sh cqa      # 同上，顯式指定
 bash /Users/user/aladdin/conn/admin-login.sh dev      # abu 共用後台（dev）
+bash /Users/user/aladdin/conn/admin-login.sh uat      # abu 共用後台（UAT）
 ```
 
-- `[cqa|dev]` 預設 `cqa`（2026-08-06 補齊 dev，`.env` 有 `DEV_ADMIN_*` 後兩邊都測過 SUCCESS：
-  CQA 落地 `abu-admin.ald777.com`、dev 落地 `admin.alddev.com`）
-- 讀 `{CQA,DEV}_ADMIN_URL/USER/PASS`，export 成通用的 `ADMIN_URL/USER/PASS` 後呼叫 `cqa-e2e/verify/verify-admin.cjs`
+- `[cqa|dev|uat]` 預設 `cqa`（2026-08-06 補齊 dev；2026-09-03 補齊 uat，`.env.uat` 原本 key 手誤打成
+  `UAT_ADMIN_UTL`，已一併修正為 `UAT_ADMIN_URL`）；三邊都測過 SUCCESS：
+  CQA 落地 `abu-admin.ald777.com`、dev 落地 `admin.alddev.com`、uat 落地 `jx-platform.jxpre.com`
+- 讀 `{CQA,DEV,UAT}_ADMIN_URL/USER/PASS`，export 成通用的 `ADMIN_URL/USER/PASS` 後呼叫 `cqa-e2e/verify/verify-admin.cjs`
   （該腳本改吃 `process.env` 的通用名字，自己不碰 `.env`，缺 env 直接 exit 2、無寫死 fallback；
-  網域檢查也從只認 `.ald777.com` 放寬成精準認 `.ald777.com` 或 `.alddev.com` 兩個，不開放式放行）
+  網域檢查也同步從 `.ald777.com`/`.alddev.com` 加開 `.jxpre.com`，精準比對、不開放式放行）
 - 成功判定：`localStorage.lt`（JWT，長度約 243）非空，URL 導到 `/platform-management/welcome`
 - 額外驗證 `/schedulers/` 可達：深連結整頁載入會被 SPA 退回 welcome（非權限問題），
   故失敗時改走側欄「排程管理 > 工作列表」client-side 導航。**只導航、不點任何執行按鈕**
@@ -272,9 +280,31 @@ K8s pod `app` label 結構跟 CQA 幾乎一樣（95 個 application），登入�
 
 ### 待辦
 
-- Kibana（`{CQA,DEV}_KIBANA_URL/USER/PASS`）目前完全空白，`.env` 沒有任何相關 key，等使用者提供後再建對應腳本
 - ⚠️ `docs/superpowers/plans/2026-06-01-cqa-grounding-playwright.md` 這份規劃文件裡 `CQA_PORTAINER_PASS` 是明文寫死的，
   待使用者確認是否要清理（同名的 design 文件已遮成 `********`，這份沒遮）
+
+---
+
+## `kibana-logs.sh`
+
+跟 `portainer-logs.sh` 同樣的「依 application 快速切換看 log」介面，資料來源改走 Kibana 後面的
+Elasticsearch（`/api/console/proxy` 轉發 `_search`），純 REST API、不需要 Playwright。
+
+```bash
+bash /Users/user/aladdin/conn/kibana-logs.sh cqa list             # 列出全部 application 名稱
+bash /Users/user/aladdin/conn/kibana-logs.sh cqa core             # 抓 core 的 log（預設 tail 100）
+bash /Users/user/aladdin/conn/kibana-logs.sh dev core --tail 300
+bash /Users/user/aladdin/conn/kibana-logs.sh uat core             # UAT（2026-09-03 補齊）
+```
+
+- `<cqa|dev|uat>`，讀 `{CQA,DEV,UAT}_KIBANA_URL`（`USER`/`PASS` 可選，走 Basic Auth；CQA/dev/UAT 目前都不需要登入即可查）
+- 網域白名單依環境精準比對：`cqa` 限 `*.ald777.com`、`dev` 限 `*.alddev.com`、`uat` 限 `*.jxpre.com`
+- Index 命名前綴自動偵測（不同環境前綴不同，如 `aladdin_dev-*`、`jx_preview-*`），不寫死環境專屬字串
+- 比對順序：**精準命中**優先；沒有才退而求其次做 substring，唯一命中才用，命中多筆一律列出候選要求打精確一點
+- 用 `k8s.kubernetes.labels.app.keyword` 做精準 term 過濾（index 名稱互有前綴重疊，純 wildcard 查會誤命中）
+- 唯讀：只列 index-pattern、只 `_search` 拉文件，不寫入/不刪除任何資料
+- exit code：`0` = SUCCESS、`1` = FAIL（含找不到/歧義/HTTP 失敗）、`2` = `.env` 缺欄位
+- 已實測 SUCCESS：UAT `list`（89 個 application）與 `core --tail 3`（真的拉到 log 內容）
 
 ---
 
@@ -283,6 +313,7 @@ K8s pod `app` label 結構跟 CQA 幾乎一樣（95 個 application），登入�
 - CQA 登入四支只操作 `*.ald777.com` CQA 測試站，腳本內建網域檢查，非 ald777 直接擋下；**嚴禁 production**
 - `app-login.sh pk --env dev` 只操作 `pk.alddev.com`（dev 測試環境，非 production），同樣是精準網域比對，非白名單組合一律擋下
 - Portainer 兩支同樣網域白名單：`cqa` 限 `*.ald777.com`、`dev` 限 `*.alddev.com`，非白名單組合擋下
+- `admin-login.sh` / `platform-login.sh` / `kibana-logs.sh` 三支的 uat 分支只操作 `*.jxpre.com`（UAT 測試站，非 production），精準網域比對，非白名單組合擋下
 - 唯讀取證：只登入、導頁、截圖，不送出任何會改資料的表單
 - 連線資訊只從 `aladdin_ai/.env.local` / `.env.cqa` / `.env.dev` / `.env.evi` / `.env.uat` / `.env.prod` 讀（皆不進 git）；任何檔案與輸出都不得出現密碼明文
 - 唯二有寫入能力的是 `db-dev-write.sh`（僅 dev DB，緊急用）；Redis 與 CQA 一律唯讀

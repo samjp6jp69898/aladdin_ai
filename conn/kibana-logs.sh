@@ -1,6 +1,6 @@
 #!/bin/bash
-# Usage: ./kibana-logs.sh <cqa|dev> list
-#        ./kibana-logs.sh <cqa|dev> <application> [--tail N]
+# Usage: ./kibana-logs.sh <cqa|dev|uat> list
+#        ./kibana-logs.sh <cqa|dev|uat> <application> [--tail N]
 #
 # 依 application（K8s pod 的 `app` label，跟 conn/portainer-logs.sh 同一套）快速切換看 log，
 # 資料來源是 Kibana 後面的 Elasticsearch（走 Kibana 的 /api/console/proxy 轉發 _search）。
@@ -15,16 +15,16 @@
 
 set -e
 
-ENV_FILES=("/Users/user/aladdin/aladdin_ai/.env.cqa" "/Users/user/aladdin/aladdin_ai/.env.dev")
+ENV_FILES=("/Users/user/aladdin/aladdin_ai/.env.cqa" "/Users/user/aladdin/aladdin_ai/.env.dev" "/Users/user/aladdin/aladdin_ai/.env.uat")
 
 usage() {
-  echo "Usage: $0 <cqa|dev> list   |   $0 <cqa|dev> <application> [--tail N]"
+  echo "Usage: $0 <cqa|dev|uat> list   |   $0 <cqa|dev|uat> <application> [--tail N]"
   exit 1
 }
 
 TARGET="$1"
 case "$TARGET" in
-  cqa|dev) ;;
+  cqa|dev|uat) ;;
   *) usage ;;
 esac
 shift
@@ -88,6 +88,15 @@ case "$TARGET" in
       *.alddev.com|*.alddev.com/*) ;;
       *)
         echo "Error: 只允許 *.alddev.com dev 環境，拿到的 URL 不符（已擋下）。"
+        exit 1
+        ;;
+    esac
+    ;;
+  uat)
+    case "$URL" in
+      *.jxpre.com|*.jxpre.com/*) ;;
+      *)
+        echo "Error: 只允許 *.jxpre.com UAT 環境，拿到的 URL 不符（已擋下）。"
         exit 1
         ;;
     esac

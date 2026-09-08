@@ -1,8 +1,11 @@
 #!/bin/bash
 # Usage: ./platform-login.sh <pk|6t> [--env cqa|dev]
+#        ./platform-login.sh jx --env uat
 # platform 後台登入（唯讀取證：只登入、截圖、存 storageState）。
-# 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取（見 lib/env.cjs），不寫死、不印出。
-# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env.dev 有 DEV_{PK,6T}_PLATFORM_*。嚴禁 production。
+# 帳密一律從 aladdin_ai/.env.cqa / .env.dev / .env.uat 讀取（見 lib/env.cjs），不寫死、不印出。
+# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env.dev 有 DEV_{PK,6T}_PLATFORM_*。
+# uat（*.jxpre.com）目前只有一組站台，target 固定打 `jx`、只能配 `--env uat`
+# （見下方 jx 分支註解：key 命名跟 pk/6t 不同組，是使用者已填值的既有 key，不可改名）。嚴禁 production。
 
 set -e
 
@@ -10,13 +13,13 @@ E2E_DIR="/Users/user/aladdin/cqa-e2e"
 OUT_DIR="$E2E_DIR/conn/artifacts"
 
 usage() {
-  echo "Usage: $0 <pk|6t> [--env cqa|dev]"
+  echo "Usage: $0 <pk|6t> [--env cqa|dev]   |   $0 jx --env uat"
   exit 1
 }
 
 TARGET="$1"
 case "$TARGET" in
-  pk|6t) ;;
+  pk|6t|jx) ;;
   *) usage ;;
 esac
 shift
@@ -29,21 +32,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-case "$TARGET" in
-  pk) SITE_KEY="pk-platform"; BASE="PK_PLATFORM" ;;
-  6t) SITE_KEY="6t-platform"; BASE="6T_PLATFORM" ;;
-esac
-
-case "$ENV_NAME" in
-  cqa) KEY_PREFIX="CQA_${BASE}" ;;
-  dev) KEY_PREFIX="DEV_${BASE}" ;;
-  *)
-    echo "Error: --env 只支援 cqa 或 dev（拿到: ${ENV_NAME}）"
-    exit 1
-    ;;
-esac
-
-# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，只取這三個 key。
+# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，只取需要的三個 key。
 # 刻意不用 `source`：.env 的值可能含反引號 / 引號等 shell metacharacter，
 # source 會因語法錯誤中止（實例：2026-08-06 的 CQA_ARCHERY_PASS），
 # 而且等同執行 .env 裡的 command substitution。
@@ -54,14 +43,46 @@ read_env_key() {
   ' "$1"
 }
 
-URL="$(read_env_key "${KEY_PREFIX}_URL")"
-USERNAME="$(read_env_key "${KEY_PREFIX}_USER")"
-PASSWORD="$(read_env_key "${KEY_PREFIX}_PASS")"
+if [ "$TARGET" = "jx" ]; then
+  # UAT 目前只有一組 platform 站台（使用者提供的範例網址是 jx-platform.jxpre.com，
+  # "jx" 是這個特定站的簡稱，不是 pk 或 6t 的第三個變體），所以不套用 pk/6t 那種
+  # `${ENV}_{PK,6T}_PLATFORM_*` 前綴公式去湊一個不存在的 site key。
+  # .env.uat 裡這組 key 歷史上就叫 JX_PLATFORM_UAT_URL/USER/PASS（單一組、前綴是
+  # JX_PLATFORM_UAT 而非 UAT_PLATFORM），已經是使用者填過實際值的既有命名，不在這次改動範圍內。
+  if [ "$ENV_NAME" != "uat" ]; then
+    echo "Error: target jx 目前只支援 --env uat（拿到: ${ENV_NAME}），因為 .env 只有 JX_PLATFORM_UAT_* 這一組 key。"
+    exit 1
+  fi
+  SITE_KEY="jx-platform"
+  URL_KEY="JX_PLATFORM_UAT_URL"
+  USER_KEY="JX_PLATFORM_UAT_USER"
+  PASS_KEY="JX_PLATFORM_UAT_PASS"
+else
+  case "$TARGET" in
+    pk) BASE="PK_PLATFORM"; SITE_KEY="pk-platform" ;;
+    6t) BASE="6T_PLATFORM"; SITE_KEY="6t-platform" ;;
+  esac
+  case "$ENV_NAME" in
+    cqa) KEY_PREFIX="CQA_${BASE}" ;;
+    dev) KEY_PREFIX="DEV_${BASE}" ;;
+    *)
+      echo "Error: --env 只支援 cqa 或 dev（拿到: ${ENV_NAME}）"
+      exit 1
+      ;;
+  esac
+  URL_KEY="${KEY_PREFIX}_URL"
+  USER_KEY="${KEY_PREFIX}_USER"
+  PASS_KEY="${KEY_PREFIX}_PASS"
+fi
+
+URL="$(read_env_key "$URL_KEY")"
+USERNAME="$(read_env_key "$USER_KEY")"
+PASSWORD="$(read_env_key "$PASS_KEY")"
 
 MISSING=""
-[ -z "$URL" ]      && MISSING="$MISSING ${KEY_PREFIX}_URL"
-[ -z "$USERNAME" ] && MISSING="$MISSING ${KEY_PREFIX}_USER"
-[ -z "$PASSWORD" ] && MISSING="$MISSING ${KEY_PREFIX}_PASS"
+[ -z "$URL" ]      && MISSING="$MISSING $URL_KEY"
+[ -z "$USERNAME" ] && MISSING="$MISSING $USER_KEY"
+[ -z "$PASSWORD" ] && MISSING="$MISSING $PASS_KEY"
 if [ -n "$MISSING" ]; then
   echo "Error: .env 缺少欄位:$MISSING"
   exit 2
@@ -83,6 +104,15 @@ case "$ENV_NAME" in
       *.alddev.com|*.alddev.com/*) ;;
       *)
         echo "Error: 只允許 *.alddev.com dev 環境，拿到的 URL 不符（已擋下）。"
+        exit 1
+        ;;
+    esac
+    ;;
+  uat)
+    case "$URL" in
+      *.jxpre.com|*.jxpre.com/*) ;;
+      *)
+        echo "Error: 只允許 *.jxpre.com UAT 環境，拿到的 URL 不符（已擋下）。"
         exit 1
         ;;
     esac

@@ -1,0 +1,75 @@
+#!/bin/bash
+# Usage: bash archery-uat-login.sh
+# UAT Archery（SQL 審核平台，https://archery.jxpre.com）登入探測：
+# 登入 + 截圖 + 讀取 /sqlquery/ 頁面結構（select/textarea/button），不送出任何 SQL、不建立工單。
+# 帳密一律從 aladdin_ai/.env.uat 讀取（見 lib/env.cjs），不寫死、不印出。
+# 僅限 *.jxpre.com（UAT 環境），嚴禁 production。
+
+set -e
+
+E2E_DIR="/Users/user/aladdin/cqa-e2e"
+VERIFY_DIR="$E2E_DIR/verify"
+
+# 用 lib/env.cjs 的 loadEnv() 合併解析 aladdin_ai/.env.* 各檔，不用 source（見 archery-login.sh 的理由，同樣適用）。
+read_env_key() {
+  node -e '
+    const { loadEnv } = require("/Users/user/aladdin/cqa-e2e/lib/env.cjs");
+    process.stdout.write(loadEnv()[process.argv[1]] || "");
+  ' "$1"
+}
+
+UAT_ARCHERY_URL="$(read_env_key UAT_ARCHERY_URL)"
+UAT_ARCHERY_USER="$(read_env_key UAT_ARCHERY_USER)"
+UAT_ARCHERY_PASS="$(read_env_key UAT_ARCHERY_PASS)"
+
+MISSING=""
+[ -z "$UAT_ARCHERY_URL" ]  && MISSING="$MISSING UAT_ARCHERY_URL"
+[ -z "$UAT_ARCHERY_USER" ] && MISSING="$MISSING UAT_ARCHERY_USER"
+[ -z "$UAT_ARCHERY_PASS" ] && MISSING="$MISSING UAT_ARCHERY_PASS"
+if [ -n "$MISSING" ]; then
+  echo "Error: .env 缺少欄位:$MISSING"
+  exit 2
+fi
+
+# 只允許 UAT 測試站網域
+case "$UAT_ARCHERY_URL" in
+  *.jxpre.com|*.jxpre.com/*) ;;
+  *)
+    echo "Error: 只允許 *.jxpre.com UAT 測試站，UAT_ARCHERY_URL 不符（已擋下）。"
+    exit 1
+    ;;
+esac
+
+LOG="$VERIFY_DIR/archery-uat-run.log"
+
+export UAT_ARCHERY_URL UAT_ARCHERY_USER UAT_ARCHERY_PASS
+
+set +e
+node "$VERIFY_DIR/archery-uat-login.cjs" >"$LOG" 2>&1
+RC=$?
+set -e
+
+node -e '
+const fs = require("fs");
+const log = fs.readFileSync(process.argv[1], "utf8");
+const s = log.indexOf("===RESULT_JSON_START===");
+const e = log.indexOf("===RESULT_JSON_END===");
+if (s < 0 || e < 0) {
+  console.log("RESULT: FAIL (腳本未產出結果 JSON，詳見 " + process.argv[1] + ")");
+  process.exit(1);
+}
+const r = JSON.parse(log.slice(s + "===RESULT_JSON_START===".length, e));
+console.log("SITE:              " + r.site);
+console.log("RESULT:            " + r.result);
+console.log("postLoginUrl:      " + (r.postLoginUrl || "-"));
+console.log("twoFactorRequired: " + r.twoFactorRequired);
+console.log("sessionCookie:     " + r.sessionCookie);
+console.log("artifacts:         " + process.argv[2] + "/archery-uat-{login,after,sqlquery}.png, archery-uat-state.json, archery-uat-debug.json");
+process.exit(r.result === "SUCCESS" ? 0 : 1);
+' "$LOG" "$VERIFY_DIR"
+SUMMARY_RC=$?
+
+if [ "$RC" -ne 0 ] && [ "$SUMMARY_RC" -eq 0 ]; then
+  exit "$RC"
+fi
+exit "$SUMMARY_RC"

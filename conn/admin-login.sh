@@ -1,8 +1,9 @@
 #!/bin/bash
-# Usage: ./admin-login.sh [cqa|dev]
+# Usage: ./admin-login.sh [cqa|dev|uat]
 # abu 共用後台 admin 登入（唯讀取證：只登入、導頁、截圖、存 storageState）。
-# 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取（見 lib/env.cjs），不寫死、不印出。
-# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env.dev 有 DEV_ADMIN_*。嚴禁 production。
+# 帳密一律從 aladdin_ai/.env.cqa / .env.dev / .env.uat 讀取（見 lib/env.cjs），不寫死、不印出。
+# 預設 cqa（*.ald777.com）；dev（*.alddev.com）需 .env.dev 有 DEV_ADMIN_*；
+# uat（*.jxpre.com）需 .env.uat 有 UAT_ADMIN_*。嚴禁 production。
 
 set -e
 
@@ -13,9 +14,9 @@ VERIFY_DIR="$E2E_DIR/verify"
 
 TARGET="${1:-cqa}"
 case "$TARGET" in
-  cqa|dev) ;;
+  cqa|dev|uat) ;;
   *)
-    echo "Usage: $0 [cqa|dev]"
+    echo "Usage: $0 [cqa|dev|uat]"
     exit 1
     ;;
 esac
@@ -63,6 +64,15 @@ case "$TARGET" in
       *.alddev.com|*.alddev.com/*) ;;
       *)
         echo "Error: 只允許 *.alddev.com dev 環境，${KEY_PREFIX}_URL 不符（已擋下）。"
+        exit 1
+        ;;
+    esac
+    ;;
+  uat)
+    case "$ADMIN_URL" in
+      *.jxpre.com|*.jxpre.com/*) ;;
+      *)
+        echo "Error: 只允許 *.jxpre.com UAT 環境，${KEY_PREFIX}_URL 不符（已擋下）。"
         exit 1
         ;;
     esac
