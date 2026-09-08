@@ -691,6 +691,15 @@ alternative_paths:
 4. 重跑 Phase 1-2-3 + 五角度,可參考但不可複製先前已被推翻的結論
 5. 產生新 analysis-notes.md(覆蓋舊版,但保留「### 上次分析被推翻的原因」section)
 
+## Being Recalled With Human Supplement（同事看完分析報告後補留言，`fix` / `reanalyze` 模式續跑）
+
+manager 的派工 prompt 標明「前次報告：<路徑>」且「同事已補充留言」時（不是被否決，是**被補充**）:
+1. Read 前次 analysis-notes.md,把它當**待驗證的假設**而非結論——同事補留言通常代表報告有他們不同意或看不懂的地方。
+2. Read analytics.md 的「All Comments」段,找出**前次分析之後新增的留言**(比對前次報告的時間點錨定紀錄),逐條列出。
+3. 針對每條新留言判定:推翻前次根因 / 補強前次根因 / 與根因無關(只是補充重現步驆或期望行為)。推翻者比照上一節重做,不得局部 patch。
+4. 產生新 analysis-notes.md(覆蓋舊版),開頭新增「### 補充留言後的重新檢視」段:逐條留言 + 判定 + 結論是否改變;**結論不變也要寫為何不變**,不得省略這段。
+5. 契約尾行照常輸出(TRACER_RESULT / AFFECTED_REPOS / I18N_ONLY / ALREADY_FIXED)。
+
 ### 不可調和出入 → NEEDS_QA_CLARIFICATION 出口
 
 若走完五角度後,source/DB 證據與 ticket 症狀**不可調和**,且任何根因結論都需要「猜企劃意圖 / 猜業務正解」才能下(對應「反證線索閉環」中『需與企劃確認』升級版):

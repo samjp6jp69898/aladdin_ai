@@ -6,7 +6,7 @@
 #
 # 用法：
 #   bash scripts/create-mr-finalize.sh <pipeline_status> <ticket_id> [--fail-reason "<一句失敗原因，含死在哪一步>"]
-#   pipeline_status ∈ success | already_fixed | i18n_manual_handoff | failed | needs_qa_clarification
+#   pipeline_status ∈ success | already_fixed | i18n_manual_handoff | failed | needs_qa_clarification | analysis_done
 #                   | NOT_TECH（Step 0.5 非技術人員早退）| SKIPPED（Step 0.1 認領失敗早退）
 #
 # 對應動作（與原 create-mr.md Step 8 表格一致）：
@@ -14,6 +14,7 @@
 #   success / already_fixed / i18n_manual_handoff → tracker.sh set <ticket> done "<now>"
 #   failed                                        → tracker.sh set <ticket> failed "<now>" ＋ tracker.sh log-fail <ticket> "<reason>"
 #   needs_qa_clarification                        → tracker.sh set <ticket> needs_qa "<now>"
+#   analysis_done（2026-09-08 pipeline-modes Phase 2）→ tracker.sh set <ticket> analysis_done "<now>"（暫停態，可再認領續跑）
 #   NOT_TECH                                      → tracker.sh set <ticket> pending（不填完成時間）
 #   SKIPPED                                       → tracker 不動（認領本來就沒成功，該行不是本 run 設的）
 #
@@ -45,6 +46,7 @@ case "$STATUS" in
   success|already_fixed|i18n_manual_handoff) TR_STATE=done; TR_TIME=1;;
   failed)                                    TR_STATE=failed; TR_TIME=1;;
   needs_qa_clarification)                    TR_STATE=needs_qa; TR_TIME=1;;
+  analysis_done)                             TR_STATE=analysis_done; TR_TIME=1;;
   NOT_TECH)                                  TR_STATE=pending; TR_TIME=0;;
   SKIPPED)                                   TR_STATE=""; TR_TIME=0;;
   *) echo "LOCK: ERROR(pipeline_status 非法：${STATUS:-空})"; echo "TRACKER: ERROR(pipeline_status 非法)"; echo "FAIL_LOG: SKIPPED"; exit 0;;

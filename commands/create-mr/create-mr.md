@@ -13,7 +13,7 @@ argument-hint: "<ticket_id>"
 
 `$ARGUMENTS`：`<ticket_id> [mode] [resume]`，以空白分隔、順序固定。
 - `ticket_id` **必填**（如 `FAQ-1702`）。呼叫端（telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。
-- `mode` 可選，值域 `full | analysis | fix | reanalyze`，缺省 `full`（dispatcher 2026-09-08 起一律帶）。存入 state `mode`。**本版本 mode 只記錄、不分流**（非 full 的走向於 pipeline-modes 計畫 Phase 2 啟用；在那之前 Notion 不會出現對應的新值）。
+- `mode` 可選，值域 `full | analysis | fix | reanalyze`，缺省 `full`（dispatcher 2026-09-08 起一律帶；對照 Notion AI分析 值見 `pipeline-modes-project-docs/plan-pipeline-modes-v1.md` §2.1）。存入 state `mode`。走向：`full` 一鍵到底；`analysis` / `reanalyze` 在 Step 2c 根因判定後走 **analysis_done 出口**（只交報告，不改程式）；`fix` 與 full 相同，但既有分析產物存在時 Step 1/2 走「補充留言後重新檢視」（見 Step 1 的 `prior_analysis`）。
 - `resume` 可選（tg-monitor 重試按鈕 / timeout 自動重試帶入，可與 mode 並存）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。判定方式：任一參數字面等於 `resume`。
 
 ## Manager 鐵律
@@ -28,11 +28,12 @@ argument-hint: "<ticket_id>"
 
 ```
 ticket_id, mode（參數；缺省 full）, notion_url, page_id（Step 0.1；page_id = URL 尾 32hex 轉 UUID）; reviewer_email（Step 0.5）
+prior_analysis = false（Step 1 開頭判定：mode ∈ {fix, reanalyze} 且既有 analysis-notes.md 存在 → true；Step 2a/2b 據此調整）
 base_branch = main（Step 1 由 analyst TARGET_BRANCH 覆寫；resume 時 Step 0.2 從 analytics.md 抽；傳給 Step 4/6/7a/7b）
 grounding_result, qa_question（2a）; affected_repos = []（2b）; bootstrap_partial = false（Step 4，true 時出口留言/報告須披露）
 tracer_attempt / fixer_attempt / total_attempt = 0
 review_result_a/b/c（Step 6 三位）; review_result_d（Step 6.5，僅三位皆 PASSED 才有值）
-pipeline_status ∈ success | already_fixed | i18n_manual_handoff | needs_qa_clarification | failed
+pipeline_status ∈ success | already_fixed | i18n_manual_handoff | needs_qa_clarification | failed | analysis_done
 fixed_commit, drive_link, mr_links, failure_reason, tg_notify_result, tg_chatid_sync_result
 worktree_path = /Users/user/aladdin/worktrees/{ticket_id}
 ```
@@ -66,7 +67,7 @@ grep -m1 '^Target Branch:' /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticke
 ```bash
 bash /Users/user/aladdin/scripts/resume-inventory.sh {ticket_id} {base_branch}
 ```
-唯讀腳本，行首 grep 取 `RESUME_POINT:` 與各產物/結論行（契約見腳本檔頭）。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。
+唯讀腳本，行首 grep 取 `RESUME_POINT:` 與各產物/結論行（契約見腳本檔頭）。腳本失敗、輸出缺失或與實況矛盾 → **忽略 resume 照常全跑**（resume 只是加速器，不是新出口路徑；寧可多跑，不可錯跳）。Step 0.5 照常執行；重試計數照常從 0 起算。`mode ∈ {analysis, reanalyze}` 時 RESUME_POINT 最深只認到 `step2`（這兩個模式不進 Step 4 之後，step4+ 一律降為 step2 處理）。
 
 - `step1` → 照常從 Step 1 全跑。
 - `step2` → 跳過 Step 1（沿用既有 analytics/spec）；Step 2 只派 `GROUNDING:` / `ANALYSIS_NOTES:` 為 missing 的那位（另一位的既有文件直接沿用），2c 照常。
@@ -84,6 +85,8 @@ bash /Users/user/aladdin/scripts/resolve-reviewer.sh {page_id}
 - `ERROR:*` → 重跑一次；仍 ERROR → `pipeline_status=failed`（`failure_reason`=該錯誤），跳 Step 7c。
 
 ## Step 1：Bug Report + Spec Analyst（合併為一次派工）
+
+先判 `prior_analysis`：`mode ∈ {fix, reanalyze}` 且 `ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md` 存在 → `prior_analysis=true`（`fix` 但檔案不存在 → 視同 full，完成報告註記「找不到既有分析產物，已從頭分析」）。**不論 prior_analysis 為何，Step 1 都照常派工**——analyst 會重新 dump 全部 Notion 留言，這是把同事補充的留言帶進後續分析的唯一管道。
 
 派工 `subagent_type: bug-report-and-spec-analyst`：
 ```
@@ -111,7 +114,7 @@ bash /Users/user/aladdin/scripts/resolve-base-branch.sh {ticket_id} {analyst 回
 
 ### 2a：CQA Grounder
 
-派工 `subagent_type: cqa-grounder`：
+`prior_analysis=true` 且既有 `{ticket_id}-grounding.md` 存在 → **不派工**，沿用既有 grounding，`grounding_result` 視為 CONSISTENT（前一輪若是 NEEDS_QA 早已走出口不會到這裡）。否則派工 `subagent_type: cqa-grounder`：
 ```
 用 CQA 實際數據對 ticket 症狀做 grounding，判定「ticket 描述 vs 實況」是否有實質出入。
 ticket_id: {ticket_id}
@@ -137,6 +140,7 @@ spec: /Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-spec.md
 歷史失效模式素材：先讀 /Users/user/aladdin/obsidian/Rules/_index.md 的「分析與失效模式（回測踩坑）」分類，挑出與本 ticket 模組相關的條目讀完再開始追因（回測 885 單顯示 13.5% 分析錯誤多為重複模式，先讀可避開）。
 若你判定 I18N_ONLY 為 yes 或 mixed：額外在 analysis-notes.md 新增「### i18n 待匯入清單」段落，逐筆列出「key + 建議的繁體中文顯示文字 + （能判斷的話）建議的英文顯示文字」。**這份清單只寫進這個 markdown 文件，絕對不要建立或編輯任何 localizations/*.json**（CLAUDE.md 硬規則，i18n 值只能由開發者從 Google Sheets 匯入，違反視為事故）——這份清單是給開發者去 Sheets 匯入用的草稿，不是最終翻譯值，也不是你能直接落地的東西。
 {第 2 次派工時加：前次分析被否決。否決回饋：<reviewer 或 fixer 的具體回饋（路徑或摘要）>。請針對回饋重新分析。}
+{prior_analysis=true 時加：本張票先前已完成一輪根因分析（只做分析模式），同事看完報告後補充了留言、要求續跑。前次報告：/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-analysis-notes.md（讀它，但當「待驗證的假設」不是結論）。analytics.md 的 All Comments 段含最新留言，依你定義檔「Being Recalled With Human Supplement」一節處理：逐條新留言判定推翻/補強/無關，新報告開頭必附「### 補充留言後的重新檢視」段。}
 回報格式（最後 4 行；TRACER_RESULT 值域就是你定義檔規定的那兩個，後三行是本次派工的附加要求）：
 TRACER_RESULT: <ROOT_CAUSE_FOUND|NEEDS_QA_CLARIFICATION>
 AFFECTED_REPOS: <逗號分隔，僅限 agrabah,abu,lago,rajah；無則 none>
@@ -164,6 +168,7 @@ ALREADY_FIXED: <no|yes commit=<hash>>   （你在 Already-Fixed Verification 判
 - `ALREADY_FIXED: yes commit=<hash>` → `pipeline_status=already_fixed`；`fixed_commit` = 該行的 hash → 跳 Step 7（7a+7c，不跑 7b）。
 - `I18N_ONLY: yes` → `pipeline_status=i18n_manual_handoff`；用上面的 sed 指令把 primary_fix_paths 段**原文留存**，另把 analysis-notes.md 的「### i18n 待匯入清單」段落也**原文留存**（Step 7a 的 i18n_keys 要用這兩段）→ 跳 Step 7（7a+7c）。
 - `I18N_ONLY: mixed` → 續行，但 Step 5 的 fixer prompt 必須加：「i18n JSON 路徑禁止寫入，僅修 code 部分；把 analysis-notes.md 的『### i18n 待匯入清單』段落原樣轉貼進 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/{ticket_id}-i18n-keys-to-import.md`」。
+- **`mode ∈ {analysis, reanalyze}`** → `pipeline_status=analysis_done` → 跳 Step 7（7a+7c，不跑 7b；不進 Step 4/5）。這是刻意的暫停出口，不是失敗：報告交同事看，同事在 Notion 改值後再認領續跑。放在 AFFECTED_REPOS 判定之前——只做分析時修復落點在哪都不影響報告交付。
 - `AFFECTED_REPOS: none` 且 sed 補救後仍無四大 repo 路徑 → **不進 Step 4/5**（全 symlink 環境 fixer 無合法落筆處）：`pipeline_status=failed`、`failure_reason="修復落點不在 agrabah/abu/lago/rajah（共用庫或非程式碼變更），pipeline 不支援，需人工"` → failed 出口（Step 8 會把 AI分析 改成「分析失敗」並留言失敗原因，見 Step 7c）。
 - 其餘（ROOT_CAUSE_FOUND + 有效 repos）→ 續 Step 4。
 
@@ -272,6 +277,7 @@ REVIEW_RESULT: <PASSED|FAILED>
 | i18n_manual_handoff | ✅ | — | ✅ | ✅ |
 | needs_qa_clarification | ✅（傳 grounding/analysis） | — | ✅ | ✅ |
 | failed | ✅（上傳既有分析+審查文件） | — | ✅ | ✅ |
+| analysis_done | ✅（analysis-notes 必有 + analytics/spec/grounding） | — | ✅（AI分析=問題分析完成，待確認） | ✅ |
 
 **failed 統一定義**：任一步驟超過重試上限、SETUP_FAIL 二連敗、resolve-reviewer 二連 ERROR → `pipeline_status=failed`，`failure_reason`＝「死在哪一步 + 最後一個錯誤訊息的第一行」；走 7a → 7c failed 分支 → Step 8，不開 MR、不留成功留言。**needs_qa_clarification 不是 failed**：它是正常暫停等 QA，走自己那列。
 
@@ -325,16 +331,17 @@ bash /Users/user/aladdin/scripts/create-mr-exit-comment.sh {pipeline_status} {pa
   {already_fixed：--fixed-commit {fixed_commit}} \
   {needs_qa_clarification：--qa-question "{qa_question}" --reviewer-email "{reviewer_email}"} \
   {failed：--failure-reason "{failure_reason}" --attempts {tracer_attempt} {fixer_attempt} {total_attempt} --reviewer-email "{reviewer_email}"} \
+  {analysis_done：--reviewer-email "{reviewer_email}"} \
   {bootstrap_partial=true 時加：--bootstrap-partial}
 ```
-腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功 + TG；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
+腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功 + TG；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；analysis_done → 留言（附報告連結 + 兩條續跑方式說明）+ 問題分析完成，待確認 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
 
 ## Step 8：解鎖 + tracker 終態 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
 
 ```bash
 bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH|SKIPPED} {ticket_id} {failed 時加：--fail-reason "<一句失敗原因，含死在哪一步>"}
 ```
-腳本內含解鎖 + tracker 終態對映（success/already_fixed/i18n → done；failed → failed + log-fail；needs_qa_clarification → needs_qa；NOT_TECH → pending；SKIPPED 不動 tracker），一律 exit 0。行首 grep `LOCK:` / `TRACKER:` / `FAIL_LOG:` 三行，任一 `ERROR(*)` 記入完成報告，不重試、不阻斷。
+腳本內含解鎖 + tracker 終態對映（success/already_fixed/i18n → done；failed → failed + log-fail；needs_qa_clarification → needs_qa；analysis_done → analysis_done；NOT_TECH → pending；SKIPPED 不動 tracker），一律 exit 0。行首 grep `LOCK:` / `TRACKER:` / `FAIL_LOG:` 三行，任一 `ERROR(*)` 記入完成報告，不重試、不阻斷。
 
 緊接著輸出完成報告（不再分獨立步驟）：
 
@@ -351,7 +358,8 @@ bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH
 - Fresh pull（Step 0）: {FRESH_PULL_OK | FRESH_PULL_FAIL:<原因>}
 - Google Drive: {drive_link}
 - MR(s): {每 repo 一行；非 success 顯示 "(N/A - {pipeline_status})"}
-- Notion AI分析: {分析成功|分析失敗|待釐清}
+- Notion AI分析: {分析成功|分析失敗|待釐清|問題分析完成，待確認}
+- Prior analysis: {prior_analysis；fix 模式找不到既有產物時加 "（找不到既有分析產物，已從頭分析）"}
 - TG 通知: {tg_notify_result}；chat_id 同步: {tg_chatid_sync_result}
 - Finalize: {LOCK / TRACKER / FAIL_LOG 三行原文；全 ok 時寫 ok}
 - Worktree: {worktree_path}；文件: /Users/user/aladdin/obsidian/Debug/{ticket_id}/

@@ -1,6 +1,6 @@
 ---
 name: drive-uploader-mr
-description: For /create-mr only. Aggregates bug analysis results into solution.md, uploads documents to Google Drive, and returns the Drive link. Does NOT post Notion comments or update the AI分析 field — those are handled by mr-pusher (success path) or by the manager (already_fixed / i18n / needs_qa / failed paths).
+description: For /create-mr only. Aggregates bug analysis results into solution.md, uploads documents to Google Drive, and returns the Drive link. Does NOT post Notion comments or update the AI分析 field — those are handled by mr-pusher (success path) or by the manager (already_fixed / i18n / needs_qa / failed / analysis_done paths).
 tools:
   - Glob
   - Read
@@ -19,11 +19,12 @@ You are a document aggregation and upload assistant. You compile the final solut
 
 ## Pipeline Status (重要)
 
-Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed`：
+Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed` / `analysis_done`：
 
 | pipeline_status | solution.md | Drive 上傳檔案清單 | Notion 留言 / AI分析 |
 |---|---|---|---|
 | `success` | 執行 Step 0 編譯 | `{id}-solution.md` + `{id}-analysis-notes.md` + `{id}-reviewer-report.md` + UI 視覺證據（`{id}-ui-before*` / `{id}-ui-after*`，**只上傳存在的，缺則略過不報錯**——只有純 UI/UX fix 才會有這些檔案） | **跳過**（由 mr-pusher 統一處理） |
+| `analysis_done` | **跳過**（沒有 fixer diff） | `{id}-analysis-notes.md`（必有）+ `{id}-analytics.md` + `{id}-spec.md` + `{id}-grounding.md`（後三者存在才傳）——同事要看的是完整分析脈絡，不只結論 | **跳過**（由 manager 統一處理） |
 | `already_fixed` | **跳過** | `{id}-analysis-notes.md` | **跳過**（由 manager 統一處理） |
 | `i18n_manual_handoff` | **跳過** | `{id}-analysis-notes.md` + `{id}-i18n-keys-to-import.md` | **跳過**（由 manager 統一處理） |
 | `needs_qa_clarification` | **跳過** | `{id}-grounding.md`（必有）+ `{id}-analysis-notes.md`（存在才傳） | **跳過**（由 manager 統一處理） |
@@ -31,7 +32,7 @@ Dispatch prompt 會傳入 `pipeline_status`，值為 `success` / `already_fixed`
 
 `failed` 狀態也要上傳既有的分析與審查文件（供人工接手參考，缺了這些文件人工無從接手）。失敗可能死在任何一步，文件清單一律「存在才傳」；死於 Step 1 之前可能一份都沒有，此時如實回報 `DRIVE_LINK: N/A` 即可，不報錯。
 
-本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / needs_qa_clarification / failed 路徑）處理。
+本 agent 已**完全不負責 Notion 留言與「AI分析」欄位更新** — 那兩件事在 /create-mr pipeline 中由 mr-pusher（success 路徑）或 manager（already_fixed / i18n_manual_handoff / needs_qa_clarification / failed / analysis_done 路徑）處理。
 
 `needs_qa_clarification` 為「實證 grounding 早停」或「tracer 判定待 QA 釐清」的純文件路徑，**行為比照 `already_fixed`**：跳過 solution.md 編譯，僅上傳既有的證據文件（grounding.md / analysis-notes.md，只上傳存在的）。
 
@@ -193,6 +194,10 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 - `{id}-grounding.md` (CQA 實證 grounding 佐證 — 本路徑最重要文件，grounding 早停路徑必有)
 - `{id}-analysis-notes.md` (若 tracer 有跑出待釐清結論則存在；grounding 早停路徑可能不存在)
 
+**`pipeline_status == analysis_done` 時文件清單（「只做問題分析」模式的暫停出口，pipeline-modes Phase 2）：**
+- `{id}-analysis-notes.md`（必要——沒有它就沒有可交付的東西，缺則如實回報 `DRIVE_LINK: N/A`）
+- `{id}-analytics.md` / `{id}-spec.md` / `{id}-grounding.md`（存在才傳，缺則略過不報錯）
+
 **`pipeline_status == failed` 時文件清單（全部「存在才傳」，缺則略過不報錯；一份都沒有 → 直接進 Step 5 回報 `DRIVE_LINK: N/A`）：**
 - `{id}-solution.md`（Step 0 有編才有）
 - `{id}-analytics.md` / `{id}-spec.md` / `{id}-grounding.md` / `{id}-analysis-notes.md`
@@ -201,7 +206,7 @@ ls /Users/user/aladdin/obsidian/Debug/{ticket_id}/
 
 ### Step 2: Create Google Drive Subfolder
 
-`pipeline_status == already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed` 時仍需建立資料夾以放置要上傳的文件（failed 時放 Step 1 清單裡實際存在的那些）。
+`pipeline_status == already_fixed` / `i18n_manual_handoff` / `needs_qa_clarification` / `failed` / `analysis_done` 時仍需建立資料夾以放置要上傳的文件（failed 時放 Step 1 清單裡實際存在的那些）。
 
 ```bash
 bash /Users/user/.claude/gdrive.sh mkdir "{ticket_id}" "1mDJGrClVuPW_mc_1w6uLYA_t1MI8incd"
@@ -235,6 +240,15 @@ bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{i
 ```bash
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
 bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-i18n-keys-to-import.md" "{FOLDER_ID}"
+```
+
+`pipeline_status == analysis_done` 時，上傳分析脈絡四份（analysis-notes 必有，其餘存在才傳）：
+
+```bash
+bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/{id}-analysis-notes.md" "{FOLDER_ID}"
+for f in "{id}-analytics.md" "{id}-spec.md" "{id}-grounding.md"; do
+  [ -f "/Users/user/aladdin/obsidian/Debug/{id}/$f" ] && bash /Users/user/.claude/gdrive.sh upload "/Users/user/aladdin/obsidian/Debug/{id}/$f" "{FOLDER_ID}"
+done
 ```
 
 `pipeline_status == needs_qa_clarification` 時，上傳存在的證據文件（缺的略過，不報錯）：

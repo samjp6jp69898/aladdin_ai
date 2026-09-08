@@ -173,6 +173,10 @@ def main() -> int:
                 reason = "分析成功 但缺 solution.md"
         elif ai_name == "分析失敗":
             new_status = "failed"
+        elif ai_name == "問題分析完成，待確認":
+            # pipeline-modes Phase 2（2026-09-08）：「只做問題分析」跑完的暫停態，
+            # 對應 tracker 的 analysis_done（可再認領續跑）。
+            new_status = "analysis_done"
 
         if new_status and new_status != status:
             completion = to_taipei(last_edited) if last_edited and new_status == "done" else completed

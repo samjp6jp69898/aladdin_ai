@@ -6,7 +6,9 @@
 #
 # 判定順序（跟原 create-mr.md Step 0.1 一致）：
 #   1. ticket_id 空 → SKIPPED
-#   2. tracker.sh row 找不到該行、或狀態不是 pending/rerun → SKIPPED
+#   2. tracker.sh row 找不到該行、或狀態不是 pending/rerun/analysis_done → SKIPPED
+#      （analysis_done：2026-09-08 pipeline-modes Phase 2 新增——「只做問題分析」跑完後的暫停態，
+#        同事把 Notion AI分析 改成「產出修復程式碼並開 MR」或「依補充留言重新分析」後可再認領續跑）
 #   3. bug-lock.sh claim 失敗（已被鎖） → SKIPPED
 #   4. tracker.sh set in_progress
 #
@@ -56,7 +58,7 @@ ROW=$(bash "$TRACKER_SH" row "$TICKET" 2>/dev/null) || { echo "SKIPPED: $TICKET 
 
 STATUS=$(printf '%s' "$ROW" | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/,"",$5); print $5}')
 case "$STATUS" in
-  pending|rerun) ;;
+  pending|rerun|analysis_done) ;;
   *) echo "SKIPPED: $TICKET not claimable"; exit 1;;
 esac
 

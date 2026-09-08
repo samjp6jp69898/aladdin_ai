@@ -4,7 +4,9 @@
 #
 # 用法：
 #   bash scripts/create-mr-exit-comment.sh <pipeline_status> <page_id> [選項]
-#   pipeline_status ∈ already_fixed | i18n_manual_handoff | needs_qa_clarification | failed
+#   pipeline_status ∈ already_fixed | i18n_manual_handoff | needs_qa_clarification | failed | analysis_done
+#   （analysis_done：2026-09-08 pipeline-modes Phase 2，「只做問題分析」/「依補充留言重新分析」模式的暫停出口——
+#     留言附報告連結 + 說明兩條續跑方式、AI分析=「問題分析完成，待確認」、TG 通知認領人）
 #   選項：
 #     --ticket <FAQ-xxxx>               TG 標題用的單號（四種狀態發 TG 時皆建議必帶）
 #     --drive-link <url|N/A>            分析文件連結（N/A 或省略 → 留言不附連結行、TG 省略該行）
@@ -19,7 +21,8 @@
 #
 # 輸出契約（呼叫端行首 grep，不假設順序）：
 #   NOTION_COMMENT: ok|failed(<摘要>)
-#   NOTION_AI_FIELD: ok|failed(<摘要>)   值：already_fixed / i18n → 分析成功；needs_qa → 待釐清；failed → 分析失敗
+#   NOTION_AI_FIELD: ok|failed(<摘要>)   值：already_fixed / i18n → 分析成功；needs_qa → 待釐清；failed → 分析失敗；
+#                                        analysis_done → 問題分析完成，待確認
 #   TG: <tg-notify.sh 的結果行>|SKIPPED(<原因>)
 # 紀律：一律 exit 0（出口動作不得再讓 pipeline 失敗）；留言失敗不影響欄位更新（欄位是最核心任務，比照 mr-pusher）。
 set -u
@@ -47,7 +50,7 @@ while [ $# -gt 0 ]; do
 done
 
 case "$STATUS" in
-  already_fixed|i18n_manual_handoff|needs_qa_clarification|failed) ;;
+  already_fixed|i18n_manual_handoff|needs_qa_clarification|failed|analysis_done) ;;
   *) echo "NOTION_COMMENT: failed(pipeline_status 非法：${STATUS:-空}；本腳本只處理非 success 出口)"
      echo "NOTION_AI_FIELD: failed(pipeline_status 非法)"; echo "TG: SKIPPED(參數錯誤)"; exit 0;;
 esac
@@ -74,6 +77,13 @@ ${QA:-(未提供具體問題)}"
 失敗原因：${REASON:-(未提供)}
 Tracer 嘗試：${T_A} 次，Fixer 嘗試：${T_F} 次（總 ${T_T}）"
     INTRO="分析與審查文件（含各 reviewer 否決理由，供人工接手）："; FIELD="分析失敗";;
+  analysis_done)
+    TEXT="AI 問題分析完成（本次只做分析、未改程式），請先看報告。
+看完後若要繼續，把「AI分析」改成：
+• 「產出修復程式碼並開 MR」→ AI 會帶著你新增的留言重新檢視根因，接著產出修復與 MR
+• 「依補充留言重新分析（仍不改程式）」→ 只依新留言重跑分析，再停在這個狀態
+補充意見請直接留言在本頁，AI 續跑時會全部讀取。"
+    INTRO="根因分析報告："; FIELD="問題分析完成，待確認";;
 esac
 [ "$PARTIAL" = 1 ] && TEXT="$TEXT
 （注：隔離環境 bootstrap 的 DB 資料供給步驟未完成，不影響本次 L0 分析結論）"
@@ -97,6 +107,9 @@ ${QA:-(未提供具體問題)}";;
     TG_TEXT="🔴 [分析失敗] {ticket}
 失敗原因：${REASON:-(未提供)}
 嘗試：tracer ${T_A} / fixer ${T_F}（總 ${T_T}）";;
+  analysis_done)
+    TG_TEXT="🧭 [問題分析完成，待確認] {ticket}
+本次只做根因分析、未改程式。看完報告後到 Notion 把「AI分析」改成「產出修復程式碼並開 MR」（續跑修復）或「依補充留言重新分析」（只重跑分析），再到 bot 重新認領即可。";;
 esac
 if [ -n "$TG_TEXT" ]; then
   [ "$DRIVE" != "N/A" ] && TG_TEXT="$TG_TEXT

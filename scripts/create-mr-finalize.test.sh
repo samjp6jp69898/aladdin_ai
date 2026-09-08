@@ -41,6 +41,12 @@ out="$(bash "$SCRIPT" needs_qa_clarification "$T")"
 has "$out" "TRACKER: SET(needs_qa)" "needs_qa_clarification → needs_qa"
 has "$out" "FAIL_LOG: SKIPPED" "needs_qa 不記 fail log"
 
+# 3b. analysis_done（pipeline-modes Phase 2）：暫停態，帶完成時間，不記 fail log
+out="$(bash "$SCRIPT" analysis_done "$T")"
+has "$out" "TRACKER: SET(analysis_done)" "analysis_done → analysis_done"
+has "$out" "FAIL_LOG: SKIPPED" "analysis_done 不記 fail log"
+[ "$(status_of)" = analysis_done ] && echo "PASS: tracker 實際為 analysis_done" || { echo "FAIL: tracker 狀態 $(status_of)"; fail=1; }
+
 # 4. NOT_TECH：回 pending，不填完成時間（沿用上一步的時間欄不變）
 before="$(bash "$HERE/tracker.sh" row "$T" | awk -F'|' '{print $7}')"
 out="$(bash "$SCRIPT" NOT_TECH "$T")"

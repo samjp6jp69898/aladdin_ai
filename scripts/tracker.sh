@@ -15,7 +15,9 @@
 #   bash scripts/tracker.sh counts               # 各狀態統計
 #   bash scripts/tracker.sh log-fail FAQ-1234 "step5 fixer 超過重試上限"  # 失敗原因記到 pipeline-failures.md
 #
-# 合法狀態：pending rerun in_progress done failed needs_qa
+# 合法狀態：pending rerun in_progress done failed needs_qa analysis_done
+#   analysis_done（2026-09-08，pipeline-modes Phase 2）：「只做問題分析」模式跑完根因分析報告後的暫停態，
+#   等同事在 Notion 改成「產出修復程式碼並開 MR」或「依補充留言重新分析」再認領續跑；可認領集合見 claim-ticket.sh。
 set -u
 TRACKER="${TRACKER_FILE:-/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md}"
 FAILLOG="$(dirname "$TRACKER")/pipeline-failures.md"
@@ -44,7 +46,7 @@ case "$ACTION" in
     T="${2:?用法: tracker.sh set FAQ-1234 <狀態> [完成時間]}"
     ST="${3:?缺狀態}"
     DONE_AT="${4:-}"
-    case "$ST" in pending|rerun|in_progress|done|failed|needs_qa) ;; *) echo "ERROR: 非法狀態 $ST"; exit 1;; esac
+    case "$ST" in pending|rerun|in_progress|done|failed|needs_qa|analysis_done) ;; *) echo "ERROR: 非法狀態 $ST"; exit 1;; esac
     grep -qE "^\| ${T} \|" "$TRACKER" || { echo "NOT_FOUND: $T"; exit 1; }
     # 檔級自旋鎖：兩個 session 並行 set 不同單時避免整檔重寫互相覆蓋（bug-lock 是 per-ticket，保護不了這裡）
     SETLOCK="/tmp/bug-analysis-locks/.tracker-set-lock"
