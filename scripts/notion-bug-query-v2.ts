@@ -3,7 +3,10 @@
  *
  * 篩選條件：
  *   狀態     = 仍有問題 OR 待處理
- *   AI分析   = 待分析 OR 需要重跑
+ *   AI分析   = 一鍵分析＋修復＋開 MR OR 全部重跑 OR 只做問題分析（不改程式）OR
+ *              產出修復程式碼並開 MR OR 依補充留言重新分析（仍不改程式）
+ *              （2026-09-08 Notion 改名：原「待分析」→「一鍵分析＋修復＋開 MR」，
+ *              原「需要重跑」→「全部重跑」；另納入三個新增可認領選項一併同步進 tracker）
  *   當前指派 = 至少一人在 tech-users.csv 名單中（程式端後篩）
  *
  * 寫入 tracker file：
@@ -112,15 +115,21 @@ function buildStatusOnlyFilter(): object {
     };
 }
 
+// 五個可認領新值（2026-09-08 Notion 改名後現存選項，見檔頭篩選條件註解）
+const AI_ANALYSIS_VALUES = [
+    '一鍵分析＋修復＋開 MR',
+    '全部重跑',
+    '只做問題分析（不改程式）',
+    '產出修復程式碼並開 MR',
+    '依補充留言重新分析（仍不改程式）',
+];
+
 function buildFilter(): object {
     return {
         and: [
             buildStatusOnlyFilter(),
             {
-                or: [
-                    { property: 'AI分析', select: { equals: '待分析' } },
-                    { property: 'AI分析', select: { equals: '需要重跑' } },
-                ],
+                or: AI_ANALYSIS_VALUES.map(v => ({ property: 'AI分析', select: { equals: v } })),
             },
         ],
     };
@@ -294,7 +303,7 @@ function readTracker(): TrackerEntry[] {
 function writeTracker(entries: TrackerEntry[]) {
     const header = `---
 name: Bug 分析追蹤清單
-description: 記錄從 Notion Bug List 查詢到的待分析 bug 及其處理狀態，跨 session 共享
+description: 記錄從 Notion Bug List 查詢到的候選 bug 及其處理狀態，跨 session 共享
 type: project
 ---
 
@@ -321,7 +330,7 @@ function applyMerge(existing: TrackerEntry[], items: BugItem[]): { added: number
     let skipped = 0;
 
     for (const item of items) {
-        const isRerun = item.aiAnalysis === '需要重跑';
+        const isRerun = item.aiAnalysis === '全部重跑';
         const entry = existingByFaq.get(item.faqNumber);
 
         if (entry) {
@@ -334,8 +343,9 @@ function applyMerge(existing: TrackerEntry[], items: BugItem[]): { added: number
                 entry.doneAt = undefined;
                 reset++;
             } else if (entry.status === 'needs_qa') {
-                // needs_qa 是「等 QA 釐清」的暫停狀態；當 Notion AI分析 從「待釐清」被改回「待分析」，
-                // 代表釐清已處理、要求重新分析，拉回處理佇列（比照 rerun，讓 /create-mrs 能重新認領）
+                // needs_qa 是「等 QA 釐清」的暫停狀態；當 Notion AI分析 從「待釐清」被改回
+                // 「一鍵分析＋修復＋開 MR」，代表釐清已處理、要求重新分析，拉回處理佇列
+                // （比照 rerun，讓 /create-mrs 能重新認領）
                 entry.status = 'rerun';
                 entry.severity = item.severity;
                 entry.url = item.url;
@@ -343,7 +353,8 @@ function applyMerge(existing: TrackerEntry[], items: BugItem[]): { added: number
                 entry.doneAt = undefined;
                 reset++;
             } else {
-                // 待分析 + 已存在（done/failed/in_progress/rerun）：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
+                // 一鍵分析＋修復＋開 MR（及其餘非全部重跑的可認領值）+ 已存在
+                // （done/failed/in_progress/rerun）：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
                 skipped++;
             }
         } else {
@@ -387,7 +398,7 @@ function applyCleanup(existing: TrackerEntry[], wantedFaqSet: Set<number>): Trac
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=仍有問題,待處理,處理中 | AI分析=待分析,需要重跑 | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=仍有問題,待處理,處理中 | AI分析=${AI_ANALYSIS_VALUES.join(',')} | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
 
     const techUsers = loadTechUsers();
     console.log(`  Tech 名單載入: ${techUsers.length} 人`);

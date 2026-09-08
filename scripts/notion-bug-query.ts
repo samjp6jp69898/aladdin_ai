@@ -1,11 +1,15 @@
 /**
  * Notion Bug List 查詢腳本
  *
- * 固定篩選：狀態=待處理,仍有問題,處理中 AI分析=待分析,需要重跑
+ * 固定篩選：狀態=待處理,仍有問題,處理中 AI分析=一鍵分析＋修復＋開 MR,全部重跑,
+ *           只做問題分析（不改程式）,產出修復程式碼並開 MR,依補充留言重新分析（仍不改程式）
+ *           （2026-09-08 Notion 改名：原「待分析」→「一鍵分析＋修復＋開 MR」，
+ *           原「需要重跑」→「全部重跑」；另納入三個新增可認領選項一併同步進 tracker）
  *
  * 寫入 tracker 的規則：
- *   - AI分析=待分析：新單以 `pending` 加入；已存在於 tracker 則略過（不覆寫現有狀態）
- *   - AI分析=需要重跑：若 tracker 已有紀錄（通常 status=done/failed），重設為 `rerun`
+ *   - AI分析=一鍵分析＋修復＋開 MR（及其餘非「全部重跑」的可認領值）：新單以 `pending`
+ *     加入；已存在於 tracker 則略過（不覆寫現有狀態）
+ *   - AI分析=全部重跑：若 tracker 已有紀錄（通常 status=done/failed），重設為 `rerun`
  *     並更新加入時間、清空完成時間；若尚未有紀錄則以 `rerun` 新增。`rerun` 為
  *     `pending` 的優先子型別，/analyze-bugs-v3 會先處理。
  *
@@ -116,8 +120,15 @@ function buildFilter(severity: string): object {
     conditions.push({
         or: statusValues.map(v => ({ property: '狀態', select: { equals: v } })),
     });
-    // AI分析 固定：待分析（新單）或 需要重跑（重送分析）
-    const aiAnalysisValues = ['待分析', '需要重跑'];
+    // AI分析 固定：五個可認領新值（一鍵分析＋修復＋開 MR / 全部重跑 / 只做問題分析
+    // （不改程式）/ 產出修復程式碼並開 MR / 依補充留言重新分析（仍不改程式））
+    const aiAnalysisValues = [
+        '一鍵分析＋修復＋開 MR',
+        '全部重跑',
+        '只做問題分析（不改程式）',
+        '產出修復程式碼並開 MR',
+        '依補充留言重新分析（仍不改程式）',
+    ];
     conditions.push({
         or: aiAnalysisValues.map(v => ({ property: 'AI分析', select: { equals: v } })),
     });
@@ -245,7 +256,7 @@ function printTable(items: BugItem[]) {
 
     console.log(`\n  共 ${items.length} 筆\n`);
     for (const item of items) {
-        const rerunMark = item.aiAnalysis === '需要重跑' ? ' [需要重跑]' : '';
+        const rerunMark = item.aiAnalysis === '全部重跑' ? ' [全部重跑]' : '';
         console.log(`  FAQ-${item.faqNumber}${rerunMark}  |  ${item.url}`);
     }
     console.log();
@@ -289,7 +300,7 @@ function readTracker(): TrackerEntry[] {
 function writeTracker(entries: TrackerEntry[]) {
     const header = `---
 name: Bug 分析追蹤清單
-description: 記錄從 Notion Bug List 查詢到的待分析 bug 及其處理狀態，跨 session 共享
+description: 記錄從 Notion Bug List 查詢到的候選 bug 及其處理狀態，跨 session 共享
 type: project
 ---
 
@@ -322,7 +333,7 @@ function mergeToTracker(items: BugItem[]): {
     let skipped = 0;
 
     for (const item of items) {
-        const isRerun = item.aiAnalysis === '需要重跑';
+        const isRerun = item.aiAnalysis === '全部重跑';
         const entry = existingByFaq.get(item.faqNumber);
 
         if (entry) {
@@ -335,7 +346,8 @@ function mergeToTracker(items: BugItem[]): {
                 entry.doneAt = undefined;
                 reset++;
             } else {
-                // 待分析 + 已存在：維持既有狀態，不覆寫（避免把做到一半或 done 的單拉回）
+                // 一鍵分析＋修復＋開 MR（及其餘非全部重跑的可認領值）+ 已存在：維持既有狀態，
+                // 不覆寫（避免把做到一半或 done 的單拉回）
                 skipped++;
             }
         } else {
@@ -367,7 +379,7 @@ function mergeToTracker(items: BugItem[]): {
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=待處理,仍有問題,處理中 | AI分析=待分析,需要重跑 | 嚴重性=${args.severity} | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=待處理,仍有問題,處理中 | AI分析=一鍵分析＋修復＋開 MR,全部重跑,只做問題分析（不改程式）,產出修復程式碼並開 MR,依補充留言重新分析（仍不改程式） | 嚴重性=${args.severity} | 上限=${args.limit}`);
 
     const filter = buildFilter(args.severity);
     const results = await queryDatabase(filter, args.limit);
