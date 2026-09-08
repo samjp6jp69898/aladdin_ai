@@ -19,72 +19,29 @@ Reads the back-testing tracker and produces:
 
 ## Execution Flow
 
-### Step 1: Read Tracker
+### Step 1-2: Compute Statistics（腳本化，確定性計算）
 
-Read the tracker file:
-```
-/Users/user/.claude/projects/-Users-user-aladdin/memory/backtest_tracker.md
+表格解析、計數、除法、累積序列這類確定性計算一律交給腳本，manager 不手算：
+
+```bash
+bun /Users/user/aladdin/aladdin_ai/scripts/back-testing-stats-compute.ts
 ```
 
-If the file does not exist or has no data rows, report and stop:
+若輸出是 `{"error": "EMPTY_TRACKER"}`，報告並停止：
 ```
 Tracker is empty. Please run the query script first:
 bun scripts/notion-backtest-query.ts
 ```
 
-Parse all rows. Columns used:
-- `單號` — ticket ID
-- `嚴重性` — severity (P1重點 / P2較高 / P3一般 / P4較低)
-- `回測狀態` — status (pending / in_progress / done / failed)
-- `回測結論` — conclusion (see values below)
-- `完成時間` — completion timestamp (YYYYMMDD HHMM), for trend ordering
+腳本輸出一份 JSON（見腳本檔頭註解），已算好：
+- `total` / `done` / `failed` / `in_progress`
+- `overall`：`correct` / `partial` / `partial_A` / `partial_B` / `wrong` / `unable` / `no_fix` / `effective` / `strict_rate`（嚴格正確率）/ `full_rate`（完全成功率，含等效，**主要指標**）/ `total_rate`（總成功率）
+- `bySeverity`：`P1重點` / `P2較高` / `P3一般` / `P4較低` 各自同上欄位
+- `cumulative`：依完成時間排序、逐張累加後的 `strict_rate` / `full_rate` / `total_rate` 序列（Step 4 畫圖直接用）
 
-Conclusion values:
-- `✅ 分析正確`
-- `✅ 部分正確`
-- `❌ 分析錯誤`
-- `⚠️ 無法比對`
-- `➖ 不需修復`
+`partial_A`（等效替代解法）/ `partial_B`（不完整）的判定，是腳本讀 `/Users/user/aladdin/obsidian/backTesting/{單號}-*.md` 的 `## Failure Mode` 區塊是否含 `alternative-path` 分出來的——腳本已做好，不需要重讀筆記或重新分類。
 
----
-
-### Step 2: Calculate Statistics
-
-#### Overall counts
-
-- `total` = all rows
-- `done` = rows where 回測狀態 = `done`
-- `failed` = rows where 回測狀態 = `failed`
-- `in_progress` = rows where 回測狀態 = `in_progress` or `pending`
-
-From `done` rows:
-- `correct` = count of `✅ 分析正確`
-- `partial` = count of `✅ 部分正確`
-- `partial_A` and `partial_B` — 從 Obsidian 筆記中區分子類型：
-  1. 對每個結論為 `✅ 部分正確` 的 done ticket，根據 `單號` 找到對應的筆記檔案：
-     ```bash
-     ls /Users/user/aladdin/obsidian/backTesting/{單號}-*.md
-     ```
-  2. 讀取該筆記，檢查 `## Failure Mode` 區塊：
-     - 若包含 `alternative-path` → 計入 `partial_A`
-     - 否則 → 計入 `partial_B`
-  3. 若筆記不存在或無 Failure Mode 區塊 → 計入 `partial_B`（向後相容舊筆記）
-- `wrong` = count of `❌ 分析錯誤`
-- `unable` = count of `⚠️ 無法比對`
-- `no_fix` = count of `➖ 不需修復`
-
-Rates (denominator = `done` total **excluding `no_fix`**):
-- `effective` = done - no_fix (有效樣本數，排除不需修復)
-- **嚴格正確率** = correct / effective（僅照 commit 對齊的完全一致）
-- **完全成功率（含等效）** = (correct + partial_A) / effective（**主要指標** — partial_A 等效替代解法視為正確：AI 已找對根因，僅實作風格與開發者不同，工程價值等同）
-- **總成功率** = (correct + partial) / effective（含等效 + 不完整，最寬鬆指標）
-
-#### Per-severity counts
-
-For each severity (P1重點 / P2較高 / P3一般 / P4較低), compute the same breakdown and three rates from `done` rows only (excluding `no_fix` from denominator):
-- 嚴格正確率 = correct / effective
-- 完全成功率(含等效) = (correct + partial_A) / effective
-- 總成功率 = (correct + partial) / effective
+Step 3、4 的所有數字直接引用這份 JSON，不重新計算、不重新解析 tracker 表格。
 
 ---
 
@@ -133,17 +90,11 @@ Rows with 0 done tickets show `—` for all rate columns.
 
 ### Step 4: Generate HTML Trend Chart
 
-#### 4a. Build cumulative series
+#### 4a. Cumulative series
 
-Take all `done` rows with a valid `完成時間`. Sort ascending by `完成時間`.
+直接用 Step 1-2 腳本輸出的 `cumulative` 陣列（已按完成時間排序、已算好每個時間點的 `strict_rate`/`full_rate`/`total_rate`），不重新計算。
 
-For each ticket in order, compute running totals at that point:
-- cumulative `correct`, `partial_A`, `partial`, `done_so_far`
-- **累積嚴格正確率** = correct / done_so_far × 100
-- **累積完全成功率(含等效)** = (correct + partial_A) / done_so_far × 100（**主要趨勢線**）
-- **累積總成功率** = (correct + partial) / done_so_far × 100
-
-X-axis labels: ticket index (1, 2, 3 … N) with ticket ID as tooltip label.
+X-axis labels: ticket index（`index` 欄位）with ticket ID（`ticket` 欄位）as tooltip label.
 
 #### 4b. Write HTML file
 

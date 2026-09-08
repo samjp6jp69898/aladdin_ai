@@ -11,7 +11,7 @@ argument-hint: "<ticket_id>"
 
 ## 參數
 
-`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（`/create-mrs` 已自行挑好單號、telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
+`$ARGUMENTS`：**必填** `ticket_id`（如 `FAQ-1702`）。呼叫端（telegram-dispatcher 由 TG 使用者指定單號）保證會帶單號，本版本不再支援無參數自動挑單。缺少時見 Step 0.1。可選第二參數 `resume`（tg-monitor 重試按鈕帶入）：啟用 Step 0.2 續跑盤點，從上一輪最後完成的階段接續，不從 Step 1 全跑。
 
 ## Manager 鐵律
 

@@ -32,15 +32,7 @@ SessionStart hook 每個 session 注入約 1.2k token 的「任何動作前必�
 - [x] tracer 失效模式閉環（見上文第一節之 2）— **2026-07-03 已完成第一步**：create-mr Step 3 與 analyze-single-bug Step 4b 的 tracer 派工 prompt 已加「先讀 Rules/_index.md『分析與失效模式』相關條目」素材行。進階項（每季蒸餾回測新錯誤模式進 tracer pre-flight checklist）仍待做，且應先用回測驗證第一步對錯誤率的實際效果。
 - [ ] 若本 session 的收尾對抗審查未完成（見 change-log 是否有「對抗審查」條目），請照 `30` 的 T5 模板，派 fresh-context agent 審查 doctrine 全部檔案 + 新版 create-mr/create-mrs + 五支腳本，重點查：規則互相打架、路徑錯誤、弱模型會誤讀的措辭。
 
-## 三.五、給下一個 session：v2 首跑 canary 清單 + 優化停損準則
-
-**首跑 canary（新版 create-mr 還沒跑過真單；第一張單用這份清單盯）：**
-1. Step 4 `setup-worktree.sh` 首次真跑（至今只 dry-run 過）：看最後一行是否 `SETUP_OK`；若 `BOOTSTRAP_PARTIAL:db-seed` 屬預期（本機 ControlCenter 連不上是既有環境問題）；`SETUP_FAIL` → 讀 `{worktree}/bootstrap.log` 再判，勿直接重試三次。
-2. tracer 的 4 行契約尾行是否完整出現（`TRACER_RESULT`/`AFFECTED_REPOS`/`I18N_ONLY`/`ALREADY_FIXED`）——缺行時走 sed 補救是正常路徑，但**記下缺了哪行**，連缺兩單就該把該行的措辭改進派工 prompt（綠區）。
-3. solution-reviewer 是否輸出 `FAIL_KIND` 行（新契約首次實戰）。
-4. `notion.sh comment-text` 首次真實寫入（至今只驗過唯讀 fetch）：Notion 留言的換行與連結是否正常呈現。
-5. mr-pusher 的五行原生契約：manager 用行首 grep 抓 `MR_LINKS:` / `NOTION_AI_FIELD:` 是否順利。
-首跑結果（不論好壞）記一行進 change-log；有坑照 40 號第 3 節寫回。
+## 三.五、給下一個 session：優化停損準則
 
 **優化停損準則（below 這些事，做了大概率是浪費——除非先有數據推翻）：**
 - ❌ 不要憑直覺動 58KB 的 tracer 定義檔做「prompt 手術」——分析品質的改善路徑是回測飛輪（量化 → 蒸餾 → 閉環），不是重寫 prompt。動它前先問：回測數據指出了哪個具體失效模式？

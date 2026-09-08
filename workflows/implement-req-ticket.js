@@ -289,7 +289,7 @@ async function runTicket(t, baseBranch) {
   const gate = await agent(buildGatePrompt(t, baseBranch, explorerReport), { schema: GATE_SCHEMA, agentType: 'general-purpose', effort: 'high', phase: t.id })
   if (!gate) return { ticket: t.id, status: 'blocked', stage: 'gate', reason: 'gate reviewer agent 未回傳結果' }
   if (gate.decision !== 'GO') {
-    await agent(buildWrapupPrompt(t, baseBranch, 'fail', null), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', phase: t.id })
+    await agent(buildWrapupPrompt(t, baseBranch, 'fail', null), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', effort: 'low', phase: t.id })
     return { ticket: t.id, status: 'blocked', stage: 'gate', reason: gate.reasons }
   }
 
@@ -311,12 +311,12 @@ async function runTicket(t, baseBranch) {
 
   if (!executorReport) return { ticket: t.id, status: 'blocked', stage: 'executor', reason: 'executor agent 未回傳結果' }
   if (!acceptance || acceptance.decision !== 'PASS') {
-    await agent(buildWrapupPrompt(t, baseBranch, 'fail', executorReport), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', phase: t.id })
+    await agent(buildWrapupPrompt(t, baseBranch, 'fail', executorReport), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', effort: 'low', phase: t.id })
     return { ticket: t.id, status: 'blocked', stage: 'acceptance', reason: acceptance ? acceptance.issues : 'acceptance reviewer 未回傳結果', executorReport, repos: explorerReport.repos }
   }
 
   log(`${t.id}：驗收 PASS，commit 並合併回 ${baseBranch}`)
-  const wrapup = await agent(buildWrapupPrompt(t, baseBranch, 'pass', executorReport), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', effort: 'high', phase: t.id })
+  const wrapup = await agent(buildWrapupPrompt(t, baseBranch, 'pass', executorReport), { schema: WRAPUP_SCHEMA, agentType: 'general-purpose', effort: 'low', phase: t.id })
   if (!wrapup || !wrapup.merged) {
     return { ticket: t.id, status: 'blocked', stage: 'wrapup', reason: wrapup ? wrapup.notes : 'wrapup agent 未回傳結果', executorReport, repos: explorerReport.repos }
   }
@@ -340,7 +340,7 @@ if (tickets.length === 0) {
 
 phase('Setup')
 log(`同步 rajah/agrabah/abu/lago 四個 repo 到最新 ${baseBranch} 分支`)
-const sync = await agent(buildSyncPrompt(baseBranch), { schema: SYNC_SCHEMA, agentType: 'general-purpose', effort: 'high' })
+const sync = await agent(buildSyncPrompt(baseBranch), { schema: SYNC_SCHEMA, agentType: 'general-purpose', effort: 'low' })
 
 const results = []
 if (!sync || !sync.ok) {
