@@ -216,27 +216,79 @@ git -C {worktree_path}/{repo} diff --name-only
 
 只有當 `affected_repos` 只包含 `abu` 和/或 `lago`，且上述指令列出的改動檔案**全部**落在 template/view 層（`.vue` 檔且屬於 views/pages/components，不含 composable、store、service、API client 等邏輯層）時才執行本步驟；其餘情況（任何後端 code、任何非 template 邏輯層檔案）一律跳過，直接進 Step 6。
 
-**執行流程：**
+**執行流程（before/after 用兩個獨立臨時環境同時起，主 worktree 全程不 stash；dev server port 一律動態偵測，不寫死）：**
 
-1. `git -C {worktree_path}/{repo} stash`（暫存這次修復的 diff，讓程式碼回到修復前狀態）
-2. 依 `{ticket_id}-analytics.md` 的 Affected Module 判斷這張單影響哪個站別（admin 後台 / PK platform / 6T platform / PK app / 6T app / lago 主站或其他子站），到 `/Users/user/aladdin/aladdin_ai/.env.dev` 找對應的 `DEV_*_URL` 與測試帳密（欄位名稱以該檔案實際內容為準，不要憑記憶猜）
-3. 在對應子專案的 `.env.local` 設定：
-   - abu 子專案：`ABU_API_URL=<第 2 步找到的 URL>`
-   - lago 子專案：`LAGO_API_URL=<第 2 步找到的 URL>`
-   （已有實例可參考：`lago/ny-gaming/.env.local` 對應 `DEV_MAIN_APP_URL`、本機 port 9001；`abu/platform` 本機 port 8002。其餘子專案先讀該專案的 `vite.config.ts` 確認實際變數名與本機 port，不要假設跟這兩個一樣）
-4. `cd {worktree_path}/{repo} && bun run dev`（vite dev server，數秒內啟動；**不是** agrabah-local-dev skill 那種本機全套後端，不會花到 30-50 秒）
-5. 用 Playwright 連本機 port，登入方式與選擇器沿用 `cqa-e2e/lib/login-backend.cjs` / `login-app.cjs` 的寫法（Quasar SPA：`input[aria-label="帳號"]` / `input[aria-label="密碼"]`，登入成功判定看 `localStorage.getItem('lt')`）——把目標網址換成本機 port，其餘照抄
-6. 導航到 ticket 描述的問題頁面：
-   - 全頁截圖：`page.screenshot({ path: '{ticket_id}-ui-before.png', fullPage: true })`
-   - 對問題所在的具體 DOM 元素再截一張特寫（這就是「標記問題所在」的做法，不必手動畫框疊圖）：`page.locator('<問題元素選擇器>').screenshot({ path: '{ticket_id}-ui-before-detail.png' })`
-   - 兩張都存到 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
-   - 若單張截圖無法呈現問題（動畫、多步驟互動）：改用 `browser.newContext({ recordVideo: { dir: '...', size: {...} } })` 錄一段短片，存為 `{ticket_id}-ui-before.mp4`
-7. 停掉本機前端 dev server
-8. `git -C {worktree_path}/{repo} stash pop`（恢復修復）
-9. 重跑第 4-6 步（`bun run dev` → Playwright 導到**同一頁面**）截 `{ticket_id}-ui-after.png` / `-ui-after-detail.png`（或 `.mp4`）
-10. 把 `.env.local` 改回原值（該檔已 gitignore，但保持乾淨，避免混淆下一個接手 worktree 的人）
+**先確定 `{sub}`**：abu/lago 底下實際可跑 `bun run dev` 的專案是子目錄（如 `lago/ny-gaming`、`abu/platform`），`{repo}` 頂層沒有 `package.json`。把 Step 5.6 開頭 `git diff --name-only` 列出的改動檔案路徑取其所屬子專案目錄（該目錄下有 `package.json` 與 `vite.config.ts`）設為 `{sub}`，下面所有指令的 `{repo}/{sub}` 都指這個目錄。
 
-**風險與紀律（比照 CQA grounding 的唯讀精神）**：dev 環境是多人共用環境（共用帳密與資料），全程只做導頁＋截圖／錄影等唯讀操作；若這張 bug 本身需要送出表單等寫入動作才能重現畫面，只用專屬測試帳號、動作降到最低，不可留下會干擾其他人觀測結果的髒資料。
+**`{sub}` 可能不只一個**（同一張 ticket 同時改到同一個 repo 底下兩個子專案，例如 abu 的 `admin` 和 `platform` 都動了）：這時第 0、2、8 步的 `git worktree add` / `worktree remove`（對象是 `{worktree_path}/{repo}`）**每個受影響的 repo 只做一次**，不可對第二個 `{sub}` 重跑一次，否則會把第一個 `{sub}` 還在用的臨時 worktree 整個砍掉；第 3-7 步（symlink、`.env.local`、啟停 dev server、抓 port、截圖）才是每個 `{sub}` 各自重複一輪，全部 `{sub}` 都截完圖後才進第 8 步統一 kill 全部 dev server、再移除該 repo 的臨時 worktree。
+
+0. 若上次執行中途失敗留下殘留，先清掉再建，避免 `worktree add` 因「已存在」報錯：
+   ```bash
+   git -C {worktree_path}/{repo} worktree remove --force "/tmp/{ticket_id}-{repo}-before" 2>/dev/null
+   git -C {worktree_path}/{repo} worktree prune
+   ```
+1. 依 `{ticket_id}-analytics.md` 的 Affected Module 判斷這張單影響哪個站別（admin 後台 / PK platform / 6T platform / PK app / 6T app / lago 主站或其他子站），到 `/Users/user/aladdin/aladdin_ai/.env.dev` 找對應的 `DEV_*_URL` 與測試帳密（欄位名稱以該檔案實際內容為準，不要憑記憶猜）
+2. 建立一個唯讀、用完即丟的臨時 worktree，停在**修復前**的程式碼——此時主 worktree 的 fixer 修改還沒 commit，`HEAD` 本身就是修復前狀態，不需要也不對主 worktree 動 stash：
+   ```bash
+   TMP_BEFORE=/tmp/{ticket_id}-{repo}-before
+   git -C {worktree_path}/{repo} worktree add "$TMP_BEFORE" HEAD
+   ```
+   **必須額外 symlink 兩類 gitignored 產物，只連 `node_modules` 會啟動成功但頁面壞掉不報錯（vite 錯誤 overlay，實測驗證過的坑）**：
+   ```bash
+   ln -s {worktree_path}/{repo}/{sub}/node_modules  "$TMP_BEFORE/{sub}/node_modules"
+   ln -s {worktree_path}/{repo}/{sub}/src/generated "$TMP_BEFORE/{sub}/src/generated"
+   ln -s {worktree_path}/{repo}/common/generated     "$TMP_BEFORE/common/generated"
+   ```
+   （`common/generated` 是否存在因子專案而異，先 `[ -d {worktree_path}/{repo}/common/generated ] && ln -s ...`；有其他 gitignored 且程式碼會 import 的目錄，一併照此模式補 symlink，不能只憑「dev server 印出 Local 那行」就當作環境就緒）
+3. `{worktree_path}/{repo}/{sub}/.env.local` 這份是主 worktree 原本就有的檔案（可能帶其他既有變數），**先備份再覆寫**，否則第 8 步「改回原值」沒有依據：
+   ```bash
+   cp -p {worktree_path}/{repo}/{sub}/.env.local /tmp/{ticket_id}-{repo}-{sub}-env.local.bak 2>/dev/null
+   ```
+   （`$TMP_BEFORE/{sub}/.env.local` 是全新臨時 worktree 裡本來就不存在的檔案，不用備份）
+   兩邊各自設定 `.env.local`（內容相同、各自獨立檔案：`$TMP_BEFORE/{sub}/.env.local` 與 `{worktree_path}/{repo}/{sub}/.env.local`）：
+   - abu 子專案：`ABU_API_URL=<第 1 步找到的 URL>`
+   - lago 子專案：`LAGO_API_URL=<第 1 步找到的 URL>`
+   （已有實例可參考：`lago/ny-gaming` 對應 `DEV_MAIN_APP_URL`；`abu/platform` 對應變數見其 `vite.config.ts`。其餘子專案先讀該專案的 `vite.config.ts` 確認實際變數名，不要假設跟這兩個一樣）
+4. 兩邊各自背景啟動 dev server（vite，數秒內啟動；**不是** agrabah-local-dev skill 那種本機全套後端），各自導出獨立 log；**必須加 `BROWSER=none`**，否則 `vite.config.ts` 的 `server.open: true` 會在本機彈出瀏覽器分頁：
+   ```bash
+   ( cd "$TMP_BEFORE/{sub}" && BROWSER=none bun run dev > /tmp/{ticket_id}-{repo}-{sub}-before-dev.log 2>&1 & echo $! > /tmp/{ticket_id}-{repo}-{sub}-before-dev.pid )
+   ( cd {worktree_path}/{repo}/{sub} && BROWSER=none bun run dev > /tmp/{ticket_id}-{repo}-{sub}-after-dev.log 2>&1 & echo $! > /tmp/{ticket_id}-{repo}-{sub}-after-dev.pid )
+   ```
+5. 兩邊各自從自己的 log **重試直到看到就緒訊號**（vite 印出的 `Local: http://.../` 那行）取得**實際**綁定的 port——**禁止沿用文件裡的固定號碼假設**：vite 預設沒開 `strictPort`，本地既有其他 worktree 的 dev server 占著同一個預設 port 時會自動跳號，若還用寫死的 port 去連，會誤連到別的 ticket worktree 殘留的 server 而截錯畫面：
+   ```bash
+   for log in /tmp/{ticket_id}-{repo}-{sub}-before-dev.log /tmp/{ticket_id}-{repo}-{sub}-after-dev.log; do
+     for i in $(seq 1 30); do
+       grep -qE 'Local:.*://[^:]+:[0-9]+/' "$log" && break
+       sleep 1
+     done
+   done
+   # 用 sed 抓數字，不要用 grep -oE '(?=...)' 這種 look-ahead——BSD/macOS 的 grep -E 不支援，會直接報錯而不是靜默失敗
+   BEFORE_PORT=$(grep -E 'Local:.*://[^:]+:[0-9]+/' /tmp/{ticket_id}-{repo}-{sub}-before-dev.log | sed -E 's#.*://[^:]+:([0-9]+)/.*#\1#' | tail -1)
+   AFTER_PORT=$(grep -E 'Local:.*://[^:]+:[0-9]+/' /tmp/{ticket_id}-{repo}-{sub}-after-dev.log | sed -E 's#.*://[^:]+:([0-9]+)/.*#\1#' | tail -1)
+   ```
+   這是「重試直到成功」的就緒檢查（比照 agrabah-local-dev skill 對 StarRocks FE 就緒的作法），不是拿固定 sleep 賭啟動時間；**若 `$BEFORE_PORT` 或 `$AFTER_PORT` 為空**（30 次逾時，或 regex 沒抓到），視為啟動失敗，回報 `UI_EVIDENCE:no` 並說明原因，直接跳到第 8 步收尾（不要帶著空值繼續往下跑，會導向 `http://localhost:/` 這種無意義的 URL）。
+6. 一個 Playwright browser 開兩個獨立 `browser.newContext()`，分別導到 `http://localhost:$BEFORE_PORT/...` 與 `http://localhost:$AFTER_PORT/...`（同一個問題頁面路徑）。用 `{sub}/node_modules/playwright`（子專案已裝好的版本）；若啟動失敗報 `Executable doesn't exist`（裝的 playwright 版本與本機瀏覽器快取版本不符），改用 `/Users/user/aladdin/cqa-e2e/node_modules/playwright`。登入方式與選擇器沿用 `cqa-e2e/lib/login-backend.cjs` / `login-app.cjs` 的寫法（Quasar SPA：`input[aria-label="帳號"]` / `input[aria-label="密碼"]`，登入成功判定看 `localStorage.getItem('lt')`），兩個 context 各自登入。**導頁後先確認掛載點真的有內容**（例如 `await page.locator('#app').innerHTML()` 非空、且不是 vite 錯誤 overlay），HTTP 200 不代表頁面真的渲染出東西——第 2 步 symlink 沒補齊時就是「200 但空白／overlay」，截了圖也看不出問題，等於白做。
+7. 兩個 context 各自截圖：
+   - 全頁：`page.screenshot({ path: '{ticket_id}-ui-before.png', fullPage: true })` / `-ui-after.png`
+   - 問題元素特寫：`page.locator('<問題元素選擇器>').screenshot({ path: '{ticket_id}-ui-before-detail.png' })` / `-ui-after-detail.png`
+   - 全部存到 `/Users/user/aladdin/obsidian/Debug/{ticket_id}/`
+   - 若單張截圖無法呈現問題（動畫、多步驟互動）：改用 `context.newPage()` 前先對該 context 設 `recordVideo`，分別錄 `-ui-before.mp4` / `-ui-after.mp4`
+8. 收尾（**不管第 5-7 步成功或失敗都要跑這一段，作為固定的清理步驟**）：
+   ```bash
+   [ -f /tmp/{ticket_id}-{repo}-{sub}-before-dev.pid ] && kill "$(cat /tmp/{ticket_id}-{repo}-{sub}-before-dev.pid)" 2>/dev/null
+   [ -f /tmp/{ticket_id}-{repo}-{sub}-after-dev.pid ]  && kill "$(cat /tmp/{ticket_id}-{repo}-{sub}-after-dev.pid)" 2>/dev/null
+   git -C {worktree_path}/{repo} worktree remove "$TMP_BEFORE" --force
+   # 把 .env.local 從第 3 步的備份還原（沒有備份檔代表本來就沒有這份檔案，直接刪掉臨時建立的）
+   if [ -f /tmp/{ticket_id}-{repo}-{sub}-env.local.bak ]; then
+     cp -p /tmp/{ticket_id}-{repo}-{sub}-env.local.bak {worktree_path}/{repo}/{sub}/.env.local
+   else
+     rm -f {worktree_path}/{repo}/{sub}/.env.local
+   fi
+   rm -f /tmp/{ticket_id}-{repo}-{sub}-before-dev.log /tmp/{ticket_id}-{repo}-{sub}-after-dev.log /tmp/{ticket_id}-{repo}-{sub}-before-dev.pid /tmp/{ticket_id}-{repo}-{sub}-after-dev.pid /tmp/{ticket_id}-{repo}-{sub}-env.local.bak
+   ```
+   （該檔已 gitignore，但還原乾淨，避免混淆下一個接手 worktree 的人；多個 `{sub}` 時這一整段收尾對每個 `{sub}` 各跑一次，`worktree remove` 例外——那一行只在最後一個 `{sub}` 跑完後、對該 repo 執行一次）
+
+**風險與紀律（比照 CQA grounding 的唯讀精神）**：dev 環境是多人共用環境（共用帳密與資料），全程只做導頁＋截圖／錄影等唯讀操作；若這張 bug 本身需要送出表單等寫入動作才能重現畫面，只用專屬測試帳號、動作降到最低，不可留下會干擾其他人觀測結果的髒資料。本流程刻意不對主 worktree 做 stash/stash pop（修復前狀態改用獨立臨時 worktree 呈現），也刻意不假設固定 port，兩者是同一個風險的兩面：前者是怕中途出錯漏了 pop 導致 Step 6 commit 時遺失修復內容，後者是怕撞號時誤連到別的 ticket worktree 殘留的 dev server。
 
 回報格式新增第三行（其餘沿用既有格式）：
 ```
