@@ -1,5 +1,5 @@
 ---
-description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one pending/rerun ticket from bug_analysis_tracker.md（ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN，UI/UX fix 另附截圖證據）+ L0 tests in an isolated worktree, 三重平行審查 + 最終獨立對抗性驗證, then MR against main with Notion writeback.
+description: Use when a tech-assigned bug ticket needs the full automated fix pipeline — claims one Notion-candidate ticket（依「AI分析」值域即時判斷，ticket_id 必填，由呼叫端指定), produces root-cause analysis, TDD 修復（RED→GREEN，UI/UX fix 另附截圖證據）+ L0 tests in an isolated worktree, 三重平行審查 + 最終獨立對抗性驗證, then MR against main with Notion writeback.
 argument-hint: "<ticket_id>"
 ---
 
@@ -18,7 +18,7 @@ argument-hint: "<ticket_id>"
 
 ## Manager 鐵律
 
-1. tracker 只透過腳本碰：認領走 `claim-ticket.sh`（Step 0.1）、終態走 `create-mr-finalize.sh`（Step 8），其餘查詢用 `bash /Users/user/aladdin/scripts/tracker.sh`（`row`/`counts`）。**禁止 cat 整個 tracker、禁止用 Edit tool 直改**（檔案 166KB）。
+1. 認領（Step 0.1）走 `claim-ticket.sh`，即時查 Notion「AI分析」值域判斷候選、bug-lock 互斥；終態（Step 8）走 `create-mr-finalize.sh`，只做解鎖（tracker.md 已於 2026-09-09 退役，本流程不再讀寫它——`tracker.sh` 仍存在，但服務的是 `/analyze-bugs` 等其他流程，本流程不使用）。
 2. Notion 寫回只用 `bash /Users/user/aladdin/scripts/notion.sh`（`comment-text`/`update-prop`）或包裝它的 `scripts/create-mr-exit-comment.sh`（Step 7c 四種非 success 出口的留言模板都在該腳本內）。**禁止手寫含 token 的 curl。**
 3. 派工一律用 Agent tool 的 `subagent_type` 直接引用註冊 agent（如 `subagent_type: bug-tracer-with-callgraph`）。**prompt 裡禁止出現「Use all text in {agent .md 路徑} as the prompt」**——定義檔本來就是該 agent 的 system prompt，叫它再讀一次 = 每次多燒 1 萬+ token。prompt 只放：本單變數、文件路徑、回報格式。並行派工的兩三個 agent，一律在同一輪訊息內各自獨立呼叫 Agent tool（不要序列等前一個回來才發下一個）。
 4. 每步派工都用同步等待（`run_in_background: false`）。agent 若中途讓出（未給出契約尾行就結束）→ 視為該次嘗試失敗重派接手（worktree 內既有變更由接手者延續）。tracer/fixer 的重派計入其 attempt 上限；**其他步驟（1/2a-grounder/6-任一 reviewer/6.5/7a/7b）的契約缺失重派以 1 次為限**，再缺失依該步的降級或失敗分支處理，不得無限重派。
@@ -50,12 +50,12 @@ bash /Users/user/aladdin/scripts/create-mr-prelude.sh
 ## Step 0.1：Claim
 
 ```bash
-bash /Users/user/aladdin/scripts/claim-ticket.sh {ticket_id}
+bash /Users/user/aladdin/scripts/claim-ticket.sh {ticket_id}{$ARGUMENTS 含 resume 時加一個參數： --resume}
 ```
-（腳本內含：tracker 狀態檢查 pending/rerun → bug-lock claim → tracker set in_progress，三步都通過才算認領成功）
+（2026-09-09 起改走 Notion：即時查該票的「AI分析」值域判斷是否可認領 → bug-lock claim，兩步都通過才算認領成功；不再依賴 bug_analysis_tracker.md。帶 `--resume` 時跳過候選值域檢查（僅供 resume 續跑使用：tg-monitor 重試按鈕、timeout 自動重試），但仍會查 Notion 拿 URL/PAGE_ID、仍要 bug-lock 互斥）
 - 成功（3 行）：`CLAIMED: {ticket_id}` / `NOTION_URL: <url>` / `PAGE_ID: <uuid>` → 存 `notion_url`、`page_id`，續 Step 0.2/0.5。
-- `SKIPPED: ticket_id required（本版本不支援無參數自動挑單，呼叫端須先用 tracker.sh next 決定單號)` → 輸出後直接結束（尚未進入任何狀態，不需要走 Step 8）。
-- `SKIPPED: {ticket_id} not claimable` 或 `SKIPPED: already locked` → 輸出後結束，**仍要走 Step 8**（finalize 以 `SKIPPED` 呼叫：只解鎖、不動 tracker，再印完成報告）。
+- `SKIPPED: ticket_id required（本版本不支援無參數自動挑單，呼叫端須先取得單號)` → 輸出後直接結束（尚未進入任何狀態，不需要走 Step 8）。
+- `SKIPPED: {ticket_id} not claimable` 或 `SKIPPED: already locked` → 輸出後結束，**仍要走 Step 8**（finalize 以 `SKIPPED` 呼叫：只解鎖、印完成報告）。
 
 ## Step 0.2：Resume 盤點（僅當 $ARGUMENTS 含 `resume`）
 
@@ -337,18 +337,19 @@ bash /Users/user/aladdin/scripts/create-mr-exit-comment.sh {pipeline_status} {pa
 ```
 腳本依 `pipeline_status` 選模板（already_fixed / i18n_manual_handoff → 留言 + AI分析=分析成功 + TG；needs_qa_clarification → 留言 + 待釐清 + TG；failed → 留言 + 分析失敗 + TG；analysis_done → 留言（附報告連結 + 兩條續跑方式說明）+ 問題分析完成，待確認 + TG；drive_link 為 N/A 時自動省略連結行），一律 exit 0。行首 grep 三行：`NOTION_COMMENT: ok|failed(...)`、`NOTION_AI_FIELD: ok|failed(...)`、`TG: <結果>|SKIPPED(...)` → `TG:` 存 `tg_notify_result`；`NOTION_AI_FIELD: failed*` → manager 補打一次 `bash /Users/user/aladdin/scripts/notion.sh update-prop {page_id} "AI分析" select "<對應值>"`，仍失敗記入 Step 8 報告。`reviewer_email` 尚未推導出來就失敗的早期路徑（如 Step 0.5 二連 ERROR）省略 `--reviewer-email`，腳本自動 `TG: SKIPPED`。
 
-## Step 8：解鎖 + tracker 終態 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
+## Step 8：解鎖 + 完成報告（**所有出口路徑必經**，包含中途 SKIPPED 之後）
 
 ```bash
 bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH|SKIPPED} {ticket_id} {failed 時加：--fail-reason "<一句失敗原因，含死在哪一步>"}
 ```
-腳本內含解鎖 + tracker 終態對映（success/already_fixed/i18n → done；failed → failed + log-fail；needs_qa_clarification → needs_qa；analysis_done → analysis_done；NOT_TECH → pending；SKIPPED 不動 tracker），一律 exit 0。行首 grep `LOCK:` / `TRACKER:` / `FAIL_LOG:` 三行，任一 `ERROR(*)` 記入完成報告，不重試、不阻斷。
+腳本內含解鎖（`TRACKER:`/`FAIL_LOG:` 兩行固定輸出 `SKIPPED(tracker 已退役)`，tracker.md 已退役、不再有實質動作——終態的權威記錄是 Step 7c 寫的 Notion「AI分析」），一律 exit 0。行首 grep `LOCK:` / `TRACKER:` / `FAIL_LOG:` 三行，任一 `ERROR(*)` 記入完成報告，不重試、不阻斷。
 
 緊接著輸出完成報告（不再分獨立步驟）：
 
 ```
 ## {ticket_id} /create-mr Pipeline Complete
 - Pipeline status: {pipeline_status}
+- Failure reason: {pipeline_status=failed 時填 failure_reason；其餘一律 N/A}
 - Mode: {mode}
 - Reviewer: {reviewer_email}
 - Base branch: {base_branch}{非 main 時加 "（技術人員於 Notion 留言指定）"；TARGET_BRANCH 格式不合法被忽略時加 "（analyst 回報 <原值> 不合法，已忽略）"}
