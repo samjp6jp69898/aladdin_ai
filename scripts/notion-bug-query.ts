@@ -2,7 +2,7 @@
  * Notion Bug List 查詢腳本
  *
  * 固定篩選：狀態=待處理,仍有問題,處理中 AI分析=一鍵分析＋修復＋開 MR,全部重跑,
- *           只做問題分析（不改程式）,產出修復程式碼並開 MR,依補充留言重新分析（仍不改程式）
+ *           只做問題分析（不改程式）,產出修復程式碼並開 MR,依留言重新分析（不改程式）
  *           （2026-09-08 Notion 改名：原「待分析」→「一鍵分析＋修復＋開 MR」，
  *           原「需要重跑」→「全部重跑」；另納入三個新增可認領選項一併同步進 tracker）
  *
@@ -121,13 +121,13 @@ function buildFilter(severity: string): object {
         or: statusValues.map(v => ({ property: '狀態', select: { equals: v } })),
     });
     // AI分析 固定：五個可認領新值（一鍵分析＋修復＋開 MR / 全部重跑 / 只做問題分析
-    // （不改程式）/ 產出修復程式碼並開 MR / 依補充留言重新分析（仍不改程式））
+    // （不改程式）/ 產出修復程式碼並開 MR / 依留言重新分析（不改程式））
     const aiAnalysisValues = [
         '一鍵分析＋修復＋開 MR',
         '全部重跑',
         '只做問題分析（不改程式）',
         '產出修復程式碼並開 MR',
-        '依補充留言重新分析（仍不改程式）',
+        '依留言重新分析（不改程式）',
     ];
     conditions.push({
         or: aiAnalysisValues.map(v => ({ property: 'AI分析', select: { equals: v } })),
@@ -379,7 +379,7 @@ function mergeToTracker(items: BugItem[]): {
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=待處理,仍有問題,處理中 | AI分析=一鍵分析＋修復＋開 MR,全部重跑,只做問題分析（不改程式）,產出修復程式碼並開 MR,依補充留言重新分析（仍不改程式） | 嚴重性=${args.severity} | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=待處理,仍有問題,處理中 | AI分析=一鍵分析＋修復＋開 MR,全部重跑,只做問題分析（不改程式）,產出修復程式碼並開 MR,依留言重新分析（不改程式） | 嚴重性=${args.severity} | 上限=${args.limit}`);
 
     const filter = buildFilter(args.severity);
     const results = await queryDatabase(filter, args.limit);

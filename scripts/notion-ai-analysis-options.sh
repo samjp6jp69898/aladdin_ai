@@ -2,7 +2,7 @@
 # notion-ai-analysis-options.sh — pipeline-modes Phase 2 一次性腳本：
 # 把 Notion Bug List「AI分析」select 屬性的選項改成 plan-pipeline-modes-v1.md §2.1 的最終值域：
 #   改名（保留 option id）：待分析 → 一鍵分析＋修復＋開 MR；需要重跑 → 全部重跑
-#   新增：只做問題分析（不改程式） / 問題分析完成，待確認 / 產出修復程式碼並開 MR / 依補充留言重新分析（仍不改程式）
+#   新增：只做問題分析（不改程式） / 問題分析完成，待確認 / 產出修復程式碼並開 MR / 依留言重新分析（不改程式）
 #   其餘既有選項（不需分析 / 回測完成 / 分析中 / 分析成功 / 分析失敗 / 待規劃 / 待釐清）原樣保留（id/name/color 不動）
 #
 # 用法：
@@ -18,7 +18,7 @@
 #
 # 新增選項的 color（Notion 若拒絕該欄，自動去掉 color 重試一次）：
 #   只做問題分析（不改程式）=blue／問題分析完成，待確認=yellow／
-#   產出修復程式碼並開 MR=green／依補充留言重新分析（仍不改程式）=orange
+#   產出修復程式碼並開 MR=green／依留言重新分析（不改程式）=orange
 #
 # 安全：
 #   - 屬性不是 select 型、GET 回錯誤、或 AI分析 屬性不存在 → RESULT: BLOCKED，exit 1，絕不送 PATCH。
@@ -78,7 +78,7 @@ ADD_DEFS = [
     ('只做問題分析（不改程式）', 'blue'),
     ('問題分析完成，待確認', 'yellow'),
     ('產出修復程式碼並開 MR', 'green'),
-    ('依補充留言重新分析（仍不改程式）', 'orange'),
+    ('依留言重新分析（不改程式）', 'orange'),
 ]
 ADD_NAMES = {n for n, _ in ADD_DEFS}
 

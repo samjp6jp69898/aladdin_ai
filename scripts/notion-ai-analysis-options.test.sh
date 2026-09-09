@@ -89,7 +89,7 @@ cat > "$AFTER" <<EOF
           {"id":"id-new1","name":"只做問題分析（不改程式）","color":"blue"},
           {"id":"id-new2","name":"問題分析完成，待確認","color":"yellow"},
           {"id":"id-new3","name":"產出修復程式碼並開 MR","color":"green"},
-          {"id":"id-new4","name":"依補充留言重新分析（仍不改程式）","color":"orange"}
+          {"id":"id-new4","name":"依留言重新分析（不改程式）","color":"orange"}
         ]
       }
     }

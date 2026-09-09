@@ -17,7 +17,7 @@
 #
 # 合法狀態：pending rerun in_progress done failed needs_qa analysis_done
 #   analysis_done（2026-09-08，pipeline-modes Phase 2）：「只做問題分析」模式跑完根因分析報告後的暫停態，
-#   等同事在 Notion 改成「產出修復程式碼並開 MR」或「依補充留言重新分析」再認領續跑；可認領集合見 claim-ticket.sh。
+#   等同事在 Notion 改成「產出修復程式碼並開 MR」或「依留言重新分析」再認領續跑；可認領集合見 claim-ticket.sh。
 set -u
 TRACKER="${TRACKER_FILE:-/Users/user/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md}"
 FAILLOG="$(dirname "$TRACKER")/pipeline-failures.md"
