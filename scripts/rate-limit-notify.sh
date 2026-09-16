@@ -66,7 +66,7 @@ check_limit() {
 
   # window 已重置（resets_at 變了）：清空已發送紀錄
   if [ "$state_resets" != "$resets_at" ]; then
-    state=$(jq -n --argjson r "$resets_at" '{"resets_at":$r,"sent":[]}')
+    state=$(jq -n --arg r "$resets_at" '{"resets_at":$r,"sent":[]}')
   fi
 
   # 無條件捨去小數（避免 79.6% 被四捨五入成 80% 提前誤發）
@@ -77,8 +77,13 @@ check_limit() {
     if [ "$pct_int" -ge "$th" ] && [ "$already" = "false" ]; then
       reset_human=$(date -r "$resets_at" '+%m/%d %H:%M' 2>/dev/null || echo "$resets_at")
       text="⚠️ [$ACCOUNT_LABEL] ${label} 使用率已達 ${th}%（目前 ${pct_int}%，重置時間 ${reset_human}）"
-      "$TG_NOTIFY" --chat-id "$CHAT_ID" --text "$text" >/dev/null 2>&1
-      state=$(printf '%s' "$state" | jq --argjson t "$th" '.sent += [$t]')
+      tg_out=$("$TG_NOTIFY" --chat-id "$CHAT_ID" --text "$text" 2>/dev/null)
+      # 只有 tg-notify.sh 回報真的送出成功（TG_SENT）才標記已發送；
+      # 失敗（TG_FAIL，如網路問題/HTTP 非 200）不標記，讓下次 render 自然重試，
+      # 避免「以為發過、其實沒發、且永不重試」的靜默遺失
+      case "$tg_out" in
+        TG_SENT*) state=$(printf '%s' "$state" | jq --argjson t "$th" '.sent += [$t]') ;;
+      esac
     fi
   done
 

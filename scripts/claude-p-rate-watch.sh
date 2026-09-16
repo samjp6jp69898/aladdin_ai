@@ -33,7 +33,7 @@ trap 'rm -f "$TMP"' EXIT
 # stdout 原封不動經 process substitution 的 tee 轉給真正呼叫端，同時留一份供事後
 # 解析；stderr 直接繼承、不經手。$CHILD 是 claude 本身的 PID（不是 tee 的），
 # 收到 TERM/INT 時明確轉送給它，wait 拿到的就是 claude 本身的真實 exit code。
-"$CLAUDE_BIN" "$@" > >(tee "$TMP") &
+"$CLAUDE_BIN" "$@" <&0 > >(tee "$TMP") &
 CHILD=$!
 trap "kill -TERM $CHILD 2>/dev/null" TERM INT
 wait "$CHILD"
