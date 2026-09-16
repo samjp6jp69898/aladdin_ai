@@ -3,6 +3,7 @@
 # Usage:
 #   notion.sh fetch <notion_url_or_page_id>              - 讀取頁面內容
 #   notion.sh comments <page_id>                          - 讀取頁面留言
+#   notion.sh comments-resolved <page_id>                 - 讀取頁面留言（含附件內容內嵌）
 #   notion.sh comment <page_id> '<rich_text_json>'        - 建立留言
 #   notion.sh update-prop <page_id> <prop_name> select <value>  - 更新 select 屬性
 #   notion.sh get-user <user_id>                          - 查詢用戶資訊
@@ -127,6 +128,114 @@ print(json.dumps({'object': 'list', 'results': all_results, 'has_more': True, 'n
             -H "Authorization: Bearer ${NOTION_TOKEN}" \
             -H "Notion-Version: ${NOTION_VERSION}" \
             -H "Content-Type: application/json"
+        ;;
+
+    # 讀取頁面留言，並把留言「附件」一併解析出來（2026-09-16 新增）。
+    # 動機：Notion 留言可以只有附件、沒有任何文字（rich_text 是空陣列，檔案
+    # 放在 attachments 欄位）。ALDREQ-865 就是這樣——同事只貼了一份 .md 規格
+    # 文件，舊的 comments 子命令雖然原樣回傳含 attachments 的 JSON，但所有呼叫
+    # 端都只讀 rich_text，那則留言被當成空留言整則丟掉，文件從頭到尾沒進過
+    # 任何一段 prompt。本子命令把每則留言正規化成
+    # {author, created_time, text, attachments:[{name, kind, content?, note?}]}，
+    # 文字類附件（見 TEXT_EXT）直接下載內容內嵌，非文字類（圖片/PDF/xlsx）至少
+    # 保留檔名讓呼叫端知道「有這份文件但讀不到」。attachments 的 file.url 是
+    # S3 presigned URL（約 1 小時到期、本身已帶簽章），下載時不可再帶 Notion
+    # token，否則 S3 會回 400。
+    comments-resolved)
+        INPUT="$2"
+        if [ -z "$INPUT" ]; then
+            echo "Usage: notion.sh comments-resolved <notion_url_or_page_id>"
+            exit 1
+        fi
+        PAGE_ID=$(extract_page_id "$INPUT")
+        python3 - "$PAGE_ID" "$NOTION_TOKEN" "$NOTION_API" "$NOTION_VERSION" <<'PYEOF'
+import json, sys, urllib.request, urllib.parse, urllib.error, os
+
+page_id, token, api, version = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+# 純文字類副檔名才下載內容內嵌；其餘（png/jpg/pdf/xlsx/zip…）只留檔名。
+TEXT_EXT = {"md", "txt", "json", "csv", "yaml", "yml", "log", "sql", "html", "htm", "ts", "js", "py", "diff", "patch", "xml", "ini", "conf", "toml"}
+# 單一附件內嵌上限（字元）。超過就截斷並註記——附件是要餵進 LLM prompt 的，
+# 一份超大檔案灌爆 context 比少讀後半段更糟。
+#
+# 上限取 150000（2026-09-16 使用者指示自 60000 調高）。估算依據：實測
+# ALDREQ-865 那份完整規格文件 29141 字元，150000 約可容納 5 份同規模文件；
+# 中英混排 markdown 粗估 1 字元 ≈ 0.5 token，滿載時單份附件約 75k tokens。
+# demand pipeline 同一份留言現在會進 draft／review×3／synthesize 共 5 段
+# prompt（見 demand-plan-prompts.ts），跑這些 agent 的是 sonnet，滿載仍留
+# 得下 draft 正文與 review 結論的空間。真的遇到 context 壓力時，這個常數
+# 就是第一個該往下調的旋鈕。
+MAX_CHARS = 150000
+DOWNLOAD_TIMEOUT = 20
+
+
+def api_get(url):
+    req = urllib.request.Request(url, headers={
+        "Authorization": "Bearer " + token,
+        "Notion-Version": version,
+        "Content-Type": "application/json",
+    })
+    # 4xx/5xx：urllib 會丟 HTTPError（不像 curl 只是印出 body），這裡接住並把
+    # Notion 原本的錯誤 JSON 照樣印到 stdout（呼叫端 JSON.parse 得到的東西跟
+    # 舊的 comments 子命令一致），但 exit 1 讓呼叫端知道這次沒拿到留言——
+    # 靜默回空陣列正是本子命令要修的那類 bug（漏掉留言而沒人發現）。
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        print(body)
+        sys.stderr.write("notion.sh comments-resolved: HTTP " + str(e.code) + "\n")
+        sys.exit(1)
+
+
+def attachment_name(url):
+    path = urllib.parse.urlparse(url).path
+    return urllib.parse.unquote(os.path.basename(path)) or "（檔名不明）"
+
+
+def resolve_attachment(att):
+    url = (att.get("file") or {}).get("url") or ""
+    name = attachment_name(url)
+    ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+    if ext not in TEXT_EXT:
+        return {"name": name, "kind": "binary", "note": "非文字檔（." + ext + "），未載入內容"}
+    if not url:
+        return {"name": name, "kind": "text", "note": "下載失敗：附件沒有 file.url"}
+    try:
+        # presigned URL 自帶簽章，刻意不帶任何 Notion header。
+        with urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT) as resp:
+            raw = resp.read()
+    except urllib.error.HTTPError as e:
+        return {"name": name, "kind": "text", "note": "下載失敗：HTTP " + str(e.code)}
+    except Exception as e:
+        return {"name": name, "kind": "text", "note": "下載失敗：" + type(e).__name__ + " " + str(e)[:200]}
+    text = raw.decode("utf-8", errors="replace")
+    if len(text) > MAX_CHARS:
+        return {"name": name, "kind": "text", "content": text[:MAX_CHARS], "note": "內容超過 " + str(MAX_CHARS) + " 字元已截斷"}
+    return {"name": name, "kind": "text", "content": text}
+
+
+results = []
+url = api + "/comments?block_id=" + page_id + "&page_size=100"
+while True:
+    page = api_get(url)
+    if page.get("object") == "error":
+        print(json.dumps(page))
+        sys.exit(1)
+    for c in page.get("results", []):
+        results.append({
+            "author": (c.get("display_name") or {}).get("resolved_name") or "未知使用者",
+            "created_time": c.get("created_time", ""),
+            "text": "".join(r.get("plain_text", "") for r in (c.get("rich_text") or [])),
+            "attachments": [resolve_attachment(a) for a in (c.get("attachments") or [])],
+        })
+    if not page.get("has_more"):
+        break
+    url = api + "/comments?block_id=" + page_id + "&page_size=100&start_cursor=" + str(page.get("next_cursor"))
+
+print(json.dumps({"object": "list", "results": results}, ensure_ascii=False))
+PYEOF
         ;;
 
     comment)
@@ -424,6 +533,7 @@ print(json.dumps({'parent': {'type': 'data_source_id', 'data_source_id': sys.arg
         echo "  notion.sh fetch <url_or_page_id>                            - 讀取頁面屬性"
         echo "  notion.sh fetch-blocks <url_or_page_id>                     - 讀取頁面內文 blocks"
         echo "  notion.sh comments <url_or_page_id>                         - 讀取頁面留言"
+        echo "  notion.sh comments-resolved <url_or_page_id>                - 讀取頁面留言（含附件內容）"
         echo "  notion.sh comment <page_id> '<rich_text_json>'               - 建立留言"
         echo "  notion.sh comment-text <page_id> <text> [link_url] [link_text] - 建立純文字留言（免 JSON）"
         echo "  notion.sh update-prop <page_id> <prop> select|status|text <val> - 更新屬性"

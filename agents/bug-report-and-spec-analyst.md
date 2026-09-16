@@ -52,12 +52,14 @@ ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/
      -H "Notion-Version: 2022-06-28"
    ```
 
-4. Read page comments:
+4. Read page comments **including their attachments**（走 notion.sh，不要自己 curl comments endpoint——原始 endpoint 只給附件的 S3 連結，不會給你檔案內容）：
    ```bash
-   curl -s "https://api.notion.com/v1/comments?block_id={page_id}&page_size=100" \
-     -H "Authorization: Bearer $ALD_NOTION_TOKEN" \
-     -H "Notion-Version: 2022-06-28"
+   bash /Users/user/aladdin/scripts/notion.sh comments-resolved {page_id}
    ```
+   回傳 `{"results":[{"author","created_time","text","attachments":[{"name","kind","content","note"}]}]}`。
+   文字類附件（.md/.txt/.json/.csv…）的 `content` 已經是下載好的全文；非文字附件（圖片/PDF/xlsx）只有 `name` 與 `note`。
+
+   ⚠️ **留言可以完全沒有文字、只有附件**（`text` 是空字串、`attachments` 有東西）。實例：ALDREQ-865 的技術人員只貼了一份 .md 規格文件、一個字都沒打。這種留言**一樣要完整收錄**，不可因為 `text` 空就略過——那份文件往往就是整張單最關鍵的規格來源。
 
 5. Update the "AI分析" property to "分析中":
    ```bash
@@ -98,7 +100,15 @@ Auxiliary Document Links:
 逐筆 dump Notion comments（**禁止摘要 / 翻譯 / 加註解**），格式：
 - [YYYY-MM-DD HH:MM] @{author}: {comment text 原文}
 
-從 Step 4 抓到的 comments JSON parse 出來，含 QA / PO / 工程師所有留言。
+該留言有附件時，逐份接在該留言底下（同樣**禁止摘要**，content 原文照抄）：
+```
+  [附件 {name}]
+  {content 全文}
+  [附件結束 {name}]
+```
+`content` 為空（kind 是 binary、或 note 寫了下載失敗）時，改寫一行 `  [附件 {name}（{note}）]`，讓後續的 tracer 知道有這份文件但讀不到；note 寫「已截斷」時照抄拿得到的部分並保留該註記。
+
+從 Step 4 抓到的 comments JSON parse 出來，含 QA / PO / 工程師所有留言（含只有附件、沒有文字的留言）。
 若無 comments，寫「(無)」。
 
 ## Ticket Status History
