@@ -19,7 +19,7 @@
 #   TG_MAP_SCRIPT / TG_NOTIFY_SCRIPT   換掉真正呼叫的子腳本
 #   TG_AUTO_SYNC_LOG / TG_AUTO_SYNC_ALERTED_FILE / TG_AUTO_SYNC_LOCK_DIR
 #   TG_AUTO_SYNC_OPERATOR_CHAT_ID
-#   （TG_NOTIFY_CSV / TG_UNKNOWN_SENDERS_LOG 等會照原樣傳給子腳本，見它們自己的說明）
+#   （TG_REGISTRY_CLI / TG_UNKNOWN_SENDERS_LOG 等會照原樣傳給子腳本，見它們自己的說明）
 #
 # 紀律：全程 exit 0，永不阻斷呼叫端（webhook message handler）；一律把結果寫進
 # LOG_FILE 供事後稽核（比照 SKILL.md「自動不等於盲寫」——自動對映仍要留痕）。
@@ -38,7 +38,7 @@ touch "$ALERTED_FILE"
 
 log(){ echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*" >> "$LOG_FILE"; }
 
-# 同一時間只跑一個（mkdir 是原子操作，同 bug-lock.sh 慣例），避免併發寫 CSV。
+# 同一時間只跑一個（mkdir 是原子操作，同 bug-lock.sh 慣例），避免併發寫名冊。
 # 搶不到鎖就直接放棄——另一個正在跑的 instance 的 --list 本來就會重掃全部
 # pending，這筆不會漏。
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then

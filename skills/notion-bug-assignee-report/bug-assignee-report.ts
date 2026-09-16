@@ -5,7 +5,7 @@
  * 列：當前指派（people）以 person id 為主鍵；未指派獨立成「（未指派）」列
  * 欄：嚴重性（select，值如 P1重點 / P2較高 / P3一般 / P4較低；未填歸「（未分級）」）
  *     —— 每個等級一欄，依 P 後數字由小到大排序（P0 最優先），未分級殿後；末欄「小計」= 該人跨等級總量
- * 分類：以 tech-users.csv 的 notion_user_id 比對 → 技術人員 / 非技術人員 / 未指派
+ * 分類：以 tech_users 名冊的 notion_user_id 比對 → 技術人員 / 非技術人員 / 未指派
  *       （刻意用 id 而非姓名比對：Notion 端顯示名常帶前後空白，靠姓名會誤判）
  * 品牌拆分：以「影響端口」(multi_select) 判斷 → 值含「巨星」(如 巨星-前端/平台/系統) 歸巨星；
  *       否則若「問題摘要」(title) 含「巨星」字樣亦歸巨星；其餘歸 FF；
@@ -31,11 +31,15 @@
  */
 
 import { readFileSync } from 'fs';
+import { spawnSync } from 'child_process';
 
 const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const WANTED_STATUSES = ['仍有問題', '待處理'] as const;
-const TECH_USERS_CSV = '/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv';
+// 2026-09-16（Phase 6：tech-users.csv 刪檔退役）：技術名單改向 telegram-dispatcher
+// 的 registry CLI 問，DB 是唯一來源。
+const REGISTRY_CLI = ['bun', '/Users/user/aladdin/telegram-dispatcher/lib/registry/tech-users-sync.ts'];
+const REGISTRY_CLI_CWD = '/Users/user/aladdin/telegram-dispatcher';
 const DEFAULT_OUT = '/Users/user/aladdin/tmp/bug-status-by-assignee.csv';
 const ENV_FILE = '/Users/user/aladdin/aladdin_ai/.env.local';
 const TG_CHAT_ID = '5022865804'; // Landon
@@ -106,15 +110,34 @@ function brandOutPath(base: string, brand: Brand): string {
 }
 
 // ── 載入技術人員名單（以 notion_user_id 為比對主鍵）──
+// registry CLI 內部以 mon_head 角色連監控 DB；本腳本可能被任何環境呼叫，若繼承
+// 了別的角色的 MON_DB_* 變數，bun 的 .env 自動載入不會覆蓋已存在的 key，角色就
+// 會判定錯誤——清掉那幾個變數並把 cwd 指到 telegram-dispatcher，讓它自己的 .env
+// 補上正確角色（同 aladdin_ai/scripts/tg-notify.sh 的處理）。
 function loadTechIds(): Set<string> {
-    const lines = readFileSync(TECH_USERS_CSV, 'utf-8').split('\n').filter(l => l.trim());
+    const env = { ...process.env };
+    for (const k of ['MON_DB_HOST', 'MON_DB_PORT', 'MON_DB_SCHEMA', 'MON_DB_USER', 'MON_DB_PASSWORD', 'MON_FIELD_KEY_V1', 'MON_BIDX_KEY']) {
+        delete env[k];
+    }
+    const proc = spawnSync(REGISTRY_CLI[0], [...REGISTRY_CLI.slice(1), '--list-roster'], {
+        encoding: 'utf-8',
+        cwd: REGISTRY_CLI_CWD,
+        env,
+        timeout: 30_000,
+    });
+    if (proc.status !== 0) {
+        throw new Error(`取不到 tech_users 名冊（tech-users-sync.ts --list-roster exit ${proc.status}）: ${proc.stderr ?? ''}`);
+    }
+    const lines = (proc.stdout ?? '').split('\n').filter(l => l.trim());
     const [header, ...rows] = lines;
-    const idIdx = header.split(',').indexOf('notion_user_id');
+    const idIdx = (header ?? '').split(',').indexOf('notion_user_id');
+    if (idIdx < 0) throw new Error(`名冊欄位不如預期：${header ?? '(空輸出)'}`);
     const ids = new Set<string>();
     for (const row of rows) {
         const id = row.split(',')[idIdx]?.trim();
         if (id) ids.add(id);
     }
+    if (ids.size === 0) throw new Error('名冊回空清單，拒絕把所有人都歸成非技術人員');
     return ids;
 }
 

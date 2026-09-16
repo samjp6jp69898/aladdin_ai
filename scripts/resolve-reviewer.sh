@@ -3,17 +3,19 @@
 #
 # 用法：bash scripts/resolve-reviewer.sh <notion_page_url_或_page_id>
 # 輸出（最後一行契約）：
-#   TECH_MATCH:<email>   — 當前指派命中 tech-users.csv
+#   TECH_MATCH:<email>   — 當前指派命中 tech_users 名冊
 #   NOT_TECH             — 指派存在但無人在 tech 名單（本流程不處理該單，還原 pending）
 #   ERROR:<原因>          — API/解析失敗（exit 1）
 #
 # token 單一來源 = scripts/notion.sh（不要在本檔或任何 prompt 硬編 token）。
 set -u
 ROOT=/Users/user/aladdin
-CSV="$ROOT/aladdin_ai/commands/create-mr/references/tech-users.csv"   # canonical：tg 腳本也讀寫這份
+# 2026-09-16（Phase 6：tech-users.csv 刪檔退役）：名冊改向 telegram-dispatcher
+# 的 registry CLI 問（DB 唯一來源，canonical：tg 腳本走的是同一支）。
+REGISTRY_CLI="${TG_REGISTRY_CLI:-bun /Users/user/aladdin/telegram-dispatcher/lib/registry/tech-users-sync.ts}"
+REGISTRY_CLI_CWD="${TG_REGISTRY_CLI_CWD:-/Users/user/aladdin/telegram-dispatcher}"
 
 INPUT="${1:?用法: resolve-reviewer.sh <notion_page_url_或_page_id>}"
-[ -f "$CSV" ] || { echo "ERROR:tech-users.csv 不存在 $CSV"; exit 1; }
 command -v jq >/dev/null 2>&1 || { echo "ERROR:jq 未安裝（缺它會把有指派誤判成 NOT_TECH，故直接報錯）"; exit 1; }
 
 # token 單一來源：環境變數 > /Users/user/aladdin/aladdin_ai/.env.local 的 ALD_NOTION_TOKEN（與 notion.sh 同源）
@@ -37,14 +39,24 @@ echo "$RESP" | grep -q '"object":"error"' && { echo "ERROR:Notion API 錯誤 $(e
 ASSIGNEE_IDS=$(echo "$RESP" | jq -r '.properties["當前指派"].people[]?.id' 2>/dev/null)
 [ -n "$ASSIGNEE_IDS" ] || { echo "NOT_TECH"; exit 0; }
 
-# CSV 欄位：notion_user_name,notion_user_id,email,pushed_repos[,tg_chat_id]
-while IFS=, read -r _name nid email _rest; do
+# 名冊欄位：notion_user_name,notion_user_id,email,pushed_repos（header 在第一行）
+# 取不到名冊一律 ERROR 中止——跟 jq 缺失同一個理由：靜默回 NOT_TECH 會讓「有
+# 指派」被誤判成「無人在名單」，整張單被還原成 pending，症狀不像錯誤。
+ROSTER="$(
+  cd "$REGISTRY_CLI_CWD" || exit 1
+  unset MON_DB_HOST MON_DB_PORT MON_DB_SCHEMA MON_DB_USER MON_DB_PASSWORD MON_FIELD_KEY_V1 MON_BIDX_KEY
+  $REGISTRY_CLI --list-roster 2>/dev/null
+)"
+[ -n "$ROSTER" ] || { echo "ERROR:取不到 tech_users 名冊（tech-users-sync.ts --list-roster）"; exit 1; }
+
+while IFS=, read -r _name nid email _repos; do
+  [ "$nid" = "notion_user_id" ] && continue   # 跳過表頭
   for aid in $ASSIGNEE_IDS; do
     if [ "$aid" = "$nid" ] && [ -n "$email" ]; then
       echo "TECH_MATCH:$email"
       exit 0
     fi
   done
-done < <(tail -n +2 "$CSV")
+done < <(printf "%s\n" "$ROSTER")
 
 echo "NOT_TECH"

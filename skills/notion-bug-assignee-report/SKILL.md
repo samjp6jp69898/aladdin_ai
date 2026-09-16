@@ -1,6 +1,6 @@
 ---
 name: notion-bug-assignee-report
-description: 從 Notion Bug List 查狀態為「仍有問題 / 待處理」的 ticket，輸出「一人一列、各嚴重性等級（P1/P2/P3/P4…）一欄」的樞紐表 CSV，並用 tech-users.csv 區分技術/非技術人員。Use when 需要統計待處理 bug 數量、依指派人員分組、看每個人跨嚴重性/優先級的 bug 分布、產生 bug 工單分配報表、盤點各技術/非技術人員手上未解的 bug、輸出 bug 指派 CSV。
+description: 從 Notion Bug List 查狀態為「仍有問題 / 待處理」的 ticket，輸出「一人一列、各嚴重性等級（P1/P2/P3/P4…）一欄」的樞紐表 CSV，並用 tech_users 名冊區分技術/非技術人員。Use when 需要統計待處理 bug 數量、依指派人員分組、看每個人跨嚴重性/優先級的 bug 分布、產生 bug 工單分配報表、盤點各技術/非技術人員手上未解的 bug、輸出 bug 指派 CSV。
 ---
 
 # notion-bug-assignee-report — Bug 指派人員統計 CSV
@@ -40,7 +40,7 @@ bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assigne
 |------|----------------|
 | 網路可達 Notion API | 無網路 → fetch 拋錯；無輸出 CSV |
 | 內嵌 token 有效 | token 失效 → `Notion API error 401`；需更新腳本內 `ALD_NOTION_TOKEN`（與 `aladdin_ai/scripts/notion.sh` 同一把） |
-| `tech-users.csv` 存在 | 路徑見下表；不存在 → `ENOENT`，全部會被歸成「非技術人員」之前就先 readFileSync 失敗 |
+| 取得 `tech_users` 名冊 | 經 `telegram-dispatcher/lib/registry/tech-users-sync.ts --list-roster`（需 bun + 監控 DB 連得上）；取不到或回空清單 → 直接 throw，不會默默把所有人歸成「非技術人員」 |
 | `/Users/user/aladdin/aladdin_ai/.env.local` 有 `TELEGRAM_BOT_TOKEN`（未加 `--no-push` 時） | 讀不到 → 腳本在查 Notion 之前就先印錯誤並以非 0 結束碼退出，不會空跑 |
 
 跑前不需手動檢查目錄；失敗時先看 stderr 的錯誤類別（網路 / 401 / ENOENT）對號入座。
@@ -53,7 +53,7 @@ bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assigne
 | 篩選狀態 | `狀態` select = `仍有問題` **OR** `待處理` |
 | 列（row） | `當前指派`（people），以 **person id** 為主鍵；未指派獨立成「（未指派）」列 |
 | 欄（column） | `嚴重性`（select，值如 `P1重點` / `P2較高` / `P3一般` / `P4較低`；未填歸「（未分級）」）每等級一欄；依 `P` 後數字由小到大排序（P0 最優先），未分級殿後；末欄 `小計` = 該人跨等級總量 |
-| 技術名單 | `aladdin_ai/commands/create-mr/references/tech-users.csv`，以 **`notion_user_id`** 比對 |
+| 技術名單 | `tech_users` 表（經 `tech-users-sync.ts --list-roster`），以 **`notion_user_id`** 比對 |
 | 分類 | id 命中名單 → `技術人員`；否則 `非技術人員`；無指派 → `未指派` |
 | Notion 版本 | `2025-09-03`（data_sources API，需全量分頁） |
 

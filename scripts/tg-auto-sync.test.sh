@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# tg-auto-sync.test.sh — 全離線測試（不打 Telegram API、不碰真實 CSV/log）
+# tg-auto-sync.test.sh — 全離線測試（不打 Telegram API、不碰真實 DB/log）
 # 跑法：bash scripts/tg-auto-sync.test.sh
+#
+# 2026-09-16（Phase 6：tech-users.csv 刪檔退役）：名冊與寫入都改由 stub 承接
+# （TG_REGISTRY_CLI）。先前版本餵的是 fixture CSV，但底下仍會呼叫到**真的**
+# registry CLI，在 MON_DB_ENABLED=1 的機器上會真的寫進正式 tech_users 表。
 set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -17,16 +21,47 @@ assert_no(){ if printf '%s' "$2" | grep -q "$3"; then no "$1" "[$2] should NOT c
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-CSV="$TMP/users.csv"
-mkcsv(){ cat > "$CSV" <<'CSVEOF'
-notion_user_name,notion_user_id,email,pushed_repos,tg_chat_id
-洋蔥,id1,pkh_farus@photons.com.tw,abu,
-Dup One,id2,pkh_dup@photons.com.tw,abu,
-Dup Two,id3,pkh_dup2@photons.com.tw,abu,
-Mapped Guy,id4,pkh_mapped@photons.com.tw,abu,777
-CSVEOF
-}
-cell_of(){ awk -F',' -v e="$1" 'NR>1 && $3==e{print $5}' "$CSV" | tr -d '[:space:]'; }
+# 假 registry CLI（有狀態）：--set 會把 email→chat_id 寫進 STATE 檔，
+# --check-connected 依 STATE 判斷，讓「自動寫入」這件事仍然可被斷言。
+STATE="$TMP/registry-state.txt"
+FAKE_CLI="$TMP/fake-registry.sh"
+cat > "$FAKE_CLI" <<'EOF'
+#!/usr/bin/env bash
+state="$FAKE_REGISTRY_STATE"
+roster='洋蔥,id1,pkh_farus@photons.com.tw,abu
+Dup One,id2,pkh_dup@photons.com.tw,abu
+Dup Two,id3,pkh_dup2@photons.com.tw,abu
+Mapped Guy,id4,pkh_mapped@photons.com.tw,abu'
+case "${1:-}" in
+  --list-roster)
+    echo 'notion_user_name,notion_user_id,email,pushed_repos'
+    printf '%s\n' "$roster"
+    ;;
+  --check-connected)
+    shift
+    for cid in "$@"; do
+      if grep -q ",${cid}$" "$state" 2>/dev/null; then echo CONNECTED; else echo NOT_CONNECTED; fi
+    done
+    ;;
+  --set)
+    if printf '%s\n' "$roster" | awk -F',' -v e="${2:-}" '$3==e{found=1} END{exit !found}'; then
+      echo "${2},${3}" >> "$state"
+      echo "SET_OK: ${2}"
+    else
+      echo "SET_ERR_NO_EMAIL: ${2:-}"
+    fi
+    ;;
+  *) echo "fake-registry: unsupported ${1:-}" >&2; exit 2 ;;
+esac
+EOF
+chmod +x "$FAKE_CLI"
+export TG_REGISTRY_CLI="bash $FAKE_CLI"
+export FAKE_REGISTRY_STATE="$STATE"
+# 測試絕不能真的重啟正式服務。
+export TG_RESTART_CMD="true"
+
+mkstate(){ : > "$STATE"; echo "pkh_mapped@photons.com.tw,777" >> "$STATE"; }
+cell_of(){ awk -F',' -v e="$1" '$1==e{print $2}' "$STATE" | tail -1 | tr -d '[:space:]'; }
 
 LOG_JSONL="$TMP/unknown-senders.jsonl"
 mklog(){ cat > "$LOG_JSONL" <<'JSONL'
@@ -54,7 +89,6 @@ STUBEOF
 chmod +x "$TMP/notify-stub.sh"
 
 run_auto_sync(){
-  TG_NOTIFY_CSV="$CSV" \
   TG_UNKNOWN_SENDERS_LOG="$LOG_JSONL" \
   TG_GETUPDATES_CMD="$TMP/upd409.sh" \
   TG_MAP_SCRIPT="$MAP_SCRIPT" \
@@ -68,10 +102,10 @@ run_auto_sync(){
 
 # ───────────────────────── 第一次跑：HIGH 自動寫入 + ASK 通知維運者 ─────────────────────────
 echo "## 第一次跑"
-mkcsv; mklog
+mkstate; mklog
 run_auto_sync
 
-assert_eq  "HIGH（111/洋蔥）自動寫入 CSV"        "$(cell_of pkh_farus@photons.com.tw)" "111"
+assert_eq  "HIGH（111/洋蔥）自動寫入名冊"        "$(cell_of pkh_farus@photons.com.tw)" "111"
 assert_has "HIGH 有發確認訊息給本人"              "$(cat "$TMP/notify-calls.txt")" "\-\-email pkh_farus@photons.com.tw"
 assert_has "確認訊息內容含『連結成功』"            "$(cat "$TMP/notify-calls.txt")" "連結成功"
 assert_has "HIGH 自動配對也通知維運者 Landon"      "$(cat "$TMP/notify-calls.txt")" "\-\-chat-id 999888 \-\-text 自動配對成功"
@@ -91,19 +125,19 @@ run_auto_sync
 
 CALLS_AFTER_2ND="$(wc -l < "$TMP/notify-calls.txt" | tr -d '[:space:]')"
 assert_eq "已對映（111）不再觸發任何 notify"        "$CALLS_AFTER_2ND" "$CALLS_AFTER_1ST"
-assert_eq "第二次跑 CSV 不再變動"                   "$(cell_of pkh_farus@photons.com.tw)" "111"
+assert_eq "第二次跑名冊不再變動"                   "$(cell_of pkh_farus@photons.com.tw)" "111"
 
-# ───────────────────────── 鎖：搶不到鎖時直接放棄，不動 CSV ─────────────────────────
+# ───────────────────────── 鎖：搶不到鎖時直接放棄，不動名冊 ─────────────────────────
 echo "## 鎖"
-mkcsv; mklog
+mkstate; mklog
 mkdir -p "$TMP/lock2"
-TG_NOTIFY_CSV="$CSV" TG_UNKNOWN_SENDERS_LOG="$LOG_JSONL" TG_GETUPDATES_CMD="$TMP/upd409.sh" \
+TG_UNKNOWN_SENDERS_LOG="$LOG_JSONL" TG_GETUPDATES_CMD="$TMP/upd409.sh" \
   TG_MAP_SCRIPT="$MAP_SCRIPT" TG_NOTIFY_SCRIPT="$TMP/notify-stub.sh" \
   TG_AUTO_SYNC_LOG="$TMP/auto-sync2.log" TG_AUTO_SYNC_ALERTED_FILE="$TMP/alerted2.txt" \
   TG_AUTO_SYNC_LOCK_DIR="$TMP/lock2" TG_AUTO_SYNC_OPERATOR_CHAT_ID="999888" \
   bash "$SCRIPT"
 assert_has "搶不到鎖時記 SKIP_LOCKED"  "$(cat "$TMP/auto-sync2.log")" "SKIP_LOCKED"
-assert_eq  "搶不到鎖時 CSV 不變"        "$(cell_of pkh_farus@photons.com.tw)" ""
+assert_eq  "搶不到鎖時名冊不變"        "$(cell_of pkh_farus@photons.com.tw)" ""
 rmdir "$TMP/lock2"
 
 # ───────────────────────── summary ─────────────────────────

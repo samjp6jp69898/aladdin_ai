@@ -7,7 +7,7 @@
  *              產出修復程式碼並開 MR OR 依留言重新分析（不改程式）
  *              （2026-09-08 Notion 改名：原「待分析」→「一鍵分析＋修復＋開 MR」，
  *              原「需要重跑」→「全部重跑」；另納入三個新增可認領選項一併同步進 tracker）
- *   當前指派 = 至少一人在 tech-users.csv 名單中（程式端後篩）
+ *   當前指派 = 至少一人在 tech_users 名冊中（程式端後篩）
  *
  * 寫入 tracker file：
  *   ~/.claude/projects/-Users-user-aladdin/memory/bug_analysis_tracker.md
@@ -30,6 +30,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { spawnSync } from 'child_process';
 import { join } from 'path';
 import { homedir } from 'os';
 
@@ -52,7 +53,10 @@ const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
 const MEMORY_DIR = join(homedir(), '.claude', 'projects', '-Users-user-aladdin', 'memory');
 const TRACKER_PATH = join(MEMORY_DIR, 'bug_analysis_tracker.md');
-const TECH_USERS_CSV = '/Users/user/aladdin/aladdin_ai/commands/create-mr/references/tech-users.csv';
+// 2026-09-16（Phase 6：tech-users.csv 刪檔退役）：技術名單改向 telegram-dispatcher
+// 的 registry CLI 問，DB 是唯一來源。
+const REGISTRY_CLI = ['bun', '/Users/user/aladdin/telegram-dispatcher/lib/registry/tech-users-sync.ts'];
+const REGISTRY_CLI_CWD = '/Users/user/aladdin/telegram-dispatcher';
 
 // ── 參數解析 ──
 
@@ -73,7 +77,7 @@ function parseArgs() {
     };
 }
 
-// ── tech-users.csv 載入 ──
+// ── 技術名冊載入（registry CLI，DB 唯一來源）──
 
 interface TechUser {
     notion_user_id: string;
@@ -81,27 +85,43 @@ interface TechUser {
     email: string;
 }
 
+// registry CLI 內部以 mon_head 角色連監控 DB；本腳本可能被任何環境呼叫，若繼承
+// 了別的角色的 MON_DB_* 變數，bun 的 .env 自動載入不會覆蓋已存在的 key，角色就
+// 會判定錯誤——清掉那幾個變數並把 cwd 指到 telegram-dispatcher，讓它自己的 .env
+// 補上正確角色（同 aladdin_ai/scripts/tg-notify.sh 的處理）。
 function loadTechUsers(): TechUser[] {
-    if (!existsSync(TECH_USERS_CSV)) {
-        throw new Error(`tech-users.csv 不存在: ${TECH_USERS_CSV}`);
+    const env = { ...process.env };
+    for (const k of ['MON_DB_HOST', 'MON_DB_PORT', 'MON_DB_SCHEMA', 'MON_DB_USER', 'MON_DB_PASSWORD', 'MON_FIELD_KEY_V1', 'MON_BIDX_KEY']) {
+        delete env[k];
     }
-    const lines = readFileSync(TECH_USERS_CSV, 'utf-8').split('\n').filter(l => l.trim());
+    const proc = spawnSync(REGISTRY_CLI[0], [...REGISTRY_CLI.slice(1), '--list-roster'], {
+        encoding: 'utf-8',
+        cwd: REGISTRY_CLI_CWD,
+        env,
+        timeout: 30_000,
+    });
+    if (proc.status !== 0) {
+        throw new Error(`取不到 tech_users 名冊（tech-users-sync.ts --list-roster exit ${proc.status}）: ${proc.stderr ?? ''}`);
+    }
+    const lines = (proc.stdout ?? '').split('\n').filter(l => l.trim());
     const [header, ...rows] = lines;
-    const cols = header.split(',');
+    const cols = (header ?? '').split(',');
     const nameIdx = cols.indexOf('notion_user_name');
     const idIdx = cols.indexOf('notion_user_id');
     const emailIdx = cols.indexOf('email');
     if (nameIdx < 0 || idIdx < 0 || emailIdx < 0) {
-        throw new Error(`tech-users.csv 缺少必要欄位 (notion_user_name / notion_user_id / email)`);
+        throw new Error(`名冊欄位不如預期 (需要 notion_user_name / notion_user_id / email)：${header ?? '(空輸出)'}`);
     }
-    return rows.map(row => {
+    const users = rows.map(row => {
         const cells = row.split(',');
         return {
-            notion_user_id: cells[idIdx].trim(),
-            notion_user_name: cells[nameIdx].trim(),
-            email: cells[emailIdx].trim(),
+            notion_user_id: (cells[idIdx] ?? '').trim(),
+            notion_user_name: (cells[nameIdx] ?? '').trim(),
+            email: (cells[emailIdx] ?? '').trim(),
         };
     }).filter(u => u.notion_user_id);
+    if (users.length === 0) throw new Error('名冊回空清單，拒絕以「無人是技術」繼續查詢');
+    return users;
 }
 
 // ── Notion API 呼叫 ──
@@ -254,7 +274,7 @@ function printTable(items: BugItem[]) {
         console.log('\n  沒有符合條件的 bug 單。\n');
         return;
     }
-    console.log(`\n  共 ${items.length} 筆（命中 tech-users.csv 名單）\n`);
+    console.log(`\n  共 ${items.length} 筆（命中 tech_users 名冊）\n`);
     for (const item of items) {
         const tech = item.matchedTechUser;
         console.log(
@@ -398,7 +418,7 @@ function applyCleanup(existing: TrackerEntry[], wantedFaqSet: Set<number>): Trac
 async function main() {
     const args = parseArgs();
 
-    console.log(`\n  查詢條件: 狀態=仍有問題,待處理,處理中 | AI分析=${AI_ANALYSIS_VALUES.join(',')} | 當前指派∈ tech-users.csv | 上限=${args.limit}`);
+    console.log(`\n  查詢條件: 狀態=仍有問題,待處理,處理中 | AI分析=${AI_ANALYSIS_VALUES.join(',')} | 當前指派∈ tech_users 名冊 | 上限=${args.limit}`);
 
     const techUsers = loadTechUsers();
     console.log(`  Tech 名單載入: ${techUsers.length} 人`);
