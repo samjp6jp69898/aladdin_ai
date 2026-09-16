@@ -57,6 +57,17 @@ esac
 [ -n "$PAGE_ID" ] || { echo "NOTION_COMMENT: failed(缺 page_id)"; echo "NOTION_AI_FIELD: failed(缺 page_id)"; echo "TG: SKIPPED(參數錯誤)"; exit 0; }
 [ "$DRIVE" = "" ] && DRIVE="N/A"
 
+# ---- failure_reason 本機錯誤遮蔽（2026-09-16 使用者要求）----
+# head/worker 本機的執行錯誤（本機路徑、指令行、工具 stack）不得外流給同事——
+# Notion 留言與本腳本發給 reviewer 的 TG 都算「同事視角」，一律遮蔽；完整錯誤
+# 留在本機 log 與 manager Step 8 報告。業務語意的失敗原因（如「修復落點不在
+# 四大 repo」「base 分支 origin/x 不存在」）不含本機特徵字串，原樣保留。
+case "$REASON" in
+  *"/Users/"*|*"Command failed"*|*"Cannot find module"*|*"node_modules"*|*"ENOENT"*|*$'\n'"    at "*|*"stdin"*" prompt argument"*)
+    REASON="pipeline 執行環境內部錯誤（非本單程式問題），本次分析結果無效；維運人員已收到詳細錯誤，排除後會重新分析，這張單不需要因此做任何處理。"
+    ;;
+esac
+
 # ---- 依 status 組留言文字（逐字沿用原 create-mr.md Step 7c 模板）----
 # TEXT = 主文；INTRO = 連結引言（只在有 drive link 時接在最後、緊鄰 notion.sh 附加的超連結）；
 # bootstrap 披露句放在主文與引言之間，避免插在「引言：」與連結中間。

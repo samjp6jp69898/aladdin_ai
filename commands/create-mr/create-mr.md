@@ -280,7 +280,7 @@ REVIEW_RESULT: <PASSED|FAILED>
 | failed | ✅（上傳既有分析+審查文件） | — | ✅ | ✅ |
 | analysis_done | ✅（analysis-notes 必有 + analytics/spec/grounding） | — | ✅（AI分析=問題分析完成，待確認） | ✅ |
 
-**failed 統一定義**：任一步驟超過重試上限、SETUP_FAIL 二連敗、resolve-reviewer 二連 ERROR → `pipeline_status=failed`，`failure_reason`＝「死在哪一步 + 最後一個錯誤訊息的第一行」；走 7a → 7c failed 分支 → Step 8，不開 MR、不留成功留言。**needs_qa_clarification 不是 failed**：它是正常暫停等 QA，走自己那列。
+**failed 統一定義**：任一步驟超過重試上限、SETUP_FAIL 二連敗、resolve-reviewer 二連 ERROR → `pipeline_status=failed`，`failure_reason`＝「死在哪一步 + 最後一個錯誤訊息的第一行」；走 7a → 7c failed 分支 → Step 8，不開 MR、不留成功留言。`failure_reason` 照舊記完整（Step 8 報告與人工排查用）；含本機路徑/指令行的執行錯誤**不會**外流到 Notion 留言與 reviewer TG——`create-mr-exit-comment.sh` 會自動遮蔽成通用句（2026-09-16 使用者要求，本機錯誤不上 Notion），manager 不需自行改寫、也不得繞過腳本手發留言。**needs_qa_clarification 不是 failed**：它是正常暫停等 QA，走自己那列。
 
 ### 7a：Drive Uploader MR（所有出口路徑都跑，含 failed——上傳既有分析與審查文件供人工接手，文件全缺時 uploader 回 `DRIVE_LINK: N/A` 不報錯）
 

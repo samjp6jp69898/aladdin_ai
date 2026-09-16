@@ -29,9 +29,7 @@ ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/
 
 **Core Principles:**
 - Absolutely no preconceived notions; do not view any source code.
-- Do not assume where the problem lies; analyze in a rational and neutral manner!!!
-- Do not assume where the problem lies; analyze in a rational and neutral manner!!!
-- Do not assume where the problem lies; analyze in a rational and neutral manner!!!
+- Do not assume where the problem lies; analyze in a rational and neutral manner.
 - Responsible only for parsing bug report content; do not perform any technical diagnosis or root cause speculation.
 
 ## Execution Steps
@@ -76,6 +74,7 @@ ALD_NOTION_TOKEN=$(grep -m1 '^ALD_NOTION_TOKEN=' /Users/user/aladdin/aladdin_ai/
 ```
 Notion Link: [Link]
 Ticket ID:
+Assignee:
 Affected Port/Terminal:
 Affected Module:
 Environment:
@@ -140,6 +139,7 @@ done
 
 **Field Descriptions:**
 - If corresponding information cannot be found in the bug report, enter "(Not provided)".
+- **Assignee**（本單負責技術人員，Tracer 的 FG6 修復範圍歸屬檢查會拿它跟改動檔案的近期主要作者比對）：從 page properties 找「負責人」／「指派人」／「Assignee」類 people 欄位，取人名原文照抄（多人時全列、逗號分隔）；properties 沒有就掃內文與留言找「由 X 負責修復」類明確指派敘述；都沒有 → "(Not provided)"，不猜。
 - List test steps sequentially; the number of steps should increase or decrease based on actual content.
 - Auxiliary document links include screenshots, videos, attachments, and all other relevant links. **Image URLs must retain the full query string signature parameters** (including X-Amz-Algorithm, X-Amz-Credential, X-Amz-Signature, etc.) and must not be truncated.
 - Strictly follow the original text of the bug report; do not add any speculation or judgment.

@@ -135,6 +135,8 @@ This is the NEW step. Compile the final solution document from all pipeline outp
 
 Write `/Users/user/aladdin/obsidian/Debug/{id}/{id}-solution.md` with this format:
 
+**文件結構原則（2026-09-16 使用者要求）**：solution.md 的讀者是「沒跟過 pipeline、只想快速搞懂這張單」的同事。開頭必須先讓人 30 秒抓到「什麼壞了、為什麼、怎麼修的」，才進技術細節；不要把 analysis-notes 的推理全文倒進來——推理細節同資料夾就有 analysis-notes.md 可看。
+
 ```
 ---
 metadata: v2
@@ -142,11 +144,19 @@ metadata: v2
 
 ## Bug 分析報告 — {ticket_id}
 
+### 問題摘要
+（直接沿用 analysis-notes.md 開頭的「問題摘要」段：問題 / 原因 / 修法 / ⚠️ 跨界改動警示 四項。⚠️ 跨界改動警示不得省略——有共用層 / 跨負責範圍改動時，這是同事審 MR 前最需要先看到的一行）
+
+### 改了什麼（一覽）
+| 檔案 | 改動內容一句話 |
+|------|--------------|
+（從 git diff --stat + analysis-notes 修復紀錄整理，一檔一列，讓人先知道範圍再看 diff）
+
 ### 根因分析（Bug Tracer）
-（來自 analysis-notes.md 的推理過程紀錄、根因定位、呼叫鏈追蹤）
+（來自 analysis-notes.md 的「根因定位」結論段 + 呼叫鏈追蹤摘要。**不要**貼推理過程紀錄與附錄證據表全文——完整推理見同資料夾的 analysis-notes.md，此處附一句參照即可）
 
 ### 修復方案（Bug Fixer）
-（來自 analysis-notes.md 的修復策略、修復紀錄、Fixer 備註）
+（來自 analysis-notes.md 的修復策略、修復紀錄、Fixer 備註；有 FG6 共用層影響評估 / 原作者意圖核對段落時**必須完整帶入**，不可省略）
 
 ### 修正代碼
 （git diff origin/{base_branch}...HEAD 的完整內容，排除測試檔案）
