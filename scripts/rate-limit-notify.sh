@@ -44,6 +44,40 @@ mkdir -p "$STATE_DIR" 2>/dev/null
 # 清掉過期 window 的 claim 目錄，避免無限累積（找不到就當作 0 個，不影響主流程）
 find "$STATE_DIR" -mindepth 1 -maxdepth 1 -type d -mtime +2 -exec rmdir {} + 2>/dev/null || true
 
+# 持久化快照（2026-09-17 新增，tg-monitor overview 頁「Claude 用量偵測」卡片用）：
+# 跟上面/下面的門檻通知、REPORT_FLAG 邏輯完全獨立、互不影響——這裡只是把「這次
+# 偵測到的原始數值」無條件存成一份檔案，給外部程式（telegram-dispatcher
+# worker-agent.ts 的 GET /rate-limit-status、tg-monitor 直讀 head 本機檔案）讀取，
+# 不受 80/90/95/99% 門檻限制。沒有任何一個百分比可用時整段跳過、不清空舊快照——
+# 讓 overview 頁能看出「上次成功偵測到用量是多久以前」，這是刻意保留的行為。
+snapshot_five_pct=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' 2>/dev/null)
+snapshot_five_resets=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.resets_at // empty' 2>/dev/null)
+snapshot_week_pct=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' 2>/dev/null)
+snapshot_week_resets=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.resets_at // empty' 2>/dev/null)
+
+if [ -n "$snapshot_five_pct" ] || [ -n "$snapshot_week_pct" ]; then
+  snapshot_five_resets_iso=""
+  [ -n "$snapshot_five_resets" ] && snapshot_five_resets_iso=$(date -u -r "$snapshot_five_resets" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
+  snapshot_week_resets_iso=""
+  [ -n "$snapshot_week_resets" ] && snapshot_week_resets_iso=$(date -u -r "$snapshot_week_resets" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
+  snapshot_detected_at=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+  snapshot_file="$STATE_DIR/latest.json"
+
+  jq -n \
+    --arg account "$ACCOUNT_LABEL" \
+    --arg detectedAt "$snapshot_detected_at" \
+    --arg fivePct "$snapshot_five_pct" \
+    --arg fiveResets "$snapshot_five_resets_iso" \
+    --arg weekPct "$snapshot_week_pct" \
+    --arg weekResets "$snapshot_week_resets_iso" \
+    '{
+      account_label: $account,
+      detected_at: $detectedAt,
+      five_hour: (if $fivePct == "" then null else {used_percentage: ($fivePct | tonumber), resets_at: (if $fiveResets == "" then null else $fiveResets end)} end),
+      seven_day: (if $weekPct == "" then null else {used_percentage: ($weekPct | tonumber), resets_at: (if $weekResets == "" then null else $weekResets end)} end)
+    }' > "$snapshot_file.tmp" 2>/dev/null && mv "$snapshot_file.tmp" "$snapshot_file"
+fi
+
 # 立即回報請求（旗標檔存在時，不論門檻，回報目前用量一次後清掉旗標；
 # 若當下 rate_limits 尚未出現在輸入 JSON 中，就保留旗標等下一次呼叫自然重試，不用 sleep 硬等）
 REPORT_FLAG="${RATE_LIMIT_NOTIFY_REPORT_FLAG:-$HOME/.claude/rate-limit-notify-report-request}"
