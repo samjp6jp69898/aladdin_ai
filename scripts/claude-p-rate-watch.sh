@@ -27,6 +27,16 @@ set -uo pipefail
 CLAUDE_BIN="${CLAUDE_BIN_REAL:-/Users/user/.local/bin/claude}"
 NOTIFY_SCRIPT="${RATE_LIMIT_NOTIFY_SCRIPT:-/Users/user/aladdin/scripts/rate-limit-notify.sh}"
 
+# 2026-09-18 暫時性診斷（待用量偵測問題查明後移除，見 change-log 同日條目）：
+# 真實 pipeline 上同步化修法（見下方 SYNTH 區塊註解）看似沒解決「用量沒更新」，
+# 但用假 claude binary 複現 bash 3.2 + process substitution + timeout + trap 的
+# 完整鏈路都測不出問題——先落地幾行 trace，等下一次真實 -p 呼叫跑完直接看卡在
+# 哪一步，不再靠合成環境瞎猜。
+DEBUG_LOG="${RATE_LIMIT_NOTIFY_DEBUG_LOG:-$HOME/.claude/rate-limit-notify-state/watch-debug.log}"
+mkdir -p "$(dirname "$DEBUG_LOG")" 2>/dev/null
+_dbg() { printf '%s pid=%s %s\n' "$(date -u +%FT%TZ)" "$$" "$*" >>"$DEBUG_LOG" 2>/dev/null; }
+_dbg "START args=$*"
+
 TMP=$(mktemp)
 trap 'rm -f "$TMP"' EXIT
 
@@ -41,11 +51,13 @@ EC=$?
 # process substitution 是非同步子行程，稍微等一下讓 tee 把最後幾行寫完，
 # 避免 $TMP 被讀取時內容還沒落地（下面的 jq 解析才會拿到完整輸出）
 wait 2>/dev/null
+_dbg "CHILD_DONE EC=$EC TMP=$TMP TMP_BYTES=$(wc -c <"$TMP" 2>/dev/null | tr -d ' ') TMP_LINES=$(wc -l <"$TMP" 2>/dev/null | tr -d ' ')"
 
 if command -v jq >/dev/null 2>&1 && [ -f "$NOTIFY_SCRIPT" ]; then
   # `..` 遞迴掃描：json 格式（整包一個陣列）與 stream-json 格式（多個獨立 JSON
   # 物件接續輸出）都吃得下，取最後一筆事件即可（同一次 -p 呼叫內用量只會愈來愈高）
   LAST_EVENT=$(jq -c '.. | objects | select(.type == "rate_limit_event")' "$TMP" 2>/dev/null | tail -1)
+  _dbg "LAST_EVENT_EMPTY=$([ -z "$LAST_EVENT" ] && echo yes || echo no)"
   if [ -n "$LAST_EVENT" ]; then
     SYNTH=$(printf '%s' "$LAST_EVENT" | jq -c '{
       rate_limits: {
@@ -59,8 +71,23 @@ if command -v jq >/dev/null 2>&1 && [ -f "$NOTIFY_SCRIPT" ]; then
         }
       }
     }' 2>/dev/null)
-    [ -n "$SYNTH" ] && sh "$NOTIFY_SCRIPT" "$SYNTH" >/dev/null 2>&1 &
+    _dbg "SYNTH_EMPTY=$([ -z "$SYNTH" ] && echo yes || echo no) SYNTH=$SYNTH"
+    # 2026-09-18 改同步（原本結尾 `&`）：呼叫端 spawn-create-mr.ts 用
+    # detached process group + timeout 包這支 script，本 script 一 exit，
+    # 外層就可能認定這個 stage 已結束並收尾（worktree/process cleanup）——
+    # 背景寫入還沒落地就可能被一起收掉，造成間歇性「用量沒更新」（2026-09-18
+    # 實測重現：wrapper 前景部分一返回，狀態目錄常常還沒建立，要再等
+    # 0.3–1s 背景 job 才真的寫完）。改同步後，快照寫入保證在本 script exit
+    # 前完成，用結構杜絕競態，不是靠等待。多出的延遲僅 jq/檔案 I/O（門檻
+    # 剛好跨界才會多一次 Telegram 呼叫，機率極低），可接受。
+    if [ -n "$SYNTH" ]; then
+      sh "$NOTIFY_SCRIPT" "$SYNTH" >/dev/null 2>&1
+      _dbg "NOTIFY_EC=$?"
+    fi
   fi
+else
+  _dbg "SKIP_BLOCK jq_found=$(command -v jq >/dev/null 2>&1 && echo yes || echo no) notify_script_exists=$([ -f "$NOTIFY_SCRIPT" ] && echo yes || echo no)"
 fi
 
+_dbg "EXIT EC=$EC"
 exit "$EC"
