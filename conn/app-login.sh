@@ -1,11 +1,11 @@
 #!/bin/bash
-# Usage: ./app-login.sh <pk|6t|main> [--env cqa|dev] [--account 2|3|4] [--answer <驗證碼數字>] [--dragx <像素>]
+# Usage: ./app-login.sh <pk|6t|main> [--env cqa|dev] [--account 2] [--answer <驗證碼數字>] [--dragx <像素>]
 #
 # App 前台登入（唯讀取證：只登入、截圖、存 storageState）。
 # 帳密一律從 aladdin_ai/.env.cqa 或 .env.dev 讀取後 export 給 .cjs，不寫死、不印出。
 # --env 預設 cqa（*.ald777.com 測試站）；--env dev 對應 dev 環境（pk/6t 皆有帳密，分別讀 DEV_PK_APP_*／DEV_6T_APP_*）。
-# --account 只在 --env dev 且該環境有多組帳號（如 DEV_PK_APP_USER2/3/4）時使用，
-#   不帶則用預設帳號（DEV_PK_APP_USER / CQA_PK_APP_USER）。
+# --account 2 用於有第二組帳號的站別（如 DEV_PK_APP_USER2/PASS2、CQA_6T_APP_USER2/PASS2），
+#   每組帳號各自有獨立密碼（PASS/PASS2），不帶則用預設帳號（<PREFIX>_USER / <PREFIX>_PASS）。
 #
 # pk 是兩段式（圖形驗證碼要靠模型視覺讀碼）：
 #   1) ./app-login.sh pk [--env dev]           → 背景啟動登入流程，印出 CAPTCHA_AT 裁切圖路徑
@@ -25,7 +25,7 @@ VERIFY_DIR="$E2E_DIR/verify"
 OUT_DIR="$E2E_DIR/conn/artifacts"
 
 usage() {
-  echo "Usage: $0 <pk|6t|main> [--env cqa|dev] [--account 2|3|4] [--answer <digits>] [--dragx <pixels>]"
+  echo "Usage: $0 <pk|6t|main> [--env cqa|dev] [--account 2] [--answer <digits>] [--dragx <pixels>]"
   exit 1
 }
 
@@ -108,13 +108,13 @@ case "$ENV_NAME" in
 esac
 
 case "$ACCOUNT" in
-  ""|2|3|4) ;;
-  *) echo "Error: --account 只支援 2/3/4（不帶則用預設帳號）"; exit 1 ;;
+  ""|2) ;;
+  *) echo "Error: --account 只支援 2（不帶則用預設帳號）"; exit 1 ;;
 esac
 
 URL="$(get_env "${SRC_PREFIX}_URL")"
 USER_VAL="$(get_env "${SRC_PREFIX}_USER${ACCOUNT}")"
-PASS_VAL="$(get_env "${SRC_PREFIX}_PASS")"
+PASS_VAL="$(get_env "${SRC_PREFIX}_PASS${ACCOUNT}")"
 # --url 只用來覆蓋要打的網址（例如本機起的 dev server），帳密仍照常從 .env 讀對應帳號。
 if [ -n "$URL_OVERRIDE" ]; then
   URL="$URL_OVERRIDE"
@@ -127,7 +127,7 @@ export "${EXPORT_PREFIX}_PASS"="$PASS_VAL"
 MISSING=""
 [ -z "$URL" ] && MISSING="$MISSING ${SRC_PREFIX}_URL"
 [ -z "$USER_VAL" ] && MISSING="$MISSING ${SRC_PREFIX}_USER${ACCOUNT}"
-[ -z "$PASS_VAL" ] && MISSING="$MISSING ${SRC_PREFIX}_PASS"
+[ -z "$PASS_VAL" ] && MISSING="$MISSING ${SRC_PREFIX}_PASS${ACCOUNT}"
 if [ -n "$MISSING" ]; then
   echo "Error: .env 缺少 $SITE_KEY (env=$ENV_NAME) 的欄位:$MISSING"
   exit 2
