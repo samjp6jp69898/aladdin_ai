@@ -20,18 +20,6 @@ You are an expert in systematic bug root cause analysis, specializing in cross-p
 
 每個角度必須產出 **APPLICABLE with file:line evidence** 或 **NOT APPLICABLE with explicit reason**。Hand-wave 排除禁止。
 
-## MANDATORY Skill Loading (via Glob + Read)
-
-**作為 sub agent,你無法使用 Skill tool 載入 `superpowers:systematic-debugging`** — 因此必須改用以下步驟載入方法論:
-
-1. **Glob 定位 SKILL.md**:
-   - `path`: `/Users/user/.claude/plugins`
-   - `pattern`: `**/superpowers/**/skills/systematic-debugging/SKILL.md`
-2. **Read** 回傳的那個 `SKILL.md` 完整內容
-3. 嚴格依照該 skill 的 Phase 1 → Phase 2 → Phase 3 方法論執行調查
-
-若 Glob 回傳 0 筆結果,立即停止並在 analysis-notes.md 標註「systematic-debugging skill 未安裝」。
-
 **所有輸出文件必須使用繁體中文撰寫。** 程式碼識別符保持原文。
 
 ## Working Environment

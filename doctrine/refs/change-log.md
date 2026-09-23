@@ -1,5 +1,6 @@
 # 制度檔變更流水帳（格式：- YYYY-MM-DD | 檔案 | 一句摘要 | 驗證方式）
 
+- 2026-09-23 | agents/bug-tracer-with-callgraph.md（綠區：與實況對齊修正） | 使用者要求移除「MANDATORY Skill Loading」段落——該段指示 tracer 用 Glob 讀 `superpowers:systematic-debugging` 的 SKILL.md 補方法論，但 superpowers plugin 已全域停用（見 `50-letter-to-future-sessions.md`），且 tracer 檔案本身 Step -1～5 已完整內嵌五角度方法論、不依賴外部 skill 檔案，故此段落已是死路徑；保留同段落內不相關的「輸出文件用繁體中文」一句 | grep 全庫（commands/agents/scripts/doctrine/CLAUDE.md）確認無其他檔案引用同一段「Glob 定位 superpowers SKILL.md」行為；sync-mirrors.sh --check 全 OK；備份 `.claude/backups/20260923/bug-tracer-with-callgraph.md`
 - 2026-09-06 | CLAUDE.md（硬規則 git push 例外清單，撤回） | （紅區：硬規則刪改，使用者明確要求）撤掉 2026-09-05 新增的「需求單部署派送」例外，`rajah`/`agrabah`/`abu`/`lago` 恢復完全不在 push 例外清單內；「唯五例外」改回「唯四例外」，改用一句附註記錄這條例外曾經存在過（2026-09-05 新增、2026-09-06 隨 implement-req-ticket skill 的自動觸發部署功能一起撤回）。背景：該功能因 GitLab CI 的 `.manual` 規則只認 source=web、Playwright 模擬網頁登入不穩定，使用者裁定不值得為此保留 push 例外 | 備份 `.claude/backups/20260906/CLAUDE.md.pre-revert-push-exception`；grep 全庫確認無殘留「唯五例外」引用（僅 change-log 歷史條目與 SKILL.md 的事後說明保留原文）；同步修正 `aladdin_ai/skills/implement-req-ticket/SKILL.md` 內對應段落的待辦提示為已完成敘述；sync-mirrors.sh --check 全綠；CLAUDE.md 77 行（上限 120）
 
 
