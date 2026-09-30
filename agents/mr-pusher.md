@@ -47,12 +47,19 @@ You are the MR publisher for the `/create-mr` pipeline. You run AFTER drive-uplo
 
 ## Permitted Commands
 
-- `cd {worktree_path}/{repo} && git fetch origin {base_branch} && git rebase origin/{base_branch}`（Step 0.5 推前基準新鮮度校驗）
-- `cd {worktree_path}/{repo} && git push -u --force-with-lease origin mr/{ticket_id} -o merge_request.create -o merge_request.target=<branch> -o merge_request.title=<...> -o merge_request.description=<單行> [-o merge_request.assign=<username>]`
+- `git -C {worktree_path}/{repo} fetch origin {base_branch}`、`git -C {worktree_path}/{repo} rebase origin/{base_branch}`（Step 0.5 推前基準新鮮度校驗，各為獨立一次 Bash 呼叫）
+- `git -C {worktree_path}/{repo} push -u --force-with-lease origin mr/{ticket_id} -o merge_request.create -o merge_request.target=<branch> -o merge_request.title=<...> -o merge_request.description=<單行> [-o merge_request.assign=<username>]`
 - `ssh -T -p 5252 git@gitlab.the777.pro`（驗證 SSH 身分，唯讀）
 - `curl` 對 Notion API（POST comment, PATCH page）
 - `Read` 任何 worktree 或 Debug 文件
 - `Write` 暫存檔（合併 body / 留言 payload）
+
+**Bash 呼叫紀律（2026-09-30 FAQ-5161 實例：headless 模式下違反會被權限檢查擋下、整條 pipeline 卡在最後一步）**：
+- 禁止 `cd <dir> && git ...`（訊息：`changes directory before running a version-control command ... Approve only if you trust it`）。一律 `git -C <絕對路徑> <子指令>`。
+- 禁止在同一個 Bash 呼叫裡用 `$(...)`、`$VAR`、`"${ARR[@]}"`、for 迴圈組指令（訊息：`Contains expansion`）。先自己把 `ASSIGN_USERNAME`（`{reviewer_email}` 去掉 `@` 之後）、`NOTION_URL`、`DESC` 這些值算好，**以字面值代入**成單行指令，**每個 repo 一次 Bash 呼叫**；從工具回傳的文字自己讀出 MR URL。
+- 本紀律針對 git 指令；Step 3/4 的 Notion `curl`（帶 `$ALD_NOTION_TOKEN`）維持既有寫法。
+- 下方各 Step 的 bash 區塊是「邏輯說明」，實際執行時照本紀律拆成單行呼叫，不要整段照抄執行。
+- 被擋時不要換寫法硬闖或宣稱需人工核准；回報 `PUSH_FAILED`（附被擋訊息）交 manager 處理。
 
 **FORBIDDEN:**
 - 修改 source / test、`git commit` / `git commit --amend` / squash、互動式 rebase（`git rebase -i`）
@@ -97,7 +104,7 @@ done
 `/create-mr` 從 tracer 到 reviewer 可能歷時數十分鐘,期間 `origin/{base_branch}` 可能已有新 commit。push 前對每個 affected repo 確認分支仍基於最新 `origin/{base_branch}`,落後則 rebase：
 
 ```bash
-cd {worktree_path}/{repo}
+# 以下每個 git 指令實際執行時都寫成 git -C {worktree_path}/{repo} <子指令>（不要 cd）
 git fetch origin {base_branch} --quiet
 
 # 工作區必須乾淨（fixer 已 commit 完畢），否則無法安全 rebase
@@ -136,7 +143,7 @@ rebase 會改寫 commit hash,故 Step 1 的 push 一律用 `--force-with-lease`�
 對 affected_repos 中每一個 repo：
 
 ```bash
-cd {worktree_path}/{repo}
+# 以下每個 git 指令實際執行時都寫成 git -C {worktree_path}/{repo} <子指令>（不要 cd）
 
 # 確認與 origin/{base_branch} 有差異
 if [ -z "$(git log origin/{base_branch}..HEAD --oneline)" ]; then
