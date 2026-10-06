@@ -44,16 +44,19 @@ for t in $TICKETS; do
 
   # 依 create-mr 的 stage 順序檢查產物；latest_* 記錄最後完成的 stage
   latest_name="(尚無產物)"; latest_ts=0
+  run_start=$(mt "$LOCK_DIR/$t") # 重跑時 Debug 內有上一輪舊產物，只認鎖建立後的
   for spec in "analytics:Step1 analyst" "spec:Step2 spec" "grounding:Step2.5 grounding" "analysis-notes:Step3 tracer" "solution:Step6 之後（solution 彙整）"; do
     key="${spec%%:*}"; label="${spec#*:}"
     f="$D/${t}-${key}.md"
     if [ -f "$f" ]; then
       ts=$(mt "$f")
+      [ "$ts" -lt "$run_start" ] && continue
       echo "  $(hm "$ts")  ${label} ✓  (${t}-${key}.md)"
       latest_name="$label"; latest_ts=$ts
     fi
   done
   rev=$(ls "$D" 2>/dev/null | grep -i "reviewer" | head -1)
+  [ -n "$rev" ] && [ "$(mt "$D/$rev")" -lt "$run_start" ] && rev=""
   [ -n "$rev" ] && { ts=$(mt "$D/$rev"); echo "  $(hm "$ts")  Step6 reviewer ✓  ($rev)"; latest_name="Step6 reviewer"; latest_ts=$ts; }
 
   # 推論目前 stage（最後產物的下一步）＋elapsed＋正常時長提示
