@@ -2,7 +2,7 @@
 # create-mr-finalize.sh — /create-mr Step 8 的機械部分：釋放 bug-lock（+ 固定的 tracker 退役提示行）
 # （2026-09-08 從 create-mr.md 抽出，因該檔超過 400 行上限；行為逐字沿用原 Step 8 表格，
 #   見 pipeline-modes-project-docs/plan-pipeline-modes-v1.md §5 / Phase 0。完成報告模板仍留在
-#   create-mr.md，由 manager 輸出——classify-result.ts 靠報告內的 `- Pipeline status:` 行分類。）
+#   create-mr.md，由 manager 輸出——classify-result.ts 優先靠報告末行 `PIPELINE_RESULT=<status>` 分類（退而求其次才看 `- Pipeline status:` 行）。）
 #
 # 2026-09-09：tracker.md 退役（使用者核准，紅區：pipeline claim/終態語意變更）——本腳本
 # 不再寫 bug_analysis_tracker.md。終態的權威記錄改成 Notion「AI分析」欄位，寫入點在

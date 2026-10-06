@@ -366,4 +366,7 @@ bash /Users/user/aladdin/scripts/create-mr-finalize.sh {pipeline_status|NOT_TECH
 - TG 通知: {tg_notify_result}；chat_id 同步: {tg_chatid_sync_result}
 - Finalize: {LOCK / TRACKER / FAIL_LOG 三行原文；全 ok 時寫 ok}
 - Worktree: {worktree_path}；文件: /Users/user/aladdin/obsidian/Debug/{ticket_id}/
+PIPELINE_RESULT={pipeline_status}
 ```
+
+**`PIPELINE_RESULT=` 是 dispatcher（`classify-result.ts`）判定成敗的首選依據**：必須是報告**最後一行**、獨立成行、行首無任何字元，格式固定半形等號、值只有 `{pipeline_status}` 那個詞，不加粗體/反引號/全形符號/說明文字（2026-10-05 FAQ-5362 實例：上面「- Pipeline status:」那行被排成全形冒號 `**Pipeline status：**`，分類器沒認出，成功的單被誤判 unknown_failure 並被覆寫成分析失敗）。上面各人類可讀行仍照模板輸出，但 dispatcher 以這一行為準。
