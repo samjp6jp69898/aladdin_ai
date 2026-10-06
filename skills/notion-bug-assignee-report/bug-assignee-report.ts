@@ -288,7 +288,39 @@ function buildCsv(brandPages: any[]): { csv: string; summary: string } {
     return { csv, summary };
 }
 
+// ── 待整理清單：「技術人員無名稱 / 非技術人員無名稱 / 未指派」三類，每類內依品牌列 Notion URL ──
+// 無名稱 = 指派欄有 person 但 API 未回傳 name（與 buildCsv 的「（無名稱）」同一口徑，類別以 id 比對名冊）
+const TODO_LABELS = ['技術人員・無名稱', '非技術人員・無名稱', '未指派'] as const;
+function buildTodoList(): { label: string; text: string }[] {
+    const urls: Record<string, Record<Brand, string[]>> = {};
+    for (const l of TODO_LABELS) urls[l] = { 'FF': [], '巨星': [], '未分類': [] };
+    for (const brand of BRANDS) {
+        for (const page of pagesByBrand[brand]) {
+            const people = (page.properties['當前指派']?.people ?? []) as any[];
+            if (people.length === 0) { urls['未指派'][brand].push(page.url); continue; }
+            const nameless = people.find(p => !(p.name ?? '').trim());
+            if (nameless) urls[techIds.has(nameless.id ?? '') ? '技術人員・無名稱' : '非技術人員・無名稱'][brand].push(page.url);
+        }
+    }
+    const out: { label: string; text: string }[] = [];
+    for (const label of TODO_LABELS) {
+        const byBrand = urls[label];
+        const total = BRANDS.reduce((n, b) => n + byBrand[b].length, 0);
+        if (total === 0) continue;
+        const parts = BRANDS.filter(b => byBrand[b].length).map(b =>
+            [`【${b}】（${byBrand[b].length}）`, ...byBrand[b].map((u, i) => `${i + 1}. ${u}`)].join('\n'));
+        out.push({ label: `${label}（共 ${total}）`, text: parts.join('\n\n') });
+    }
+    return out;
+}
+
 console.error(`技術名單載入: ${techIds.size} 人`);
+{
+    const todo = buildTodoList();
+    const todoPath = `${outBase.replace(/\.[^./]+$/, '')}-待整理.json`;
+    await Bun.write(todoPath, JSON.stringify(todo));
+    console.error(`已寫入: ${todoPath}`);
+}
 let hadFailure = false;
 for (const brand of BRANDS) {
     const path = brandOutPath(outBase, brand);
