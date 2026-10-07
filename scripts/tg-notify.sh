@@ -60,13 +60,72 @@ done
 [ -z "$CHAT_DIRECT" ] && [ -z "$EMAIL" ] && [ -z "$IDS" ] && { echo "TG_FAIL: missing selector (--email/--notion-user-ids/--chat-id)"; exit 0; }
 [ -n "$FILE" ] && [ ! -f "$FILE" ] && { echo "TG_FAIL: file not found ($FILE)"; exit 0; }
 
+# 2026-10-07：worker 沒有 MON_FIELD_KEY_V1（金鑰只放 head），解不開 chat_id。
+# 解析失敗時先把「收件人＋文字」POST 給 head 的 /cluster/notify，由 head 本機
+# （有金鑰）跑同一支 tg-notify.sh 代發；只有轉發也失敗才退回 escalate_to_operator。
+# 條件：非 --file（代發只支援文字）、非 head 代跑自己（TG_NO_RELAY）、
+# 讀得到 CLUSTER_HEAD_URL / CLUSTER_SHARED_SECRET（先看環境變數，再讀
+# telegram-dispatcher/.env 的這兩個 key；只取這兩個，不 source 整檔）。
+# 成功印出 head 回傳的結果行並回傳 0。
+DISPATCHER_ENV_FILE="${TG_DISPATCHER_ENV_FILE:-/Users/user/aladdin/telegram-dispatcher/.env}"
+relay_via_head() {
+  [ -n "$FILE" ] && return 1
+  [ -n "${TG_NO_RELAY:-}" ] && return 1
+  local url="${CLUSTER_HEAD_URL:-}" secret="${CLUSTER_SHARED_SECRET:-}"
+  if [ -f "$DISPATCHER_ENV_FILE" ]; then
+    [ -z "$url" ] && url="$(grep -E '^CLUSTER_HEAD_URL=' "$DISPATCHER_ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]"'"'"'')"
+    [ -z "$secret" ] && secret="$(grep -E '^CLUSTER_SHARED_SECRET=' "$DISPATCHER_ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '[:space:]"'"'"'')"
+  fi
+  [ -z "$url" ] || [ -z "$secret" ] && return 1
+  local payload resp http body result
+  payload="$(TG_P_EMAIL="$EMAIL" TG_P_IDS="$IDS" TG_P_TEXT="$TEXT" TG_P_DRY="$DRY" python3 -c '
+import json, os
+d = {"text": os.environ["TG_P_TEXT"]}
+if os.environ["TG_P_EMAIL"]: d["email"] = os.environ["TG_P_EMAIL"]
+else: d["notionUserIds"] = os.environ["TG_P_IDS"]
+if os.environ["TG_P_DRY"] == "1": d["dryRun"] = True
+print(json.dumps(d))
+')" || return 1
+  # secret 經 --config - 從 stdin 餵給 curl，不出現在 argv（ps 看不到）。
+  # --max-time 35 要大於 head 端 execFile 的 30 秒，避免 worker 先放棄、
+  # head 其實送出了，造成同一則通知又被轉維運者而重複。
+  resp="$(printf 'header = "x-cluster-token: %s"\n' "$secret" | curl -s --max-time 35 -w $'\n%{http_code}' -X POST "${url%/}/cluster/notify" \
+    --config - -H 'content-type: application/json' --data "$payload")" || return 1
+  http="${resp##*$'\n'}"; body="${resp%$'\n'*}"
+  [ "$http" = "200" ] || return 1
+  result="$(printf '%s' "$body" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("result",""))' 2>/dev/null)" || return 1
+  [ -n "$result" ] || return 1
+  echo "$result"
+  return 0
+}
+
+# 2026-10-07：收件人 chat_id「解析失敗」（≠ 真的沒綁）時，原本全被印成
+# TG_SKIP_NO_CHATID 且 stderr 被吞，通知就此無聲消失。典型情境：worker 沒有
+# MON_FIELD_KEY_V1（金鑰只放 head），--resolve-chat-id 解不開密文
+# （RESOLVE_ERR_DECRYPT_FAILED）。改為：基礎設施類失敗另用 TG_FAIL_RESOLVE 標示，
+# 並把原文連同原因轉給維運者（TG_ESCALATION_CHAT_ID，預設同 health-monitor.ts
+# 的維運對象）。真正沒綁（RESOLVE_ERR_NO_CHATID）維持 TG_SKIP_NO_CHATID 不轉發。
+# 只走 --chat-id 直送，不會再進名冊查詢，不可能遞迴。
+escalate_to_operator() {
+  local who="$1" reason="$2" esc_chat esc_text esc_out
+  esc_chat="${TG_ESCALATION_CHAT_ID:-5022865804}"
+  esc_text="⚠️ [通知未送達本人] 收件人 ${who}：${reason}
+以下為原訊息：
+${TEXT:-（僅附件，未轉發檔案：${FILE}）}"
+  esc_text="${esc_text:0:3500}"
+  local args=(--chat-id "$esc_chat" --text "$esc_text")
+  [ "$DRY" = "1" ] && args+=(--dry-run)
+  esc_out="$(bash "${BASH_SOURCE[0]}" "${args[@]}")"
+  echo "TG_FAIL_RESOLVE: ${who} (${reason}); escalated: ${esc_out}"
+}
+
 MATCH_EMAIL=""; MATCH_CHAT=""
 if [ -n "$CHAT_DIRECT" ]; then
   # 直送模式：繞過名冊，供使用者獨立測試真實送出
   MATCH_EMAIL="(direct)"; MATCH_CHAT="$CHAT_DIRECT"
 else
   ROSTER="$(list_roster_via_registry)"
-  [ -z "$ROSTER" ] && { echo "TG_FAIL: roster unavailable (tech-users-sync.ts --list-roster)"; exit 0; }
+  [ -z "$ROSTER" ] && { relay_via_head && exit 0; escalate_to_operator "${EMAIL:-$IDS}" "名冊取不到（tech-users-sync.ts --list-roster 失敗，多為監控 DB 連線/權限問題）"; exit 0; }
   # header-aware 欄位索引（去除可能的 CR）
   header="$(printf '%s\n' "$ROSTER" | head -n1 | tr -d '\r')"
   IFS=',' read -r -a COLS <<< "$header"
@@ -95,7 +154,8 @@ else
   RESOLVE_OUT="$(resolve_chat_id_via_registry "$MATCH_EMAIL")"
   case "$RESOLVE_OUT" in
     RESOLVE_OK:*) MATCH_CHAT="${RESOLVE_OUT#RESOLVE_OK: }" ;;
-    *) echo "TG_SKIP_NO_CHATID: $MATCH_EMAIL"; exit 0 ;;
+    RESOLVE_ERR_NO_CHATID:*) echo "TG_SKIP_NO_CHATID: $MATCH_EMAIL"; exit 0 ;;
+    *) relay_via_head && exit 0; escalate_to_operator "$MATCH_EMAIL" "chat_id 解析失敗：${RESOLVE_OUT:-（registry CLI 無輸出）}（非未綁定；worker 缺 MON_FIELD_KEY_V1 或 DB 異常）"; exit 0 ;;
   esac
   MATCH_CHAT="$(printf '%s' "$MATCH_CHAT" | tr -d '[:space:]')"
   [ -z "$MATCH_CHAT" ] && { echo "TG_SKIP_NO_CHATID: $MATCH_EMAIL"; exit 0; }
