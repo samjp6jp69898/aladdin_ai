@@ -32,6 +32,7 @@
 
 import { readFileSync } from 'fs';
 import { spawnSync } from 'child_process';
+import { overwriteSheet } from './sheets-sync';
 
 const DATA_SOURCE_ID = '21c87d78-618a-817f-ae71-000baa9ab11b';
 const NOTION_API = 'https://api.notion.com/v1';
@@ -329,6 +330,19 @@ for (const brand of BRANDS) {
     console.error(`[${brand}] ${summary}`);
     console.error(`已寫入: ${path}`);
     console.log(csv);
+
+    // Google Sheet：工作表名稱 = 品牌名；--no-push（除錯）時不動正式試算表
+    if (shouldPush) {
+        try {
+            await overwriteSheet(brand, csv);
+            console.error(`[${brand}] 已覆蓋 Google Sheet 工作表「${brand}」`);
+        } catch (e) {
+            hadFailure = true;
+            const message = e instanceof Error ? e.message : String(e);
+            console.error(`[${brand}] Google Sheet 更新失敗: ${message}`);
+            if (tgToken) await tgNotifyFail(tgToken, `[${brand}] Google Sheet：${message}`);
+        }
+    }
 
     if (tgToken) {
         try {

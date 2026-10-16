@@ -31,6 +31,7 @@ bun /Users/user/aladdin/aladdin_ai/skills/notion-bug-assignee-report/bug-assigne
 
 本機 launchd 排程（`com.aladdin.bug-report`，週一至週五 08:00 觸發）跑的是 `zsh /Users/user/aladdin/telegram-dispatcher/cron/bug-report-run.sh`，經 `cron/bug-report-send.ts` → `lib/webhook-server/run-bug-assignee-report.ts` 以 `execFileSync` 呼叫上面這支 `.ts`（不帶 `--no-push`）。**注意：這代表會推播兩次**——本腳本內建推給 Landon（固定 chat_id，見上）一次，`bug-report-send.ts` 另外再推給 `TG_BUG_REPORT_ADMIN_CHAT_ID` 一次，兩邊互不知情、不是同一份邏輯去重（2026-09-01 排查時發現，尚未收斂成單一推送路徑）。
 
+- **Google Sheet 同步（2026-10-16 起）**：未加 `--no-push` 時，三份 CSV 會依品牌名（`FF` / `巨星` / `未分類`）整份覆蓋試算表 `1QOa-9cXGbCbQ97XqOtHR0NerBgnfiX_KHvQxYJ0ZCOI` 的同名工作表（先 clear 再寫）。實作在 `sheets-sync.ts`，憑證為 `aladdin_ai/service-account.json`（已 gitignore、600）；試算表須把該 service account 的 `client_email` 加為編輯者，工作表名稱不可改。失敗會發 `⚠️` 通知並以非 0 結束，但不阻斷 Telegram 推送。
 - 進度訊息（技術名單載入人數、等級欄、各等級張數、總計、寫入路徑、推送結果）印到 **stderr**，不汙染 CSV stdout。
 - 輸出用 `Bun.write`，`--out` 父目錄不存在會**自動建立**，不需先 mkdir。
 

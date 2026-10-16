@@ -13,3 +13,6 @@ __pycache__/
 .env.prod
 skills/*/.env
 skills/*/*/.env
+
+# Google service account 金鑰，絕不可進 git
+service-account.json
