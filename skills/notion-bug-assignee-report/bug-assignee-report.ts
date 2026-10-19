@@ -203,6 +203,8 @@ type Cat = '技術人員' | '非技術人員' | '未指派';
 interface Stat { name: string; cat: Cat; bySev: Map<string, number>; total: number }
 
 const SEV_EMPTY = '（未分級）';
+// 固定基準等級欄：即使本次該等級 0 張也保留欄位（以 0 填滿），避免 CSV / Google Sheet 欄位隨資料增減
+const BASELINE_SEVS = ['P1重點', 'P2較高', 'P3一般', 'P4較低'];
 
 // ── 依品牌分桶 ──
 const pagesByBrand: Record<Brand, any[]> = { 'FF': [], '巨星': [], '未分類': [] };
@@ -218,7 +220,7 @@ for (const page of pages) {
 // ── 單一品牌分桶內：組出一人一列、跨等級分布的 pivot CSV ──
 function buildCsv(brandPages: any[]): { csv: string; summary: string } {
     const byKey = new Map<string, Stat>();
-    const sevSet = new Set<string>();
+    const sevSet = new Set<string>(BASELINE_SEVS);
     const ensure = (key: string, name: string, cat: Cat) => {
         if (!byKey.has(key)) byKey.set(key, { name, cat, bySev: new Map(), total: 0 });
         return byKey.get(key)!;
