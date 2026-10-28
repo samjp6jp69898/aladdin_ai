@@ -3,16 +3,19 @@
 // look up the menu.<name> Chinese label from each project's localizations/zh-TW.json.
 //
 // Usage:
-//   node parse-abu-menu.js [output.json]
+//   node parse-abu-menu.js [output.json] [abu-root]
 //   default output: /tmp/changelog/menu-tree.json
+//   default abu-root: /Users/user/aladdin/abu（TG tag 模式改傳 resolve-tag-ranges.ts --menu-src 抽出的目錄）
 //
-// Inputs (hardcoded — abu is at fixed location):
-//   /Users/user/aladdin/abu/platform/src/menu.ts
-//   /Users/user/aladdin/abu/admin/src/menu.ts
-//   /Users/user/aladdin/abu/<app>/localizations/zh-TW.json
+// Inputs (relative to abu-root):
+//   platform/src/menu.ts
+//   admin/src/menu.ts
+//   <app>/localizations/zh-TW.json
 
 const fs = require('fs');
 const path = require('path');
+
+const ABU_ROOT = process.argv[3] || '/Users/user/aladdin/abu';
 
 function parseMenuFile(menuPath) {
   let src = fs.readFileSync(menuPath, 'utf8');
@@ -62,12 +65,12 @@ function parseMenuFile(menuPath) {
   return new Function(body)();
 }
 
-const platformTree = parseMenuFile('/Users/user/aladdin/abu/platform/src/menu.ts');
-const adminTree    = parseMenuFile('/Users/user/aladdin/abu/admin/src/menu.ts');
+const platformTree = parseMenuFile(`${ABU_ROOT}/platform/src/menu.ts`);
+const adminTree    = parseMenuFile(`${ABU_ROOT}/admin/src/menu.ts`);
 
 // Load localizations once
 function loadZh(project) {
-  const file = `/Users/user/aladdin/abu/${project}/localizations/zh-TW.json`;
+  const file = `${ABU_ROOT}/${project}/localizations/zh-TW.json`;
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 

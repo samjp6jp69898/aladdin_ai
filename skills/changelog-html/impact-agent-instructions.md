@@ -79,6 +79,8 @@ cd /Users/user/aladdin/<REPO>
 git log --no-merges --format='%h %s' origin/<BASE>..origin/<BRANCH>
 ```
 
+> **TG tag 模式**（見 SKILL.md「TG tag 模式」）：BASE 是 tag 而非分支，且有子專案路徑限制。改用 `git log --no-merges --format='%h %s' <TAG>..origin/<BRANCH> -- <PATHS>`（tag 不加 `origin/`；PATHS 取 ranges.json 該組的 `paths`，空陣列代表整個 repo）。同一 repo 有多組 range（如 abu platform + admin）時，每組各跑一次再合併。分析該組前先 `export ALADDIN_ROOT_AT_DATE=<該組 srcRoot>`，步驟 1 的 `cd` 與讀檔都改到 `<srcRoot>/<REPO>`（不要用 `/Users/user/aladdin/<REPO>` 的工作目錄）。
+
 把這份結果存著當索引；後面對每條 change 都會用 title/subs 關鍵字回查。
 
 ### 步驟 3 — 對每條 change 處理

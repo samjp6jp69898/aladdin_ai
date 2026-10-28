@@ -31,6 +31,37 @@ description: 從多個 feature branch 提取變更，按 abu/lago 真實菜單�
 > **v1 流程**（沒有影響範圍分析）只需階段 1–4 + 7，跳過 5、6。
 > **v2 流程**（含影響範圍）執行全部 7 階段。
 > **v3 流程**（v2 + 前端 app 多選 chip filter）執行全部 7 階段，且階段 2 / 4 額外處理 `apps` 欄位；HTML 頂部多 5 個 chip（platform / admin / n8 / ny / pk），所有 leaves / changes / pill / lago tag 都依當下勾選的 apps 動態過濾。本 skill **預設走 v3**，因為「影響哪個前端」與「影響範圍」都是非技術讀者最關心的資訊。
+> **TG tag 模式**（Telegram `/changelog` 觸發，背景 `claude -p` 無人值守）：見下一節，與上述互動流程的差異以該節為準。
+
+---
+
+## TG tag 模式（`/changelog` 觸發；非增量、非互動、不上傳 Notion）
+
+由 telegram-dispatcher 的 `/changelog <repo> <branch> <tag> ...`（`lib/webhook-server/changelog-command.ts`）觸發。dispatcher 已先跑過 `resolve-tag-ranges.ts`（確定性腳本：檢查 tag 在指定分支上、依 tag 前綴決定子專案路徑、算出 commit 清單），並把結果放進 `RUN_DIR`。prompt 會給 `RUN_DIR` 與 `OUTPUT_HTML` 兩個參數。
+
+**輸入（已備妥，不要重算）**
+- `RUN_DIR/ranges.json`：`{ ok, ranges: [{ repo, branch, tag, project, sub, paths, tagSha, headSha, commits: [{sha, author, date, subject}] }], repos: { <repo>: { commits: [{sha, author, date, subject, ranges: [<ranges 索引>]}] } }, srcRoots }`。一次指令常同時帶多個 repo 與多個子專案（如 agrabah、rajah、abu admin、abu platform、lago pk、lago ny），同 repo 的多組範圍會重疊（lago 各子專案共用 `common/`、rajah 多組 tag），**以 `repos.<repo>.commits` 為準（已去重）**，不要逐組累加 `ranges[].commits`。每組 range 的變更範圍是 `git log --no-merges <tag>..origin/<branch> -- <paths>`（`paths` 為空代表整個 repo；abu/lago 為 `<sub>/` + `common/`；rajah 一律整個 repo）。
+- `RUN_DIR/menu-src/`：依各 abu app 所在分支抽出的 `menu.ts` + `zh-TW.json`。
+- 每組 range 的 `srcRoot`（`ranges.json` 另有 `srcRoots: { branch: path }`）：該分支從 origin 建好的唯讀 detached worktree 集合（`<srcRoot>/{agrabah,rajah,abu,lago}`）。**一律查 origin，不得讀或切換 `/Users/user/aladdin/<repo>` 的工作目錄**（本機 checkout 可能在任何分支）。分析某組 range 時：
+  - 跑 call-graph-scanner / rajah-lookup / i18n-lookup / db-lookup 前先 `export ALADDIN_ROOT_AT_DATE=<該組 srcRoot>`（同一 shell 內），腳本會改讀該 worktree。
+  - 直接讀檔從 `<srcRoot>/<repo>/...` 讀；`git log` / `git show` / `git grep` 在 `/Users/user/aladdin/<repo>` 下對 `origin/<branch>`、tag 操作即可（只讀 refs，不碰工作目錄）。
+  - 同一 repo 多組範圍在不同分支（如 abu platform 在 dev、admin 在 main）時，各組用各自的 srcRoot。
+  - worktree 由 dispatcher 在結束後清除，不要自行刪除或修改裡面的檔案。
+
+**與互動流程的差異（硬規則）**
+1. **無人值守**：禁止 `AskUserQuestion`；有疑義依本 skill 既有預設（v3、保守全選 apps）自行決定，並記在 `RUN_DIR/notes.md`。
+2. **非增量**：每次從零產生，**不讀也不寫** `obsidian/Projects/changelog/data/`，跳過「JSON-first 增量更新」整節與「菜單改名校驗」。
+3. **路徑**：所有中間檔放 `RUN_DIR`（取代文中的 `/tmp/changelog`；`/tmp/changelog/v2` 改成 `RUN_DIR/v2`），不得寫到 `/tmp/changelog`（避免與其他執行互相覆蓋）。
+4. **單一版本**：`versions` 只有一個物件，`id: "rel"`、`cls: "vrel"`、`short` = 今天的 `MMDD`（template 用它推導標題月份）、`full` = `<各 tag> 之後至各分支最新`（例：`agrabah_1.10.249 → main、abu_platform_1.10.111 → hotfix/20261020`）、`color/bg/fg` 用 `#6366f1`/`#eef2ff`/`#4338ca`。所有 change 的 `ver` 都是 `"rel"`。
+5. **階段 1 跳過**：範圍以 `ranges.json` 為準。
+6. **階段 2**：每個 repo 一個 agent（同 repo 多組 range 交給同一個 agent），只看 `repos.<repo>.commits`（已去重）；輸出 `RUN_DIR/<repo>.md`。apps 標記取該 commit `ranges` 所指各組 `sub` 對應 app 的聯集（例：lago `common/` 的 commit 同時屬於 pk、ny 兩組 → `[app: pk, ny]`）。各組 `sub` 對應：abu `platform`/`admin` → 對應 app（`common/` 的改動也歸該 range 的 app）；lago `n8-gaming`/`ny-gaming`/`pk-gaming` → `n8`/`ny`/`pk`；lago 其他子專案（`agent-backend`、`landing-page`、`jump-page`、`promo-page`）用 `_lago.<sub>` leaf、apps 保守全選。
+7. **階段 3**：`node /Users/user/aladdin/aladdin_ai/skills/changelog-html/parse-abu-menu.js RUN_DIR/menu-tree.json RUN_DIR/menu-src`（第二個參數必帶，菜單要跟 tag 所在分支一致，不是本機 abu 工作目錄）。
+8. **階段 4**：同原規則，輸出 `RUN_DIR/changes.json`；commit 可追溯性（`commits` 欄位）與 FAQ → Notion 連結照做，覆蓋率審計寫到 `RUN_DIR/commit-audit.md`。
+9. **階段 5**：每個「有 range 的 repo」派一個 worker（不是 4×N），參數 `VER=rel`、`BRANCH`/`BASE` 改給該 repo 的 ranges（BASE 是 tag，見 `impact-agent-instructions.md` 步驟 2 的 TG tag 模式說明）。`merge-impact.js` 需要 4 個 repo 檔案都存在：沒在 ranges 裡的 repo，manager 直接寫 `RUN_DIR/v2/impact-<repo>-rel.json` = `{"results":[]}`。
+10. **階段 6**：同原規則，`WORKDIR=RUN_DIR/v2`。
+11. **階段 7**：`node build-html.js RUN_DIR/menu-tree.json RUN_DIR/v2/changes-business.json OUTPUT_HTML`。
+12. **階段 8 跳過**：不上傳 Notion（HTML 由 dispatcher 用 Telegram 回傳）。
+13. **收尾**：成功時最後一行輸出 `CHANGELOG_HTML=<OUTPUT_HTML>`；無法完成時把原因寫進 `RUN_DIR/FAILED.md` 並輸出 `CHANGELOG_FAILED`。dispatcher 以 `OUTPUT_HTML` 是否存在判定成敗。
 
 ---
 
@@ -549,14 +580,15 @@ v5 階段統計（**新增階段 8 Notion 上傳**：7/14 版，沿用 7/10 版 
 - **apps 欄位向後相容**：build-html.js 不驗證 apps（缺值時 template 視為全 5）。v3 流程的 mapper 必須在輸出前自行跑 apps validation（見階段 4）
 - **影響範圍嚴禁編造**：worker 只能引用 method-call-graph / grep 輸出真實看到的 caller；rewriter 只能引用 i18n-lookup / 辭典查到的業務名
 - **避免 worker stall**：若 method-call-graph 某 method 有 100+ caller，或 grep 某 super-shared 元件有 300+ importer（如 abu DataTable），worker 必須直接寫總結句「影響後台 N+ 頁」，不要逐一列舉。stage 5 派工時務必在 prompt 內提醒 time-cap（每條 ≤ 30 秒、call-graph ≤ 1 次）
-- **階段 8（Notion 上傳）不可省略**：組裝完 HTML 後一定要接著上傳到 Notion「更新報告」database（見階段 8），不是使用者額外要求才做的步驟；Notion token 一律走 `notion.sh`，禁止手寫含 token 的 curl
+- **階段 8（Notion 上傳）不可省略**：組裝完 HTML 後一定要接著上傳到 Notion「更新報告」database（見階段 8），不是使用者額外要求才做的步驟；Notion token 一律走 `notion.sh`，禁止手寫含 token 的 curl。**唯一例外**：TG tag 模式不上傳（見該節）
 
 ## 檔案清單
 
 ```
 changelog-html/
 ├── SKILL.md                       # 本檔
-├── parse-abu-menu.js              # abu menu.ts → menu-tree.json
+├── resolve-tag-ranges.ts          # TG tag 模式：<repo> <branch> <tag> 驗證 + 範圍/commit 計算 + 抽 abu menu 來源
+├── parse-abu-menu.js              # abu menu.ts → menu-tree.json（第二參數可指定 abu 來源目錄）
 ├── build-html.js                  # menu-tree + changes → HTML（schema 註解已含 apps 欄位）
 ├── template.html                  # HTML template（含 impact 摺疊區塊 + v3 5 app chip filter）
 ├── merge-impact.js                # v2 階段 5.3：12 worker 輸出 → changes-with-impact.json
